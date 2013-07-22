@@ -19,15 +19,15 @@
 	"repositories": [
 		{
 			"type":"vcs",
-			"url":"https://github.com/seleneapp/common.git"
+			"url":"git://github.com/seleneapp/common.git"
 		},
 		{
 			"type":"vcs",
-			"url":"https://github.com/seleneapp/testsuite.git"
+			"url":"git://github.com/seleneapp/testsuite.git"
 		},
 		{
 			"type":"vcs",
-			"url":"https://github.com/seleneapp/dependency-injection.git"
+			"url":"git://github.com/seleneapp/dependency-injection.git"
 		}
 	],
 	"autoload": {
