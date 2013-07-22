@@ -8,7 +8,6 @@
             "email": "mail@thomas-appel.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
 		"selene/common":"dev-development"
     },
@@ -24,5 +23,10 @@
 			"type":"vcs",
 			"url":"https://github.com/seleneapp/testsuite.git"
 		}
-	]
+	],
+	"autoload": {
+		"psr-0": {"Selene\\Components\\Events\\": ""}
+	},
+	"target-dir": "Selene/Components/Events",
+    "minimum-stability": "dev"
 }
