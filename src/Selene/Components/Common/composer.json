@@ -1,0 +1,22 @@
+{
+    "name": "selene/common",
+    "description": "Selene common components",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thomas Appel",
+            "email": "mail@thomas-appel.com"
+        }
+    ],
+	"require": {
+		"php":">=5.4.*"
+	},
+    "require-dev": {
+		"selene/testsuite":"dev-development"
+    },
+	"autoload": {
+		"psr-0": {"Selene\\Components\\Common\\": ""}
+	},
+	"target-dir": "Selene/Components/Common",
+    "minimum-stability": "dev"
+}
