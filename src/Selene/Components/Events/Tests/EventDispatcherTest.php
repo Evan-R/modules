@@ -278,7 +278,7 @@ class EventDispatcherTest extends TestCase
             return true;
         });
 
-        $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface, ArrayAccess');
+        $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
         $container->shouldReceive('offsetGet')->with('HandleAwareClass')->andReturn($class);
 
         $dispatcher = new Dispatcher($container);
