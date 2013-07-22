@@ -1,0 +1,28 @@
+{
+    "name": "selene/events",
+    "description": "Selene event component",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thomas Appel",
+            "email": "mail@thomas-appel.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+		"selene/common":"dev-development"
+    },
+    "require-dev": {
+		"selene/testsuite":"dev-development"
+    },
+	"repositories": [
+		{
+			"type":"vcs",
+			"url":"https://github.com/seleneapp/common.git"
+		},
+		{
+			"type":"vcs",
+			"url":"https://github.com/seleneapp/testsuite.git"
+		}
+	]
+}

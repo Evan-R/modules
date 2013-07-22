@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+    backupStaticAttributes="true"
+    bootstrap="vendor/autoload.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    processIsolation="false"
+    stopOnFailure="false"
+    syntaxCheck="true">
+  <testsuites>
+    <testsuite name="Common">
+      <directory>src/Selene/Components/Common/Tests/</directory>
+    </testsuite>
+    <testsuite name="Events">
+      <directory>src/Selene/Components/Events/Tests/</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
