@@ -234,13 +234,16 @@ class Dispatcher implements DispatcherInterface
 
         $results = [];
         $this->sort($event);
-        $canBeStopped = $parameters instanceof EventInterface;
+
+        if ($isEvent = $parameters instanceof EventInterface) {
+            $parameters->setName($event);
+        }
 
         foreach ($this->handlers[$event] as $i => $handler) {
 
             extract($handler);
 
-            if ($canBeStopped and $parameters->isPropagationStopped()) {
+            if ($isEvent and $parameters->isPropagationStopped()) {
                 break;
             }
 

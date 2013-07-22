@@ -278,7 +278,7 @@ class EventDispatcherTest extends TestCase
             return true;
         });
 
-        $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
+        $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface, ArrayAccess');
         $container->shouldReceive('offsetGet')->with('HandleAwareClass')->andReturn($class);
 
         $dispatcher = new Dispatcher($container);
@@ -339,6 +339,8 @@ class EventStub implements EventInterface
 {
     protected $stopped = false;
 
+    protected $name = false;
+
     public function stopPropagation()
     {
         $this->stopped = true;
@@ -347,6 +349,16 @@ class EventStub implements EventInterface
     public function isPropagationStopped()
     {
         return $this->stopped;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 }
 

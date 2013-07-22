@@ -33,4 +33,25 @@ interface EventInterface
      * @return boolean
      */
     public function isPropagationStopped();
+
+    /**
+     * getName
+     *
+     * @param mixed $name
+     *
+     * @access public
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * setName
+     *
+     * @param string $name
+     *
+     * @access public
+     * @return void
+     */
+    public function setName($name);
+
 }
