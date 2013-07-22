@@ -13,7 +13,8 @@
 		"phpunit":">=3.7.0"
     },
     "require-dev": {
-		"selene/testsuite":"dev-development"
+        "mockery/mockery": "dev-master",
+        "mikey179/vfsStream": "dev-master"
     },
 	"autoload": {
 		"psr-0": {"Selene\\Components\\TestSuite\\": ""}
