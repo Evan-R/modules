@@ -69,4 +69,22 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
         return $call->invokeArgs($object, $arguments);
     }
+
+    /**
+     * isWindows
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function isWindows()
+    {
+        return defined('PHP_WINDOWS_VERSION_MAJOR');
+    }
+
+    protected function markSkippedIfWindows()
+    {
+        if ($this->isWindows()) {
+            $this->markTestSkipped();
+        }
+    }
 }
