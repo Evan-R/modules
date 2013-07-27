@@ -1,32 +1,32 @@
 {
-    "name": "selene/framework",
-    "description": "Selene php framework",
-    "require": {
-        "php": ">=5.4.0",
-        "symfony/console": "~2.2",
-        "propel/propel": "2.0.*",
-        "monolog/monolog":"dev-master",
-        "psr/log": "~1.0"
+  "name": "selene/framework",
+  "description": "Selene php framework",
+  "require": {
+    "php": ">=5.4.0",
+    "symfony/console": "~2.2",
+    "propel/propel": "2.0.*",
+    "monolog/monolog":"dev-master",
+    "psr/log": "~1.0"
+  },
+  "require-dev": {
+    "mockery/mockery": "dev-master",
+    "mikey179/vfsStream": "dev-master",
+    "symfony/browser-kit": "dev-master"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+    "name": "Thomas Appel",
+    "email": "mail@thomas-appel.com"
+  }
+  ],
+  "autoload": {
+    "psr-0": {
+      "Selene":"src/"
     },
-    "require-dev": {
-        "mockery/mockery": "dev-master",
-        "mikey179/vfsStream": "dev-master",
-        "symfony/browser-kit": "dev-master"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Thomas Appel",
-            "email": "mail@thomas-appel.com"
-        }
-    ],
-    "autoload": {
-        "psr-0": {
-            "Selene":"src/"
-        },
-        "files": [
-            "src/Selene/Components/Common/Helper/functions.php"
-        ]
-    },
-    "minimum-stability": "dev"
+    "files": [
+      "src/Selene/Components/Common/Helper/functions.php"
+    ]
+  },
+  "minimum-stability": "dev"
 }

@@ -58,6 +58,10 @@ if (!function_exists('array_set')) {
             $array[$key] = [];
         }
 
+        if (!is_array($array[$key])) {
+            return $array;
+        }
+
         return array_set(implode($separator, $keys), $value, $array[$key], $separator);
     }
 }
@@ -499,7 +503,7 @@ if (!function_exists('get_require')) {
      * get_require
      *
      * @param mixed $file
-     * @access 
+     * @access
      * @return mixed
      */
     function get_require($file)
