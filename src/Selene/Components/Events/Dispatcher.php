@@ -11,7 +11,6 @@
 
 namespace Selene\Components\Events;
 
-use Closure;
 use Selene\Components\DependencyInjection\ContainerInterface;
 
 /**
@@ -86,9 +85,9 @@ class Dispatcher implements DispatcherInterface
     /**
      * Attach an eventhandler
      *
-     * @param string $event         the event name
-     * @param mixed  $eventHandler  a callable or string `class@method`
-     * @param int    $priority      the priority with the handler being called
+     * @param string $event        the event name
+     * @param mixed  $eventHandler a callable or string `class@method`
+     * @param int    $priority     the priority with the handler being called
      * (handlers with higher values will be called first)
      *
      * @access public
@@ -96,7 +95,8 @@ class Dispatcher implements DispatcherInterface
      */
     public function on($event, $eventHandler, $priority = 10)
     {
-        $class = null; $method = null;
+        $class = null;
+        $method = null;
         if (!is_callable($eventHandler)) {
             extract($this->getEventHandlerFromClassString($event, $eventHandler));
         }
@@ -108,24 +108,24 @@ class Dispatcher implements DispatcherInterface
      *
      * Unbinds the eventhandler once the event was fired;
      *
-     * @param string $event         the event name
-     * @param mixed  $eventHandler  a callable or string `class@method`
-     * @param int $priority         the priority with the handler being called
+     * @param string $event        the event name
+     * @param mixed  $eventHandler a callable or string `class@method`
+     * @param int    $priority     the priority with the handler being called
      *
      * @access public
      * @return void
      */
     public function once($event, $eventHandler, $priority = 10)
     {
-        $class = null; $method = null;
+        $class = null;
+        $method = null;
         if (!is_callable($eventHandler)) {
             extract($this->getEventHandlerFromClassString($event, $eventHandler));
         }
 
         $handler = $eventHandler;
 
-        $eventHandler = function () use ($event, &$handler, &$eventHandler)
-        {
+        $eventHandler = function () use ($event, &$handler, &$eventHandler) {
             $dispatched = call_user_func_array($handler, func_get_args());
             $this->off($event, $eventHandler);
         };
@@ -136,8 +136,8 @@ class Dispatcher implements DispatcherInterface
     /**
      * Detach an eventhandler from an event
      *
-     * @param string $event         the event name
-     * @param mixed  $eventHanlder  the eventhandler
+     * @param string $event        the event name
+     * @param mixed  $eventHanlder the eventhandler
      *
      * @access public
      * @return void
@@ -204,6 +204,7 @@ class Dispatcher implements DispatcherInterface
             foreach ($eventSubscriptions as $subscription) {
                 $this->listSubscriptions($subscriber, $event, $subscription, $list);
             }
+
             return $list;
         }
 
@@ -218,10 +219,10 @@ class Dispatcher implements DispatcherInterface
     /**
      * Dispatches an event.
      *
-     * @param string $event             the event name
-     * @param mixed  $parameters        data to be send along with the event,
+     * @param string $event      the event name
+     * @param mixed  $parameters data to be send along with the event,
      * typically an EventInteface instance
-     * @param bool   $stopOnFirstResult stop fireing if first result was found
+     * @param bool $stopOnFirstResult stop fireing if first result was found
      *
      * @access public
      * @return array the event results;
@@ -256,6 +257,7 @@ class Dispatcher implements DispatcherInterface
                 break;
             }
         }
+
         return $results;
     }
 
@@ -289,11 +291,13 @@ class Dispatcher implements DispatcherInterface
                 $stack = ['stack' => &$handlers] + array_pluck('eventHandler', $handler);
                 call_user_func_array('array_push', $stack);
             }
+
             return $handlers;
         }
 
         if (isset($this->handlers[$event])) {
             $this->sort($event);
+
             return array_pluck('eventHandler', $this->handlers[$event]);
         }
 
@@ -303,9 +307,9 @@ class Dispatcher implements DispatcherInterface
     /**
      * Bind the Eventhandler to the dispatcher
      *
-     * @param string $event       the event name
-     * @param mixed $eventHandler a callable
-     * @param int $priority       event fire priority
+     * @param string $event        the event name
+     * @param mixed  $eventHandler a callable
+     * @param int    $priority     event fire priority
      *
      * @access protected
      * @return void
@@ -336,10 +340,11 @@ class Dispatcher implements DispatcherInterface
             return;
         }
 
-        usort($this->handlers[$event], function ($a, $b)
-        {
+        $comparator = function ($a, $b) {
             return $a['priority'] > $b['priority'] ? -1 : 1;
-        });
+        };
+
+        usort($this->handlers[$event], $comparator);
 
         $this->sorted[$event] = true;
     }
@@ -347,8 +352,8 @@ class Dispatcher implements DispatcherInterface
     /**
      * Finds a matching handler an unsets the handler for the given event.
      *
-     * @param string $event         the event name
-     * @param mixed $eventHandler   the event handler
+     * @param string $event        the event name
+     * @param mixed  $eventHandler the event handler
      *
      * @access protected
      * @return boolean always returns true
@@ -357,7 +362,8 @@ class Dispatcher implements DispatcherInterface
     {
         if ($isClass = is_string($eventHandler)) {
             $classHandler = implode(
-                static::EVTHANDLER_SEPARATOR, $this->extractClass($eventHandler)
+                static::EVTHANDLER_SEPARATOR,
+                $this->extractClass($eventHandler)
             );
         }
 
@@ -369,6 +375,7 @@ class Dispatcher implements DispatcherInterface
                 unset($this->handlers[$event][$index]);
             }
         }
+
         return true;
     }
 
@@ -391,8 +398,7 @@ class Dispatcher implements DispatcherInterface
                 );
             }
 
-            $eventHandler = function () use ($class, $method)
-            {
+            $eventHandler = function () use ($class, $method) {
                 return call_user_func_array([$this->container[$class], $method], func_get_args());
             };
 

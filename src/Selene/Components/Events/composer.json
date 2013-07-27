@@ -1,38 +1,38 @@
 {
-    "name": "selene/events",
-    "description": "Selene event component",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Thomas Appel",
-            "email": "mail@thomas-appel.com"
-        }
-    ],
-    "require": {
-		"php":">=5.4.0",
-		"selene/common":"dev-development"
+  "name": "selene/events",
+  "description": "Selene event component",
+  "license": "MIT",
+  "authors": [
+    {
+    "name": "Thomas Appel",
+    "email": "mail@thomas-appel.com"
+  }
+  ],
+  "require": {
+    "php":">=5.4.0",
+    "selene/common":"dev-development"
+  },
+  "require-dev": {
+    "selene/testsuite":"dev-development",
+    "selene/dependency-injection":"dev-development"
+  },
+  "repositories": [
+    {
+    "type":"vcs",
+    "url":"git://github.com/seleneapp/common.git"
+  },
+    {
+      "type":"vcs",
+      "url":"git://github.com/seleneapp/testsuite.git"
     },
-    "require-dev": {
-		"selene/testsuite":"dev-development",
-		"selene/dependency-injection":"dev-development"
-    },
-	"repositories": [
-		{
-			"type":"vcs",
-			"url":"git://github.com/seleneapp/common.git"
-		},
-		{
-			"type":"vcs",
-			"url":"git://github.com/seleneapp/testsuite.git"
-		},
-		{
-			"type":"vcs",
-			"url":"git://github.com/seleneapp/dependency-injection.git"
-		}
-	],
-	"autoload": {
-		"psr-0": {"Selene\\Components\\Events\\": ""}
-	},
-	"target-dir": "Selene/Components/Events",
-    "minimum-stability": "dev"
+      {
+        "type":"vcs",
+        "url":"git://github.com/seleneapp/dependency-injection.git"
+      }
+  ],
+  "autoload": {
+    "psr-0": {"Selene\\Components\\Events\\": ""}
+  },
+  "target-dir": "Selene/Components/Events",
+  "minimum-stability": "dev"
 }
