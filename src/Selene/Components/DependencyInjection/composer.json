@@ -1,23 +1,23 @@
 {
-    "name": "selene/dependency-injection",
-    "description": "Selene di component",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Thomas Appel",
-            "email": "mail@thomas-appel.com"
-        }
-    ],
-    "require": {
-		"php":">=5.4.0",
-		"selene/common":"dev-development"
-    },
-    "require-dev": {
-		"selene/testsuite":"dev-development"
-    },
-	"autoload": {
-		"psr-0": {"Selene\\Components\\DependencyInjection\\": ""}
-	},
-	"target-dir": "Selene/Components/DependencyInjection",
-    "minimum-stability": "dev"
+  "name": "selene/dependency-injection",
+  "description": "Selene di component",
+  "license": "MIT",
+  "authors": [
+    {
+    "name": "Thomas Appel",
+    "email": "mail@thomas-appel.com"
+  }
+  ],
+  "require": {
+    "php":">=5.4.0",
+    "selene/common":"dev-development"
+  },
+  "require-dev": {
+    "selene/testsuite":"dev-development"
+  },
+  "autoload": {
+    "psr-0": {"Selene\\Components\\DependencyInjection\\": ""}
+  },
+  "target-dir": "Selene/Components/DependencyInjection",
+  "minimum-stability": "dev"
 }
