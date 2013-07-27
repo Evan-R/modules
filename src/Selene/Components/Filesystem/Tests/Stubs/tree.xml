@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<directories>
+  <directory name="source_tree" permission="0755">
+    <files>
+      <file name="bar.txt" permission="0644">some text</file>
+      <file name="bar.jpg" permission="0644"/>
+      <file name="bar.png" permission="0644"/>
+    </files>
+    <directories>
+      <directory name="nested_node" permission="0755"/>
+      <directory name="boom" permission="0755">
+        <files>
+          <file name="bar.txt" permission="0644">some text</file>
+          <file name="bar.jpg" permission="0644"/>
+          <file name="bar.png" permission="0644"/>
+        </files>
+      </directory>
+    </directories>
+  </directory>
+  <directory name="bar" permission="0755">
+    <files>
+      <file name="baz.txt" permission="0644">some text</file>
+      <file name="baz.jpg" permission="0644"/>
+      <file name="baz.png" permission="0644"/>
+    </files>
+  </directory>
+  <files>
+    <file name="baz.txt" permission="0644">some text</file>
+    <file name="baz.jpg" permission="0644"/>
+    <file name="baz.png" permission="0644"/>
+  </files>
+</directories>
