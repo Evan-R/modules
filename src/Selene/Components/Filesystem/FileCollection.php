@@ -400,7 +400,7 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
      * @access public
      * @return FileCollection
      */
-    public function setNestedOutput($tree = true)
+    public function setOutputTree($tree = true)
     {
         $this->nested = $tree;
         return $this;
@@ -425,12 +425,15 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
                 continue;
             }
 
+            $name = $file->getFilename();
+
             if ($file->isDir()) {
                 $out = array_merge($file->toArray(), $out);
                 continue;
             }
+
             if ($file->isFile()) {
-                $out[$file->getFilename()] = array_merge($file->toArray(), $out);
+                $out[$name] = isset($out[$name]) ? array_merge($file->toArray(), $out) : $file->toArray();
                 continue;
             }
         }

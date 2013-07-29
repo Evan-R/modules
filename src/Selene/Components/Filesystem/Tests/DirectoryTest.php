@@ -99,38 +99,57 @@ class DirectoryTest extends FilesystemTestCase
 
     }
 
+    public function testListDirectoryStructureSouldIncludeFiles()
+    {
+        foreach (['fileA', 'fileB', 'fileC'] as $file) {
+            touch($this->testDrive.DIRECTORY_SEPARATOR.$file);
+        }
+        $dir = $this->fs->directory($this->testDrive);
+        $collection = $dir->get();
+        $collection->setOutputTree(false);
+        $this->assertTrue(3 === count($collection->toArray()));
+    }
+
+    public function testListDirectoryStructureSouldIncludeFilesAndDirectories()
+    {
+        foreach (['fileA', 'fileB', 'fileC'] as $file) {
+            touch($this->testDrive.DIRECTORY_SEPARATOR.$file);
+        }
+
+        mkdir($dir = $this->testDrive.DIRECTORY_SEPARATOR.'testB');
+        foreach (['fileD', 'fileE', 'fileF'] as $file) {
+            touch($dir.DIRECTORY_SEPARATOR.$file);
+        }
+
+        $dir = $this->fs->directory($this->testDrive);
+        $collection = $dir->get();
+        $collection->setOutputTree(false);
+        $this->assertEquals(7, count($collection->toArray()));
+
+        $collection->setOutputTree(true);
+
+        $files = $collection->toArray();
+
+        $this->assertTrue(is_array($f = arrayGet('%files%.fileA', $files)) && $f['name'] === 'fileA');
+        $this->assertTrue(is_array($f = arrayGet('%directories%.testB', $files)) && $f['name'] === 'testB');
+        $this->assertTrue(is_array($f = arrayGet('%directories%.testB.%files%', $files)) && isset($f['fileD']));
+        $this->assertTrue(
+            is_array($f = arrayGet('%directories%.testB.%files%.fileD', $files))&& $f['name'] === 'fileD'
+        );
+    }
+
+    /*
     public function testListDirectoryStructure()
     {
-        $this->markTestSkipped();
+        //$this->markTestSkipped();
         $this->buildTree();
         $this->fs->touch($this->testDrive.'/baz.png', time() -  10);
         $collection = $this->fs->directory($this->testDrive)
-            //->filter(['.*\.(jpe?g$|png|gif)$'])
-            //->filter(['.*\.txt$'])
-            //->notIn(['sub_tree', 'source_tree'])
-            //->in(['source_tree'])
-            ->in(['source_tree/nested_subtree'])
-            //->notIn(['source_tree/nested_node'])
+            ->filter(['.*\.(jpe?g$|png|gif)$'])
             ->get()
             ->toJson();
-
-            //var_dump($collection->getPool());
-            //die;
-            //->sortByModDate('asc')
-            //->sortByExtension('desc');
-            //->sortBySize('asc')
-            //->setNestedOutput(false)
-            //->toJson();
-            //->filter('.*\.jpe?g$')
-            //->in(['sub_tree'])
-            //->get()
-            //->getPool();
-            //->toJson();
-
-        //var_dump($collection);
-        echo($collection);
     }
-
+    */
 
     protected function getPathsAsArgument(array $paths)
     {
