@@ -39,7 +39,8 @@ class SplFileInfo extends \SplFileInfo implements ArrayableInterface
             'lastmod' => $this->getMTime(),
             'type'    => $this->getType(),
             'owner'   => $this->getOwner(),
-            'group'   => $this->getGroup()
+            'group'   => $this->getGroup(),
+            'size'    => $this->getSize()
         ];
 
         if ($this->isFile()) {

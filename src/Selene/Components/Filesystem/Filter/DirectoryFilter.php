@@ -63,7 +63,6 @@ class DirectoryFilter extends AbstractFilter
      */
     protected function doMatch($pattern)
     {
-        //var_dump($pattern, $this->compiled);
-        return (bool)preg_match($this->compiled, $pattern);
+        return (bool)preg_match($this->compiled, str_replace('\\', '/', $pattern));
     }
 }

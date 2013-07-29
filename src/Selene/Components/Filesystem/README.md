@@ -258,3 +258,42 @@ $collection->toArray();
 // export collection to json
 $collection->toJson();
 ```
+
+```json
+ {
+    ".": {
+        "%directories%": {
+            "source_tree": {
+                "name": "source_tree",
+                "path": "\/files\/source_tree",
+                "lastmod": 1375118383,
+                "type": "dir",
+                "owner": 501,
+                "group": 20,
+                "%directories%": {
+                    "nested_subtree": {
+                        "name": "nested_subtree",
+                        "path": "\/files\/source_tree\/nested_subtree",
+                        "lastmod": 1375118383,
+                        "type": "dir",
+                        "owner": 501,
+                        "group": 20
+                    }
+                },
+                "%files%": {
+                    "bar.txt": {
+                        "name": "bar.txt",
+                        "path": "\/files\/source_tree\/bar.txt",
+                        "lastmod": 1375118383,
+                        "type": "file",
+                        "owner": 501,
+                        "group": 20,
+                        "extension": "txt",
+                        "mimetype": "text\/plain"
+                    }
+                }
+            }
+        }
+    }
+}
+```

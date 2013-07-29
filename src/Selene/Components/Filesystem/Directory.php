@@ -234,9 +234,11 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
                 continue;
             }
 
-            if ($recursive and $fileInfo->isDir() and $this->isIncludedDir($fileInfo->getRealPath())) {
+            if ($recursive and $fileInfo->isDir()) {
                 $this->doList($collection, $fileInfo->getRealPath(), true);
-                $collection->add($fileInfo->getFileInfo());
+                if ($this->isIncludedDir($fileInfo->getRealPath())) {
+                    $collection->add($fileInfo->getFileInfo());
+                }
                 continue;
             }
         }

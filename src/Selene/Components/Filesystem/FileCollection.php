@@ -98,7 +98,7 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
      */
     public function getIterator()
     {
-        return new ArrayIterator(isset($this->pool['.']) ? $this->pool['.'] : $this->pool);
+        return new ArrayIterator($this->pool);
     }
 
     /**
@@ -154,12 +154,12 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
      */
     protected function getFilePath(SplFileInfo $file)
     {
-        $path = '.'.$this->normalizePath(substr($file->getPathName(), strlen($this->baseDir)));
+        $path = $this->normalizePath(substr($file->getPathName(), strlen($this->baseDir)));
         $path = explode('/', $path);
         $name = array_pop($path);
         $path = implode('/'.static::$dirsKey.'/', $path).'/'.static::$fileKey.'/'.$name;
 
-        return $path;
+        return ltrim($path, '/');
 
     }
 
@@ -173,11 +173,11 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
      */
     protected function getDirPath(SplFileInfo $file)
     {
-        $path = '.'.$this->normalizePath(substr($file->getPathName(), strlen($this->baseDir)));
+        $path = $this->normalizePath(substr($file->getPathName(), strlen($this->baseDir)));
         $path = explode('/', $path);
         $path = implode('/'.static::$dirsKey.'/', $path).'/'.static::$dirKey;
 
-        return $path;
+        return ltrim($path, '/');
     }
 
     /**
@@ -188,9 +188,9 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
      * @access protected
      * @return string
      */
-    protected function getPath(SplFileInfo $file)
+    public function getPath(SplFileInfo $file)
     {
-        return '.'.$this->normalizePath(substr($file->getPathName(), strlen($this->baseDir)));
+        return ltrim($this->normalizePath(substr($file->getPathName(), strlen($this->baseDir))), '/');
     }
 
     /**
@@ -202,13 +202,7 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
     public function toArray()
     {
         $in = [];
-
-        if (isset($this->sort)) {
-            list($sortMethod, $sortOptions) = $this->sort;
-            call_user_func_array([$this, $sortMethod], (array)$sortOptions);
-        } else {
-            $this->doSort();
-        }
+        $this->applySort();
 
         if ($this->nested) {
             foreach ($this->pool as $path => $file) {
@@ -218,6 +212,23 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
         }
         return $this->export($this->pool);
     }
+
+    /**
+     * applySort
+     *
+     * @access protected
+     * @return void
+     */
+    protected function applySort()
+    {
+        if (isset($this->sort)) {
+            list($sortMethod, $sortOptions) = $this->sort;
+            call_user_func_array([$this, $sortMethod], (array)$sortOptions);
+        } else {
+            $this->doSort();
+        }
+    }
+
 
     /**
      * export
@@ -381,9 +392,17 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
         return json_encode($this->toArray(), defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0);
     }
 
-    public function setNestedOutput($nested = true)
+    /**
+     * setNestedOutput
+     *
+     * @param boolean $tree
+     *
+     * @access public
+     * @return FileCollection
+     */
+    public function setNestedOutput($tree = true)
     {
-        $this->nested = $nested;
+        $this->nested = $tree;
         return $this;
     }
 
@@ -400,18 +419,19 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
     {
         //ksort($in);
         foreach ($in as $path => $file) {
+
             if (is_array($file)) {
-                $out[$path] = isset($out[$path]) ? $out[$path] : [];
-                $out[$path] = $this->exportToArray($file, $out[$path]);
+                $out[$path] = $this->exportToArray($file);
                 continue;
             }
 
-            if (static::$dirKey === $path) {
-                $out = $file->toArray();
+            if ($file->isDir()) {
+                $out = array_merge($file->toArray(), $out);
                 continue;
             }
             if ($file->isFile()) {
-                $out[$file->getFilename()] = $file->toArray();
+                $out[$file->getFilename()] = array_merge($file->toArray(), $out);
+                continue;
             }
         }
         return $out;

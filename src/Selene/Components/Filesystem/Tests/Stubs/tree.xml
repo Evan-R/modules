@@ -4,14 +4,21 @@
   </directory>
   <directory name="source_tree" permission="0755">
     <files>
+      <file name="foo.txt" permission="0644">some more text text text text</file>
       <file name="bar.txt" permission="0644">some text</file>
       <file name="bar.jpg" permission="0644"/>
       <file name="bar.png" permission="0644"/>
     </files>
     <directories>
-      <directory name="nested_node" permission="0755"/>
+      <directory name="nested_node" permission="0755">
+        <files>
+          <file name="foo.txt" permission="0644">some more text text text text</file>
+          <file name="shizzle.png" permission="0644"/>
+        </files>
+      </directory>
       <directory name="nested_subtree" permission="0755">
         <files>
+          <file name="foo.txt" permission="0644">some more text text text text</file>
           <file name="shizzle.png" permission="0644"/>
         </files>
       </directory>
