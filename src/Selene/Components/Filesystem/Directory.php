@@ -12,6 +12,8 @@
 namespace Selene\Components\Filesystem;
 
 use FilesystemIterator;
+use Selene\Components\Filesystem\Filter\FileFilter;
+use Selene\Components\Filesystem\Filter\DirectoryFilter;
 use Selene\Components\Common\Interfaces\JsonableInterface;
 use Selene\Components\Common\Interfaces\ArrayableInterface;
 
@@ -47,21 +49,23 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      *
      * @var mixed
      */
-    protected $fileFilter = [];
+    protected $fileFilter;
 
     /**
      * inFilter
      *
      * @var mixed
      */
-    protected $inFilter = [];
+    protected $inFilter;
 
     /**
      * notInFilter
      *
      * @var mixed
      */
-    protected $notInFilter = [];
+    protected $notInFilter;
+
+    protected $ignoreFilter;
 
     /**
      * vcsPattern
@@ -69,7 +73,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      * @var array
      */
     protected static $vcsPattern = [
-        '.git.*', '.svn.*'
+        '\.git.*', '\.svn.*'
     ];
 
     /**
@@ -159,31 +163,6 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     }
 
     /**
-     * files
-     *
-     *
-     * @access public
-     * @return mixed
-     */
-    public function files()
-    {
-        $this->listDir($collection = new FileCollection((string)$this), $this->currentFilter, false);
-        return $collection;
-    }
-
-    /**
-     * clealFilter
-     *
-     * @access public
-     * @return void
-     */
-    public function clealFilter()
-    {
-        $this->currentFilter  = null;
-        $this->currentExclude = null;
-    }
-
-    /**
      * get
      *
      *
@@ -192,13 +171,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     public function get()
     {
-        $this->listDir(
-            $collection = new FileCollection((string)$this),
-            $this->currentFilter ? $this->currentFilter : '.*',
-            true,
-            $this->currentExclude ? $this->currentExclude : '.*'
-        );
-        return $collection;
+        return $this->listDir(new FileCollection($path = (string)$this), $path, true);
     }
 
     /**
@@ -209,8 +182,8 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     public function toArray()
     {
-        $this->listDir($collection = new FileCollection((string)$this), true);
-        return $collection->toArray();
+        $this->clearFilter();
+        return $this->get()->toArray();
     }
 
     /**
@@ -222,26 +195,147 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      * @param mixed $exclude
      *
      * @access protected
+     * @return FileCollection
+     */
+    protected function listDir(FileCollection $collection, $location, $recursive = true)
+    {
+        $this->setVcsFilter();
+        $this->doList($collection, $location, $recursive);
+        $this->clearFilter();
+
+        return $collection;
+    }
+
+    /**
+     * doList
+     *
+     * @param FileCollection $collection
+     * @param mixed $location
+     * @param mixed $recursive
+     *
+     * @access private
      * @return void
      */
-    protected function listDir(FileCollection $collection, $filter = null, $recursive = true, $exclude = [])
+    private function doList(FileCollection $collection, $location, $recursive = true, $ignorefiles = false)
     {
-        foreach ($this->getIterator((string)$this) as $fileInfo) {
 
-            if ($fileInfo->isFile()) {
-                if ($this->matchExpression($this->expandRegexp($filter), $fileInfo->getPathName())) {
-                    $collection->add($fileInfo->getFileInfo());
-                }
+        if (!$this->isIncludedDir($location)) {
+            $ignorefiles = true;
+        }
+
+        foreach ($iterator = $this->getIterator($location) as $fileInfo) {
+
+            if ($fileInfo->isLink()) {
                 continue;
             }
 
-            if ($recursive and $fileInfo->isDir()) {
-                if (!$this->matchExpression($this->expandRegexp($filter), $fileInfo->getPathName())) {
-                    $this->listDir($collection, $fileInfo->getPathName(), $filter, $exclude);
-                }
+            if (!$ignorefiles and $fileInfo->isFile() and $this->isIncludedFile($fileInfo->getBaseName())) {
+                $collection->add($fileInfo->getFileInfo());
+                continue;
+            }
+
+            if ($recursive and $fileInfo->isDir() and $this->isIncludedDir($fileInfo->getRealPath())) {
+                $this->doList($collection, $fileInfo->getRealPath(), true);
+                $collection->add($fileInfo->getFileInfo());
                 continue;
             }
         }
+    }
+
+    /**
+     * clealFilter
+     *
+     * @access private
+     * @return void
+     */
+    private function clearFilter()
+    {
+        unset($this->inFilter);
+        unset($this->fileFilter);
+        unset($this->notInFilter);
+        unset($this->ignoreFilter);
+        unset($this->currentFilter);
+        unset($this->currentExclude);
+
+        $this->inFilter       = null;
+        $this->fileFilter     = null;
+        $this->notInFilter    = null;
+        $this->ignoreFilter   = null;
+        $this->currentFilter  = null;
+        $this->currentExclude = null;
+    }
+
+    /**
+     * setVcsFilter
+     *
+     *
+     * @access protected
+     * @return void
+     */
+    protected function setVcsFilter()
+    {
+        if (!isset($this->ignoreFilter)) {
+            $this->ignoreFilter = new FileFilter(static::$vcsPattern);
+        }
+    }
+
+    /**
+     * isIncludedFile
+     *
+     * @param mixed $file
+     *
+     * @access protected
+     * @return bool
+     */
+    protected function isIncludedFile($file)
+    {
+        if ($this->isIgnoredFile($file)) {
+            return false;
+        }
+        return isset($this->fileFilter) ? $this->fileFilter->match($file) : true;
+    }
+
+    /**
+     * isIgnoredFile
+     *
+     * @param mixed $file
+     *
+     * @access protected
+     * @return bool
+     */
+    protected function isIgnoredFile($file)
+    {
+        return $this->ignoreFilter->match($file);
+    }
+
+    /**
+     * isIncludedDir
+     *
+     * @param mixed $dir
+     *
+     * @access protected
+     * @return bool
+     */
+    protected function isIncludedDir($dir)
+    {
+        return $this->isExcludedDir($dir) ?
+            false :
+            (isset($this->inFilter) ? $this->inFilter->match($dir) : true);
+    }
+
+    /**
+     * isExcludedDir
+     *
+     * @param mixed $path
+     *
+     * @access protected
+     * @return bool
+     */
+    protected function isExcludedDir($path)
+    {
+        return $this->isIgnoredFile(basename($path)) ? true : (
+            (!isset($this->notInFilter) ? false : $this->notInFilter->match($path))
+        );
     }
 
     /**
@@ -252,6 +346,27 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     public function filter($expression)
     {
+        $this->fileFilter = new FileFilter((array)$expression);
+        return $this;
+    }
+
+    /**
+     * ignore
+     *
+     * @param mixed $expression
+     *
+     * @access public
+     * @return mixed
+     */
+    public function ignore($expression)
+    {
+        $pattern = static::$vcsPattern;
+        if (is_array($expression)) {
+            $pattern = array_merge($pattern, $expression);
+        } else {
+            array_push($pattern, $expression);
+        }
+        $this->ignoreFilter = new FileFilter($pattern);
         return $this;
     }
 
@@ -263,7 +378,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     public function in($directories)
     {
-        $this->getDirectoryExpression($directories);
+        $this->inFilter = new DirectoryFilter((array)$directories, (string)$this);
         return $this;
     }
 
@@ -275,7 +390,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     public function notIn($directories)
     {
-        $this->getDirectoryExpression($directories);
+        $this->notInFilter = new DirectoryFilter((array)$directories, (string)$this);
         return $this;
     }
 
@@ -295,17 +410,6 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
             (string)$directories;
 
         return $directories;
-    }
-
-    /**
-     * flushFilter
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function flushFilter()
-    {
-
     }
 
     /**
@@ -345,36 +449,15 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     }
 
     /**
-     * expandRegexp
+     * addVcsPattern
      *
-     * @access protected
-     * @return string
+     * @param mixed $pattern
+     *
+     * @access public
+     * @return void
      */
-    protected function expandRegexp($expression)
+    public static function addVcsPattern($pattern)
     {
-        return sprintf('#(%s)$#', $expression);
-    }
-
-    /**
-     * getExludeList
-     *
-     * @access protected
-     * @return array
-     */
-    protected function getExludeList()
-    {
-
-    }
-
-    /**
-     * matchExpression
-     *
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function matchExpression($expression, $value)
-    {
-        return (bool)preg_match($expression, $value);
+        static::$vcsPattern = array_merge(static::$vcsPattern, (array)$pattern);
     }
 }

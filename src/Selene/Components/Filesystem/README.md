@@ -44,7 +44,7 @@ doesn't exist yet.
 $filesystem->ensureFile('/path/target_file.txt');
 ```
 
-### Set files contents
+### Dump content into a file 
 `setContents()` dumps content into a file. `setContents()` takes a second argument
 `$writeFlags`, see [file_put_contents *flags*](http://www.php.net/manual/en/function.file-put-contents.php).  
 If the file doesn't exists, it will be created.
@@ -54,7 +54,7 @@ If the file doesn't exists, it will be created.
 
 $filesystem->setContents('/path/target_file.txt', 'some content');
 ```
-### Get files contents
+### Get a files content
 
 `getContents()` dumps the files content. It takes a second argument
 `$readFlags`, see [file_get_contents *flags*](http://www.php.net/manual/en/function.file-get-contents.php).
@@ -67,7 +67,7 @@ $filesystem->getContents('/path/target_file.txt'); // returns 'some content'
 
 ### Creating directories
 
-`mkdir()` tries to create a directory using. The method
+`mkdir()` tries to create a directory. The method
 takes a second, boolean argument weather to recursivly create directories or
 not (default is `true`).
 
@@ -78,7 +78,7 @@ $filesystem->mkdir('/path/target_dir');
 ```
 
 This however will throw an `IOExecption` if the target already exists. If you
-want to be sure a directory is only created if it doesn't exists yes, you can
+want to be sure a directory is only created if it doesn't exists yet, you can
 use `Filesystem::ensureDirectory`
 
 ```php
@@ -229,9 +229,11 @@ $collection = $filesystem->directory('/path/target_dir')
 	->get(); 
 
 // Filter for files:
+// By now, `filter takes an arbitrary regeular expression. Glob matching is
+// planed for the future. `
 $collection = $filesystem->directory('/path/target_dir')
 	->in(['images'])
-	->filter('\.jpg$')
+	->filter('.*\.(jpe?g|png|gif)$')
 	->get(); 
 ```
 

@@ -12,7 +12,6 @@
 namespace Selene\Components\Filesystem;
 
 use FilesystemIterator;
-use Selene\Components\Events\Traits\Observable;
 use Selene\Components\Filesystem\Exception\IOException;
 
 /**
@@ -22,8 +21,6 @@ use Selene\Components\Filesystem\Exception\IOException;
  */
 class Filesystem
 {
-    use Observable;
-
     /**
      * @var string
      */

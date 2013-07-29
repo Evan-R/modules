@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <directories>
+  <directory name=".git" permission="0755">
+  </directory>
   <directory name="source_tree" permission="0755">
     <files>
       <file name="bar.txt" permission="0644">some text</file>
@@ -8,25 +10,27 @@
     </files>
     <directories>
       <directory name="nested_node" permission="0755"/>
-      <directory name="boom" permission="0755">
+      <directory name="nested_subtree" permission="0755">
         <files>
-          <file name="bar.txt" permission="0644">some text</file>
-          <file name="bar.jpg" permission="0644"/>
-          <file name="bar.png" permission="0644"/>
+          <file name="shizzle.png" permission="0644"/>
         </files>
       </directory>
     </directories>
   </directory>
-  <directory name="bar" permission="0755">
+  <directory name="sub_tree" permission="0755">
     <files>
-      <file name="baz.txt" permission="0644">some text</file>
-      <file name="baz.jpg" permission="0644"/>
-      <file name="baz.png" permission="0644"/>
+      <file name="sub.txt" permission="0644">some text</file>
+      <file name="sub.jpg" permission="0644"/>
+      <file name="sub.png" permission="0644"/>
     </files>
   </directory>
   <files>
-    <file name="baz.txt" permission="0644">some text</file>
+    <file name=".gitignore" permission="0644">some text</file>
+    <file name=".gitimodules" permission="0644">some text</file>
+    <file name="target.txt" permission="0644">some text</file>
     <file name="baz.jpg" permission="0644"/>
+    <file name="barn.jpg" permission="0644"/>
+    <file name="bpr.jpg" permission="0644"/>
     <file name="baz.png" permission="0644"/>
   </files>
 </directories>
