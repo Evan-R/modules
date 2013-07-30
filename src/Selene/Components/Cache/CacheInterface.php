@@ -94,7 +94,28 @@ interface CacheInterface
      */
     public function has($key);
 
+    /**
+     * setDefault
+     *
+     * @param mixed $key
+     * @param Closure $callback
+     * @param mixed $expires
+     * @param mixed $compressed
+     *
+     * @access public
+     * @return void
+     */
     public function setDefault($key, Closure $callback, $expires = null, $compressed = false);
 
+    /**
+     * sealDefault
+     *
+     * @param mixed $key
+     * @param Closure $callback
+     * @param mixed $compressed
+     *
+     * @access public
+     * @return void
+     */
     public function sealDefault($key, Closure $callback, $compressed = false);
 }

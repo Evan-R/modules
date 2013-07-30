@@ -99,4 +99,32 @@ class ApcDriver extends AbstractDriver
     {
         apc_clear_cache('user');
     }
+
+    /**
+     * incrementValue
+     *
+     * @param string $key
+     * @param int    $value
+     *
+     * @access protected
+     * @return void
+     */
+    protected function incrementValue($key, $value)
+    {
+        apc_inc($key, $value);
+    }
+
+    /**
+     * decrementValue
+     *
+     * @param string $key
+     * @param int    $value
+     *
+     * @access protected
+     * @return void
+     */
+    protected function decrementValue($key, $value)
+    {
+        apc_dec($key, $value);
+    }
 }
