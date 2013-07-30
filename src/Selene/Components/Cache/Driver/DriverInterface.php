@@ -23,24 +23,24 @@ interface DriverInterface
     /**
      * cachedItemExists
      *
-     * @param mixed $cacheid
+     * @param mixed $key
      */
-    public function cachedItemExists($cacheid);
+    public function cachedItemExists($key);
 
     /**
      * getCachedItem
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @abstract
      * @access public
      * @return Boolean
      */
-    public function getFromCache($cacheid);
+    public function getFromCache($key);
 
     /**
      * writeToCache
      *
-     * @param String $cacheid the cache item identifier
+     * @param String $key the cache item identifier
      * @param Mixed $data Data to be cached
      * @param Mixed $expires Integer value of the expiry time in minutes or
      * unix timestamp
@@ -49,18 +49,17 @@ interface DriverInterface
      * @access public
      * @return Boolean
      */
-    public function writeToCache($cacheid, $data, $expires = 60, $compressed = false);
+    public function writeToCache($key, $data, $expires = 60, $compressed = false);
 
     /**
      * deleteFromCache
      *
-     * @param String $cacheid the cache item identifier
+     * @param String $key the cache item identifier
      * @abstract
      * @access public
      * @return Boolean
      */
-    public function deleteFromCache($cacheid);
-
+    public function deleteFromCache($key);
 
     /**
      * flushCache
@@ -74,14 +73,14 @@ interface DriverInterface
     /**
      * saveForeaver
      *
-     * @param String $cacheid the cache item identifier
+     * @param String $key the cache item identifier
      * @param Mixed $data Data to be cached
      * @param boolean $compressed  compress data
      * @abstract
      * @access public
      * @return Boolean
      */
-    public function saveForever($cacheid, $data, $compressed);
+    public function saveForever($key, $data, $compressed = false);
 
     /**
      * get default expiry time

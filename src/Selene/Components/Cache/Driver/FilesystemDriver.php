@@ -67,7 +67,7 @@ class FilesystemDriver extends AbstractDriver
     /**
      * cachedItemExists
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @access protected
      * @return void
      */
@@ -181,7 +181,7 @@ class FilesystemDriver extends AbstractDriver
     /**
      * saveForever
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @param Mixed $data
      * @param Mixed $compressed
      * @access protected
@@ -195,7 +195,7 @@ class FilesystemDriver extends AbstractDriver
     /**
      * deleteFromCache
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @access protected
      * @return Boolean
      */
@@ -222,7 +222,7 @@ class FilesystemDriver extends AbstractDriver
      *
      * @todo test without igbinary
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @param Mixed $data
      * @param int $expires
      * @param Mixed $compressed

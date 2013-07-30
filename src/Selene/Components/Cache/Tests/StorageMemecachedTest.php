@@ -44,7 +44,6 @@ class StorageMemcachedTest extends StorageTestCase
             ];
 
         $connection = new MemcachedConnection(new Memcached('fooish'), $servers);
-
         $this->cache = new Storage(new MemcachedDriver($connection), 'mycache');
     }
 

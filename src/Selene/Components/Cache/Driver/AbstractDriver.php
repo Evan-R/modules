@@ -37,27 +37,27 @@ abstract class AbstractDriver implements DriverInterface
     /**
      * itemExists
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @abstract
      * @access public
      * @return Booelan
      */
-    abstract public function cachedItemExists($cacheid);
+    abstract public function cachedItemExists($key);
 
     /**
      * getCachedItem
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @abstract
      * @access public
      * @return Boolean
      */
-    abstract public function getFromCache($cacheid);
+    abstract public function getFromCache($key);
 
     /**
      * writeToCache
      *
-     * @param String $cacheid the cache item identifier
+     * @param String $key the cache item identifier
      * @param Mixed $data Data to be cached
      * @param Mixed $expires Integer value of the expiry time in minutes or
      * unix timestamp
@@ -67,17 +67,17 @@ abstract class AbstractDriver implements DriverInterface
      * @return Boolean
      */
 
-    abstract public function writeToCache($cacheid, $data, $expires = 60, $compressed = false);
+    abstract public function writeToCache($key, $data, $expires = 60, $compressed = false);
 
     /**
      * deleteFromCache
      *
-     * @param String $cacheid the cache item identifier
+     * @param String $key the cache item identifier
      * @abstract
      * @access public
      * @return Boolean
      */
-    abstract public function deleteFromCache($cacheid);
+    abstract public function deleteFromCache($key);
 
     /**
      * flushCache
@@ -91,14 +91,14 @@ abstract class AbstractDriver implements DriverInterface
     /**
      * saveForeaver
      *
-     * @param String $cacheid the cache item identifier
+     * @param String $key the cache item identifier
      * @param Mixed $data Data to be cached
      * @param boolean $compressed  compress data
      * @abstract
      * @access public
      * @return Boolean
      */
-    abstract public function saveForever($cacheid, $data, $compressed = false);
+    abstract public function saveForever($key, $data, $compressed = false);
 
     /**
      * increment

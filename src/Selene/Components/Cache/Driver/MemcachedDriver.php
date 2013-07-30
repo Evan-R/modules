@@ -48,13 +48,13 @@ class MemcachedDriver extends AbstractDriver
     /**
      * check if cached item exists
      *
-     * @param Mixed $cacheid
+     * @param mixed $key
      * @access protected
      * @return void
      */
-    public function cachedItemExists($cacheid)
+    public function cachedItemExists($key)
     {
-        if (!$has = $this->memcached->get($cacheid)) {
+        if (!$has = $this->memcached->get($key)) {
             return false;
         }
         return true;
@@ -63,27 +63,27 @@ class MemcachedDriver extends AbstractDriver
     /**
      * retrieve cached item
      *
-     * @param Mixed $cacheid
+     * @param mixed $key
      * @access protected
      * @return void
      */
-    public function getFromCache($cacheid)
+    public function getFromCache($key)
     {
-        return $this->memcached->get($cacheid);
+        return $this->memcached->get($key);
     }
 
     /**
      * write data to cache
      *
-     * @param String $cacheid the cache item identifier
-     * @param Mixed $data Data to be cached
-     * @param Mixed $expires Integer value of the expiry time in minutes or
+     * @param String $key the cache item identifier
+     * @param mixed $data Data to be cached
+     * @param mixed $expires Integer value of the expiry time in minutes or
      * @param boolean $compressed compress data
      * unix timestamp
      * @access public
      * @return void
      */
-    public function writeToCache($cacheid, $data, $expires = 60, $compressed = false)
+    public function writeToCache($key, $data, $expires = 60, $compressed = false)
     {
         $expires = is_int($expires) ?
             (time() + ($expires * 60)) :
@@ -92,7 +92,7 @@ class MemcachedDriver extends AbstractDriver
             (time() + ($this->default * 60)));
 
         $this->memcached->setOption(Memcached::OPT_COMPRESSION, $compressed);
-        $cached = $this->memcached->set($cacheid, $data, $expires);
+        $cached = $this->memcached->set($key, $data, $expires);
         $this->memcached->setOption(Memcached::OPT_COMPRESSION, false);
 
         return $cached;
@@ -101,21 +101,21 @@ class MemcachedDriver extends AbstractDriver
     /**
      * save cached item with a long future expiry date
      *
-     * @param Mixed $cacheid
-     * @param Mixed $data
+     * @param mixed $key
+     * @param mixed $data
      * @param boolean $compressed  compress data
      * @access public
      * @return void
      */
-    public function saveForever($cacheid, $data, $compressed = false)
+    public function saveForever($key, $data, $compressed = false)
     {
-        return $this->writeToCache($cacheid, $data, '2037-12-31', $compressed);
+        return $this->writeToCache($key, $data, '2037-12-31', $compressed);
     }
 
     /**
      * increment
      *
-     * @param mixed $cacheid
+     * @param mixed $key
      * @param mixed $value
      *
      * @access public
@@ -143,13 +143,13 @@ class MemcachedDriver extends AbstractDriver
     /**
      * delete a cached item
      *
-     * @param Mixed $cacheid
+     * @param mixed $key
      * @access public
      * @return void
      */
-    public function deleteFromCache($cacheid)
+    public function deleteFromCache($key)
     {
-        return $this->memcached->delete($cacheid);
+        return $this->memcached->delete($key);
     }
 
     /**

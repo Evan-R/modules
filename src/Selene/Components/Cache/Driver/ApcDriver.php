@@ -20,37 +20,37 @@ namespace Stream\Cache\Driver;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class ApcDriver extends Driver
+class ApcDriver extends AbstractDriver
 {
 
     /**
      * check if cached item exists
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @access protected
      * @return void
      */
-    public function cachedItemExists($cacheid)
+    public function cachedItemExists($key)
     {
-        return apc_exists($cacheid);
+        return apc_exists($key);
     }
 
     /**
      * retrieve cached item
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @access protected
      * @return void
      */
-    public function getFromCache($cacheid)
+    public function getFromCache($key)
     {
-        return apc_fetch($cacheid);
+        return apc_fetch($key);
     }
 
     /**
      * write data to cache
      *
-     * @param String $cacheid the cache item identifier
+     * @param String $key the cache item identifier
      * @param Mixed $data Data to be cached
      * @param Mixed $expires Integer value of the expiry time in minutes or
      * @param boolean $compressed compress data
@@ -58,35 +58,35 @@ class ApcDriver extends Driver
      * @access public
      * @return void
      */
-    public function writeToCache($cacheid, $data, $expires = 60, $compressed)
+    public function writeToCache($key, $data, $expires = 60, $compressed = false)
     {
-        apc_store($cacheid, $data, $expires);
+        apc_store($key, $data, $expires);
     }
 
     /**
      * save cached item with a long future expiry date
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @param Mixed $data
      * @param boolean $compressed  compress data
      * @access public
      * @return void
      */
-    public function saveForever($cacheid, $data, $compressed)
+    public function saveForever($key, $data, $compressed = false)
     {
-        return $this->writeToCache($cacheid, $data, 0, $compressed);
+        return $this->writeToCache($key, $data, 0, $compressed);
     }
 
     /**
      * delete a cached item
      *
-     * @param Mixed $cacheid
+     * @param Mixed $key
      * @access public
      * @return void
      */
-    public function deleteFromCache($cacheid)
+    public function deleteFromCache($key)
     {
-        apc_delete($cacheid);
+        apc_delete($key);
     }
 
     /**
@@ -100,4 +100,3 @@ class ApcDriver extends Driver
         apc_clear_cache('user');
     }
 }
-
