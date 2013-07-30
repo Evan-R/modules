@@ -20,12 +20,14 @@
       "Helper/functions.php"
     ]
   },
-  "repositories": [{
+  "repositories": [
+    {
       "type":"vcs", 
-      "url":"https://github.com/seleneapp/testsuite.git"
-    },{
+      "url":"git://github.com/seleneapp/testsuite.git"
+    }, 
+    {
       "type":"vcs", 
-      "url":"https://github.com/seleneapp/common.git"
+      "url":"git://github.com/seleneapp/common.git"
     }
   ],
   "target-dir": "Selene/Components/Common",

@@ -112,6 +112,20 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($time, $this->fs->fileMTime($file));
     }
 
+    public function testFileATime()
+    {
+        touch($file = $this->testDrive.DIRECTORY_SEPARATOR.'file');
+        touch($file, time(), $time = time() + 1000);
+        $this->assertEquals($time, $this->fs->fileATime($file));
+    }
+
+    public function testFileCTime()
+    {
+        $time = time();
+        touch($file = $this->testDrive.DIRECTORY_SEPARATOR.'file');
+        $this->assertEquals($time, $this->fs->fileCTime($file));
+    }
+
     public function testTouchFileModificationTime()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_file';
@@ -265,6 +279,26 @@ class FilesystemTest extends FilesystemTestCase
         $this->fs->copy($source);
 
         $this->assertFileEquals($source, $target);
+    }
+
+    /**
+     * @expectedException Selene\Components\Filesystem\Exception\IOException
+     */
+    public function testFileCopyOnExistingTargetShouldThrowExceptionWithoutReplaceFlag()
+    {
+        touch($fileA = $this->testDrive.DIRECTORY_SEPARATOR.'testA');
+        touch($fileB = $this->testDrive.DIRECTORY_SEPARATOR.'testB');
+        $this->fs->copy($fileA, $fileB);
+    }
+
+    public function testFileCopyOnExistingTarget()
+    {
+        touch($fileA = $this->testDrive.DIRECTORY_SEPARATOR.'testA');
+        touch($fileB = $this->testDrive.DIRECTORY_SEPARATOR.'testB');
+
+        file_put_contents($fileA, 'some content');
+        $this->fs->copy($fileA, $fileB, true);
+        $this->assertFileEquals($fileA, $fileB);
     }
 
     public function testFileDirectorySouldContiouslyEnumerate()

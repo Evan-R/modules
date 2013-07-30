@@ -61,11 +61,11 @@ abstract class AbstractFileObject implements ArrayableInterface, JsonableInterfa
      *
      *
      * @access public
-     * @return boolean
+     * @return Directory
      */
     public function remove()
     {
-        $this->files->remove((string)$this);
+        $this->files->remove($this->path);
         return $this;
     }
 
@@ -79,7 +79,7 @@ abstract class AbstractFileObject implements ArrayableInterface, JsonableInterfa
      */
     public function copy($target = null)
     {
-        $this->files->copy((string)$this, $target);
+        $this->files->copy($this->path, $target);
         return $this;
     }
 
@@ -93,7 +93,7 @@ abstract class AbstractFileObject implements ArrayableInterface, JsonableInterfa
      */
     public function rename($newName)
     {
-        $this->files->rename($path = (string)$this, dirname($path).DIRECTORY_SEPARATOR.trim($newName, '\\\/'));
+        $this->files->rename($path = $this->path, dirname($path).DIRECTORY_SEPARATOR.trim($newName, '\\\/'));
         return $this;
     }
 
@@ -107,7 +107,7 @@ abstract class AbstractFileObject implements ArrayableInterface, JsonableInterfa
      */
     public function move($location)
     {
-        $this->files->rename((string)$this, $location);
+        $this->files->rename($this->path, $location);
         return $this;
     }
 
@@ -131,6 +131,21 @@ abstract class AbstractFileObject implements ArrayableInterface, JsonableInterfa
     public function getInfo()
     {
         return new SplFileInfo((string)$this);
+    }
+
+    /**
+     * getRealPath
+     *
+     * @param mixed $file
+     *
+     * @access public
+     * @return string
+     */
+    public function getRealPath($file = null)
+    {
+        return is_null($file) ?
+            (string)$this :
+            (string)$this.DIRECTORY_SEPARATOR.$file;
     }
 
     /**

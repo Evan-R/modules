@@ -65,6 +65,11 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     protected $notInFilter;
 
+    /**
+     * ignoreFilter
+     *
+     * @var mixed
+     */
     protected $ignoreFilter;
 
     /**
@@ -90,22 +95,9 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         return $this;
     }
 
-    /**
-     * remove
-     *
-     *
-     * @access public
-     * @return Directory
-     */
-    public function remove($file = null)
+    public function flush()
     {
-        $this->files->remove($this->getFile($file));
-        return $this;
-    }
-
-    public function flush($file = null)
-    {
-        $this->files->flush($this->getFile($file));
+        $this->files->flush((string)$this);
         return $this;
     }
 
@@ -119,7 +111,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     public function isEmpty($directory = null)
     {
-        return $this->files->isEmpty($this->getFile($directory));
+        return $this->files->isEmpty($this->getRealPath($directory));
     }
 
     /**
@@ -207,7 +199,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     public function exists($file)
     {
-        return $this->files->exists($this->getFile($file));
+        return $this->files->exists($this->getRealPath($file));
     }
 
     /**
@@ -234,25 +226,6 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         return $this->get()->toArray();
     }
 
-    public function getRealPath($file = null)
-    {
-        return $this->getFile($file);
-    }
-
-    /**
-     * getFile
-     *
-     * @param mixed $file
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function getFile($file = null)
-    {
-        return is_null($file) ?
-            (string)$this :
-            (string)$this.DIRECTORY_SEPARATOR.$file;
-    }
 
     /**
      * listDir

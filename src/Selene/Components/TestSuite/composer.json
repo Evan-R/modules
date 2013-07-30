@@ -1,29 +1,27 @@
 {
-    "name": "selene/testsuite",
-    "description": "Selene testsuite component",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Thomas Appel",
-            "email": "mail@thomas-appel.com"
-        }
-    ],
-    "require": {
-      "php":">=5.4.0"
-    },
-    "require-dev": {
-        "mockery/mockery": "dev-master",
-        "mikey179/vfsStream": "dev-master"
-    },
-	"autoload": {
-		"psr-0": {"Selene\\Components\\TestSuite\\": ""}
-	},
+  "name": "selene/testsuite",
+  "description": "Selene testsuite component",
+  "license": "MIT",
+  "authors": [
+    {
+    "name": "Thomas Appel",
+    "email": "mail@thomas-appel.com"
+  }
+  ],
+  "require": {
+    "php":">=5.4.0",
+    "mockery/mockery": "dev-master",
+    "mikey179/vfsStream": "dev-master"
+  },
+  "autoload": {
+    "psr-0": {"Selene\\Components\\TestSuite\\": ""}
+  },
   "repositories": [
     {
       "type":"vcs", 
-      "url":"https://github.com/seleneapp/testsuite.git"
+      "url":"git://github.com/seleneapp/testsuite.git"
     }
   ],
-	"target-dir": "Selene/Components/TestSuite",
-    "minimum-stability": "dev"
+  "target-dir": "Selene/Components/TestSuite",
+  "minimum-stability": "dev"
 }

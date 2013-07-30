@@ -80,7 +80,6 @@ class FilesystemDriver extends AbstractDriver
         }
 
         $timestamp = $this->files->fileMTime($file);
-
         return time() < $timestamp;
     }
 
@@ -132,7 +131,7 @@ class FilesystemDriver extends AbstractDriver
 
             extract($this->serializeData($data, $state === static::C_UNCOMPRESSED));
             $this->files->setContents($file, $contents, LOCK_EX);
-            $this->cachedir->touch($key, $timestamp);
+            $this->files->touch($file, $timestamp);
 
             return true;
         }

@@ -111,6 +111,7 @@ class Filesystem
     }
 
     /**
+
      * mkdir
      *
      * @param mixed $param
@@ -237,13 +238,14 @@ class Filesystem
     /**
      * copy
      *
-     * @param mixed $source
-     * @param mixed $target
+     * @param string $source
+     * @param string $target
+     * @param bool   $replace
      *
      * @access public
-     * @return mixed
+     * @return void
      */
-    public function copy($source, $target = null)
+    public function copy($source, $target = null, $replace = false)
     {
         if (!$this->isFile($source) and !$this->isDir($source)) {
             throw new IOException(sprintf('%s: no such file or directory', $source));
@@ -256,11 +258,10 @@ class Filesystem
                 $this->getCopyPrefix()
             );
         } elseif ($this->exists($target)) {
-            $target = $this->enum(
-                dirname($target).DIRECTORY_SEPARATOR.basename($target),
-                $this->getCopyStartOffset(),
-                $this->getCopyPrefix()
-            );
+            if (!$replace) {
+                throw new IOException(sprintf('target %s exists', $target));
+            }
+            $this->remove($target);
         }
 
         $this->ensureDirectory(dirname($target));
@@ -692,6 +693,17 @@ class Filesystem
         return $this->copyStartOffset;
     }
 
+    /**
+     * enum
+     *
+     * @param string $file
+     * @param int    $start
+     * @param string $prefix
+     * @param bool   $pad
+     *
+     * @access public
+     * @return string
+     */
     public function enum($file, $start, $prefix = null, $pad = true)
     {
         if ($this->isFile($file)) {
@@ -706,13 +718,13 @@ class Filesystem
     /**
      * enum
      *
-     * @param mixed $file
-     * @param mixed $start
-     * @param mixed $prefix
-     * @param mixed $pad
+     * @param string $file
+     * @param int    $start
+     * @param string $prefix
+     * @param bool   $pad
      *
      * @access protected
-     * @return mixed
+     * @return string
      */
     protected function enumDir($file, $start, $prefix = null, $pad = true)
     {
@@ -732,13 +744,13 @@ class Filesystem
     /**
      * enumFile
      *
-     * @param mixed $file
-     * @param mixed $start
-     * @param mixed $prefix
-     * @param mixed $pad
+     * @param string $file
+     * @param int    $start
+     * @param string $prefix
+     * @param bool   $pad
      *
      * @access protected
-     * @return mixed
+     * @return string
      */
     protected function enumFile($file, $start, $prefix = null, $pad = true)
     {

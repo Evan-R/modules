@@ -18,7 +18,15 @@ namespace Selene\Components\Filesystem;
  */
 class File extends AbstractFileObject
 {
-    public function setPath($path)
+    /**
+     * setPath
+     *
+     * @param mixed $path
+     *
+     * @access protected
+     * @return void
+     */
+    protected function setPath($path)
     {
         if (!$this->files->isFile($path)) {
             throw new IOException(sprintf('%s is not a file', $path));
@@ -26,21 +34,59 @@ class File extends AbstractFileObject
         $this->path = $path;
     }
 
+    /**
+     * chmod
+     *
+     * @param int $permissions
+     *
+     * @access public
+     * @return void
+     */
     public function chmod($permissions = 0644)
     {
         $this->files->chmod((string)$this, $permissions);
         return $this;
     }
 
+    /**
+     * chgrp
+     *
+     * @param mixed $group
+     *
+     * @access public
+     * @return void
+     */
     public function chgrp($group)
     {
         $this->files->chmod((string)$this, $group);
         return $this;
     }
 
+    /**
+     * chown
+     *
+     * @param mixed $owner
+     *
+     * @access public
+     * @return void
+     */
     public function chown($owner)
     {
         $this->files->chown((string)$this, $owner);
         return $this;
+    }
+
+    /**
+     * touch
+     *
+     * @param mixed $time
+     * @param mixed $atime
+     *
+     * @access public
+     * @return void
+     */
+    public function touch($time, $atime)
+    {
+        $this->files->touch((string)$this, $time, $atime);
     }
 }

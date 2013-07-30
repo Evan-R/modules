@@ -4,9 +4,9 @@
   "license": "MIT",
   "authors": [
     {
-    "name": "Thomas Appel",
-    "email": "mail@thomas-appel.com"
-  }
+      "name": "Thomas Appel",
+      "email": "mail@thomas-appel.com"
+    }
   ],
   "require": {
     "php":">=5.4.0",
@@ -18,6 +18,20 @@
   "autoload": {
     "psr-0": {"Selene\\Components\\DependencyInjection\\": ""}
   },
+  "repositories": [
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/testsuite.git"
+    },
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/common.git"
+    },
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/dependency-injection.git"
+    }
+  ],
   "target-dir": "Selene/Components/DependencyInjection",
   "minimum-stability": "dev"
 }
