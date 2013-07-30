@@ -30,13 +30,11 @@ class EventDispatcherTest extends TestCase
     {
         $dispatcher = new Dispatcher();
 
-        $dispatcher->on('foo', function ()
-        {
-            return 'bar';
+        $dispatcher->on('foo', function () {
+                return 'bar';
         });
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return 'baz';
         });
 
@@ -52,18 +50,15 @@ class EventDispatcherTest extends TestCase
     {
         $dispatcher = new Dispatcher();
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return 'foo';
         }, 200);
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return 'bar';
         }, 100);
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return 'baz';
         }, 300);
 
@@ -71,7 +66,6 @@ class EventDispatcherTest extends TestCase
 
         $this->assertSame(['baz', 'foo', 'bar'], $result);
     }
-
 
     /**
      * @test
@@ -96,6 +90,7 @@ class EventDispatcherTest extends TestCase
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('handleEvent')->andReturnUsing(function () {
             $this->assertTrue(true);
+
             return true;
         });
 
@@ -145,8 +140,7 @@ class EventDispatcherTest extends TestCase
         $counter = 0;
         $dispatcher = new Dispatcher();
 
-        $dispatcher->once('foo', function () use (&$counter)
-        {
+        $dispatcher->once('foo', function () use (&$counter) {
             $counter++;
             if ($counter > 1) $this->fail();
         });
@@ -162,26 +156,23 @@ class EventDispatcherTest extends TestCase
     public function testStopEventPropagation()
     {
         $dispatcher = new Dispatcher();
-        $dispatcher->on('foo', function ($event)
-        {
+        $dispatcher->on('foo', function ($event) {
             $event->stopPropagation();
+
             return 'bar';
         });
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return 'baz';
         });
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return 'boom';
         });
 
         $result = $dispatcher->dispatch('foo', new EventStub);
         $this->assertSame(['bar'], $result);
     }
-
 
     /**
      * @test
@@ -191,23 +182,19 @@ class EventDispatcherTest extends TestCase
 
         $dispatcher = new Dispatcher();
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return;
         });
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return;
         });
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return 'boom';
         });
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return 'bam';
         });
 
@@ -221,14 +208,13 @@ class EventDispatcherTest extends TestCase
     public function testDetachEvent()
     {
         $dispatcher = new Dispatcher();
-        $dispatcher->on('foo', $foo = function ()
-        {
+        $dispatcher->on('foo', $foo = function () {
             $this->fail();
+
             return 'bar';
         });
 
-        $dispatcher->on('foo', function ()
-        {
+        $dispatcher->on('foo', function () {
             return 'baz';
         });
 
@@ -247,11 +233,13 @@ class EventDispatcherTest extends TestCase
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('handleEvent')->andReturnUsing(function () {
             $this->fail();
+
             return true;
         });
 
         $class->shouldReceive('doHandleEvent')->andReturnUsing(function () {
             $this->assertTrue(true);
+
             return true;
         });
 
@@ -271,6 +259,7 @@ class EventDispatcherTest extends TestCase
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('handleEvent')->andReturnUsing(function () {
             $this->fail();
+
             return true;
         });
 
@@ -364,7 +353,7 @@ class EventStub implements EventInterface
 
 class EventSubscriberStub implements SubscriberInterface
 {
-    static $event;
+    public static $event;
 
     public static function getSubscriptions()
     {

@@ -104,5 +104,4 @@ interface DispatcherInterface
      * @return mixed
      */
     public function removeSubscriber(SubscriberInterface $subscriber);
-
 }

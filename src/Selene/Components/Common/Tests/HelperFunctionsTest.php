@@ -28,11 +28,11 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayGet()
     {
-        $this->assertNull(array_get('baz.bar', ['foo' => ['bar' => 'baz']]));
-        $this->assertNull(array_get('fo.baz', ['foo' => ['bar' => 'baz']]));
+        $this->assertNull(arrayGet('baz.bar', ['foo' => ['bar' => 'baz']]));
+        $this->assertNull(arrayGet('fo.baz', ['foo' => ['bar' => 'baz']]));
 
-        $this->assertEquals('baz', array_get('foo.bar', ['foo' => ['bar' => 'baz']]));
-        $this->assertEquals('baz', array_get('foo.bar.boo.bar', ['foo' => ['bar' => ['boo' => ['bar' => 'baz']]]]));
+        $this->assertEquals('baz', arrayGet('foo.bar', ['foo' => ['bar' => 'baz']]));
+        $this->assertEquals('baz', arrayGet('foo.bar.boo.bar', ['foo' => ['bar' => ['boo' => ['bar' => 'baz']]]]));
     }
 
     /**
@@ -41,9 +41,9 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
     public function testArraySet()
     {
         $array = [];
-        array_set('service.location.locale', 'en', $array);
-        array_set('service.location.name', 'myservice', $array);
-        array_set('service.namespace', 'myserviceNS', $array);
+        arraySet('service.location.locale', 'en', $array);
+        arraySet('service.location.name', 'myservice', $array);
+        arraySet('service.namespace', 'myserviceNS', $array);
 
         $this->assertTrue(isset($array['service']));
         $this->assertTrue(isset($array['service']['namespace']));
@@ -68,8 +68,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
 
         $array = ['name' => 'array', 'id' => 3];
 
-        $this->assertEquals(['obj-a', 'obj-b'], array_pluck('name', [$objectA, $objectB]));
-        $this->assertEquals(['obj-a', 'obj-b', 'array'], array_pluck('name', [$objectA, $objectB, $array]));
+        $this->assertEquals(['obj-a', 'obj-b'], arrayPluck('name', [$objectA, $objectB]));
+        $this->assertEquals(['obj-a', 'obj-b', 'array'], arrayPluck('name', [$objectA, $objectB, $array]));
     }
 
     /**
@@ -77,8 +77,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayNumeric()
     {
-        $this->assertTrue(array_numeric([1, 2, 3]));
-        $this->assertFalse(array_numeric([1, 'foo' => 'bar', 3]));
+        $this->assertTrue(arrayNumeric([1, 2, 3]));
+        $this->assertFalse(arrayNumeric([1, 'foo' => 'bar', 3]));
     }
 
     /**
@@ -86,8 +86,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayCompact()
     {
-        $this->assertEquals([1, 2, 'a', 'b'], array_compact([1, '', 2, false, 'a', null, 'b']));
-        $this->assertEquals(['foo' => true, 'bar' => 1], array_compact(['foo' => true, 'boo' => 0, 'bar' => 1]));
+        $this->assertEquals([1, 2, 'a', 'b'], arrayCompact([1, '', 2, false, 'a', null, 'b']));
+        $this->assertEquals(['foo' => true, 'bar' => 1], arrayCompact(['foo' => true, 'boo' => 0, 'bar' => 1]));
     }
 
     /**
@@ -95,7 +95,7 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayZip()
     {
-        $this->assertEquals([['a', 'A', 1], ['b', 'B', 2], ['c', 'C', 3]], array_zip(['a', 'b', 'c'], ['A', 'B', 'C'], [1, 2, 3]));
+        $this->assertEquals([['a', 'A', 1], ['b', 'B', 2], ['c', 'C', 3]], arrayZip(['a', 'b', 'c'], ['A', 'B', 'C'], [1, 2, 3]));
     }
 
     /**
@@ -103,7 +103,7 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayMax()
     {
-        $this->assertEquals(3, array_max([['a', 'b', 'c'], ['A', 'C'], [1, 2, 3]]));
+        $this->assertEquals(3, arrayMax([['a', 'b', 'c'], ['A', 'C'], [1, 2, 3]]));
     }
 
     /**
@@ -111,7 +111,7 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayMin()
     {
-        $this->assertEquals(2, array_min([['a', 'b', 'c'], ['A', 'C'], [1, 2, 3]]));
+        $this->assertEquals(2, arrayMin([['a', 'b', 'c'], ['A', 'C'], [1, 2, 3]]));
     }
 
     /**
@@ -119,7 +119,7 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testStrCamelCase()
     {
-        $this->assertEquals('fooBar', str_camel_case('foo_bar'));
+        $this->assertEquals('fooBar', strCamelCase('fooBar'));
     }
 
     /**
@@ -127,7 +127,7 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testStrCamelCaseAll()
     {
-        $this->assertEquals('FooBar', str_camel_case_all('foo_bar'));
+        $this->assertEquals('FooBar', strCamelCaseAll('foo_bar'));
     }
 
     /**
@@ -135,8 +135,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testStrLowDash()
     {
-        $this->assertEquals('foo_bar', str_low_dash('fooBar'));
-        $this->assertEquals('foo_bar_baz', str_low_dash('fooBarBaz'));
+        $this->assertEquals('foo_bar', strLowDash('fooBar'));
+        $this->assertEquals('foo_bar_baz', strLowDash('fooBarBaz'));
     }
 
     /**
@@ -144,8 +144,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testStrStartsWith()
     {
-        $this->assertTrue(str_starts_with('str', 'string'));
-        $this->assertFalse(str_starts_with('sdr', 'string'));
+        $this->assertTrue(strStartsWith('str', 'string'));
+        $this->assertFalse(strStartsWith('sdr', 'string'));
     }
 
     /**
@@ -153,8 +153,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testStrIStartsWith()
     {
-        $this->assertTrue(stri_starts_with('str', 'String'));
-        $this->assertTrue(stri_starts_with('Str', 'string'));
+        $this->assertTrue(striStartsWith('str', 'String'));
+        $this->assertTrue(striStartsWith('Str', 'string'));
     }
 
     /**
@@ -162,8 +162,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testStrEndsWith()
     {
-        $this->assertTrue(str_ends_with('ing', 'string'));
-        $this->assertFalse(str_ends_with('ink', 'string'));
+        $this->assertTrue(strEndsWith('ing', 'string'));
+        $this->assertFalse(strEndsWith('ink', 'string'));
     }
 
     /**
@@ -171,8 +171,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testStriEndsWith()
     {
-        $this->assertTrue(stri_ends_with('ING', 'string'));
-        $this->assertTrue(stri_ends_with('ing', 'STRING'));
+        $this->assertTrue(striEndsWith('ING', 'string'));
+        $this->assertTrue(striEndsWith('ing', 'STRING'));
     }
 
     /**
@@ -180,7 +180,7 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testStrContains()
     {
-        $this->assertTrue(str_contains('rin', 'string'));
+        $this->assertTrue(strContains('rin', 'string'));
     }
 
     /**
@@ -188,8 +188,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubstrAfter()
     {
-        $this->assertEquals('doodle', substr_after('=', '--env=doodle'));
-        $this->assertEquals('doodle=foo', substr_after('=', '--env=doodle=foo'));
+        $this->assertEquals('doodle', substrAfter('=', '--env=doodle'));
+        $this->assertEquals('doodle=foo', substrAfter('=', '--env=doodle=foo'));
     }
 
     /**
@@ -197,7 +197,7 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubstriAfter()
     {
-        $this->assertEquals('DAACD', substri_after('c', 'ABCDAACD'));
+        $this->assertEquals('DAACD', substriAfter('c', 'ABCDAACD'));
     }
 
     /**
@@ -205,9 +205,9 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubstrBefore()
     {
-        $this->assertEquals('ABC', substr_before('D', 'ABCDAACD'));
-        $this->assertFalse('ABC' == substr_before('d', 'ABCDAACD'));
-        $this->assertFalse(substr_before('x', 'ABCDAACD'));
+        $this->assertEquals('ABC', substrBefore('D', 'ABCDAACD'));
+        $this->assertFalse('ABC' == substrBefore('d', 'ABCDAACD'));
+        $this->assertFalse(substrBefore('x', 'ABCDAACD'));
     }
 
     /**
@@ -215,8 +215,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubstriBefore()
     {
-        $this->assertEquals('ABC', substri_before('D', 'ABCDAACD'));
-        $this->assertEquals('ABC', substri_before('d', 'ABCDAACD'));
+        $this->assertEquals('ABC', substriBefore('D', 'ABCDAACD'));
+        $this->assertEquals('ABC', substriBefore('d', 'ABCDAACD'));
     }
 
     /**
@@ -227,8 +227,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
         $obj = $this->getMock('MyObject', array('__toString'));
         $obj->expects($this->any())->method('__toString')->will($this->returnValue('foo'));
 
-        $this->assertEquals('foo bar', str_concat('foo', ' ', 'bar'));
-        $this->assertEquals('foo bar', str_concat($obj, ' ', 'bar'));
+        $this->assertEquals('foo bar', strConcat('foo', ' ', 'bar'));
+        $this->assertEquals('foo bar', strConcat($obj, ' ', 'bar'));
     }
 
     /**
@@ -236,12 +236,12 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testClearValue()
     {
-        $this->assertNull(clear_value(''));
-        $this->assertNull(clear_value(' '));
-        $this->assertNull(clear_value(null));
-        $this->assertFalse(is_null(clear_value(0)));
-        $this->assertFalse(is_null(clear_value(false)));
-        $this->assertFalse(is_null(clear_value([])));
+        $this->assertNull(clearValue(''));
+        $this->assertNull(clearValue(' '));
+        $this->assertNull(clearValue(null));
+        $this->assertFalse(is_null(clearValue(0)));
+        $this->assertFalse(is_null(clearValue(false)));
+        $this->assertFalse(is_null(clearValue([])));
     }
 
     /**
@@ -274,8 +274,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testContainedAndStartsWith()
     {
-        $this->assertTrue(contained_and_starts_with(['foo', 'baz', 'bar'], 'fooBar'));
-        $this->assertFalse(contained_and_starts_with(['foo', 'baz', 'bar'], 'FooBar'));
+        $this->assertTrue(containedAndStartsWith(['foo', 'baz', 'bar'], 'fooBar'));
+        $this->assertFalse(containedAndStartsWith(['foo', 'baz', 'bar'], 'FooBar'));
     }
 
     /**
@@ -283,7 +283,7 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testContainedAndEndsWith()
     {
-        $this->assertTrue(contained_and_ends_with(['foo', 'baz', 'bar'], 'Barfoo'));
-        $this->assertFalse(contained_and_ends_with(['foo', 'baz', 'bar'], 'BarFoo'));
+        $this->assertTrue(containedAndEndsWith(['foo', 'baz', 'bar'], 'Barfoo'));
+        $this->assertFalse(containedAndEndsWith(['foo', 'baz', 'bar'], 'BarFoo'));
     }
 }

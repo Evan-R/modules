@@ -1,0 +1,35 @@
+{
+  "name": "selene/cache",
+  "description": "selene cache",
+  "license": "MIT",
+  "authors": [
+    {
+    "name": "Thomas Appel",
+    "email": "mail@thomas-appel.com"
+  }
+  ],
+  "require": {
+    "php":">=5.4.0",
+    "selene/filesystem":"dev-development",
+    "selene/common":"dev-development"
+  },
+  "require-dev": {
+    "selene/testsuite":"dev-development"
+  },
+  "autoload": {
+    "psr-0": {"Selene\\Components\\Cache\\": ""}
+  },
+  "repositories": [{
+    "type":"vcs", 
+    "url":"https://github.com/seleneapp/testsuite.git"
+  },{
+      "type":"vcs", 
+      "url":"https://github.com/seleneapp/common.git"
+  },{
+      "type":"vcs", 
+      "url":"https://github.com/seleneapp/filesystem.git"
+    }
+  ],
+  "target-dir": "Selene/Components/Cache",
+  "minimum-stability": "dev"
+}

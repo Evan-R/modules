@@ -60,17 +60,13 @@ if (!function_exists('arraySet')) {
 
         if (!is_array($array[$key])) {
             return $array;
-        } elseif (is_array($key)) {
-            var_dump('ajksdh '. $key);
         }
-
-
 
         return arraySet(implode($separator, $keys), $value, $array[$key], $separator);
     }
 }
 
-if (!function_exists('array_pluck')) {
+if (!function_exists('arrayPluck')) {
     /**
      * array_pluck
      *
@@ -79,34 +75,39 @@ if (!function_exists('array_pluck')) {
      * @access
      * @return mixed
      */
-    function array_pluck($key, array $array) {
-        return array_map(function ($item) use ($key) {
-            return is_object($item) ? $item->$key : $item[$key];
-        }, $array);
+    function arrayPluck($key, array $array)
+    {
+        return array_map(
+            function ($item) use ($key) {
+                return is_object($item) ? $item->$key : $item[$key];
+            },
+            $array
+        );
     }
 }
 
-if (!function_exists('array_zip')) {
+if (!function_exists('arrayZip')) {
     /**
      * array_zip
      *
      * @access
      * @return mixed
      */
-    function array_zip() {
+    function arrayZip()
+    {
         $args = func_get_args();
         $count = count($args);
 
         $out = [];
 
         for ($i = 0; $i < $count; $i++) {
-            $out[$i] = array_pluck($i, $args);
+            $out[$i] = arrayPluck($i, $args);
         }
         return $out;
     }
 }
 
-if (!function_exists('array_max')) {
+if (!function_exists('arrayMax')) {
     /**
      * array_max
      *
@@ -114,15 +115,19 @@ if (!function_exists('array_max')) {
      * @access
      * @return mixed
      */
-    function array_max(array $args) {
-        uasort($args, function ($a, $b) {
-            return count($a) < count($b) ? 1 : -1;
-        });
+    function arrayMax(array $args)
+    {
+        uasort(
+            $args,
+            function ($a, $b) {
+                return count($a) < count($b) ? 1 : -1;
+            }
+        );
         return count(head($args));
     }
 }
 
-if (!function_exists('array_min')) {
+if (!function_exists('arrayMin')) {
     /**
      * array_min
      *
@@ -130,10 +135,14 @@ if (!function_exists('array_min')) {
      * @access
      * @return mixed
      */
-    function array_min(array $args) {
-        usort($args, function ($a, $b) {
-            return count($a) < count($b) ? 1 : -1;
-        });
+    function arrayMin(array $args)
+    {
+        usort(
+            $args,
+            function ($a, $b) {
+                return count($a) < count($b) ? 1 : -1;
+            }
+        );
         return count(tail($args));
     }
 }
@@ -146,7 +155,8 @@ if (!function_exists('head')) {
      * @access
      * @return mixed
      */
-    function head(array $array) {
+    function head(array $array)
+    {
         return reset($array);
     }
 }
@@ -158,12 +168,13 @@ if (!function_exists('tail')) {
      * @access
      * @return mixed
      */
-    function tail(array $array) {
+    function tail(array $array)
+    {
         return end($array);
     }
 }
 
-if (!function_exists('array_numeric')) {
+if (!function_exists('arrayNumeric')) {
     /**
      * array_numeric
      *
@@ -171,12 +182,13 @@ if (!function_exists('array_numeric')) {
      *
      * @return boolean
      */
-    function array_numeric(array $array) {
+    function arrayNumeric(array $array)
+    {
         return ctype_digit(implode('', array_keys($array)));
     }
 }
 
-if (!function_exists('array_compact')) {
+if (!function_exists('arrayCompact')) {
     /**
      * array_compact
      *
@@ -184,16 +196,19 @@ if (!function_exists('array_compact')) {
      *
      * @return array
      */
-    function array_compact(array $array) {
-        $out = array_filter($array, function ($item)
-        {
-            return false !== (bool)$item;
-        });
-        return array_numeric($out) ? array_values($out) : $out;
+    function arrayCompact(array $array)
+    {
+        $out = array_filter(
+            $array,
+            function ($item) {
+                return false !== (bool)$item;
+            }
+        );
+        return arrayNumeric($out) ? array_values($out) : $out;
     }
 }
 
-if (!function_exists('clear_value')) {
+if (!function_exists('clearValue')) {
     /**
      * null a given value in case it's an empty string
      *
@@ -201,7 +216,8 @@ if (!function_exists('clear_value')) {
      *
      * @return mixed
      */
-    function clear_value($value) {
+    function clearValue($value)
+    {
         return ((is_string($value) && 0 === strlen(trim($value))) || is_null($value)) ? null : $value;
     }
 }
@@ -215,7 +231,8 @@ if (!function_exists('equals')) {
      *
      * @return boolean
      */
-    function equals($value, $comparator) {
+    function equals($value, $comparator)
+    {
         return $value == $comparator;
     }
 }
@@ -229,12 +246,13 @@ if (!function_exists('same')) {
      * @access
      * @return mixed
      */
-    function same($value, $comparator) {
+    function same($value, $comparator)
+    {
         return  $value === $comparator;
     }
 }
 
-if (!function_exists('str_camel_case')) {
+if (!function_exists('strCamelCase')) {
     /**
      * camelcase notataion
      *
@@ -244,12 +262,13 @@ if (!function_exists('str_camel_case')) {
      * @access
      * @return mixed
      */
-    function str_camel_case($str) {
-        return lcfirst(str_camel_case_all($str));
+    function strCamelCase($str)
+    {
+        return lcfirst(strCamelCaseAll($str));
     }
 }
 
-if (!function_exists('str_camel_case_all')) {
+if (!function_exists('strCamelCaseAll')) {
     /**
      * all camelcase notataion
      *
@@ -257,12 +276,13 @@ if (!function_exists('str_camel_case_all')) {
      *
      * @return string
      */
-    function str_camel_case_all($string) {
+    function strCamelCaseAll($string)
+    {
         return str_replace(' ', null, ucwords(str_replace(['-', '_'], ' ', $string)));
     }
 }
 
-if (!function_exists('str_low_dash')) {
+if (!function_exists('strLowDash')) {
     /**
      * convert camelcase to low dash notation
      *
@@ -270,12 +290,13 @@ if (!function_exists('str_low_dash')) {
      *
      * @return string
      */
-    function str_low_dash($string) {
+    function strLowDash($string)
+    {
         return strtolower(preg_replace('/[A-Z]/', '_$0', $string));
     }
 }
 
-if (!function_exists('str_starts_with')) {
+if (!function_exists('strStartsWith')) {
     /**
      * determine if a string starts wiht a given sequence
      *
@@ -284,12 +305,13 @@ if (!function_exists('str_starts_with')) {
      *
      * @return boolean
      */
-    function str_starts_with($sequence, $string) {
+    function strStartsWith($sequence, $string)
+    {
         return 0 === strpos($string, $sequence);
     }
 }
 
-if (!function_exists('stri_starts_with')) {
+if (!function_exists('striStartsWith')) {
     /**
      * determine if a string starts wiht a given sequence
      *
@@ -298,12 +320,13 @@ if (!function_exists('stri_starts_with')) {
      *
      * @return boolean
      */
-    function stri_starts_with($sequence, $string) {
+    function striStartsWith($sequence, $string)
+    {
         return 0 === stripos($string, $sequence);
     }
 }
 
-if (!function_exists('contained_and_starts_with')) {
+if (!function_exists('containedAndStartsWith')) {
     /**
      * contained_and_starts_with
      *
@@ -312,9 +335,10 @@ if (!function_exists('contained_and_starts_with')) {
      * @access
      * @return boolean
      */
-    function contained_and_starts_with(array $comparable, $string) {
+    function containedAndStartsWith(array $comparable, $string)
+    {
         while (count($comparable)) {
-            if (true === str_starts_with(array_shift($comparable), $string)) {
+            if (true === strStartsWith(array_shift($comparable), $string)) {
                 return true;
             }
         }
@@ -322,7 +346,7 @@ if (!function_exists('contained_and_starts_with')) {
     }
 }
 
-if (!function_exists('contained_and_ends_with')) {
+if (!function_exists('containedAndEndsWith')) {
     /**
      * contained_and_ends_with
      *
@@ -331,9 +355,10 @@ if (!function_exists('contained_and_ends_with')) {
      * @access
      * @return mixed
      */
-    function contained_and_ends_with(array $comparable, $string) {
+    function containedAndEndsWith(array $comparable, $string)
+    {
         while (count($comparable)) {
-            if (true === str_ends_with(array_shift($comparable), $string)) {
+            if (true === strEndsWith(array_shift($comparable), $string)) {
                 return true;
             }
         }
@@ -341,7 +366,7 @@ if (!function_exists('contained_and_ends_with')) {
     }
 }
 
-if (!function_exists('str_ends_with')) {
+if (!function_exists('strEndsWith')) {
     /**
      * determine if a string ends wiht a given sequence
      *
@@ -350,13 +375,13 @@ if (!function_exists('str_ends_with')) {
      *
      * @return boolean
      */
-    function str_ends_with($sequence, $string)
+    function strEndsWith($sequence, $string)
     {
         return (strlen($string) - strlen($sequence)) === strpos($string, $sequence);
     }
 }
 
-if (!function_exists('stri_ends_with')) {
+if (!function_exists('striEndsWith')) {
     /**
      * determine if a string ends wiht a given sequence
      *
@@ -365,12 +390,13 @@ if (!function_exists('stri_ends_with')) {
      *
      * @return boolean
      */
-    function stri_ends_with($sequence, $string) {
+    function striEndsWith($sequence, $string)
+    {
         return (strlen($string) - strlen($sequence)) === stripos($string, $sequence);
     }
 }
 
-if (!function_exists('str_contains')) {
+if (!function_exists('strContains')) {
     /**
      * determine if a string contains a gicen string sequence
      *
@@ -379,12 +405,13 @@ if (!function_exists('str_contains')) {
      *
      * @return boolean
      */
-    function str_contains($sequence, $string) {
+    function strContains($sequence, $string)
+    {
         return false !== strpos($string, $sequence);
     }
 }
 
-if (!function_exists('stri_contains')) {
+if (!function_exists('striContains')) {
     /**
      * str_contains
      *
@@ -393,12 +420,13 @@ if (!function_exists('stri_contains')) {
      *
      * @return boolean
      */
-    function stri_contains($sequence, $string) {
+    function striContains($sequence, $string)
+    {
         return false !== stripos($string, $sequence);
     }
 }
 
-if (!function_exists('substr_after')) {
+if (!function_exists('substrAfter')) {
     /**
      * returns the substring after the first occurance of a given character
      *
@@ -407,12 +435,13 @@ if (!function_exists('substr_after')) {
      *
      * @return string|boolean
      */
-    function substr_after($char, $string) {
+    function substrAfter($char, $string)
+    {
         return false !== ($pos = strpos($string, $char)) ? substr($string, $pos + 1) : false;
     }
 }
 
-if (!function_exists('substri_after')) {
+if (!function_exists('substriAfter')) {
     /**
      * returns the substring after the first occurance of a given character
      * (case insensitive)
@@ -422,12 +451,13 @@ if (!function_exists('substri_after')) {
      *
      * @return string|boolean
      */
-    function substri_after($char, $string) {
+    function substriAfter($char, $string)
+    {
         return false !== ($pos = stripos($string, $char)) ? substr($string, $pos + 1) : false;
     }
 }
 
-if (!function_exists('substr_before')) {
+if (!function_exists('substrBefore')) {
     /**
      * returns the substring before the first occurance of a given character
      *
@@ -436,12 +466,13 @@ if (!function_exists('substr_before')) {
      *
      * @return string|boolean
      */
-    function substr_before($char, $string) {
+    function substrBefore($char, $string)
+    {
         return false !== ($pos = strpos($string, $char)) ? substr($string, 0, $pos) : false;
     }
 }
 
-if (!function_exists('substri_before')) {
+if (!function_exists('substriBefore')) {
     /**
      * returns the substring before the first occurance of a given character
      * (case insensitive)
@@ -451,12 +482,13 @@ if (!function_exists('substri_before')) {
      *
      * @return string|boolean
      */
-    function substri_before($char, $string) {
+    function substriBefore($char, $string)
+    {
         return false !== ($pos = stripos($string, $char)) ? substr($string, 0, $pos) : false;
     }
 }
 
-if (!function_exists('str_concat')) {
+if (!function_exists('strConcat')) {
     /**
      * concatenate string|number|object segments
      *
@@ -468,13 +500,14 @@ if (!function_exists('str_concat')) {
      *
      * @return string
      */
-    function str_concat() {
-        return vsprintf(str_repeat('%s', count($args = func_get_args())),  $args);
+    function strConcat()
+    {
+        return vsprintf(str_repeat('%s', count($args = func_get_args())), $args);
     }
 
 }
 
-if (!function_exists('get_require')) {
+if (!function_exists('getRequire')) {
 
     /**
      * get_require
@@ -483,7 +516,8 @@ if (!function_exists('get_require')) {
      * @access
      * @return mixed
      */
-    function get_require($file) {
+    function getRequire($file)
+    {
         return require($file);
     }
 }

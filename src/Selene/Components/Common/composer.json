@@ -17,6 +17,14 @@
   "autoload": {
     "psr-0": {"Selene\\Components\\Common\\": ""}
   },
+  "repositories": [{
+      "type":"vcs", 
+      "url":"https://github.com/seleneapp/testsuite.git"
+    },{
+      "type":"vcs", 
+      "url":"https://github.com/seleneapp/common.git"
+    }
+  ],
   "target-dir": "Selene/Components/Common",
   "minimum-stability": "dev"
 }

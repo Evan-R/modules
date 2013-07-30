@@ -53,5 +53,4 @@ interface EventInterface
      * @return void
      */
     public function setName($name);
-
 }

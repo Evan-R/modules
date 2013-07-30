@@ -288,7 +288,7 @@ class Dispatcher implements DispatcherInterface
             $handlers = [];
 
             foreach ($this->handlers as $handler) {
-                $stack = ['stack' => &$handlers] + array_pluck('eventHandler', $handler);
+                $stack = ['stack' => &$handlers] + arrayPluck('eventHandler', $handler);
                 call_user_func_array('array_push', $stack);
             }
 
@@ -298,7 +298,7 @@ class Dispatcher implements DispatcherInterface
         if (isset($this->handlers[$event])) {
             $this->sort($event);
 
-            return array_pluck('eventHandler', $this->handlers[$event]);
+            return arrayPluck('eventHandler', $this->handlers[$event]);
         }
 
         return [];
@@ -423,7 +423,6 @@ class Dispatcher implements DispatcherInterface
             2,
             'handleEvent'
         );
-
         return compact('class', 'method');
     }
 }
