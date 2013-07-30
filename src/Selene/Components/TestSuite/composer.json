@@ -19,6 +19,12 @@
 	"autoload": {
 		"psr-0": {"Selene\\Components\\TestSuite\\": ""}
 	},
+  "repositories": [
+    {
+      "type":"vcs", 
+      "url":"https://github.com/seleneapp/testsuite.git"
+    }
+  ],
 	"target-dir": "Selene/Components/TestSuite",
     "minimum-stability": "dev"
 }
