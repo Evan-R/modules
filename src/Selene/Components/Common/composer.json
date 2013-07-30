@@ -15,7 +15,10 @@
     "selene/testsuite":"dev-development"
   },
   "autoload": {
-    "psr-0": {"Selene\\Components\\Common\\": ""}
+    "psr-0": {"Selene\\Components\\Common\\": ""},
+    "files": [
+      "Helper/functions.php"
+    ]
   },
   "repositories": [{
       "type":"vcs", 
