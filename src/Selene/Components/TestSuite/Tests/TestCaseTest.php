@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * This File is part of the Selene\Components\TestSuite\Tests package
+ *
+ * (c) Thomas Appel <mail@thomas-appel.com>
+ *
+ * For full copyright and license information, please refer to the LICENSE file
+ * that was distributed with this package.
+ */
+
+namespace Selene\Components\TestSuite\Tests;
+
+use Selene\Components\TestSuite\TestCase;
+
+/**
+ * @class TestCaseTest
+ * @package
+ * @version $Id$
+ */
+class TestCaseTest extends TestCase
+{
+    public function testInvokeObjectMethod()
+    {
+        $this->assertSame('bar', $this->invokeObjectMethod('getFoo', $this));
+    }
+
+    public function testGetObjectPropertyValue()
+    {
+        $object = new \StdClass;
+        $object->foo = 'bar';
+        $this->assertSame('bar', $this->getObjectPropertyValue('foo', $object));
+    }
+
+    protected function getFoo()
+    {
+        return 'bar';
+    }
+}
