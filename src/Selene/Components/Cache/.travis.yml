@@ -5,7 +5,7 @@ php:
 services:
   - memcached
 before_script:
-  - composer --dev install && composer --dev update
+  - composer install --prefer-source --no-interaction --dev
   - printf "\n" | pecl install -f memcached-2.0.1
   - echo "extension=\"memcached.so\"" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
   - phpenv rehash
