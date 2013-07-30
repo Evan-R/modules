@@ -13,7 +13,8 @@
     "selene/common":"dev-development"
   },
   "require-dev": {
-    "selene/testsuite":"dev-development"
+    "selene/testsuite":"dev-development",
+    "selene/dependency-injection":"dev-development"
   },
   "autoload": {
     "psr-0": {"Selene\\Components\\Events\\": ""}
