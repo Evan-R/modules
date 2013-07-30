@@ -148,6 +148,42 @@ class Filesystem
     }
 
     /**
+     * flush
+     *
+     *
+     * @access public
+     * @return mixed
+     */
+    public function flush($directory)
+    {
+        if (!$this->isDir($directory)) {
+            throw new IOException(sprintf('%s is not a directory', $directory));
+        }
+
+        try {
+            $this->rmRecursive($directory);
+        } catch (\Exception $e) {
+            throw new IOException(sprintf('could not flush directory %s', $directory));
+        }
+    }
+
+    /**
+     * isEmpty
+     *
+     * @param string $directory
+     *
+     * @access public
+     * @return bool
+     */
+    public function isEmpty($directory)
+    {
+        foreach ($this->getIterator($directory) as $file) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * touch
      *
      * @param mixed $file
@@ -466,6 +502,45 @@ class Filesystem
     }
 
     /**
+     * fileMTime
+     *
+     * @param mixed $file
+     *
+     * @access public
+     * @return mixed
+     */
+    public function fileMTime($file)
+    {
+        return filemtime($file);
+    }
+
+    /**
+     * fileATime
+     *
+     * @param mixed $file
+     *
+     * @access public
+     * @return mixed
+     */
+    public function fileATime($file)
+    {
+        return fileatime($file);
+    }
+
+    /**
+     * fileCTime
+     *
+     * @param mixed $file
+     *
+     * @access public
+     * @return mixed
+     */
+    public function fileCTime($file)
+    {
+        return filectime($file);
+    }
+
+    /**
      * file
      *
      * @param mixed $file
@@ -543,11 +618,11 @@ class Filesystem
      * @access public
      * @return mixed
      */
-    public function getContents($file, $readFlags = null)
+    public function getContents($file, $includepath = null, $context = null, $start = null, $stop = null)
     {
-        return is_null($readFlags) ?
-            file_get_contents($file) :
-            file_get_contents($file, $readFlags);
+        return is_null($start) ?
+            file_get_contents($file, $includepath, $context) :
+            file_get_contents($file, $includepath, $context, $start, $stop);
     }
 
     /**

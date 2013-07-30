@@ -1,0 +1,30 @@
+{
+  "name": "selene/filesystem",
+  "description": "selene filesystem",
+  "license": "MIT",
+  "authors": [
+    {
+    "name": "Thomas Appel",
+    "email": "mail@thomas-appel.com"
+  }
+  ],
+  "require": {
+    "php":">=5.4.0"
+  },
+  "require-dev": {
+    "selene/testsuite":"dev-development"
+  },
+  "autoload": {
+    "psr-0": {"Selene\\Components\\Filesystem\\": ""}
+  },
+  "repositories": [{
+    "type":"vcs", 
+    "url":"https://github.com/seleneapp/testsuite.git"
+  },{
+      "type":"vcs", 
+      "url":"https://github.com/seleneapp/common.git"
+    }
+  ],
+  "target-dir": "Selene/Components/Filesystem",
+  "minimum-stability": "dev"
+}

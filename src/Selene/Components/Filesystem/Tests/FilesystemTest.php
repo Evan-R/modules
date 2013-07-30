@@ -103,7 +103,13 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->fs->touch($target);
         $this->assertEquals(time(), filemtime($target));
+    }
 
+    public function testFileMTime()
+    {
+        touch($file = $this->testDrive.DIRECTORY_SEPARATOR.'file');
+        touch($file, $time = time() + 1000);
+        $this->assertEquals($time, $this->fs->fileMTime($file));
     }
 
     public function testTouchFileModificationTime()
@@ -294,6 +300,24 @@ class FilesystemTest extends FilesystemTestCase
         $this->fs->rmdir($source);
         $this->assertFalse(is_dir($source));
         $this->assertFalse(file_exists($source));
+    }
+
+    public function testFlushDirectory()
+    {
+        $this->buildTree();
+        $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_tree';
+        $this->assertIsDir($source);
+
+        $this->fs->flush($source);
+        $this->assertIsDir($source);
+        $this->assertFalse(file_exists($source.DIRECTORY_SEPARATOR.'nested_subtree'));
+    }
+
+    public function testDirectoryIsEmpty()
+    {
+        $this->assertTrue($this->fs->isEmpty($this->testDrive));
+        mkdir($this->testDrive.DIRECTORY_SEPARATOR.'foo');
+        $this->assertFalse($this->fs->isEmpty($this->testDrive));
     }
 
     public function testChangeDirectoryPermissions()

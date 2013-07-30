@@ -15,6 +15,7 @@ use org\bovigo\vfs\vfsStream;
 use Selene\Components\TestSuite\TestCase;
 use Selene\Components\Filesystem\Filesystem;
 use Selene\Components\Filesystem\FileCollection;
+use Selene\Components\TestSuite\Traits\TestDrive;
 
 /**
  * @class FilesystemTest
@@ -23,6 +24,7 @@ use Selene\Components\Filesystem\FileCollection;
  */
 abstract class FilesystemTestCase extends TestCase
 {
+    use TestDrive;
     /**
      * fs
      *
@@ -36,26 +38,18 @@ abstract class FilesystemTestCase extends TestCase
     {
         parent::setUp();
         $this->fs = new Filesystem;
-        $this->setupTestDrive();
+        $this->testDrive = $this->setupTestDrive();
     }
 
     protected function tearDown()
     {
-        if (!is_null($this->testDrive) && is_dir($this->testDrive)) {
-            $this->cleanUp($this->testDrive);
+        if (file_exists($this->testDrive)) {
+            $this->teardownTestDrive($this->testDrive);
         }
 
         $this->testDrive = null;
     }
 
-    protected function setupTestDrive()
-    {
-        $dir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.(time().rand(0, 1000));
-        mkdir($dir, 0777, true);
-
-        $this->testDrive = realpath($dir);
-
-    }
 
     protected function buildTree(\SimpleXMLElement $xml = null)
     {
@@ -114,27 +108,6 @@ abstract class FilesystemTestCase extends TestCase
         return is_string($perm) ? octdec($perm) : $perm;
     }
 
-    /**
-     * cleanUp
-     *
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function cleanUp($file)
-    {
-        foreach (new \DirectoryIterator($file) as $f) {
-            if ($f->isDot()) {
-                continue;
-            }
-            if ($f->isFile() || $f->isLink()) {
-                unlink($f->getRealPath());
-            } elseif ($f->isDir()) {
-                $this->cleanUp($f->getRealPath());
-            }
-        }
-        rmdir($file);
-    }
 
     public static function assertIsFile($file)
     {

@@ -82,7 +82,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      * @param mixed $dir
      *
      * @access public
-     * @return mixed
+     * @return Directory
      */
     public function mkdir($dir, $permissions = 0755, $recursive = true)
     {
@@ -95,11 +95,46 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      *
      *
      * @access public
-     * @return boolean
+     * @return Directory
      */
-    public function remove()
+    public function remove($file = null)
     {
-        $this->files->remove((string)$this);
+        $this->files->remove($this->getFile($file));
+        return $this;
+    }
+
+    public function flush($file = null)
+    {
+        $this->files->flush($this->getFile($file));
+        return $this;
+    }
+
+    /**
+     * isEmpty
+     *
+     * @param mixed $directory
+     *
+     * @access public
+     * @return bool
+     */
+    public function isEmpty($directory = null)
+    {
+        return $this->files->isEmpty($this->getFile($directory));
+    }
+
+    /**
+     * touch
+     *
+     * @param mixed $file
+     * @param mixed $time
+     * @param mixed $atime
+     *
+     * @access public
+     * @return Directory
+     */
+    public function touch($file, $time = null, $atime = null)
+    {
+        $this->files->touch($this->getRealPath($file), $time, $atime);
         return $this;
     }
 
@@ -163,6 +198,19 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     }
 
     /**
+     * exists
+     *
+     * @param mixed $file
+     *
+     * @access public
+     * @return boolean
+     */
+    public function exists($file)
+    {
+        return $this->files->exists($this->getFile($file));
+    }
+
+    /**
      * get
      *
      *
@@ -184,6 +232,26 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     {
         $this->clearFilter();
         return $this->get()->toArray();
+    }
+
+    public function getRealPath($file = null)
+    {
+        return $this->getFile($file);
+    }
+
+    /**
+     * getFile
+     *
+     * @param mixed $file
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function getFile($file = null)
+    {
+        return is_null($file) ?
+            (string)$this :
+            (string)$this.DIRECTORY_SEPARATOR.$file;
     }
 
     /**
