@@ -9,11 +9,13 @@
  * that was distributed with this package.
  */
 
+namespace Selene\Components\Events\Tests;
+
 use Mockery as m;
 use Selene\Components\TestSuite\TestCase;
 use Selene\Components\Events\Dispatcher;
-use Selene\Components\Events\EventInterface;
-use Selene\Components\Events\SubscriberInterface;
+use Selene\Components\Events\Tests\Stubs\EventStub;
+use Selene\Components\Events\Tests\Stubs\EventSubscriberStub;
 use Selene\Components\DependencyInjection\ContainerInterface;
 
 class EventDispatcherTest extends TestCase
@@ -30,13 +32,19 @@ class EventDispatcherTest extends TestCase
     {
         $dispatcher = new Dispatcher();
 
-        $dispatcher->on('foo', function () {
+        $dispatcher->on(
+            'foo',
+            function () {
                 return 'bar';
-        });
+            }
+        );
 
-        $dispatcher->on('foo', function () {
-            return 'baz';
-        });
+        $dispatcher->on(
+            'foo',
+            function () {
+                return 'baz';
+            }
+        );
 
         $result = $dispatcher->dispatch('foo');
 
@@ -50,17 +58,29 @@ class EventDispatcherTest extends TestCase
     {
         $dispatcher = new Dispatcher();
 
-        $dispatcher->on('foo', function () {
-            return 'foo';
-        }, 200);
+        $dispatcher->on(
+            'foo',
+            function () {
+                return 'foo';
+            },
+            200
+        );
 
-        $dispatcher->on('foo', function () {
-            return 'bar';
-        }, 100);
+        $dispatcher->on(
+            'foo',
+            function () {
+                return 'bar';
+            },
+            100
+        );
 
-        $dispatcher->on('foo', function () {
-            return 'baz';
-        }, 300);
+        $dispatcher->on(
+            'foo',
+            function () {
+                return 'baz';
+            },
+            300
+        );
 
         $result = $dispatcher->dispatch('foo');
 
@@ -88,11 +108,13 @@ class EventDispatcherTest extends TestCase
     public function testBindClassDefinitionShouldCallHandleEvent()
     {
         $class = m::mock('HandleAwareClass');
-        $class->shouldReceive('handleEvent')->andReturnUsing(function () {
-            $this->assertTrue(true);
+        $class->shouldReceive('handleEvent')->andReturnUsing(
+            function () {
+                $this->assertTrue(true);
 
-            return true;
-        });
+                return true;
+            }
+        );
 
         $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
         $container->shouldReceive('offsetGet')->with('HandleAwareClass')->andReturn($class);
@@ -105,7 +127,6 @@ class EventDispatcherTest extends TestCase
         if (empty($result)) {
             $this->fail();
         }
-
     }
 
     /**
@@ -114,10 +135,13 @@ class EventDispatcherTest extends TestCase
     public function testBindClassDefinitionShouldCallDefinedMethod()
     {
         $class = m::mock('HandleAwareClass');
-        $class->shouldReceive('doHandle')->andReturnUsing(function () {
-            $this->assertTrue(true);
-            return true;
-        });
+        $class->shouldReceive('doHandle')->andReturnUsing(
+            function () {
+                $this->assertTrue(true);
+
+                return true;
+            }
+        );
 
         $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
         $container->shouldReceive('offsetGet')->with('HandleAwareClass')->andReturn($class);
@@ -140,10 +164,15 @@ class EventDispatcherTest extends TestCase
         $counter = 0;
         $dispatcher = new Dispatcher();
 
-        $dispatcher->once('foo', function () use (&$counter) {
-            $counter++;
-            if ($counter > 1) $this->fail();
-        });
+        $dispatcher->once(
+            'foo',
+            function () use (&$counter) {
+                $counter++;
+                if ($counter > 1) {
+                    $this->fail();
+                }
+            }
+        );
 
         $result = $dispatcher->dispatch('foo');
         $result = $dispatcher->dispatch('foo');
@@ -156,19 +185,27 @@ class EventDispatcherTest extends TestCase
     public function testStopEventPropagation()
     {
         $dispatcher = new Dispatcher();
-        $dispatcher->on('foo', function ($event) {
-            $event->stopPropagation();
+        $dispatcher->on(
+            'foo',
+            function ($event) {
+                $event->stopPropagation();
+                return 'bar';
+            }
+        );
 
-            return 'bar';
-        });
+        $dispatcher->on(
+            'foo',
+            function () {
+                return 'baz';
+            }
+        );
 
-        $dispatcher->on('foo', function () {
-            return 'baz';
-        });
-
-        $dispatcher->on('foo', function () {
-            return 'boom';
-        });
+        $dispatcher->on(
+            'foo',
+            function () {
+                return 'boom';
+            }
+        );
 
         $result = $dispatcher->dispatch('foo', new EventStub);
         $this->assertSame(['bar'], $result);
@@ -182,21 +219,33 @@ class EventDispatcherTest extends TestCase
 
         $dispatcher = new Dispatcher();
 
-        $dispatcher->on('foo', function () {
-            return;
-        });
+        $dispatcher->on(
+            'foo',
+            function () {
+                return;
+            }
+        );
 
-        $dispatcher->on('foo', function () {
-            return;
-        });
+        $dispatcher->on(
+            'foo',
+            function () {
+                return;
+            }
+        );
 
-        $dispatcher->on('foo', function () {
-            return 'boom';
-        });
+        $dispatcher->on(
+            'foo',
+            function () {
+                return 'boom';
+            }
+        );
 
-        $dispatcher->on('foo', function () {
-            return 'bam';
-        });
+        $dispatcher->on(
+            'foo',
+            function () {
+                return 'bam';
+            }
+        );
 
         $result = $dispatcher->untill('foo');
         $this->assertSame(['boom'], $result);
@@ -208,15 +257,20 @@ class EventDispatcherTest extends TestCase
     public function testDetachEvent()
     {
         $dispatcher = new Dispatcher();
-        $dispatcher->on('foo', $foo = function () {
-            $this->fail();
+        $dispatcher->on(
+            'foo',
+            $foo = function () {
+                $this->fail();
+                return 'bar';
+            }
+        );
 
-            return 'bar';
-        });
-
-        $dispatcher->on('foo', function () {
-            return 'baz';
-        });
+        $dispatcher->on(
+            'foo',
+            function () {
+                return 'baz';
+            }
+        );
 
         $dispatcher->off('foo', $foo);
         $result = $dispatcher->dispatch('foo');
@@ -231,17 +285,19 @@ class EventDispatcherTest extends TestCase
         $dispatcher = new Dispatcher();
 
         $class = m::mock('HandleAwareClass');
-        $class->shouldReceive('handleEvent')->andReturnUsing(function () {
-            $this->fail();
+        $class->shouldReceive('handleEvent')->andReturnUsing(
+            function () {
+                $this->fail();
+                return true;
+            }
+        );
 
-            return true;
-        });
-
-        $class->shouldReceive('doHandleEvent')->andReturnUsing(function () {
-            $this->assertTrue(true);
-
-            return true;
-        });
+        $class->shouldReceive('doHandleEvent')->andReturnUsing(
+            function () {
+                $this->assertTrue(true);
+                return true;
+            }
+        );
 
         $dispatcher->on('foo', [$class, 'handleEvent']);
         $dispatcher->on('foo', [$class, 'doHandleEvent']);
@@ -257,15 +313,18 @@ class EventDispatcherTest extends TestCase
     public function testDetachEventWithBoundCallableClass()
     {
         $class = m::mock('HandleAwareClass');
-        $class->shouldReceive('handleEvent')->andReturnUsing(function () {
-            $this->fail();
+        $class->shouldReceive('handleEvent')->andReturnUsing(
+            function () {
+                $this->fail();
+                return true;
+            }
+        );
 
-            return true;
-        });
-
-        $class->shouldReceive('doHandleEvent')->andReturnUsing(function () {
-            return true;
-        });
+        $class->shouldReceive('doHandleEvent')->andReturnUsing(
+            function () {
+                return true;
+            }
+        );
 
         $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
         $container->shouldReceive('offsetGet')->with('HandleAwareClass')->andReturn($class);
@@ -282,10 +341,16 @@ class EventDispatcherTest extends TestCase
 
     public function testGetAllHandlers()
     {
+        $foo = function () {
+        };
+        $bar = function () {
+        };
+        $baz = function () {
+        };
         $dispatcher = new Dispatcher();
-        $dispatcher->on('foo', $foo = function () {});
-        $dispatcher->on('bar', $bar = function () {});
-        $dispatcher->on('baz', $baz = function () {});
+        $dispatcher->on('foo', $foo);
+        $dispatcher->on('bar', $bar);
+        $dispatcher->on('baz', $baz);
 
         $handlers = $dispatcher->getEventHandlers();
 
@@ -321,69 +386,5 @@ class EventDispatcherTest extends TestCase
 
         $result = $dispatcher->dispatch('bar.event');
         $this->assertSame([], $result);
-    }
-}
-
-class EventStub implements EventInterface
-{
-    protected $stopped = false;
-
-    protected $name = false;
-
-    public function stopPropagation()
-    {
-        $this->stopped = true;
-    }
-
-    public function isPropagationStopped()
-    {
-        return $this->stopped;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-}
-
-class EventSubscriberStub implements SubscriberInterface
-{
-    public static $event;
-
-    public static function getSubscriptions()
-    {
-        return [
-            'foo.event' => [
-                ['onFooEventPre', 100],
-                ['onFooEventMid', 10],
-                ['onFooEventAfter', 0]
-            ],
-            'bar.event' => ['onBarEvent', 10]
-        ];
-    }
-
-    public function onFooEventPre()
-    {
-        return 'foo.pre';
-    }
-
-    public function onFooEventMid()
-    {
-        return 'foo.mid';
-    }
-
-    public function onFooEventAfter()
-    {
-        return 'foo.after';
-    }
-
-    public function onBarEvent()
-    {
-        return 'bar';
     }
 }
