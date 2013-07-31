@@ -51,6 +51,25 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * setObjectPropertyValue
+     *
+     * @param mixed $property
+     * @param mixed $object
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function setObjectPropertyValue($property, $value, $object)
+    {
+        $reflect  = new \ReflectionObject($object);
+        $property = $reflect->getProperty($property);
+
+        $property->setAccessible(true);
+
+        return $property->setValue($object, $value);
+    }
+
+    /**
      * Invoke a none public object method.
      *
      * @param string $method

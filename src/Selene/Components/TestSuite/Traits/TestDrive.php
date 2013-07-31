@@ -29,7 +29,6 @@ trait TestDrive
     {
         $dir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.(time().rand(0, 1000));
         mkdir($dir, 0777, true);
-
         return realpath($dir);
     }
 

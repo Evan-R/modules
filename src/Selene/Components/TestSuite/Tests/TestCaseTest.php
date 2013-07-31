@@ -20,6 +20,8 @@ use Selene\Components\TestSuite\TestCase;
  */
 class TestCaseTest extends TestCase
 {
+    private $bar;
+
     public function testInvokeObjectMethod()
     {
         $this->assertSame('bar', $this->invokeObjectMethod('getFoo', $this));
@@ -32,8 +34,19 @@ class TestCaseTest extends TestCase
         $this->assertSame('bar', $this->getObjectPropertyValue('foo', $object));
     }
 
+    public function testSetObjectPropertyValue()
+    {
+        $this->setObjectPropertyValue('bar', 'foo', $this);
+        $this->assertSame('foo', $this->getBar());
+    }
+
     protected function getFoo()
     {
         return 'bar';
+    }
+
+    protected function getBar()
+    {
+        return $this->bar;
     }
 }
