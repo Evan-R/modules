@@ -242,7 +242,7 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
     protected function export(array $array, array $out = [])
     {
         foreach ($array as $path => $file) {
-            $out[$this->getPath($file)] = $file->toArray();
+            $out[] = $file->getRealPath();
         }
         return $out;
     }

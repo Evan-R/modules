@@ -59,11 +59,25 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     protected $inFilter;
 
     /**
+     * depthsFilter
+     *
+     * @var int
+     */
+    protected $depthsFilter;
+
+    /**
      * notInFilter
      *
      * @var mixed
      */
     protected $notInFilter;
+
+    /**
+     * onlyFilesFilter
+     *
+     * @var mixed
+     */
+    protected $onlyFilesFilter = false;
 
     /**
      * ignoreFilter
@@ -211,7 +225,11 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     public function get()
     {
-        return $this->listDir(new FileCollection($path = (string)$this), $path, true);
+        return $this->listDir(
+            new FileCollection($path = (string)$this),
+            $path,
+            0 === $this->depthsFilter ? false : true
+        );
     }
 
     /**
@@ -264,6 +282,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
             $ignorefiles = true;
         }
 
+
         foreach ($iterator = $this->getIterator($location) as $fileInfo) {
 
             if ($fileInfo->isLink()) {
@@ -276,8 +295,17 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
             }
 
             if ($recursive and $fileInfo->isDir()) {
+
+                if (isset($this->depthsFilter)) {
+                    if (0 === $this->depthsFilter) {
+                        break;
+                    }
+                    $this->depthsFilter--;
+                }
+
                 $this->doList($collection, $fileInfo->getRealPath(), true);
-                if ($this->isIncludedDir($fileInfo->getRealPath())) {
+
+                if ($this->isIncludedDir($fileInfo->getRealPath()) and true !== $this->onlyFilesFilter) {
                     $collection->add($fileInfo->getFileInfo());
                 }
                 continue;
@@ -296,6 +324,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         unset($this->inFilter);
         unset($this->fileFilter);
         unset($this->notInFilter);
+        unset($this->depthsFilter);
         unset($this->ignoreFilter);
         unset($this->currentFilter);
         unset($this->currentExclude);
@@ -303,9 +332,12 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         $this->inFilter       = null;
         $this->fileFilter     = null;
         $this->notInFilter    = null;
+        $this->depthsFilter   = null;
         $this->ignoreFilter   = null;
         $this->currentFilter  = null;
         $this->currentExclude = null;
+
+        $this->onlyFilesFilter = false;
     }
 
     /**
@@ -438,21 +470,23 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     }
 
     /**
-     * getDirectoryExpression
+     * depth
      *
-     * @param mixed $directories
+     * @param mixed $depths
      *
-     * @access protected
+     * @access public
      * @return mixed
      */
-    protected function getDirectoryExpression($directories)
+    public function depth($depths)
     {
-        $directories = is_array($directories) ?
-            ($path = '^'.(string)$this.DIRECTORY_SEPARATOR)
-            .implode('|'.$path, str_replace('\\\//', DIRECTORY_SEPARATOR, $directories)) :
-            (string)$directories;
+        $this->depthsFilter = (int)$depths;
+        return $this;
+    }
 
-        return $directories;
+    public function files()
+    {
+        $this->onlyFilesFilter = true;
+        return $this;
     }
 
     /**

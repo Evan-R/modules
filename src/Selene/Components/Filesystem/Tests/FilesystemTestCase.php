@@ -32,7 +32,7 @@ abstract class FilesystemTestCase extends TestCase
      */
     protected $fs;
 
-    protected $testDriver;
+    protected $testDrive;
 
     protected function setUp()
     {
@@ -48,6 +48,7 @@ abstract class FilesystemTestCase extends TestCase
         }
 
         $this->testDrive = null;
+        parent::tearDown();
     }
 
 

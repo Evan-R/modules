@@ -12,6 +12,7 @@
     "php": ">=5.4.0",
     "symfony/console": "~2.2",
     "monolog/monolog":"dev-master",
+    "ircmaxell/password-compat":"1.0.*",
     "psr/log": "~1.0"
   },
   "require-dev": {

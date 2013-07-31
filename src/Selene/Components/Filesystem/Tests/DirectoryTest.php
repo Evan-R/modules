@@ -130,12 +130,68 @@ class DirectoryTest extends FilesystemTestCase
 
         $files = $collection->toArray();
 
-        $this->assertTrue(is_array($f = arrayGet('%files%.fileA', $files)) && $f['name'] === 'fileA');
-        $this->assertTrue(is_array($f = arrayGet('%directories%.testB', $files)) && $f['name'] === 'testB');
-        $this->assertTrue(is_array($f = arrayGet('%directories%.testB.%files%', $files)) && isset($f['fileD']));
+        $this->assertTrue(is_array($f = arrayGet($files, '%files%.fileA')) && $f['name'] === 'fileA');
+        $this->assertTrue(is_array($f = arrayGet($files, '%directories%.testB')) && $f['name'] === 'testB');
+        $this->assertTrue(is_array($f = arrayGet($files, '%directories%.testB.%files%')) && isset($f['fileD']));
         $this->assertTrue(
-            is_array($f = arrayGet('%directories%.testB.%files%.fileD', $files))&& $f['name'] === 'fileD'
+            is_array($f = arrayGet($files, '%directories%.testB.%files%.fileD'))&& $f['name'] === 'fileD'
         );
+    }
+
+    public function testListDirectoryRestrictDepth()
+    {
+        foreach (['fileA', 'fileB', 'fileC'] as $file) {
+            touch($this->testDrive.DIRECTORY_SEPARATOR.$file);
+        }
+
+        mkdir($dir = $this->testDrive.DIRECTORY_SEPARATOR.'testB');
+        foreach (['fileD', 'fileE', 'fileF'] as $file) {
+            touch($dir.DIRECTORY_SEPARATOR.$file);
+        }
+
+        mkdir($dir = $this->testDrive.DIRECTORY_SEPARATOR.'testB'.DIRECTORY_SEPARATOR.'testC');
+        foreach (['fileG', 'fileH', 'fileI'] as $file) {
+            touch($dir.DIRECTORY_SEPARATOR.$file);
+        }
+
+        $dir = $this->fs->directory($this->testDrive);
+        $collection = $dir->depth(0)->get();
+        $collection->setOutputTree(false);
+
+        $this->assertEquals(3, count($collection->toArray()));
+
+        $collection = $dir->depth(1)->get();
+        $collection->setOutputTree(false);
+
+        $this->assertEquals(7, count($collection->toArray()));
+
+        $collection = $dir->depth(2)->get();
+        $collection->setOutputTree(false);
+
+        $this->assertEquals(11, count($collection->toArray()));
+    }
+
+    public function testListDirectoryOnlyFiles()
+    {
+        foreach (['fileA', 'fileB', 'fileC'] as $file) {
+            touch($this->testDrive.DIRECTORY_SEPARATOR.$file);
+        }
+
+        mkdir($dir = $this->testDrive.DIRECTORY_SEPARATOR.'testB');
+        foreach (['fileD', 'fileE', 'fileF'] as $file) {
+            touch($dir.DIRECTORY_SEPARATOR.$file);
+        }
+
+        $dir = $this->fs->directory($this->testDrive);
+        $collection = $dir->get();
+        $collection->setOutputTree(false);
+
+        $this->assertEquals(7, count($collection->toArray()));
+
+        $collection = $dir->files()->get();
+        $collection->setOutputTree(false);
+
+        $this->assertEquals(6, count($collection->toArray()));
     }
 
     /*
