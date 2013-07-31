@@ -19,16 +19,17 @@ if (!function_exists('arrayGet')) {
      * @access
      * @return mixed
      */
-    function arrayGet($namespace, array $array, $separator = '.')
+    function arrayGet(array $array, $namespace = null, $separator = '.')
     {
-        $keys = explode($separator, $namespace);
-
-        if (!isset($array[current($keys)])) {
-            return;
+        if (!is_string($namespace)) {
+            return $array;
         }
 
-        while (count($keys) > 0) {
-            $array = $array[array_shift($keys)];
+        $keys = explode($separator, $namespace);
+
+        while (count($keys) > 0 and !is_null($array)) {
+            $key = array_shift($keys);
+            $array = isset($array[$key]) ? $array[$key] : null;
         }
         return $array;
     }
@@ -45,24 +46,18 @@ if (!function_exists('arraySet')) {
      *
      * @return array
      */
-    function arraySet($namespace, $value, array &$array = [], $separator = '.', $override = false)
+    function arraySet($namespace, $value, array &$input = [], $separator = '.')
     {
-        $keys = explode($separator, $namespace);
-        $key = array_shift($keys);
+        $keys  = explode($separator, $namespace);
+        $pointer = &$input;
 
-        if (!count($keys) && $array[$key] = $value) {
-            return $array;
+        while (count($keys) > 0) {
+            $pointer[$key = array_shift($keys)] = isset($pointer[$key]) ? $pointer[$key] : [];
+            $pointer = &$pointer[$key];
         }
 
-        if (!isset($array[$key])) {
-            $array[$key] = [];
-        }
-
-        if (!is_array($array[$key])) {
-            return $array;
-        }
-
-        return arraySet(implode($separator, $keys), $value, $array[$key], $separator);
+        $pointer = $value;
+        return $input;
     }
 }
 

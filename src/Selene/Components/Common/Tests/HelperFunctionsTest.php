@@ -28,11 +28,17 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayGet()
     {
-        $this->assertNull(arrayGet('baz.bar', ['foo' => ['bar' => 'baz']]));
-        $this->assertNull(arrayGet('fo.baz', ['foo' => ['bar' => 'baz']]));
+        $this->assertNull(arrayGet(['foo' => ['bar' => 'baz']], 'baz.bar'));
+        $this->assertNull(arrayGet(['foo' => ['bar' => 'baz']], 'fo.baz'));
 
-        $this->assertEquals('baz', arrayGet('foo.bar', ['foo' => ['bar' => 'baz']]));
-        $this->assertEquals('baz', arrayGet('foo.bar.boo.bar', ['foo' => ['bar' => ['boo' => ['bar' => 'baz']]]]));
+        $this->assertEquals('baz', arrayGet(['foo' => ['bar' => 'baz']], 'foo.bar'));
+        $this->assertEquals('baz', arrayGet(['foo' => ['bar' => ['boo' => ['bar' => 'baz']]]], 'foo.bar.boo.bar'));
+    }
+
+    public function testArrayGetReturnInput()
+    {
+        $this->assertEquals(['a' => 'b'], arrayGet(['a' => 'b']));
+        $this->assertEquals(['a' => 'b'], arrayGet(['a' => 'b']));
     }
 
     /**
@@ -41,16 +47,23 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
     public function testArraySet()
     {
         $array = [];
+        arraySet('foo', 'bar', $array);
         arraySet('service.location.locale', 'en', $array);
         arraySet('service.location.name', 'myservice', $array);
         arraySet('service.namespace', 'myserviceNS', $array);
 
+        $this->assertTrue(isset($array['foo']) && $array['foo'] === 'bar');
         $this->assertTrue(isset($array['service']));
-        $this->assertTrue(isset($array['service']['namespace']));
+        $this->assertTrue(
+            isset($array['service']['namespace']) && $array['service']['namespace'] === 'myserviceNS'
+        );
         $this->assertTrue(isset($array['service']['location']));
-        $this->assertTrue(isset($array['service']['location']));
-        $this->assertTrue(isset($array['service']['location']['locale']));
-        $this->assertTrue(isset($array['service']['location']['name']));
+        $this->assertTrue(
+            isset($array['service']['location']['locale']) && $array['service']['location']['locale'] === 'en'
+        );
+        $this->assertTrue(
+            isset($array['service']['location']['name']) && $array['service']['location']['name'] === 'myservice'
+        );
     }
 
     /**
@@ -95,7 +108,10 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayZip()
     {
-        $this->assertEquals([['a', 'A', 1], ['b', 'B', 2], ['c', 'C', 3]], arrayZip(['a', 'b', 'c'], ['A', 'B', 'C'], [1, 2, 3]));
+        $this->assertEquals(
+            [['a', 'A', 1], ['b', 'B', 2], ['c', 'C', 3]],
+            arrayZip(['a', 'b', 'c'], ['A', 'B', 'C'], [1, 2, 3])
+        );
     }
 
     /**
