@@ -38,7 +38,7 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayGet($query, $array, $expected)
     {
-        $this->assertEquals($expected, $array, $query);
+        $this->assertEquals($expected, arrayGet($array, $query));
     }
 
     public function arrayGetDataProvider()
