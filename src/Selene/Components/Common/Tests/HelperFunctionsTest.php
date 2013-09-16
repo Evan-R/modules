@@ -26,15 +26,45 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testArrayGet()
+    public function testArrayGetShouldReturnNullOnUnknowenKeys()
     {
         $this->assertNull(arrayGet(['foo' => ['bar' => 'baz']], 'baz.bar'));
         $this->assertNull(arrayGet(['foo' => ['bar' => 'baz']], 'fo.baz'));
-
-        $this->assertEquals('baz', arrayGet(['foo' => ['bar' => 'baz']], 'foo.bar'));
-        $this->assertEquals('baz', arrayGet(['foo' => ['bar' => ['boo' => ['bar' => 'baz']]]], 'foo.bar.boo.bar'));
     }
 
+    /**
+     * @test
+     * @dataProvider arrayGetDataProvider
+     */
+    public function testArrayGet($query, $array, $expected)
+    {
+        $this->assertEquals($expected, $array, $query);
+    }
+
+    public function arrayGetDataProvider()
+    {
+        return [
+            [
+                'foo.bar',
+                ['foo' => ['bar' => 'baz']],
+                'baz'
+            ],
+            [
+                'foo.bar.baz',
+                ['foo' => ['bar'=> ['baz' => 'boom']]],
+                'boom'
+            ],
+            [
+                'foo.bar.baz.boom',
+                ['foo' => ['bar'=> ['baz' => ['boom' => 'baz']]]],
+                'baz'
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     */
     public function testArrayGetReturnInput()
     {
         $this->assertEquals(['a' => 'b'], arrayGet(['a' => 'b']));
