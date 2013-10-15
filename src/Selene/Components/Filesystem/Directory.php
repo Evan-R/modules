@@ -282,6 +282,8 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
             $ignorefiles = true;
         }
 
+        $count = true;
+
 
         foreach ($iterator = $this->getIterator($location) as $fileInfo) {
 
@@ -289,28 +291,37 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
                 continue;
             }
 
-            if (!$ignorefiles and $fileInfo->isFile() and $this->isIncludedFile($fileInfo->getBaseName())) {
+            if (true !== $ignorefiles and $fileInfo->isFile() and $this->isIncludedFile($fileInfo->getBaseName())) {
                 $collection->add($fileInfo->getFileInfo());
                 continue;
             }
 
             if ($recursive and $fileInfo->isDir()) {
 
-                if (isset($this->depthsFilter)) {
-                    if (0 === $this->depthsFilter) {
-                        break;
-                    }
-                    $this->depthsFilter--;
-                }
-
-                $this->doList($collection, $fileInfo->getRealPath(), true);
 
                 if ($this->isIncludedDir($fileInfo->getRealPath()) and true !== $this->onlyFilesFilter) {
                     $collection->add($fileInfo->getFileInfo());
                 }
+
+                if (isset($this->depthsFilter)) {
+                    if (0 === $this->depthsFilter) {
+                        continue;
+                    }
+                    if (false !== $count) {
+                        $this->depthsFilter--;
+                        $count = false;
+                    }
+                }
+
+                $this->doList($collection, $fileInfo->getRealPath(), true, $ignorefiles);
                 continue;
             }
         }
+    }
+
+    private function countDepth($path)
+    {
+
     }
 
     /**

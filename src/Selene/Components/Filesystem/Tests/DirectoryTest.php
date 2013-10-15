@@ -181,7 +181,7 @@ class DirectoryTest extends FilesystemTestCase
         $collection = $dir->depth(1)->get();
         $collection->setOutputTree(false);
 
-        $this->assertEquals(7, count($collection->toArray()));
+        $this->assertEquals(8, count($collection->toArray()));
 
         $collection = $dir->depth(2)->get();
         $collection->setOutputTree(false);
