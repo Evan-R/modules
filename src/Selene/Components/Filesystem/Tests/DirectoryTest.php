@@ -99,6 +99,24 @@ class DirectoryTest extends FilesystemTestCase
 
     }
 
+    public function testIgnoreVcs()
+    {
+        $this->fs->mkdir($this->testDrive.DIRECTORY_SEPARATOR.'.git'.DIRECTORY_SEPARATOR.'0983912380921830809sa89d89a0s8d', 0775, true);
+
+        $dir = $this->fs->directory($this->testDrive);
+        $array = $dir->toArray();
+
+        $this->assertTrue(empty($array));
+
+        $this->fs->mkdir($this->testDrive.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'.git'.DIRECTORY_SEPARATOR.'0983912380921830809sa89d89a0s8d', 0775, true);
+
+        $dir = $this->fs->directory($this->testDrive);
+        $array = $dir->toArray();
+
+        $this->assertTrue(isset($array['%directories%']['foo']));
+        $this->assertFalse(isset($array['%directories%']['foo']['.git']));
+    }
+
     public function testListDirectoryStructureSouldIncludeFiles()
     {
         foreach (['fileA', 'fileB', 'fileC'] as $file) {

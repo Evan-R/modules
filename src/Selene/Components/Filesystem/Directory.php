@@ -393,6 +393,10 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     protected function isIncludedDir($dir)
     {
+        // need to check agains vcs ignore pattern
+        if ($this->isIgnoredFile($dir)) {
+            return false;
+        }
         return $this->isExcludedDir($dir) ?
             false :
             (isset($this->inFilter) ? $this->inFilter->match($dir) : true);
@@ -522,6 +526,8 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
             FilesystemIterator::CURRENT_AS_SELF|$flags
         );
         $iterator->setInfoClass(__NAMESPACE__.'\\SplFileInfo');
+        //$this->issnottheend;
+
         return $iterator;
     }
 
