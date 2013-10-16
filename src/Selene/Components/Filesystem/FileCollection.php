@@ -45,6 +45,13 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
     protected $nested = true;
 
     /**
+     * pathAsKey
+     *
+     * @var mixed
+     */
+    protected $pathAsKey = true;
+
+    /**
      * basedir
      *
      * @var mixed
@@ -400,9 +407,10 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
      * @access public
      * @return FileCollection
      */
-    public function setOutputTree($tree = true)
+    public function setOutputTree($tree = true, $pathAsKey = true)
     {
-        $this->nested = $tree;
+        $this->nested    = $tree;
+        $this->pathAsKey = $pathAsKey;
         return $this;
     }
 
@@ -421,7 +429,11 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
         foreach ($in as $path => $file) {
 
             if (is_array($file)) {
-                $out[$path] = $this->exportToArray($file);
+                if ($this->pathAsKey or (static::$dirsKey === $path or static::$fileKey === $path)) {
+                    $out[$path] = $this->exportToArray($file);
+                } else {
+                    $out[] = $this->exportToArray($file);
+                }
                 continue;
             }
 
@@ -433,7 +445,11 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
             }
 
             if ($file->isFile()) {
-                $out[$name] = isset($out[$name]) ? array_merge($file->toArray(), $out) : $file->toArray();
+                if ($this->pathAsKey) {
+                    $out[$name] = isset($out[$name]) ? array_merge($file->toArray(), $out) : $file->toArray();
+                } else {
+                    $out[] = isset($out[$name]) ? array_merge($file->toArray(), $out) : $file->toArray();
+                }
                 continue;
             }
         }

@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Filesystem;
 
+use Selene\Components\Filesystem\Traits\SubstitudePath;
+
 /**
  * @class FilesystemIterator
  * @package Selene\Components\Filesystem
@@ -18,6 +20,8 @@ namespace Selene\Components\Filesystem;
  */
 class FilesystemIterator extends \FilesystemIterator
 {
+    use SubstitudePath;
+
     /**
      * currentPath
      *
@@ -107,27 +111,7 @@ class FilesystemIterator extends \FilesystemIterator
     private function setRootPath($path)
     {
         $this->rootPath = $path;
-        $this->substitutePaths($path, $this->currentPath);
-    }
-
-    /**
-     * substitutePaths
-     *
-     * @param mixed $root
-     * @param mixed $current
-     *
-     * @access private
-     * @return mixed
-     */
-    private function substitutePaths($root, $current)
-    {
-        $path = substr($current, 0, strlen($root));
-
-        if (strcasecmp($root, $path) !== 0)  {
-            throw new \InvalidArgumentException('Root path does not contain current path');
-        }
-
-        $subPath = substr($current, strlen($root) + 1);
-        $this->subPath = false === $subPath ? '' : $subPath;
+        $this->subPath = $this->substitutePaths($path, $this->currentPath);
     }
 }
+

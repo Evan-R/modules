@@ -21,6 +21,9 @@ use Selene\Components\Filesystem\Directory;
 class DirectoryTest extends FilesystemTestCase
 {
 
+    /**
+     * @test
+     */
     public function testMkdir()
     {
         $dir = new Directory($this->fs, $this->testDrive);
@@ -28,6 +31,9 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertIsDir($this->testDrive.DIRECTORY_SEPARATOR.'test');
     }
 
+    /**
+     * @test
+     */
     public function testRemove()
     {
         mkdir($test = $this->testDrive.DIRECTORY_SEPARATOR.'test');
@@ -37,6 +43,9 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertFalse(file_exists($test));
     }
 
+    /**
+     * @test
+     */
     public function testCopy()
     {
         mkdir($test = $this->testDrive.DIRECTORY_SEPARATOR.'test'.DIRECTORY_SEPARATOR.'test', 0777, true);
@@ -45,6 +54,9 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertFileEquals(dirname($test), $this->testDrive.DIRECTORY_SEPARATOR.'test copy 1');
     }
 
+    /**
+     * @test
+     */
     public function testIsIncludedDir()
     {
         $this->buildTree();
@@ -58,6 +70,9 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertTrue($this->invokeObjectMethod('isIncludedDir', $collection, $this->getPathsAsArgument($paths)));
     }
 
+    /**
+     * @test
+     */
     public function testIsIncludedFile()
     {
         $this->buildTree();
@@ -71,6 +86,9 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertTrue($this->invokeObjectMethod('isIncludedFile', $collection, $this->getPathsAsArgument($paths)));
     }
 
+    /**
+     * @test
+     */
     public function testOnlyInFilter()
     {
         $this->buildTree();
@@ -99,6 +117,9 @@ class DirectoryTest extends FilesystemTestCase
 
     }
 
+    /**
+     * @test
+     */
     public function testIgnoreVcs()
     {
         $this->fs->mkdir($this->testDrive.DIRECTORY_SEPARATOR.'.git'.DIRECTORY_SEPARATOR.'0983912380921830809sa89d89a0s8d', 0775, true);
@@ -117,6 +138,9 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertFalse(isset($array['%directories%']['foo']['.git']));
     }
 
+    /**
+     * @test
+     */
     public function testListDirectoryStructureSouldIncludeFiles()
     {
         foreach (['fileA', 'fileB', 'fileC'] as $file) {
@@ -128,6 +152,9 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertTrue(3 === count($collection->toArray()));
     }
 
+    /**
+     * @test
+     */
     public function testListDirectoryStructureSouldIncludeFilesAndDirectories()
     {
         foreach (['fileA', 'fileB', 'fileC'] as $file) {
@@ -156,6 +183,9 @@ class DirectoryTest extends FilesystemTestCase
         );
     }
 
+    /**
+     * @test
+     */
     public function testListDirectoryRestrictDepth()
     {
         foreach (['fileA', 'fileB', 'fileC'] as $file) {
@@ -176,7 +206,7 @@ class DirectoryTest extends FilesystemTestCase
         $collection = $dir->depth(0)->get();
         $collection->setOutputTree(false);
 
-        $this->assertEquals(3, count($collection->toArray()));
+        $this->assertEquals(4, count($collection->toArray()));
 
         $collection = $dir->depth(1)->get();
         $collection->setOutputTree(false);
@@ -189,6 +219,9 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertEquals(11, count($collection->toArray()));
     }
 
+    /**
+     * @test
+     */
     public function testListDirectoryOnlyFiles()
     {
         foreach (['fileA', 'fileB', 'fileC'] as $file) {
@@ -208,6 +241,7 @@ class DirectoryTest extends FilesystemTestCase
 
         $collection = $dir->files()->get();
         $collection->setOutputTree(false);
+
 
         $this->assertEquals(6, count($collection->toArray()));
     }

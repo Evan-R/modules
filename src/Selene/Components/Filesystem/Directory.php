@@ -16,6 +16,7 @@ use Selene\Components\Filesystem\Filter\FileFilter;
 use Selene\Components\Filesystem\Filter\DirectoryFilter;
 use Selene\Components\Common\Interfaces\JsonableInterface;
 use Selene\Components\Common\Interfaces\ArrayableInterface;
+use Selene\Components\Filesystem\Traits\SubstitudePath;
 
 /**
  * @class Directory
@@ -30,6 +31,7 @@ use Selene\Components\Common\Interfaces\ArrayableInterface;
 class Directory extends AbstractFileObject implements ArrayableInterface, JsonableInterface
 {
 
+    use SubstitudePath;
     /**
      * currentExclude
      *
@@ -78,6 +80,13 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      * @var mixed
      */
     protected $notInFilter;
+
+    /**
+     * includeSelfFilter
+     *
+     * @var bool
+     */
+    protected $includeSelfFilter;
 
     /**
      * onlyFilesFilter
@@ -232,12 +241,17 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     public function get()
     {
-        $collection = $this->listDir(
-            new FileCollection($path = $this->getEntryPoint()),
-            $path,
-            0 === $this->depthsFilter ? false : true
-        );
-        return $collection;
+        $collection = new FileCollection($path = $this->getEntryPoint());
+
+        if ($this->includeSelfFilter) {
+            $subpathname = $this->substitutePaths((string)$this, $path);
+            $subpath     = dirname($subpathname);
+            $collection->add(new SplFileInfo($path, $subpath, $subpathname));
+        }
+
+        //return $this->listDir($collection, $path, 0 === $this->depthsFilter ? false : true);
+        return $this->listDir($collection, $path, true, false);
+
     }
 
     /**
@@ -286,45 +300,70 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     private function doList(FileCollection $collection, $location, $recursive = true, $ignorefiles = false)
     {
 
-        if (!$this->isIncludedDir($location)) {
-            //$ignorefiles = true;
-        }
+        //if (!$this->isIncludedDir($location)) {
+        //    //$ignorefiles = true;
+        //}
 
         $count = true;
 
-
         foreach ($iterator = $this->getIterator($location) as $fileInfo) {
 
+            // continue loop if file is link
             if ($fileInfo->isLink()) {
                 continue;
             }
 
-            if (true !== $ignorefiles and $fileInfo->isFile() and $this->isIncludedFile($fileInfo->getBaseName())) {
+            // add file to collection:
+            if ($fileInfo->isFile() and true !== $ignorefiles and $this->isIncludedFile($fileInfo->getBaseName())) {
                 $collection->add($fileInfo);
                 continue;
             }
 
+            // operate on all included directories
             if ($recursive and $fileInfo->isDir()) {
 
-
+                // only add directory to collection only if onlyfiles is false
+                // and is included directory
                 if ($this->isIncludedDir($fileInfo->getRealPath()) and true !== $this->onlyFilesFilter) {
                     $collection->add($fileInfo);
                 }
 
-                if (isset($this->depthsFilter)) {
-                    if (0 === $this->depthsFilter) {
-                        continue;
-                    }
-                    if (false !== $count) {
-                        $this->depthsFilter--;
-                        $count = false;
-                    }
+                if (!$this->isRecursionStoppend()) {
+                    $this->countRecursion($count);
+                    $this->doList($collection, $fileInfo->getRealPath(), $recursive, $ignorefiles);
                 }
-
-                $this->doList($collection, $fileInfo->getRealPath(), true, $ignorefiles);
-                continue;
             }
         }
+    }
+
+    /**
+     * countRecursion
+     *
+     * @param mixed $count
+     *
+     * @access private
+     * @return void
+     */
+    private function countRecursion(&$count)
+    {
+        if (isset($this->depthsFilter) and $count) {
+            $count = false;
+            $this->depthsFilter--;
+        }
+    }
+
+    /**
+     * isRecursionStoppend
+     *
+     * @access private
+     * @return bool
+     */
+    private function isRecursionStoppend()
+    {
+        if (isset($this->depthsFilter)) {
+            return $this->depthsFilter < 1;
+        }
+        return false;
     }
 
     private function getEntryPoint()
@@ -352,17 +391,19 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         unset($this->startAtFilter);
         unset($this->currentFilter);
         unset($this->currentExclude);
+        unset($this->includeSelfFilter);
 
-        $this->inFilter       = null;
-        $this->fileFilter     = null;
-        $this->notInFilter    = null;
-        $this->depthsFilter   = null;
-        $this->ignoreFilter   = null;
-        $this->startAtFilter  = null;
-        $this->currentFilter  = null;
-        $this->currentExclude = null;
+        $this->inFilter          = null;
+        $this->fileFilter        = null;
+        $this->notInFilter       = null;
+        $this->depthsFilter      = null;
+        $this->ignoreFilter      = null;
+        $this->startAtFilter     = null;
+        $this->currentFilter     = null;
+        $this->currentExclude    = null;
+        $this->includeSelfFilter = null;
 
-        $this->onlyFilesFilter = false;
+        $this->onlyFilesFilter   = false;
     }
 
     /**
@@ -509,6 +550,18 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     public function findIn($subPath = null)
     {
         $this->startAtFilter = $subPath;
+        return $this;
+    }
+
+    /**
+     * includeSelf
+     *
+     * @access public
+     * @return mixed
+     */
+    public function includeSelf()
+    {
+        $this->includeSelfFilter = true;
         return $this;
     }
 
