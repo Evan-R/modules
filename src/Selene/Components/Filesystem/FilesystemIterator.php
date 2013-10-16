@@ -93,7 +93,7 @@ class FilesystemIterator extends \FilesystemIterator
      */
     private function getSubPathname($basename = null)
     {
-        return $this->subPath.DIRECTORY_SEPARATOR.$basename;
+        return rtrim($this->subPath.DIRECTORY_SEPARATOR.$basename, '\/');
     }
 
     /**
