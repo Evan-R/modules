@@ -25,6 +25,17 @@ use Selene\Components\Common\Interfaces\ArrayableInterface;
  */
 class SplFileInfo extends \SplFileInfo implements ArrayableInterface
 {
+    private $relativePath;
+
+    private $relativePathName;
+
+    public function __construct($file, $relativePath = null, $relativePathName = null)
+    {
+        parent::__construct($file);
+        $this->relativePath = $relativePath;
+        $this->relativePathName = $relativePathName;
+    }
+
     /**
      * toArray
      *
@@ -34,13 +45,15 @@ class SplFileInfo extends \SplFileInfo implements ArrayableInterface
     public function toArray()
     {
         $attributes = [
-            'name'    => $this->getBasename(),
-            'path'    => $this->getRealPath(),
-            'lastmod' => $this->getMTime(),
-            'type'    => $this->getType(),
-            'owner'   => $this->getOwner(),
-            'group'   => $this->getGroup(),
-            'size'    => $this->getSize()
+            'name'             => $this->getBasename(),
+            'path'             => $this->getRealPath(),
+            'relativePath'     => $this->getRelativePath(),
+            'relativePathName' => $this->getRelativePathName(),
+            'lastmod'          => $this->getMTime(),
+            'type'             => $this->getType(),
+            'owner'            => $this->getOwner(),
+            'group'            => $this->getGroup(),
+            'size'             => $this->getSize()
         ];
 
         if ($this->isFile()) {
@@ -48,5 +61,27 @@ class SplFileInfo extends \SplFileInfo implements ArrayableInterface
             $attributes['mimetype']  = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $this->getRealPath());
         }
         return $attributes;
+    }
+
+    /**
+     * getRelativePath
+     *
+     * @access public
+     * @return string
+     */
+    public function getRelativePath()
+    {
+        return $this->relativePath;
+    }
+
+    /**
+     * getRelativePathName
+     *
+     * @access public
+     * @return string
+     */
+    public function getRelativePathName()
+    {
+        return $this->relativePathName;
     }
 }

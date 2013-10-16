@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Filesystem;
 
+use Selene\Components\Filesystem\Exception\IOException;
+
 /**
  * @class File
  * @package
@@ -58,7 +60,7 @@ class File extends AbstractFileObject
      */
     public function chgrp($group)
     {
-        $this->files->chmod((string)$this, $group);
+        $this->files->chgrp((string)$this, $group);
         return $this;
     }
 
@@ -85,8 +87,20 @@ class File extends AbstractFileObject
      * @access public
      * @return void
      */
-    public function touch($time, $atime)
+    public function touch($time = null, $atime = null)
     {
         $this->files->touch((string)$this, $time, $atime);
+    }
+
+    /**
+     * toArray
+     *
+     * @access public
+     * @return array
+     */
+    public function toArray()
+    {
+        $file = new SplFileInfo($this->path);
+        return $file->toArray();
     }
 }

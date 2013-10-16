@@ -11,7 +11,7 @@
 
 namespace Selene\Components\Filesystem;
 
-use FilesystemIterator;
+use Selene\Components\Filesystem\FilesystemIterator;
 use Selene\Components\Filesystem\Filter\FileFilter;
 use Selene\Components\Filesystem\Filter\DirectoryFilter;
 use Selene\Components\Common\Interfaces\JsonableInterface;
@@ -64,6 +64,13 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      * @var int
      */
     protected $depthsFilter;
+
+    /**
+     * startAtFilter
+     *
+     * @var string
+     */
+    protected $startAtFilter;
 
     /**
      * notInFilter
@@ -225,11 +232,12 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     public function get()
     {
-        return $this->listDir(
-            new FileCollection($path = (string)$this),
+        $collection = $this->listDir(
+            new FileCollection($path = $this->getEntryPoint()),
             $path,
             0 === $this->depthsFilter ? false : true
         );
+        return $collection;
     }
 
     /**
@@ -279,7 +287,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     {
 
         if (!$this->isIncludedDir($location)) {
-            $ignorefiles = true;
+            //$ignorefiles = true;
         }
 
         $count = true;
@@ -292,7 +300,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
             }
 
             if (true !== $ignorefiles and $fileInfo->isFile() and $this->isIncludedFile($fileInfo->getBaseName())) {
-                $collection->add($fileInfo->getFileInfo());
+                $collection->add($fileInfo);
                 continue;
             }
 
@@ -300,7 +308,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
 
 
                 if ($this->isIncludedDir($fileInfo->getRealPath()) and true !== $this->onlyFilesFilter) {
-                    $collection->add($fileInfo->getFileInfo());
+                    $collection->add($fileInfo);
                 }
 
                 if (isset($this->depthsFilter)) {
@@ -319,9 +327,13 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         }
     }
 
-    private function countDepth($path)
+    private function getEntryPoint()
     {
+        if (is_null($this->startAtFilter)) {
+            return (string)$this;
+        }
 
+        return (string)$this.DIRECTORY_SEPARATOR.ltrim($this->startAtFilter, '\/');
     }
 
     /**
@@ -337,6 +349,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         unset($this->notInFilter);
         unset($this->depthsFilter);
         unset($this->ignoreFilter);
+        unset($this->startAtFilter);
         unset($this->currentFilter);
         unset($this->currentExclude);
 
@@ -345,6 +358,7 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         $this->notInFilter    = null;
         $this->depthsFilter   = null;
         $this->ignoreFilter   = null;
+        $this->startAtFilter  = null;
         $this->currentFilter  = null;
         $this->currentExclude = null;
 
@@ -485,6 +499,20 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     }
 
     /**
+     * findIn
+     *
+     * @param mixed $subPath
+     *
+     * @access public
+     * @return mixed
+     */
+    public function findIn($subPath = null)
+    {
+        $this->startAtFilter = $subPath;
+        return $this;
+    }
+
+    /**
      * depth
      *
      * @param mixed $depths
@@ -534,10 +562,11 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     {
         $iterator = new FilesystemIterator(
             $directory,
-            FilesystemIterator::CURRENT_AS_SELF|$flags
+            FilesystemIterator::CURRENT_AS_FILEINFO|$flags,
+            (string)$this
         );
+        //$iterator->setRootPath((string)$this);
         $iterator->setInfoClass(__NAMESPACE__.'\\SplFileInfo');
-        //$this->issnottheend;
 
         return $iterator;
     }

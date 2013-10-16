@@ -252,11 +252,7 @@ class Filesystem
         }
 
         if (is_null($target)) {
-            $target = $this->enum(
-                $source,
-                $this->getCopyStartOffset(),
-                $this->getCopyPrefix()
-            );
+            $target = $this->enum($source, $this->getCopyStartOffset(), $this->getCopyPrefix());
         } elseif ($this->exists($target)) {
             if (!$replace) {
                 throw new IOException(sprintf('target %s exists', $target));
@@ -292,16 +288,12 @@ class Filesystem
 
             if (!$this->isLink($item) and $this->isDir($item) and $recursive) {
                 $this->chmod(
-                    $this->getIterator(
-                        $item,
-                        FilesystemIterator::CURRENT_AS_PATHNAME
-                    ),
+                    $this->getIterator($item, FilesystemIterator::CURRENT_AS_PATHNAME),
                     $permission,
                     true,
                     $umask
                 );
             }
-
             if (true !== @chmod($item, $permission & ~$umask)) {
                 throw new IOException('filerpermissions could not be set');
             }
@@ -731,13 +723,10 @@ class Filesystem
         $prefix = is_null($prefix) ?
             $prefix :
             ($pad ? str_pad($prefix, strlen($prefix) + 2, ' ', STR_PAD_BOTH) : $prefix);
-
         $i = $start;
-
         while (is_dir(sprintf("%s%s%d", $file, $prefix, $i))) {
             $i++;
         }
-
         return sprintf("%s%s%d", $file, $prefix, $i);
     }
 
@@ -768,7 +757,6 @@ class Filesystem
         while (file_exists(sprintf("%s%s%s%d%s", $path, $name, $prefix, $i, $extension))) {
             $i++;
         }
-
         return sprintf("%s%s%s%d%s", $path, $name, $prefix, $i, $extension);
     }
 
@@ -799,7 +787,6 @@ class Filesystem
         if (!(is_array($file) or $file instanceof \Traversable)) {
             return [$file];
         }
-
         return $file;
     }
 }
