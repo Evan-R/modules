@@ -550,13 +550,14 @@ class Filesystem
      * directory
      *
      * @param string $directory
+     * @param int    $flags
      *
      * @access public
      * @return Directory
      */
-    public function directory($directory)
+    public function directory($directory, $flags = Directory::IGNORE_VCS)
     {
-        return new Directory($this, $directory);
+        return new Directory($this, $directory, $flags);
     }
 
     /**

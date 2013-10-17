@@ -18,15 +18,53 @@ namespace Selene\Components\Filesystem\Filter;
  */
 class FileFilter extends AbstractFilter
 {
+    /**
+     * filter
+     *
+     * @var mixed
+     */
     protected $filter;
 
+    /**
+     * compiled
+     *
+     * @var mixed
+     */
     protected $compiled;
 
+    /**
+     * __construct
+     *
+     * @param array $filter
+     *
+     * @access public
+     * @return mixed
+     */
     public function __construct(array $filter)
     {
         $this->filter = $filter;
     }
 
+    /**
+     * add
+     *
+     * @param mixed $expression
+     *
+     * @access public
+     * @return void
+     */
+    public function add($expression)
+    {
+        $this->filter = array_merge($this->filter, (array)$expression);
+    }
+
+    /**
+     * compile
+     *
+     *
+     * @access protected
+     * @return mixed
+     */
     protected function compile()
     {
         $this->compiled = sprintf('~(%s)~', implode('|', $this->filter));

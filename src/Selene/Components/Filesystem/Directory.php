@@ -25,13 +25,24 @@ use Selene\Components\Filesystem\Traits\SubstitudePath;
  *
  * @package Selene\Components\Filesystem
  * @version $Id$
- * @author Thomas Appel <mail@thomas-appel.com
+ * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Directory extends AbstractFileObject implements ArrayableInterface, JsonableInterface
+class Directory extends AbstractFileObject
 {
 
     use SubstitudePath;
+
+    /**
+     * @var int
+     */
+    const IGNORE_VCS = 1;
+
+    /**
+     * @var int
+     */
+    const IGNORE_DOT = 2;
+
     /**
      * currentExclude
      *
@@ -103,6 +114,20 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     protected $ignoreFilter;
 
     /**
+     * ignoreVcs
+     *
+     * @var mixed
+     */
+    protected $ignoreVcs;
+
+    /**
+     * ignoreDot
+     *
+     * @var mixed
+     */
+    protected $ignoreDot;
+
+    /**
      * vcsPattern
      *
      * @var array
@@ -110,6 +135,24 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     protected static $vcsPattern = [
         '\.git.*', '\.svn.*'
     ];
+
+    /**
+     * __construct
+     *
+     * @param Filesystem $files
+     * @param mixed $path
+     * @param mixed $flags
+     *
+     * @access public
+     * @return mixed
+     */
+    public function __construct(Filesystem $files, $path, $flags = self::IGNORE_VCS)
+    {
+        parent::__construct($files, $path);
+
+        $this->ignoreVcs = (bool)($flags & static::IGNORE_VCS);
+        $this->ignoreDot = (bool)($flags & static::IGNORE_DOT);
+    }
 
     /**
      * mkdir
@@ -125,27 +168,8 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         return $this;
     }
 
-    public function flush()
-    {
-        $this->files->flush((string)$this);
-        return $this;
-    }
-
     /**
-     * isEmpty
-     *
-     * @param mixed $directory
-     *
-     * @access public
-     * @return bool
-     */
-    public function isEmpty($directory = null)
-    {
-        return $this->files->isEmpty($this->getRealPath($directory));
-    }
-
-    /**
-     * touch
+     * alter timestamps on a file.
      *
      * @param mixed $file
      * @param mixed $time
@@ -220,7 +244,32 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     }
 
     /**
-     * exists
+     * flushes all files in the directory
+     *
+     * @access public
+     * @return mixed
+     */
+    public function flush()
+    {
+        $this->files->flush((string)$this);
+        return $this;
+    }
+
+    /**
+     * check if directory is empty
+     *
+     * @param mixed $directory
+     *
+     * @access public
+     * @return bool
+     */
+    public function isEmpty($directory = null)
+    {
+        return $this->files->isEmpty($this->getRealPath($directory));
+    }
+
+    /**
+     * Check if a files exists
      *
      * @param mixed $file
      *
@@ -233,11 +282,11 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     }
 
     /**
-     * get
-     *
+     * Get a collection of files and firectories objects (SplFileInfo objects)
+     * based on filters.
      *
      * @access public
-     * @return mixed
+     * @return FileCollection
      */
     public function get()
     {
@@ -249,13 +298,13 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
             $collection->add(new SplFileInfo($path, $subpath, $subpathname));
         }
 
-        //return $this->listDir($collection, $path, 0 === $this->depthsFilter ? false : true);
         return $this->listDir($collection, $path, true, false);
 
     }
 
     /**
-     * toArrray
+     * Converts this directory to an array,
+     * based on previously applied filters.
      *
      * @access public
      * @return array
@@ -266,6 +315,105 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         return $this->get()->toArray();
     }
 
+    /**
+     * filter
+     *
+     * @access public
+     * @return mixed
+     */
+    public function filter($expression)
+    {
+        $this->fileFilter = new FileFilter((array)$expression);
+        return $this;
+    }
+
+    /**
+     * ignore
+     *
+     * @param mixed $expression
+     *
+     * @access public
+     * @return mixed
+     */
+    public function ignore($expression)
+    {
+        if (!is_array($expression) and !is_string($expression)) {
+            throw new \InvalidArgumentException('Argument 1 must be string or array');
+        }
+
+        $this->populateIgnoreFilter((array)$expression);
+        return $this;
+    }
+
+    /**
+     * in
+     *
+     * @access public
+     * @return mixed
+     */
+    public function in($directories)
+    {
+        $this->inFilter = new DirectoryFilter((array)$directories, (string)$this);
+        return $this;
+    }
+
+    /**
+     * notIn
+     *
+     * @access public
+     * @return Directory
+     */
+    public function notIn($directories)
+    {
+        $this->notInFilter = new DirectoryFilter((array)$directories, (string)$this);
+        return $this;
+    }
+
+    /**
+     * findIn
+     *
+     * @param mixed $subPath
+     *
+     * @access public
+     * @return mixed
+     */
+    public function findIn($subPath = null)
+    {
+        $this->startAtFilter = $subPath;
+        return $this;
+    }
+
+    /**
+     * includeSelf
+     *
+     * @access public
+     * @return mixed
+     */
+    public function includeSelf()
+    {
+        $this->includeSelfFilter = true;
+        return $this;
+    }
+
+    /**
+     * depth
+     *
+     * @param mixed $depths
+     *
+     * @access public
+     * @return mixed
+     */
+    public function depth($depths)
+    {
+        $this->depthsFilter = (int)$depths;
+        return $this;
+    }
+
+    public function files()
+    {
+        $this->onlyFilesFilter = true;
+        return $this;
+    }
 
     /**
      * listDir
@@ -281,6 +429,8 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     protected function listDir(FileCollection $collection, $location, $recursive = true)
     {
         $this->setVcsFilter();
+        $this->setDotFilter();
+
         $this->doList($collection, $location, $recursive);
         $this->clearFilter();
 
@@ -299,10 +449,6 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
      */
     private function doList(FileCollection $collection, $location, $recursive = true, $ignorefiles = false)
     {
-
-        //if (!$this->isIncludedDir($location)) {
-        //    //$ignorefiles = true;
-        //}
 
         $count = true;
 
@@ -328,6 +474,8 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
                     $collection->add($fileInfo);
                 }
 
+                // just list this directory if max depths is not already
+                // reached
                 if (!$this->isRecursionStoppend()) {
                     $this->countRecursion($count);
                     $this->doList($collection, $fileInfo->getRealPath(), $recursive, $ignorefiles);
@@ -409,15 +557,23 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     /**
      * setVcsFilter
      *
-     *
      * @access protected
      * @return void
      */
     protected function setVcsFilter()
     {
-        if (!isset($this->ignoreFilter)) {
-            $this->ignoreFilter = new FileFilter(static::$vcsPattern);
-        }
+        $this->populateIgnoreFilter($this->ignoreVcs ? static::$vcsPattern : []);
+    }
+
+    /**
+     * setDotFilter
+     *
+     * @access protected
+     * @return void
+     */
+    protected function setDotFilter()
+    {
+        $this->populateIgnoreFilter($this->ignoreDot ? ['\..*?'] : []);
     }
 
     /**
@@ -484,108 +640,6 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
     }
 
     /**
-     * filter
-     *
-     * @access public
-     * @return mixed
-     */
-    public function filter($expression)
-    {
-        $this->fileFilter = new FileFilter((array)$expression);
-        return $this;
-    }
-
-    /**
-     * ignore
-     *
-     * @param mixed $expression
-     *
-     * @access public
-     * @return mixed
-     */
-    public function ignore($expression)
-    {
-        $pattern = static::$vcsPattern;
-        if (is_array($expression)) {
-            $pattern = array_merge($pattern, $expression);
-        } else {
-            array_push($pattern, $expression);
-        }
-        $this->ignoreFilter = new FileFilter($pattern);
-        return $this;
-    }
-
-    /**
-     * in
-     *
-     * @access public
-     * @return mixed
-     */
-    public function in($directories)
-    {
-        $this->inFilter = new DirectoryFilter((array)$directories, (string)$this);
-        return $this;
-    }
-
-    /**
-     * notIn
-     *
-     * @access public
-     * @return Directory
-     */
-    public function notIn($directories)
-    {
-        $this->notInFilter = new DirectoryFilter((array)$directories, (string)$this);
-        return $this;
-    }
-
-    /**
-     * findIn
-     *
-     * @param mixed $subPath
-     *
-     * @access public
-     * @return mixed
-     */
-    public function findIn($subPath = null)
-    {
-        $this->startAtFilter = $subPath;
-        return $this;
-    }
-
-    /**
-     * includeSelf
-     *
-     * @access public
-     * @return mixed
-     */
-    public function includeSelf()
-    {
-        $this->includeSelfFilter = true;
-        return $this;
-    }
-
-    /**
-     * depth
-     *
-     * @param mixed $depths
-     *
-     * @access public
-     * @return mixed
-     */
-    public function depth($depths)
-    {
-        $this->depthsFilter = (int)$depths;
-        return $this;
-    }
-
-    public function files()
-    {
-        $this->onlyFilesFilter = true;
-        return $this;
-    }
-
-    /**
      * setDirectory
      *
      * @param string $dir
@@ -622,6 +676,23 @@ class Directory extends AbstractFileObject implements ArrayableInterface, Jsonab
         $iterator->setInfoClass(__NAMESPACE__.'\\SplFileInfo');
 
         return $iterator;
+    }
+
+    /**
+     * populateIgnoreFilter
+     *
+     * @param array $patterns
+     *
+     * @access private
+     * @return void
+     */
+    private function populateIgnoreFilter(array $patterns)
+    {
+        if (!isset($this->ignoreFilter)) {
+            $this->ignoreFilter = new FileFilter($patterns);
+        } else {
+            !empty($patterns) && $this->ignoreFilter->add($patterns);
+        }
     }
 
     /**

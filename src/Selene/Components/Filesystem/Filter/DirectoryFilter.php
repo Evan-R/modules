@@ -23,16 +23,53 @@ namespace Selene\Components\Filesystem\Filter;
 class DirectoryFilter extends AbstractFilter
 {
 
+    /**
+     * filterBase
+     *
+     * @var string
+     */
     private $filterBase;
 
+    /**
+     * filter
+     *
+     * @var array
+     */
     protected $filter;
 
+    /**
+     * compiled
+     *
+     * @var string
+     */
     protected $compiled;
 
+    /**
+     * __construct
+     *
+     * @param array $filter
+     * @param string $filterBase
+     *
+     * @access public
+     * @return mixed
+     */
     public function __construct(array $filter, $filterBase = '/')
     {
         $this->filter     = $filter;
         $this->filterBase = $filterBase;
+    }
+
+    /**
+     * add
+     *
+     * @param mixed $expression
+     *
+     * @access public
+     * @return void
+     */
+    public function add($expression)
+    {
+        $this->filter = array_merge($this->filter, $filter);
     }
 
     /**
