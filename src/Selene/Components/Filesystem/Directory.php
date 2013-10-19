@@ -293,13 +293,29 @@ class Directory extends AbstractFileObject
         $collection = new FileCollection($path = $this->getEntryPoint());
 
         if ($this->includeSelfFilter) {
-            $subpathname = $this->substitutePaths((string)$this, $path);
-            $subpath     = dirname($subpathname);
-            $collection->add(new SplFileInfo($path, $subpath, $subpathname));
+            $collection->add($this->getFileInfo());
         }
 
         return $this->listDir($collection, $path, true, false);
 
+    }
+
+    /**
+     * getFileInfo
+     *
+     * @param mixed $file
+     *
+     * @access public
+     * @return SplFileInfo
+     */
+    public function getFileInfo($file = null)
+    {
+        $file = is_null($file) ? (string)$this : $this->getRealPath($file);
+
+        $subpathname = $this->substitutePaths((string)$this, $file);
+        $subpath     = dirname($subpathname);
+
+        return new SplFileInfo($file, $subpath, $subpathname);
     }
 
     /**
