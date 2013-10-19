@@ -293,7 +293,7 @@ class Directory extends AbstractFileObject
         $collection = new FileCollection($path = $this->getEntryPoint());
 
         if ($this->includeSelfFilter) {
-            $collection->add($this->getFileInfo());
+            $collection->add($this->getFileInfo($path));
         }
 
         return $this->listDir($collection, $path, true, false);
