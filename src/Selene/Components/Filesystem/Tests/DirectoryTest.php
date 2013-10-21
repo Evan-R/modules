@@ -246,19 +246,22 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertEquals(6, count($collection->toArray()));
     }
 
-    /*
-    public function testListDirectoryStructure()
-    {
-        //$this->markTestSkipped();
-        $this->buildTree();
-        $this->fs->touch($this->testDrive.'/baz.png', time() -  10);
-        $collection = $this->fs->directory($this->testDrive)
-            ->filter(['.*\.(jpe?g$|png|gif)$'])
-            ->get()
-            ->toJson();
-    }
-    */
+    //public function testListDirectoryStructure()
+    //{
+    //    //$this->markTestSkipped();
+    //    $this->buildTree();
+    //    $this->fs->touch($this->testDrive.'/baz.png', time() -  10);
+    //    $collection = $this->fs->directory($this->testDrive)
+    //        ->filter(['.*\.(jpe?g$|png|gif)$'])
+    //        ->files()
+    //        ->get();
+    //    $collection->setOutputTree(true, false);
+    //    var_dump($collection->toArray());
+    //}
 
+    /**
+     * @test
+     */
     public function testGetRealPath()
     {
         $dir = $this->fs->directory($this->testDrive);
@@ -268,6 +271,72 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertSame($pathA, $dir->getRealPath('foo'));
         $this->assertSame($this->testDrive, $dir->getRealPath());
     }
+
+    /**
+     * @test
+     */
+    public function testIgnoreVCSPattern()
+    {
+        $this->buildTree();
+        $dir = $this->fs->directory($this->testDrive.DIRECTORY_SEPARATOR, Directory::IGNORE_VCS);
+        $collection = $dir->get();
+        $collection->setOutputTree(false);
+
+        $ignored = ['.git', '.svn'];
+
+        foreach($collection->toArray() as $file) {
+            if (in_array(basename($file), $ignored)) {
+                $this->fail();
+            }
+        }
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @test
+     */
+    public function testNotIgnoreVCSPattern()
+    {
+        $this->buildTree();
+        $dir = $this->fs->directory($this->testDrive.DIRECTORY_SEPARATOR, null);
+        $collection = $dir->get();
+        $collection->setOutputTree(false);
+
+        $hasVCS = 0;
+
+        $ignored = ['.git', '.svn'];
+
+        foreach($collection->toArray() as $file) {
+            if (in_array(basename($file), $ignored)) {
+                $hasVCS++;
+            }
+        }
+
+        $this->assertEquals(2, $hasVCS);
+    }
+
+    public function testListDirAndIncludeSelf()
+    {
+        $this->buildTree();
+        $dir = $this->fs->directory($this->testDrive.DIRECTORY_SEPARATOR, Directory::IGNORE_VCS|Directory::IGNORE_DOT);
+
+        $collection = $dir->get();
+        $collection->setOutputTree(true, false);
+
+        $files = $collection->toArray();
+
+        $this->assertTrue(count($files) === 1);
+        $this->assertTrue(isset($files['%directories%']) && 'source_tree' === $files['%directories%'][0]['name']);
+
+        $collection = $dir->includeSelf()->get();
+        $collection->setOutputTree(true, false);
+
+        $files = $collection->toArray();
+
+        $this->assertTrue(isset($files['name']) && basename($this->testDrive) === $files['name']);
+    }
+
+
 
     protected function getPathsAsArgument(array $paths)
     {

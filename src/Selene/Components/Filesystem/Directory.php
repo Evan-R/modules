@@ -290,7 +290,7 @@ class Directory extends AbstractFileObject
      */
     public function get()
     {
-        $collection = new FileCollection($path = $this->getEntryPoint());
+        $collection = $this->getCollection($path = $this->getEntryPoint());
 
         if ($this->includeSelfFilter) {
             $collection->add($this->getFileInfo($path));
@@ -430,6 +430,7 @@ class Directory extends AbstractFileObject
         $this->onlyFilesFilter = true;
         return $this;
     }
+
 
     /**
      * listDir
@@ -688,10 +689,22 @@ class Directory extends AbstractFileObject
             FilesystemIterator::CURRENT_AS_FILEINFO|$flags,
             (string)$this
         );
-        //$iterator->setRootPath((string)$this);
         $iterator->setInfoClass(__NAMESPACE__.'\\SplFileInfo');
 
         return $iterator;
+    }
+
+    /**
+     * create a new filecollection object
+     *
+     * @param string $path
+     *
+     * @access protected
+     * @return FileCollection
+     */
+    protected function getCollection($path = null)
+    {
+        return new FileCollection($path);
     }
 
     /**

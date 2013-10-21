@@ -10,6 +10,8 @@
       <file name="bar.png" permission="0644"/>
     </files>
     <directories>
+      <directory name=".git" permission="0755">
+      </directory>
       <directory name="nested_node" permission="0755">
         <files>
           <file name="foo.txt" permission="0644">some more text text text text</file>

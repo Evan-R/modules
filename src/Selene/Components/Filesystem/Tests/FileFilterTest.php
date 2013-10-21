@@ -32,13 +32,27 @@ class FileFilterTest extends TestCase
         $this->assertTrue($result === $isRegexp);
     }
 
+    /**
+     * @test
+     */
+    public function testMatchPattern()
+    {
+        $filter = new FileFilter([]);
+
+        $this->assertFalse($filter->match('/path/to/file.jpg'));
+
+        $filter->add('\.jpe?g$');
+
+        $this->assertTrue($filter->match('/path/to/file.jpg'));
+    }
+
     //public function testRemoveDelimitter()
     //{
     //    $filter = new FileFilter('/(.*\.jpg)/ieii');
     //    //$result = $this->invokeObjectMethod('removeModifyer', $filter, ['/(.*\.jpg)/emxi']);
     //    $result = $this->invokeObjectMethod('removeModifyer', $filter, ['/file']);
 
-    //    //var_dump($result);
+    //    var_dump($result);
     //}
 
     public function patternProvider()
@@ -50,6 +64,7 @@ class FileFilterTest extends TestCase
             ['path/to/some_target/', false],
             ['~/path/to/some_target~', true],
             ['~*.jpg~', true],
+            [null, false],
         ];
     }
 }

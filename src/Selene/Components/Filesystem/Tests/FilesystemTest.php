@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem\Tests package
+ * This File is part of the Selene\Components\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -17,23 +17,36 @@ use Selene\Components\Filesystem\Filesystem;
 use Selene\Components\Filesystem\FileCollection;
 
 /**
- * @class FilesystemTest
- * @package
+ * @class FilesystemTest extends FilesystemTestCase FilesystemTest
+ * @see FilesystemTestCase
+ *
+ * @package Selene\Components\Filesystem
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 class FilesystemTest extends FilesystemTestCase
 {
+    /**
+     * @test
+     */
     public function testIsDirecctory()
     {
         $this->assertTrue($this->fs->isDir($this->testDrive));
     }
 
-    public function testIsDirecctorySouldReportFalseOnFile()
+    /**
+     * @test
+     */
+    public function testIsDirecctoryShouldReportFalseOnFile()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_file';
         $this->assertFalse($this->fs->isDir($target));
     }
 
+    /**
+     * @test
+     */
     public function testIsFile()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_file';
@@ -44,13 +57,19 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue($this->fs->isFile($target));
     }
 
+    /**
+     * @test
+     */
     public function testShouldCreateDirectory()
     {
         $this->fs->mkdir($target = $this->testDrive.DIRECTORY_SEPARATOR.'create_dir');
         $this->assertIsDir($target);
     }
 
-    public function testFirectoryOrFileExistsSouldReportTrue()
+    /**
+     * @test
+     */
+    public function testFirectoryOrFileExistsShouldReportTrue()
     {
         $this->assertTrue($this->fs->exists($this->testDrive));
 
@@ -61,7 +80,10 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue($this->fs->exists($target));
     }
 
-    public function testFirectoryOrFileExistsSouldReportFalse()
+    /**
+     * @test
+     */
+    public function testDirectoryOrFileExistsShouldReportFalse()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_file';
         $this->assertFalse($this->fs->exists($target));
@@ -70,6 +92,7 @@ class FilesystemTest extends FilesystemTestCase
     }
 
     /**
+     * @test
      * @expectedException Selene\Components\Filesystem\Exception\IOException
      */
     public function testShouldCreateDirectoryShouldThrowIOException()
@@ -82,20 +105,29 @@ class FilesystemTest extends FilesystemTestCase
         $this->fs->mkdir($target);
     }
 
+    /**
+     * @test
+     */
     public function testShouldCreateFile()
     {
         $this->fs->touch($target = $this->testDrive.DIRECTORY_SEPARATOR.'target_file');
         $this->assertIsFile($target);
     }
 
-    public function testShouldCreateFileSouldNotThrowIOExceptionIfFileExists()
+    /**
+     * @test
+     */
+    public function testShouldCreateFileShouldNotThrowIOExceptionIfFileExists()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_file';
         $this->fs->touch($target);
         $this->assertIsFile($target);
     }
 
-    public function testTouchSouldUpdateMTime()
+    /**
+     * @test
+     */
+    public function testTouchShouldUpdateMTime()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_file';
         file_put_contents($target, '');
@@ -105,6 +137,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals(time(), filemtime($target));
     }
 
+    /**
+     * @test
+     */
     public function testFileMTime()
     {
         touch($file = $this->testDrive.DIRECTORY_SEPARATOR.'file');
@@ -112,6 +147,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($time, $this->fs->fileMTime($file));
     }
 
+    /**
+     * @test
+     */
     public function testFileATime()
     {
         touch($file = $this->testDrive.DIRECTORY_SEPARATOR.'file');
@@ -119,6 +157,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($time, $this->fs->fileATime($file));
     }
 
+    /**
+     * @test
+     */
     public function testFileCTime()
     {
         $time = time();
@@ -126,6 +167,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($time, $this->fs->fileCTime($file));
     }
 
+    /**
+     * @test
+     */
     public function testTouchFileModificationTime()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_file';
@@ -140,6 +184,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($atime, fileatime($target));
     }
 
+    /**
+     * @test
+     */
     public function testRenameFile()
     {
         $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_file';
@@ -168,6 +215,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->fs->rename($source, $target, false);
     }
 
+    /**
+     * @test
+     */
     public function testRenameFileShouldOverwriteExistingFile()
     {
         $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_file';
@@ -181,6 +231,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFalse(is_file($source));
     }
 
+    /**
+     * @test
+     */
     public function testFileSetContents()
     {
         $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_tree';
@@ -189,6 +242,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($content, file_get_contents($source));
     }
 
+    /**
+     * @test
+     */
     public function testFileGetContents()
     {
         $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_tree';
@@ -197,6 +253,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($content, $this->fs->getContents($source));
     }
 
+    /**
+     * @test
+     */
     public function testRenameDirectory()
     {
         $this->buildTree();
@@ -210,6 +269,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertIsDir($target.DIRECTORY_SEPARATOR.'nested_node');
     }
 
+    /**
+     * @test
+     */
     public function testEnsureDirectoryExists()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_dir'.DIRECTORY_SEPARATOR.'nested_dir';
@@ -217,6 +279,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertIsDir($target);
     }
 
+    /**
+     * @test
+     */
     public function testFileCopy()
     {
         $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_file';
@@ -228,7 +293,10 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileEquals($source, $target);
     }
 
-    public function testFileCopySouldEnumerate()
+    /**
+     * @test
+     */
+    public function testFileCopyShouldEnumerate()
     {
         $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_file';
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'source_file copy 1';
@@ -237,7 +305,10 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileEquals($source, $target);
     }
 
-    public function testFileCopySouldEnumerateWithCustomPrefix()
+    /**
+     * @test
+     */
+    public function testFileCopyShouldEnumerateWithCustomPrefix()
     {
         $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_file';
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'source_file kopie 1';
@@ -247,7 +318,10 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileEquals($source, $target);
     }
 
-    public function testFileCopySouldContiouslyEnumerate()
+    /**
+     * @test
+     */
+    public function testFileCopyShouldContiouslyEnumerate()
     {
         $source   = $this->testDrive.DIRECTORY_SEPARATOR.'source_file';
         $target   = $this->testDrive.DIRECTORY_SEPARATOR.'source_file copy 1';
@@ -260,6 +334,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileEquals($source, $expected);
     }
 
+    /**
+     * @test
+     */
     public function testDirectoryCopy()
     {
         $this->buildTree();
@@ -270,6 +347,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileEquals($source, $target);
     }
 
+    /**
+     * @test
+     */
     public function testDirectoryCopyShouldEnumerate()
     {
         $this->buildTree();
@@ -282,6 +362,7 @@ class FilesystemTest extends FilesystemTestCase
     }
 
     /**
+     * @test
      * @expectedException Selene\Components\Filesystem\Exception\IOException
      */
     public function testFileCopyOnExistingTargetShouldThrowExceptionWithoutReplaceFlag()
@@ -291,6 +372,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->fs->copy($fileA, $fileB);
     }
 
+    /**
+     * @test
+     */
     public function testFileCopyOnExistingTarget()
     {
         touch($fileA = $this->testDrive.DIRECTORY_SEPARATOR.'testA');
@@ -301,7 +385,10 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileEquals($fileA, $fileB);
     }
 
-    public function testFileDirectorySouldContiouslyEnumerate()
+    /**
+     * @test
+     */
+    public function testFileDirectoryShouldContiouslyEnumerate()
     {
         $this->buildTree();
         $source   = $this->testDrive.DIRECTORY_SEPARATOR.'source_tree';
@@ -315,9 +402,10 @@ class FilesystemTest extends FilesystemTestCase
     }
 
     /**
+     * @test
      * @expectedException Selene\Components\Filesystem\Exception\IOException
      */
-    public function testCopyNoneExistingFileSouldThrowIOExeption()
+    public function testCopyNoneExistingFileShouldThrowIOExeption()
     {
         $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_file';
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_file';
@@ -325,6 +413,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->fs->copy($source, $target);
     }
 
+    /**
+     * @test
+     */
     public function testDeleteDirectory()
     {
         $this->buildTree();
@@ -336,6 +427,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFalse(file_exists($source));
     }
 
+    /**
+     * @test
+     */
     public function testFlushDirectory()
     {
         $this->buildTree();
@@ -347,6 +441,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFalse(file_exists($source.DIRECTORY_SEPARATOR.'nested_subtree'));
     }
 
+    /**
+     * @test
+     */
     public function testDirectoryIsEmpty()
     {
         $this->assertTrue($this->fs->isEmpty($this->testDrive));
@@ -354,6 +451,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFalse($this->fs->isEmpty($this->testDrive));
     }
 
+    /**
+     * @test
+     */
     public function testChangeDirectoryPermissions()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_dir'.DIRECTORY_SEPARATOR.'sub_dir';
@@ -365,6 +465,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(777, $target);
     }
 
+    /**
+     * @test
+     */
     public function testChangeDirectoryGroup()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_dir'.DIRECTORY_SEPARATOR.'sub_dir';
@@ -373,6 +476,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->fs->chgrp(dirname($target), $this->getFileGroup($target), true);
     }
 
+    /**
+     * @test
+     */
     public function testChangeDirectoryOwner()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_dir'.DIRECTORY_SEPARATOR.'sub_dir';
@@ -390,6 +496,7 @@ class FilesystemTest extends FilesystemTestCase
     }
 
     /**
+     * @test
      * @dataProvider absPathProvider
      */
     public function testIsRelativePath($path, $true)
@@ -402,9 +509,13 @@ class FilesystemTest extends FilesystemTestCase
         return [
             ['/this/path', true],
             ['this/path', false],
+            ['../this/path', false],
             ['file:///this/path', true],
             ['C:\\\\windows\\System', true],
-            ['windows\\System', false]
+            ['C://windows/System', true],
+            ['windows\\System', false],
+            ['', false],
+            [null, false],
         ];
     }
 

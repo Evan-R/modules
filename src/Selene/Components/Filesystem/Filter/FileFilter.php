@@ -40,9 +40,9 @@ class FileFilter extends AbstractFilter
      * @access public
      * @return mixed
      */
-    public function __construct(array $filter)
+    public function __construct($filter)
     {
-        $this->filter = $filter;
+        $this->filter = (array)$filter;
     }
 
     /**
@@ -67,7 +67,7 @@ class FileFilter extends AbstractFilter
      */
     protected function compile()
     {
-        $this->compiled = sprintf('~(%s)~', implode('|', $this->filter));
+        $this->compiled = empty($this->filter) ? null : sprintf('~(%s)~', implode('|', $this->filter));
     }
 
     /**
@@ -106,6 +106,6 @@ class FileFilter extends AbstractFilter
      */
     protected function doMatch($pattern)
     {
-        return (bool)preg_match($this->compiled, $pattern);
+        return null !== $this->compiled ? (bool)preg_match($this->compiled, $pattern) : false;
     }
 }
