@@ -380,4 +380,33 @@ class FilesystemTest extends FilesystemTestCase
         $this->fs->chown(dirname($target), $this->getFileOwner($target), true);
         $this->fs->chown(dirname($target), get_current_user(), true);
     }
+
+    /**
+     * @dataProvider absPathProvider
+     */
+    public function testIsAbsolutePath($path, $true)
+    {
+        $this->assertTrue($true === $this->fs->isAbsolutePath($path));
+    }
+
+    /**
+     * @dataProvider absPathProvider
+     */
+    public function testIsRelativePath($path, $true)
+    {
+        $this->assertTrue($true !== $this->fs->isRelativePath($path));
+    }
+
+    public function absPathProvider()
+    {
+        return [
+            ['/this/path', true],
+            ['this/path', false],
+            ['file:///this/path', true],
+            ['C:\\\\windows\\System', true],
+            ['windows\\System', false]
+        ];
+    }
+
+
 }

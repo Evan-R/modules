@@ -259,9 +259,21 @@ class DirectoryTest extends FilesystemTestCase
     }
     */
 
+    public function testGetRealPath()
+    {
+        $dir = $this->fs->directory($this->testDrive);
+
+        $pathA = $this->testDrive.DIRECTORY_SEPARATOR.'foo';
+        $this->assertSame($pathA, $pathA);
+        $this->assertSame($pathA, $dir->getRealPath('foo'));
+        $this->assertSame($this->testDrive, $dir->getRealPath());
+    }
+
     protected function getPathsAsArgument(array $paths)
     {
         $paths = $this->testDrive.DIRECTORY_SEPARATOR.implode(','.$this->testDrive.DIRECTORY_SEPARATOR, $paths);
         return explode(',', $paths);
     }
+
+
 }
