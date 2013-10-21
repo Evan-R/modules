@@ -392,6 +392,32 @@ class Filesystem
     }
 
     /**
+     * isAbsolutePath
+     *
+     * @param string $file
+     *
+     * @access public
+     * @return bool
+     */
+    public function isAbsolutePath($file)
+    {
+        return strspn($file, '/\\', 0, 1) or null !== parse_url($file, PHP_URL_SCHEME);
+    }
+
+    /**
+     * isRelativePath
+     *
+     * @param string $file
+     *
+     * @access public
+     * @return bool
+     */
+    public function isRelativePath($file)
+    {
+        return !$this->isAbsolutePath($file);
+    }
+
+    /**
      * isFile
      *
      * @param mixed $file
@@ -446,18 +472,6 @@ class Filesystem
             $this->ensureDirectory($dir = dirname($file));
             $this->touch($file);
         }
-    }
-
-    /**
-     * isRelativePath
-     *
-     *
-     * @access public
-     * @return mixed
-     */
-    public function isRelativePath()
-    {
-
     }
 
     /**
