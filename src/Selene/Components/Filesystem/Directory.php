@@ -470,29 +470,23 @@ class Directory extends AbstractFileObject
 
         foreach ($iterator = $this->getIterator($location) as $fileInfo) {
 
-            $skip = false;
             // continue loop if file is link
             if ($fileInfo->isLink()) {
                 continue;
             }
-
             // add file to collection:
             if ($fileInfo->isFile() and true !== $ignorefiles and $this->isIncludedFile($fileInfo->getBaseName())) {
                 $collection->add($fileInfo);
                 continue;
             }
-
             // operate on all included directories
             if ($fileInfo->isDir()) {
-
                 // only add directory to collection only if onlyfiles is false
                 // and is included directory
                 if ($this->isIncludedDir($fileInfo->getRealPath())) {
-
                     if (true !== $this->onlyFilesFilter) {
                         $collection->add($fileInfo);
                     }
-
                     // just list this directory if max depths is not already
                     // reached
                     if (!$this->isRecursionStoppend()) {
