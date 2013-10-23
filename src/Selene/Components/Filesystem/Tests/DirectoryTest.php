@@ -68,6 +68,11 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertFalse($this->invokeObjectMethod('isIncludedFile', $collection, $this->getPathsAsArgument($paths)));
         $paths = ['source_tree'];
         $this->assertTrue($this->invokeObjectMethod('isIncludedDir', $collection, $this->getPathsAsArgument($paths)));
+
+        $paths = ['.git'];
+
+        $this->assertFalse($this->invokeObjectMethod('isIncludedDir', $collection, ['/some/path/.git']));
+        $this->assertFalse($this->invokeObjectMethod('isIncludedFile', $collection, ['/some/path/.git/somefile']));
     }
 
     /**
@@ -242,7 +247,6 @@ class DirectoryTest extends FilesystemTestCase
         $collection = $dir->files()->get();
         $collection->setOutputTree(false);
 
-
         $this->assertEquals(6, count($collection->toArray()));
     }
 
@@ -285,11 +289,38 @@ class DirectoryTest extends FilesystemTestCase
         $ignored = ['.git', '.svn'];
 
         foreach($collection->toArray() as $file) {
-            if (in_array(basename($file), $ignored)) {
-                $this->fail();
+            if (in_array($f = basename($file), $ignored)) {
+                $this->fail('testAddVCSPattern:'. (is_file($file) ? ' file ' : ' directory ') . $f . ' was included where it shouldn\'t');
+            }
+
+            if ($d = in_array(basename(dirname($file)), $ignored)) {
+                $this->fail('testAddVCSPattern: file ' . basename($file) . ' was included where it shouldn\'t');
             }
         }
         $this->assertTrue(true);
+    }
+
+    public function testAddVCSPattern()
+    {
+        $this->buildTree();
+
+        Directory::addVCSPattern('^\.sass.*?');
+
+        $dir = $this->fs->directory($this->testDrive, Directory::IGNORE_VCS);
+        $collection = $dir->get();
+        $collection->setOutputTree(false);
+        $ignored = ['.git', '.svn', '.sass-cache'];
+
+        foreach($collection->toArray() as $file) {
+
+            if (in_array($f = basename($file), $ignored)) {
+                $this->fail('testAddVCSPattern:'. (is_file($file) ? ' file ' : ' directory ') . $f . ' was included where it shouldn\'t');
+            }
+
+            if ($d = in_array(basename(dirname($file)), $ignored)) {
+                $this->fail('testAddVCSPattern: file ' . basename($file) . ' was included where it shouldn\'t');
+            }
+        }
     }
 
     /**
@@ -336,13 +367,9 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertTrue(isset($files['name']) && basename($this->testDrive) === $files['name']);
     }
 
-
-
     protected function getPathsAsArgument(array $paths)
     {
         $paths = $this->testDrive.DIRECTORY_SEPARATOR.implode(','.$this->testDrive.DIRECTORY_SEPARATOR, $paths);
         return explode(',', $paths);
     }
-
-
 }

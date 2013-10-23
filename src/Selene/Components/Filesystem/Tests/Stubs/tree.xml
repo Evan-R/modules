@@ -11,6 +11,20 @@
     </files>
     <directories>
       <directory name=".git" permission="0755">
+        <directory name="modules" permission="0755">
+        </directory>
+        <files>
+          <file name="index" permission="0644"/>
+        </files>
+      </directory>
+      <!-- test for ignoring vcs pattern -->
+      <directory name=".sass-cache" permission="0755">
+        <files>
+          <file name="831809887971289738912738.scss" permission="0644"/>
+          <file name="kahsdjhaksjdhjah79qw7e87.scss" permission="0644"/>
+          <file name="19837878da7s8d8781273879.scss" permission="0644"/>
+          <file name="897qwe7812787q9w87e87713.scss" permission="0644"/>
+        </files>
       </directory>
       <directory name="nested_node" permission="0755">
         <files>

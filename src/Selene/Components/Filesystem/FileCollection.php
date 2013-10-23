@@ -84,7 +84,14 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
      *
      * @var string
      */
-    protected static $keyDelimmiter = '%';
+    protected static $keyStartDelimmiter = '%';
+
+    /**
+     * keyDelimmiter
+     *
+     * @var string
+     */
+    protected static $keyEndDelimmiter = '%';
 
     /**
      * add
@@ -476,9 +483,22 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
      * @access public
      * @return void
      */
-    public static function setKeyDelimmiter($key)
+    public static function setKeyStartDelimmiter($key)
     {
-        static::$keyDelimmtiter = $key;
+        static::$keyStartDelimmiter = $key;
+    }
+
+    /**
+     * setKeyDelimmiter
+     *
+     * @param mixed $key
+     *
+     * @access public
+     * @return void
+     */
+    public static function setKeyEndDelimmiter($key)
+    {
+        static::$keyEndDelimmiter = $key;
     }
 
     /**
@@ -530,6 +550,6 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
      */
     private static function getKey($key)
     {
-        sprintf('%s%s%s', static::$keyDelimmtiter, trim($key, static::$keyDelimmtiter), static::$keyDelimmtiter);
+        return sprintf('%s%s%s', static::$keyStartDelimmiter, $key, static::$keyEndDelimmiter);
     }
 }

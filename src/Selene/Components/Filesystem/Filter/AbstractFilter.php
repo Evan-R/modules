@@ -50,6 +50,12 @@ abstract class AbstractFilter implements FilterInterface
         return !$this->match($pattern);
     }
 
+    public function __toString()
+    {
+        return $this->compiled ? $this->compiled : '';
+    }
+
+
     abstract public function add($expression);
 
     abstract protected function doMatch($patter);

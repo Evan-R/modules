@@ -327,7 +327,6 @@ class Directory extends AbstractFileObject
      */
     public function toArray()
     {
-        $this->clearFilter();
         return $this->get()->toArray();
     }
 
@@ -471,6 +470,7 @@ class Directory extends AbstractFileObject
 
         foreach ($iterator = $this->getIterator($location) as $fileInfo) {
 
+            $skip = false;
             // continue loop if file is link
             if ($fileInfo->isLink()) {
                 continue;
@@ -483,19 +483,22 @@ class Directory extends AbstractFileObject
             }
 
             // operate on all included directories
-            if ($recursive and $fileInfo->isDir()) {
+            if ($fileInfo->isDir()) {
 
                 // only add directory to collection only if onlyfiles is false
                 // and is included directory
-                if ($this->isIncludedDir($fileInfo->getRealPath()) and true !== $this->onlyFilesFilter) {
-                    $collection->add($fileInfo);
-                }
+                if ($this->isIncludedDir($fileInfo->getRealPath())) {
 
-                // just list this directory if max depths is not already
-                // reached
-                if (!$this->isRecursionStoppend()) {
-                    $this->countRecursion($count);
-                    $this->doList($collection, $fileInfo->getRealPath(), $recursive, $ignorefiles);
+                    if (true !== $this->onlyFilesFilter) {
+                        $collection->add($fileInfo);
+                    }
+
+                    // just list this directory if max depths is not already
+                    // reached
+                    if (!$this->isRecursionStoppend()) {
+                        $this->countRecursion($count);
+                        $this->doList($collection, $fileInfo->getRealPath(), $recursive, $ignorefiles);
+                    }
                 }
             }
         }
