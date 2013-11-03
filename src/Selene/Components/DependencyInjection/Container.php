@@ -23,7 +23,6 @@ namespace Selene\Components\DependencyInjection;
 class Container implements InspectableInterface
 {
     const SCOPE_CONTAINER = 'container';
-
     const SCOPE_PROTOTYPE = 'prototype';
 
     /**
@@ -84,15 +83,15 @@ class Container implements InspectableInterface
     /**
      * getParam
      *
-     * @param mixed $param
+     * @param mixed $parameter
      * @param mixed $definition
      *
      * @access public
      * @return mixed
      */
-    public function getParam($param)
+    public function getParam($parameter)
     {
-        $this->params->get($param);
+        return $this->parameters->get($parameter);
     }
 
     /**
@@ -139,14 +138,42 @@ class Container implements InspectableInterface
         throw new \Exception(sprintf('service %s not found', $service));
     }
 
-    protected function isReference($reference)
+    /**
+     * hasService
+     *
+     * @param string $service
+     *
+     * @access public
+     * @return boolean
+     */
+    public function hasService($service)
+    {
+        return is_string($service) and isset($this->services[$service]);
+    }
+
+    /**
+     * isReference
+     *
+     * @param string $reference
+     *
+     * @access public
+     * @return boolean
+     */
+    public function isReference($reference)
     {
         return 0 === strrpos($reference, '$') && $this->hasService(substr($reference, 1));
     }
 
+    /**
+     * resolveService
+     *
+     * @param string $service
+     *
+     * @access protected
+     * @return Object the service instance
+     */
     protected function resolveService($service)
     {
-
         $definition = $this->services[$service];
 
         if ($definition->isResolved()) {
@@ -163,21 +190,31 @@ class Container implements InspectableInterface
             $instance = new $class;
         }
 
-        $definition->setResolved($instance);
+        $this->postProcessInstance($definition, $instance);
+
+        if ($definition->scopeIsContainer()) {
+            $definition->setResolved($instance);
+        }
+
         return $instance;
     }
 
     /**
-     * hasService
+     * postProcessInstance
      *
-     * @param mixed $service
+     * @param Definition $definition
+     * @param Object $instance
      *
-     * @access public
-     * @return mixed
+     * @access protected
+     * @return void
      */
-    public function hasService($service)
+    protected function postProcessInstance(Definition $definition, $instance)
     {
-        return is_string($service) and isset($this->services[$service]);
+        if ($definition->hasSetters()) {
+            foreach ($definition->getSetters() as $setter) {
+                call_user_func_array([$instance, $setter['method']], $this->resolveArgs($setter['arguments']));
+            }
+        }
     }
 
     /**
@@ -202,59 +239,99 @@ class Container implements InspectableInterface
 
     }
 
+    /**
+     * resolveServiceArgs
+     *
+     * @param Definition $definition
+     *
+     * @access protected
+     * @return array
+     */
     protected function resolveServiceArgs(Definition $definition)
     {
-        $args = $this->getDefinitionArguments($definition);
+        return $this->resolveArgs($this->getDefinitionArguments($definition));
+    }
+
+    /**
+     * resolveArgs
+     *
+     * @param array $args
+     *
+     * @access protected
+     * @return array
+     */
+    protected function resolveArgs(array $args)
+    {
         $arguments = [];
 
-        if (null !== $args) {
+        if (!empty($args)) {
+
             foreach ($args as $argument) {
+
+                if (!is_string($argument)) {
+                    $arguments[] = $argument;
+                    continue;
+                }
+
                 if ($this->isReference($argument)) {
                     $arguments[] = $this->getService($this->getNameFromReference($argument));
                     continue;
                 }
+
                 $arguments[] = $this->parameters->get($argument);
             }
+
         }
         return $arguments;
     }
 
+    /**
+     * getNameFromReference
+     *
+     * @param mixed $reference
+     *
+     * @access protected
+     * @return mixed
+     */
     protected function getNameFromReference($reference)
     {
         return substr($reference, 1);
     }
 
+    /**
+     * Create a new Class instance with its arguments
+     *
+     * @param string $class
+     * @param array $args
+     *
+     * @access protected
+     * @throws \InvalidArgumentException
+     * @return Object
+     */
     protected function setClassArgs($class, $args)
     {
         $instance;
 
         switch(count($args)) {
             case 1:
-                $instance = new $class($args[0]);
-                break;
+                return new $class($args[0]);
             case 2:
-                $instance = new $class($args[0], $args[1]);
-                break;
+                return new $class($args[0], $args[1]);
             case 3:
-                $instance = new $class($args[0], $args[1], $args[2]);
-                break;
+                return new $class($args[0], $args[1], $args[2]);
             case 4:
-                $instance = new $class($args[0], $args[1], $args[2], $args[3]);
-                break;
+                return new $class($args[0], $args[1], $args[2], $args[3]);
             case 5:
-                $instance = new $class($args[0], $args[1], $args[2], $args[3], $args[4]);
-                break;
+                return new $class($args[0], $args[1], $args[2], $args[3], $args[4]);
             case 6:
-                $instance = new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5]);
-                break;
+                return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5]);
             case 7:
-                $instance = new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6]);
-                break;
+                return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6]);
+            case 8:
+                return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7]);
             default:
                 throw new \InvalidArgumentException('no arguments or argument limit exceeded');
                 break;
         }
-
-        return $instance;
     }
 }

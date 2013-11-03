@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <container>
-  <service>
+  <parameters>
+    <parameter name="foo.service.class">Acme\FooService</parameter>
+    <parameter name="foo.service.name">foo</parameter>
+  </parameters>
+  <services>
     <arguments>
       <argument name="@foo"/>
       <argument name="$foo"/>
     </arguments>
-  </service>
+  </services>
 </container>
-

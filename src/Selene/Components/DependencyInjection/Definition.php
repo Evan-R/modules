@@ -24,6 +24,8 @@ class Definition implements DefinitionInterface
 
     private $arguments;
 
+    public $setters = [];
+
     private $instance;
 
     /**
@@ -40,31 +42,86 @@ class Definition implements DefinitionInterface
         $this->setScope(Container::SCOPE_CONTAINER);
     }
 
+    /**
+     * Get the definition classname
+     *
+     * @access public
+     * @return string
+     */
     public function getClass()
     {
         return $this->class;
     }
 
+    /**
+     * Get parent class name
+     *
+     * @access public
+     * @return string|boolean false if no parent class
+     */
     public function getParent()
     {
         return $this->parent;
     }
 
+    /**
+     * get definition arguments
+     *
+     * @access public
+     * @return array
+     */
     public function getArguments()
     {
         return $this->arguments;
     }
 
+    /**
+     * getScope
+     *
+     * @access public
+     * @return string
+     */
     public function getScope()
     {
         return $this->scope;
     }
 
-    public function setScope($scope)
+    /**
+     * hasScope
+     *
+     * @param mixed $scope
+     *
+     * @access public
+     * @return bool
+     */
+    public function hasScope($scope)
     {
-        return $this->scope = $scope;
+        return $scope === ($scope & $this->scope);
     }
 
+    /**
+     * setScope
+     *
+     * @param mixed $scope
+     *
+     * @access public
+     * @return void
+     */
+    public function setScope($scope)
+    {
+        $this->scope = $scope;
+        return $this;
+    }
+
+    /**
+     * addScope
+     *
+     * @param mixed $scope
+     *
+     * @throws \InvalidArgumentException
+     * @access public
+     * @return void
+     */
     public function addScope($scope)
     {
         if ($this->scopeIsContainer() and
@@ -74,23 +131,50 @@ class Definition implements DefinitionInterface
         }
 
         $this->scope = !$this->scope ? $scope : $this->scope | $scope;
+        return $this;
     }
 
+    /**
+     * scopeIsContainer
+     *
+     * @access public
+     * @return bool
+     */
     public function scopeIsContainer()
     {
         return Container::SCOPE_CONTAINER === (Container::SCOPE_CONTAINER & $this->scope);
     }
 
+    /**
+     * isResolved
+     *
+     * @access public
+     * @return bool
+     */
     public function isResolved()
     {
         return (bool)$this->getResolved();
     }
 
+    /**
+     * getResolved
+     *
+     * @access public
+     * @return mixed|object
+     */
     public function getResolved()
     {
         return $this->instance;
     }
 
+    /**
+     * setResolved
+     *
+     * @param mixed $resolved
+     *
+     * @access public
+     * @return void
+     */
     public function setResolved($resolved)
     {
         if (!$this->scopeIsContainer()) {
@@ -99,10 +183,55 @@ class Definition implements DefinitionInterface
         $this->instance = $resolved;
     }
 
+    /**
+     * addArgument
+     *
+     * @param mixed $argument
+     *
+     * @access public
+     * @return mixed
+     */
     public function addArgument($argument)
     {
         $this->arguments[] = $argument;
         return $this;
+    }
+
+    /**
+     * addSetter
+     *
+     * @param string $method
+     * @param array $arguments
+     *
+     * @access public
+     * @return void
+     */
+    public function addSetter($method, array $arguments)
+    {
+        $this->setters[] = compact('method', 'arguments');
+        return $this;
+    }
+
+    /**
+     * getSetters
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getSetters()
+    {
+        return $this->setters;
+    }
+
+    /**
+     * hasSetters
+     *
+     * @access public
+     * @return mixed
+     */
+    public function hasSetters()
+    {
+        return (bool)$this->setters;
     }
 
     /**

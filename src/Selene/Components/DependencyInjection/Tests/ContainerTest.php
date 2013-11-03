@@ -11,8 +11,12 @@
 
 namespace Selene\Components\DependencyInjection\Tests;
 
+use Mockery as m;
 use Selene\Components\TestSuite\TestCase;
 use Selene\Components\DependencyInjection\Container;
+use Selene\Components\DependencyInjection\Tests\Stubs\FooService;
+use Selene\Components\DependencyInjection\Tests\Stubs\BarService;
+use Selene\Components\DependencyInjection\Tests\Stubs\SetterAwareService;
 
 /**
  * @class ContainerTest extends TestCase ContainerTest
@@ -38,75 +42,104 @@ class ContainerTest extends TestCase
     /**
      * @test
      */
-    public function testSetUpContainer()
+    public function testContainerSetParams()
     {
-        $this->container->setParam('foo.options', ['opt1', 'opt2']);
+        $this->container->setParam('foo.service.class', 'foo');
+        $this->assertSame('foo', $this->container->getParam('@foo.service.class'));
 
-        $this->container->setParam('foo.service.class', 'Acme\FooService');
-        $this->container->setParam('bar.service.class', 'Acme\BarService');
-        $this->container->setParam('baz.service.class', 'Acme\BazService');
-        $this->container->setParam('bla.service.class', 'Acme\BlaService');
-        $this->container->setParam('Acme\BarService', ['$foo']);
+        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
+        $this->assertSame($opts, $this->container->getParam('@foo.options'));
+    }
 
-        $this->container->setService('foo', '@foo.service.class', ['@foo.options']);
+    /**
+     * @test
+     */
+    public function testContainerScopeContainer()
+    {
+        $this->container->setParam('foo.service.class', 'StdClass');
 
-        $this->container->setService('bar', '@bar.service.class', ['$foo']);
+        $this->container->setService('foo', '@foo.service.class');
 
-        $this->container->setService('baz', '@baz.service.class');
-        $this->container->setService('bla', '@bla.service.class')
-            ->addArgument('@foo.options');
+        $instanceA = $this->container->getService('foo');
+        $instanceB = $this->container->getService('foo');
 
-        $service = $this->container->getService('bar');
-        var_dump($service);
+        $this->assertSame($instanceA, $instanceB);
+    }
 
-        $service = $this->container->getService('baz');
-        var_dump($service);
+    /**
+     * @test
+     */
+    public function testContainerScopePrototype()
+    {
+        $this->container->setParam('foo.service.class', 'StdClass');
 
-        $service = $this->container->getService('bla');
-        var_dump($service);
+        $this->container
+            ->setService('foo', '@foo.service.class')
+            ->setScope(Container::SCOPE_PROTOTYPE);
 
-        //var_dump($service);
+        $instanceA = $this->container->getService('foo');
+        $instanceB = $this->container->getService('foo');
 
+        $this->assertTrue($instanceA !== $instanceB);
+    }
+
+    /**
+     * @test
+     */
+    public function testAddSetters()
+    {
+        $classname = __NAMESPACE__.'\Stubs\SetterAwareService';
+
+        $this->container->setParam('setter.class', $classname);
+        $this->container->setParam('setter.name', 'foo');
+        $this->container->setService('my_service', '@setter.class')->addSetter('setName', ['@setter.name']);
+
+        $service = $this->container->getService('my_service');
+
+        $this->assertSame('foo', $service->name);
+    }
+
+    /**
+     * @test
+     */
+    public function testAddSettersResolveArgs()
+    {
+        $classname = __NAMESPACE__.'\Stubs\SetterAwareService';
+
+        $this->container->setParam('foo.class', $fooclass = __NAMESPACE__.'\Stubs\FooService');
+        $this->container->setParam('setter.class', $classname);
+        $this->container->setService('foo_service', '@foo.class');
+
+        $this->container->setService('my_service', '@setter.class')
+            ->addSetter('setFoo', ['$foo_service']);
+
+        $fooService = $this->container->getService('foo_service');
+        $service = $this->container->getService('my_service');
+
+        $this->assertInstanceOf($fooclass, $service->foo);
+        $this->assertSame($fooService, $service->foo);
+    }
+
+    /**
+     * @test
+     */
+    public function testParameterInheritance()
+    {
+        $abstract = __NAMESPACE__.'\Stubs\AbstractService';
+
+        $this->container->setParam('foo.service.class', $fooclass = __NAMESPACE__.'\Stubs\FooService');
+        $this->container->setParam('inh.service.class', __NAMESPACE__.'\Stubs\InheritedService');
+        $this->container->setParam($abstract, ['$foo_service']);
+        $this->container->setService('foo_service', '@foo.service.class');
+        $this->container->setService('foo_service', '@foo.service.class');
+        $this->container->setService('inh_service', '@inh.service.class');
+
+        $service = $this->container->getService('inh_service');
+        $this->assertInstanceOf($fooclass, $service->foo);
     }
 
     protected function tearDown()
     {
 
-    }
-}
-
-namespace Acme;
-
-class FooService
-{
-    private $options;
-
-    public function __construct(array $options)
-    {
-        $this->options = $options;
-    }
-}
-
-class BarService
-{
-    private $foo;
-
-    public function __construct(FooService $foo)
-    {
-        $this->foo = $foo;
-    }
-}
-
-class BazService extends BarService
-{
-
-}
-
-class BlaService extends BarService
-{
-    public function __construct(FooService $foo, $bam = null)
-    {
-        parent::__construct($foo);
-        $this->bam = $bam;
     }
 }
