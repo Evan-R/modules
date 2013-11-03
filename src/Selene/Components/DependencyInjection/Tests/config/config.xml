@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container>
+  <service>
+    <arguments>
+      <argument name="@foo"/>
+      <argument name="$foo"/>
+    </arguments>
+  </service>
+</container>
+
