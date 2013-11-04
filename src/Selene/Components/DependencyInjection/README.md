@@ -26,6 +26,26 @@ $container->getParam('@my.options'); // [1, 2, 3]
 
 ---------
 
+### Defining a service
+
+```php
+<?php
+$container->setService('service_id', 'ServiceClass', ['service args']);
+```
+
+### Injecting a class instance as service
+
+There're a situations where it's not possible for a service being created by
+the container. Therefor you my inject a class instance as a service. 
+
+```php
+<?php
+
+$container->injectService('service_id', $instance);
+```
+
+---------
+
 ### Injection
 
 #### Argument injection
@@ -102,7 +122,6 @@ $container
 	->addArgument('@foo.options');
 
 ```
-
 ---------
 
 ### Scopes
