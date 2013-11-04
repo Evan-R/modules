@@ -11,6 +11,7 @@
 
 namespace Selene\Components\DependencyInjection\Tests;
 
+use Mockery as m;
 use Selene\Components\TestSuite\TestCase;
 use Selene\Components\DependencyInjection\Container;
 use Selene\Components\DependencyInjection\ContainerInterface;
@@ -155,9 +156,11 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf($fooclass, $service->foo);
     }
 
+    /**
+     * @test
+     */
     public function testConstructClassWithFactorySetArgs()
     {
-
         $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
 
         $this->container->setService('foo_service', null, ['@foo.options'])
@@ -170,9 +173,11 @@ class ContainerTest extends TestCase
 
     }
 
+    /**
+     * @test
+     */
     public function testConstructClassWithFactoryAddArgs()
     {
-
         $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
         $this->container->setService('foo_service', null)
             ->addArgument('@foo.options')
@@ -182,12 +187,23 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $fooService, 'factory.add.args');
         $this->assertSame($opts, $fooService->getOptions(), 'factory.add.args');
-
     }
 
+    /**
+     * @test
+     */
+    public function testInjectServiceInstance()
+    {
+        $service = m::mock('Acme\InjectedService');
+        $this->container->injectService('injected_service', $service);
+        $this->assertSame($service, $this->container->getService('injected_service'));
+    }
+
+    /**
+     * @test
+     */
     public function testConstructClassWithFactoryDependOnOtherService()
     {
-
         $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
         $this->container->setParam('foo.class', __NAMESPACE__.'\Stubs\FooService');
 

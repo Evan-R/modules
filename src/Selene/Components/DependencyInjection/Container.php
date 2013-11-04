@@ -154,6 +154,21 @@ class Container implements ContainerInterface, InspectableInterface
     }
 
     /**
+     * injectService
+     *
+     * @param string $service
+     * @param object $instance
+     *
+     * @access public
+     * @return voic
+     */
+    public function injectService($service, $instance)
+    {
+        $this->services[$service] = $this->getDefinition(get_class($instance));
+        $this->services[$service]->setResolved($instance);
+    }
+
+    /**
      * isReference
      *
      * @param string $reference

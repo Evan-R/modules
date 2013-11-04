@@ -10,15 +10,70 @@ $container = new Container;
 
 ## Usage
 
+---------
+
 ### Parameters
 
 ```php
 <?php
 
 $container->setParam('my.param', 'param value');
-$container->getParam('@my.param');
-```
-### Creating services using factories
+$container->setParam('my.options', [1, 2, 3]);
+
+$container->getParam('@my.param'); // 'param value'
+$container->getParam('@my.options'); // [1, 2, 3]
+```                                               
+
+---------
+
+### Injection
+
+#### Argument injection
+
+```php
+<?php
+
+$container->setParam('my.param', 'param value');
+
+// passing a parameter to the services' constructor:
+$container->setService('my_service', 'Acme\FooService', ['@my.param']);
+// or
+$container->setService('my_service', 'Acme\FooService')
+	->addArgument('@my.param');
+
+// passing a service reference to the services' constructor:
+
+$container->setService('other_service', 'Acme\OtherService');
+
+$container->setService('my_service', 'Acme\ServiceNeedsOtherService', ['$other_service']);
+// or
+$container->setService('my_service', 'Acme\ServiceNeedsOtherService')
+	->addArgument('$other_service');
+
+```                                               
+#### Setter injection
+
+```php
+<?php
+
+$container->setParam('my.options', [1, 2, 3]);
+
+// passing a parameter to a service's setter method
+$container->setService('my_service', 'Acme\FooService')
+	->addSetter('setOptions', ['@my.options'])
+
+// passing a service reference to the service's setter method
+
+$container->setService('other_service', 'Acme\OtherService');
+
+$container->setService('my_service', 'Acme\ServiceNeedsOtherService')
+	->addSetter('setOtherService', ['$other_service']);
+```                                               
+#### Factories
+
+Sometimes you may find it easier to bootstrap a service using a factory. 
+With regards to ti IoC container, a factory is a static class method that takes
+certain (or no) arguments, and returns an instance of your service.
 
 ```php
 <?php
@@ -42,8 +97,43 @@ $container->setParam('foo.options', ['opt1', 'opt2']);
 $container->setParam('foo.factory', 'Acme\Foo\ServiceFactory');
 
 $container
-	->setService('foo_service', null)
+	->setService('foo_service')
 	->setFactory('@foo.factory', 'makeFooService')
 	->addArgument('@foo.options');
 
+```
+
+---------
+
+### Scopes
+
+There're two different scopes, `container` and `prototype`. Services are
+created as `container` by default. You may override this by setting the
+respective scope. 
+
+```php
+<?php
+$container->setService('my_service', 'Acme\FooService')
+	->setScope(ContainerInterface::SCOPE_PROTOTYPE);
+```
+
+#### Services and scope container
+
+Services defined with a `container` scope will return the same instance each time
+the service is called.
+
+#### Services and scope prototype
+
+Unlink a container scope, setting a service's scope to `prototype` will create a new instance of that
+service each time it is called. 
+
+---------
+
+### Resolving a Service
+
+All serices are lazy. A service gets resolved the first time it is called. 
+
+```php
+<?php
+$service = $container->getService('my_service');
 ```

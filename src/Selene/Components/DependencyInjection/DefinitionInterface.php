@@ -21,7 +21,7 @@ interface DefinitionInterface
     public function getClass();
     public function getParent();
 
-    public function addArgument();
+    public function addArgument($argument);
     public function getArguments();
 
     public function setScope($scope);
@@ -29,7 +29,7 @@ interface DefinitionInterface
     public function hasScope($scope);
     public function getScope();
 
-    public function addSetter();
+    public function addSetter($method, array $arguments);
     public function getSetters();
     public function hasSetters();
 
