@@ -14,6 +14,7 @@ namespace Selene\Components\DependencyInjection\Tests;
 use Selene\Components\TestSuite\TestCase;
 use Selene\Components\DependencyInjection\Container;
 use Selene\Components\DependencyInjection\Definition;
+use Selene\Components\DependencyInjection\ContainerInterface;
 
 /**
  * @class ContainerTest extends TestCase ContainerTest
@@ -32,10 +33,10 @@ class DefinitionTest extends TestCase
     public function testDefinitionSetScope()
     {
         $definition = new Definition('StdClass');
-        $this->assertSame(Container::SCOPE_CONTAINER, $definition->getScope());
+        $this->assertSame(ContainerInterface::SCOPE_CONTAINER, $definition->getScope());
 
-        $definition->setScope(Container::SCOPE_PROTOTYPE);
-        $this->assertSame(Container::SCOPE_PROTOTYPE, $definition->getScope());
+        $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE);
+        $this->assertSame(ContainerInterface::SCOPE_PROTOTYPE, $definition->getScope());
     }
 
     /**
@@ -67,7 +68,7 @@ class DefinitionTest extends TestCase
     public function testDefinitionAddScopeShouldThrowException()
     {
         $definition = new Definition('StdClass');
-        $definition->addScope(Container::SCOPE_PROTOTYPE);
+        $definition->addScope(ContainerInterface::SCOPE_PROTOTYPE);
     }
 
     /**
@@ -92,7 +93,7 @@ class DefinitionTest extends TestCase
     public function testDefinitionIsResolvedOnPrototypeScope()
     {
         $definition = new Definition('StdClass');
-        $definition->setScope(Container::SCOPE_PROTOTYPE);
+        $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE);
         $class = new \StdClass;
 
         $definition->setResolved($class);

@@ -12,11 +12,15 @@
 namespace Selene\Components\DependencyInjection;
 
 /**
- * @class Parameters
+ * @class Parameters implements ParameterInterface Parameters
+ * @see ParameterInterface
+ *
  * @package Selene\Components\DependencyInjection
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
-class Parameters
+class Parameters implements ParameterInterface
 {
     /**
      * add
@@ -46,13 +50,15 @@ class Parameters
             $this->parameters[$param] : (null !== $default ? $default : $param);
     }
 
-
-    private function getKey($param)
-    {
-        return '@'.$this->escapeKey($param);
-    }
-
-    private function has($param)
+    /**
+     * has
+     *
+     * @param mixed $param
+     *
+     * @access public
+     * @return mixed
+     */
+    public function has($param)
     {
         return array_key_exists($param, $this->parameters);
     }
@@ -60,5 +66,10 @@ class Parameters
     private function escapeKey($param)
     {
         return str_replace('\\', '\\\\', $param);
+    }
+
+    private function getKey($param)
+    {
+        return '@'.$this->escapeKey($param);
     }
 }

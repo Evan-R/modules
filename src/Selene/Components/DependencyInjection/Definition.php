@@ -12,9 +12,13 @@
 namespace Selene\Components\DependencyInjection;
 
 /**
- * @class Definition
+ * @class Definition implements DefinitionInterface Definition
+ * @see DefinitionInterface
+ *
  * @package Selene\Components\DependencyInjection
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 class Definition implements DefinitionInterface
 {
@@ -71,7 +75,7 @@ class Definition implements DefinitionInterface
     {
         $this->setClass($class);
         $this->setArguments($arguments);
-        $this->setScope(Container::SCOPE_CONTAINER);
+        $this->setScope(ContainerInterface::SCOPE_CONTAINER);
     }
 
     /**
@@ -157,7 +161,7 @@ class Definition implements DefinitionInterface
     public function addScope($scope)
     {
         if ($this->scopeIsContainer() and
-            (Container::SCOPE_PROTOTYPE === (Container::SCOPE_PROTOTYPE & $scope))
+            (ContainerInterface::SCOPE_PROTOTYPE === (ContainerInterface::SCOPE_PROTOTYPE & $scope))
         ) {
             throw new \InvalidArgumentException('cannot add prototype scope to a container scope');
         }
@@ -174,7 +178,7 @@ class Definition implements DefinitionInterface
      */
     public function scopeIsContainer()
     {
-        return Container::SCOPE_CONTAINER === (Container::SCOPE_CONTAINER & $this->scope);
+        return ContainerInterface::SCOPE_CONTAINER === (ContainerInterface::SCOPE_CONTAINER & $this->scope);
     }
 
     /**

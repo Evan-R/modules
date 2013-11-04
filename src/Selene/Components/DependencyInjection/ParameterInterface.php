@@ -12,11 +12,13 @@
 namespace Selene\Components\DependencyInjection;
 
 /**
- * @interface InspectableInterface
+ * @interface ParameterInterface
  * @package Selene\Components\DependencyInjection
  * @version $Id$
  */
-interface InspectableInterface
+interface ParameterInterface
 {
-    public function inspect();
+    public function set($param, $value);
+
+    public function get($param, $default = null);
 }

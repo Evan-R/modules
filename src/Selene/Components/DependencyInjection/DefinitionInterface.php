@@ -18,5 +18,27 @@ namespace Selene\Components\DependencyInjection;
  */
 interface DefinitionInterface
 {
+    public function getClass();
+    public function getParent();
 
+    public function addArgument();
+    public function getArguments();
+
+    public function setScope($scope);
+    public function addScope($scope);
+    public function hasScope($scope);
+    public function getScope();
+
+    public function addSetter();
+    public function getSetters();
+    public function hasSetters();
+
+    public function setFactory($class, $method);
+    public function hasFactory();
+    public function getFactory();
+
+    public function scopeIsContainer();
+    public function isResolved();
+    public function getResolved();
+    public function setResolved($resolved);
 }

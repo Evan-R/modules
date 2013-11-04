@@ -20,11 +20,8 @@ namespace Selene\Components\DependencyInjection;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Container implements InspectableInterface
+class Container implements ContainerInterface, InspectableInterface
 {
-    const SCOPE_CONTAINER = 'container';
-    const SCOPE_PROTOTYPE = 'prototype';
-
     /**
      * parameters
      *
@@ -48,6 +45,11 @@ class Container implements InspectableInterface
     public function __construct(Parameters $parameters = null)
     {
         $this->setParameter($parameters);
+    }
+
+    public function inspect()
+    {
+        return null;
     }
 
     /**
@@ -343,9 +345,7 @@ class Container implements InspectableInterface
      */
     protected function setClassArgs($class, $args)
     {
-        $instance;
-
-        switch(count($args)) {
+        switch (count($args)) {
             case 1:
                 return new $class($args[0]);
             case 2:

@@ -13,6 +13,7 @@ namespace Selene\Components\DependencyInjection\Tests;
 
 use Selene\Components\TestSuite\TestCase;
 use Selene\Components\DependencyInjection\Container;
+use Selene\Components\DependencyInjection\ContainerInterface;
 use Selene\Components\DependencyInjection\Tests\Stubs\FooService;
 use Selene\Components\DependencyInjection\Tests\Stubs\BarService;
 use Selene\Components\DependencyInjection\Tests\Stubs\ServiceFactory;
@@ -75,7 +76,7 @@ class ContainerTest extends TestCase
 
         $this->container
             ->setService('foo', '@foo.service.class')
-            ->setScope(Container::SCOPE_PROTOTYPE);
+            ->setScope(ContainerInterface::SCOPE_PROTOTYPE);
 
         $instanceA = $this->container->getService('foo');
         $instanceB = $this->container->getService('foo');
