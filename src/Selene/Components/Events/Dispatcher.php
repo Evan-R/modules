@@ -95,12 +95,12 @@ class Dispatcher implements DispatcherInterface
      */
     public function on($event, $eventHandler, $priority = 10)
     {
-        $class = null;
+        $service = null;
         $method = null;
         if (!is_callable($eventHandler)) {
             extract($this->getEventHandlerFromClassString($event, $eventHandler));
         }
-        $this->bindEvent($event, $eventHandler, $priority, $class, $method);
+        $this->bindEvent($event, $eventHandler, $priority, $service, $method);
     }
 
     /**
@@ -117,8 +117,9 @@ class Dispatcher implements DispatcherInterface
      */
     public function once($event, $eventHandler, $priority = 10)
     {
-        $class = null;
+        $service = null;
         $method = null;
+
         if (!is_callable($eventHandler)) {
             extract($this->getEventHandlerFromClassString($event, $eventHandler));
         }
@@ -130,7 +131,7 @@ class Dispatcher implements DispatcherInterface
             $this->off($event, $eventHandler);
         };
 
-        $this->bindEvent($event, $eventHandler, $priority, $class, $method);
+        $this->bindEvent($event, $eventHandler, $priority, $service, $method);
     }
 
     /**
@@ -162,7 +163,6 @@ class Dispatcher implements DispatcherInterface
     public function addSubscriber(SubscriberInterface $subscriber)
     {
         foreach ($subscriber::getSubscriptions() as $event => $handles) {
-
             foreach ($this->listSubscriptions($subscriber, $event, $handles) as $subscription) {
                 call_user_func_array([$this, 'on'], $subscription);
             }
@@ -180,7 +180,6 @@ class Dispatcher implements DispatcherInterface
     public function removeSubscriber(SubscriberInterface $subscriber)
     {
         foreach ($subscriber::getSubscriptions() as $event => $handles) {
-
             foreach ($this->listSubscriptions($subscriber, $event, $handles) as $subscription) {
                 array_pop($subscription);
                 call_user_func_array([$this, 'off'], $subscription);
@@ -314,13 +313,13 @@ class Dispatcher implements DispatcherInterface
      * @access protected
      * @return void
      */
-    protected function bindEvent($event, $eventHandler, $priority = 10, $class = null, $method = null)
+    protected function bindEvent($event, $eventHandler, $priority = 10, $service = null, $method = null)
     {
         $handler = compact('event', 'priority');
         $handler['eventHandler'] =& $eventHandler;
 
-        if (!is_null($class)) {
-            $handler['uses'] = implode(static::EVTHANDLER_SEPARATOR, [$class, $method]);
+        if (!is_null($service)) {
+            $handler['uses'] = implode(static::EVTHANDLER_SEPARATOR, [$service, $method]);
         }
 
         unset($this->sorted[$event]);
@@ -363,12 +362,11 @@ class Dispatcher implements DispatcherInterface
         if ($isClass = is_string($eventHandler)) {
             $classHandler = implode(
                 static::EVTHANDLER_SEPARATOR,
-                $this->extractClass($eventHandler)
+                $this->extractService($eventHandler)
             );
         }
 
         foreach ($this->handlers[$event] as $index => &$handler) {
-
             if ($isClass and isset($handler['uses']) and $classHandler === $handler['uses']) {
                 unset($this->handlers[$event][$index]);
             } elseif ($eventHandler === $handler['eventHandler']) {
@@ -390,7 +388,7 @@ class Dispatcher implements DispatcherInterface
     protected function getEventHandlerFromClassString($event, $eventHandler)
     {
         if (is_string($eventHandler)) {
-            extract($this->extractClass($eventHandler));
+            extract($this->extractService($eventHandler));
 
             if (!$this->container) {
                 throw new \InvalidArgumentException(
@@ -398,11 +396,11 @@ class Dispatcher implements DispatcherInterface
                 );
             }
 
-            $eventHandler = function () use ($class, $method) {
-                return call_user_func_array([$this->container[$class], $method], func_get_args());
+            $eventHandler = function () use ($service, $method) {
+                return call_user_func_array([$this->container->getService($service), $method], func_get_args());
             };
 
-            return compact('eventHandler', 'class', 'method');
+            return compact('eventHandler', 'service', 'method');
         }
 
         throw new \InvalidArgumentException('Eventhandler is invalid');
@@ -416,13 +414,13 @@ class Dispatcher implements DispatcherInterface
      * @access protected
      * @return array
      */
-    protected function extractClass($eventHandler)
+    protected function extractService($eventHandler)
     {
-        list($class, $method) = array_pad(
+        list($service, $method) = array_pad(
             explode(static::EVTHANDLER_SEPARATOR, $eventHandler),
             2,
             'handleEvent'
         );
-        return compact('class', 'method');
+        return compact('service', 'method');
     }
 }

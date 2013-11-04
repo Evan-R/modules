@@ -117,11 +117,11 @@ class EventDispatcherTest extends TestCase
         );
 
         $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
-        $container->shouldReceive('offsetGet')->with('HandleAwareClass')->andReturn($class);
+        $container->shouldReceive('getService')->with('some_service')->andReturn($class);
 
         $dispatcher = new Dispatcher($container);
 
-        $dispatcher->on('foo', 'HandleAwareClass');
+        $dispatcher->on('foo', 'some_service');
         $result = $dispatcher->dispatch('foo');
 
         if (empty($result)) {
@@ -144,11 +144,11 @@ class EventDispatcherTest extends TestCase
         );
 
         $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
-        $container->shouldReceive('offsetGet')->with('HandleAwareClass')->andReturn($class);
+        $container->shouldReceive('getService')->with('some_service')->andReturn($class);
 
         $dispatcher = new Dispatcher($container);
 
-        $dispatcher->on('foo', 'HandleAwareClass@doHandle');
+        $dispatcher->on('foo', 'some_service@doHandle');
         $result = $dispatcher->dispatch('foo');
 
         if (empty($result)) {
@@ -313,27 +313,27 @@ class EventDispatcherTest extends TestCase
     public function testDetachEventWithBoundCallableClass()
     {
         $class = m::mock('HandleAwareClass');
-        $class->shouldReceive('handleEvent')->andReturnUsing(
-            function () {
-                $this->fail();
-                return true;
-            }
-        );
-
-        $class->shouldReceive('doHandleEvent')->andReturnUsing(
-            function () {
-                return true;
-            }
-        );
+        $class
+            ->shouldReceive('handleEvent')->andReturnUsing(
+                function () {
+                    $this->fail('event callback `handleEvent` should not be called');
+                    return true;
+                }
+            )
+            ->shouldReceive('responde')->andReturnUsing(
+                function () {
+                    return true;
+                }
+            );
 
         $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
-        $container->shouldReceive('offsetGet')->with('HandleAwareClass')->andReturn($class);
+        $container->shouldReceive('getService')->with('some_service')->andReturn($class);
 
         $dispatcher = new Dispatcher($container);
 
-        $dispatcher->on('foo', 'HandleAwareClass');
-        $dispatcher->on('foo', 'HandleAwareClass@doHandleEvent');
-        $dispatcher->off('foo', 'HandleAwareClass');
+        $dispatcher->on('foo', 'some_service');
+        $dispatcher->on('foo', 'some_service@responde');
+        $dispatcher->off('foo', 'some_service');
 
         $result = $dispatcher->dispatch('foo');
         $this->assertSame([true], $result);
