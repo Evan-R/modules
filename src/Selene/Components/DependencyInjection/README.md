@@ -35,8 +35,8 @@ $container->setService('service_id', 'ServiceClass', ['service args']);
 
 ### Injecting a class instance as service
 
-There're a situations where it's not possible for a service being created by
-the container. Therefor you my inject a class instance as a service. 
+There're situations where it's not possible for a service being created by
+the container. Therefor you may inject a class instance as a service. 
 
 ```php
 <?php
@@ -55,13 +55,13 @@ $container->injectService('service_id', $instance);
 
 $container->setParam('my.param', 'param value');
 
-// passing a parameter to the services' constructor:
+// passing a parameter to the constructor of a service:
 $container->setService('my_service', 'Acme\FooService', ['@my.param']);
 // or
 $container->setService('my_service', 'Acme\FooService')
 	->addArgument('@my.param');
 
-// passing a service reference to the services' constructor:
+// passing a service reference to the constructor of a service:
 
 $container->setService('other_service', 'Acme\OtherService');
 
@@ -71,6 +71,10 @@ $container->setService('my_service', 'Acme\ServiceNeedsOtherService')
 	->addArgument('$other_service');
 
 ```                                               
+
+Notice the `$` symbol in front of the service id. `$` will indicate that you're
+referencing a service. 
+
 #### Setter injection
 
 ```php
@@ -78,11 +82,11 @@ $container->setService('my_service', 'Acme\ServiceNeedsOtherService')
 
 $container->setParam('my.options', [1, 2, 3]);
 
-// passing a parameter to a service's setter method
+// passing a parameter to a setter method of a service
 $container->setService('my_service', 'Acme\FooService')
 	->addSetter('setOptions', ['@my.options'])
 
-// passing a service reference to the service's setter method
+// passing a service reference to a setter method of a service
 
 $container->setService('other_service', 'Acme\OtherService');
 
@@ -92,7 +96,7 @@ $container->setService('my_service', 'Acme\ServiceNeedsOtherService')
 #### Factories
 
 Sometimes you may find it easier to bootstrap a service using a factory. 
-With regards to ti IoC container, a factory is a static class method that takes
+With regards to the IoC container, a factory is a static class method that takes
 certain (or no) arguments, and returns an instance of your service.
 
 ```php
@@ -126,7 +130,7 @@ $container
 
 ### Scopes
 
-There're two different scopes, `container` and `prototype`. Services are
+Currently there're two different scopes, `container` and `prototype`. Services are
 created as `container` by default. You may override this by setting the
 respective scope. 
 
@@ -143,7 +147,7 @@ the service is called.
 
 #### Services and scope prototype
 
-Unlink a container scope, setting a service's scope to `prototype` will create a new instance of that
+Unlike the container scope, setting the scope of a service to `prototype` will create a new instance of that
 service each time it is called. 
 
 ---------
