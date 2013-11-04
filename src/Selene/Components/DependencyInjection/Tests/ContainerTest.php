@@ -11,11 +11,11 @@
 
 namespace Selene\Components\DependencyInjection\Tests;
 
-use Mockery as m;
 use Selene\Components\TestSuite\TestCase;
 use Selene\Components\DependencyInjection\Container;
 use Selene\Components\DependencyInjection\Tests\Stubs\FooService;
 use Selene\Components\DependencyInjection\Tests\Stubs\BarService;
+use Selene\Components\DependencyInjection\Tests\Stubs\ServiceFactory;
 use Selene\Components\DependencyInjection\Tests\Stubs\SetterAwareService;
 
 /**
@@ -86,6 +86,22 @@ class ContainerTest extends TestCase
     /**
      * @test
      */
+    public function testCreateServiceDefaultArgs()
+    {
+        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
+        $this->container->setParam('foo.class', $fooclass = __NAMESPACE__.'\Stubs\FooService');
+
+        $this->container->setService('foo_service', '@foo.class', ['@foo.options']);
+
+        $fooClass = $this->container->getService('foo_service');
+
+        $this->assertInstanceOf($fooclass, $fooClass);
+        $this->assertSame($opts, $fooClass->getOptions());
+    }
+
+    /**
+     * @test
+     */
     public function testAddSetters()
     {
         $classname = __NAMESPACE__.'\Stubs\SetterAwareService';
@@ -138,8 +154,51 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf($fooclass, $service->foo);
     }
 
-    protected function tearDown()
+    public function testConstructClassWithFactorySetArgs()
     {
 
+        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
+
+        $this->container->setService('foo_service', null, ['@foo.options'])
+            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeFoo');
+
+        $fooService = $this->container->getService('foo_service');
+
+        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $fooService, 'factory.with.args');
+        $this->assertSame($opts, $fooService->getOptions(), 'factory.with.args');
+
+    }
+
+    public function testConstructClassWithFactoryAddArgs()
+    {
+
+        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
+        $this->container->setService('foo_service', null)
+            ->addArgument('@foo.options')
+            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeFoo');
+
+        $fooService = $this->container->getService('foo_service');
+
+        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $fooService, 'factory.add.args');
+        $this->assertSame($opts, $fooService->getOptions(), 'factory.add.args');
+
+    }
+
+    public function testConstructClassWithFactoryDependOnOtherService()
+    {
+
+        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
+        $this->container->setParam('foo.class', __NAMESPACE__.'\Stubs\FooService');
+
+        $this->container->setService('foo_service', '@foo.class', ['@foo.options']);
+
+        $this->container->setService('bar_service', null)
+            ->addArgument('$foo_service')
+            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeBar');
+
+        $barService = $this->container->getService('bar_service');
+
+        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\BarService', $barService);
+        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $barService->getFoo());
     }
 }

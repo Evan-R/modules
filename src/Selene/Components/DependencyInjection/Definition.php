@@ -18,14 +18,46 @@ namespace Selene\Components\DependencyInjection;
  */
 class Definition implements DefinitionInterface
 {
+    /**
+     * class
+     *
+     * @var string
+     */
     private $class;
 
+    /**
+     * parent
+     *
+     * @var string|boolean
+     */
     private $parent;
 
+    /**
+     * setters
+     *
+     * @var array|null
+     */
+    private $setters;
+
+    /**
+     * factory
+     *
+     * @var array|null
+     */
+    private $factory;
+
+    /**
+     * arguments
+     *
+     * @var array
+     */
     private $arguments;
 
-    public $setters = [];
-
+    /**
+     * instance
+     *
+     * @var object|null
+     */
     private $instance;
 
     /**
@@ -232,6 +264,44 @@ class Definition implements DefinitionInterface
     public function hasSetters()
     {
         return (bool)$this->setters;
+    }
+
+    /**
+     * setFactory
+     *
+     * @param mixed $class
+     * @param mixed $method
+     * @param array $arguments
+     *
+     * @access public
+     * @return mixed
+     */
+    public function setFactory($class, $method)
+    {
+        $this->factory = compact('class', 'method');
+    }
+
+    /**
+     * hasFactory
+     *
+     * @access public
+     * @return bool
+     */
+    public function hasFactory()
+    {
+        return (bool)$this->factory;
+    }
+
+
+    /**
+     * getFactory
+     *
+     * @access public
+     * @return array
+     */
+    public function getFactory()
+    {
+        return $this->factory;
     }
 
     /**

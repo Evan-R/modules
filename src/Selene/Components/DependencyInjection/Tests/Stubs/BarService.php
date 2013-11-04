@@ -10,4 +10,9 @@ class BarService
     {
         $this->foo = $foo;
     }
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
 }

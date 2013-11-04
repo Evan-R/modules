@@ -114,10 +114,10 @@ class Container implements InspectableInterface
      * @access public
      * @return Definition
      */
-    public function setService($service, $class, $arguments = null)
+    public function setService($service, $class = null, $arguments = null)
     {
         $this->services[$this->parameters->get($service)] =
-            $definition = new Definition($this->parameters->get($class), $arguments);
+            $definition = $this->getDefinition($this->parameters->get($class), $arguments);
 
         return $definition;
     }
@@ -183,11 +183,16 @@ class Container implements InspectableInterface
         $params = $this->resolveServiceArgs($definition);
         $instance;
 
-        if (count($params) > 0) {
-            $instance = $this->setClassArgs($definition->getClass(), $params);
+        if ($definition->hasFactory()) {
+            $instance = $this->getInstanceFromFactory($definition);
         } else {
-            $class = $definition->getClass();
-            $instance = new $class;
+
+            if (count($params) > 0) {
+                $instance = $this->setClassArgs($definition->getClass(), $params);
+            } else {
+                $class = $definition->getClass();
+                $instance = new $class;
+            }
         }
 
         $this->postProcessInstance($definition, $instance);
@@ -215,6 +220,20 @@ class Container implements InspectableInterface
                 call_user_func_array([$instance, $setter['method']], $this->resolveArgs($setter['arguments']));
             }
         }
+    }
+
+    /**
+     * getInstanceFromFactory
+     *
+     * @param Definition $definition
+     *
+     * @access protected
+     * @return Object
+     */
+    protected function getInstanceFromFactory(Definition $definition)
+    {
+        extract($definition->getFactory());
+        return call_user_func_array($class.'::'.$method, $this->resolveServiceArgs($definition));
     }
 
     /**
@@ -296,6 +315,20 @@ class Container implements InspectableInterface
     protected function getNameFromReference($reference)
     {
         return substr($reference, 1);
+    }
+
+    /**
+     * getDefinition
+     *
+     * @param mixed $class
+     * @param mixed $arguments
+     *
+     * @access protected
+     * @return Definition
+     */
+    protected function getDefinition($class = null, $arguments = null)
+    {
+        return new Definition($class, $arguments);
     }
 
     /**
