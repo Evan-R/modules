@@ -1,3 +1,4 @@
+[![Build Status](https://api.travis-ci.org/seleneapp/filesystem.png?branch=development)](https://travis-ci.org/seleneapp/filesystem)
 
 ## Setup
 

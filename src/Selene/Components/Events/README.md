@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.org/seleneapp/events.png?branch=development)](https://travis-ci.org/seleneapp/events)
+
 ## Setup
 
 ```php
@@ -207,4 +209,3 @@ $events->dispatch('bar_event');  // => ['bar']
 // if you need to remove a subscriber, call:
 $events->removeSubscriber($subscriber);
 ```
-

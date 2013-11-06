@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.org/seleneapp/dependency-injection.png?branch=development)](https://travis-ci.org/seleneapp/dependency-injection)
+
 ## Setup
 
 ```php
