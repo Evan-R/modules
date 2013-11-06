@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Stream\Cache package
+ * This File is part of the Selene\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -17,7 +17,7 @@ use Memcached;
  * DriverMemcached
  *
  * @uses Storage
- * @package Stream\Cache
+ * @package Selene\Cache
  * @version 1.0
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -25,7 +25,7 @@ use Memcached;
 class MemcachedDriver extends AbstractDriver
 {
     /**
-     * memcached
+     * Memcached instance
      *
      * @var Memcached
      * @access private
@@ -41,7 +41,6 @@ class MemcachedDriver extends AbstractDriver
      */
     public function __construct(MemcachedConnection $connection)
     {
-        $this->connection = $connection;
         $this->memcached  = $connection->getMemcached();
     }
 

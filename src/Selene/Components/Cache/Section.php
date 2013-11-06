@@ -18,7 +18,6 @@ namespace Selene\Components\Cache;
  */
 class Section implements CacheInterface
 {
-
     /**
      * cache
      *

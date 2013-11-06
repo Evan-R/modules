@@ -25,17 +25,6 @@ use Selene\Components\Filesystem\Filesystem;
 class FilesystemDriver extends AbstractDriver
 {
     /**
-     * Flag a file as compressed
-     */
-    const C_COMPRESSED = 1;
-
-    /**
-     *
-     * Flag a file as uncompressed
-     */
-    const C_UNCOMPRESSED = 0;
-
-    /**
      * cache directory
      *
      * @var Stream\FSDirectory
@@ -168,7 +157,7 @@ class FilesystemDriver extends AbstractDriver
         $state = (int)substr($contents, 0, 1);
         $data = substr($contents, 2);
 
-        if ($state === self::C_UNCOMPRESSED) {
+        if ($state === static::C_UNCOMPRESSED) {
             $data = unserialize($data);
         } else {
             $data = unserialize($this->uncompressData($data));
@@ -176,7 +165,6 @@ class FilesystemDriver extends AbstractDriver
 
         return compact('data', 'state');
     }
-
 
     /**
      * saveForever
@@ -277,6 +265,14 @@ class FilesystemDriver extends AbstractDriver
         return gzuncompress(base64_decode($data));
     }
 
+    /**
+     * getFilePath
+     *
+     * @param mixed $key
+     *
+     * @access private
+     * @return string
+     */
     private function getFilePath($key)
     {
         $hash = hash('md5', $key);
@@ -294,18 +290,25 @@ class FilesystemDriver extends AbstractDriver
      */
     private function serializeData($data, $compressed = false, $time = null)
     {
-        $timestamp = is_int($time) ?
-            time() + ($time * 60) :
-            (is_string($time) ?
-                strtotime($time) :
-                (time() + $this->default * 60)
-            );
-
+        $timestamp = $this->getExpiryTimeStamp($time);
         $data = serialize($data);
         $data = $compressed ? $this->compressData($data) : $data;
-        $contents = sprintf('%d;%s', $compressed ? self::C_COMPRESSED : self::C_UNCOMPRESSED, $data);
+        $contents = sprintf('%d;%s', $compressed ? static::C_COMPRESSED : self::C_UNCOMPRESSED, $data);
 
         return compact('contents', 'timestamp');
+    }
+
+    /**
+     * getExpiryTimeStamp
+     *
+     * @param mixed $time
+     *
+     * @access private
+     * @return int
+     */
+    private function getExpiryTimeStamp($time = null)
+    {
+        return is_int($time) ? time() + ($time * 60) : (is_string($time) ? strtotime($time) : (time() + $this->default * 60));
     }
 
     /**

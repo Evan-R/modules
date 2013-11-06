@@ -21,6 +21,17 @@ namespace Selene\Components\Cache\Driver;
 interface DriverInterface
 {
     /**
+     * Flag a file as compressed
+     */
+    const C_COMPRESSED = 1;
+
+    /**
+     *
+     * Flag a file as uncompressed
+     */
+    const C_UNCOMPRESSED = 0;
+
+    /**
      * cachedItemExists
      *
      * @param mixed $key
