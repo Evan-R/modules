@@ -11,6 +11,8 @@
 
 namespace Selene\Components\DependencyInjection;
 
+use Selene\Components\DependencyInjection\Exception\ContainerLockedException;
+
 /**
  * @class Container implements ContainerInterface, InspectableInterface
  *
@@ -39,6 +41,13 @@ class Container implements ContainerInterface, InspectableInterface
     protected $services;
 
     /**
+     * locked
+     *
+     * @var boolean
+     */
+    protected $locked;
+
+    /**
      *
      * @param Parameters $parameters
      *
@@ -46,7 +55,8 @@ class Container implements ContainerInterface, InspectableInterface
      */
     public function __construct(Parameters $parameters = null)
     {
-        $this->setParameter($parameters);
+        $this->locked = false;
+        $this->setParameters($parameters);
     }
 
     public function inspect()
@@ -62,12 +72,65 @@ class Container implements ContainerInterface, InspectableInterface
      * @access protected
      * @return void
      */
-    protected function setParameter(Parameters $parameters = null)
+    public function setParameters(Parameters $parameters = null)
     {
         if (null === $parameters) {
             $parameters = new Parameters;
         }
         $this->parameters = $parameters;
+    }
+
+    /**
+     * getParameters
+     *
+     * @param mixed $param
+     *
+     * @access public
+     * @return ParameterInterface
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * merge
+     *
+     * @param ContainerInterface $container
+     *
+     * @access public
+     * @return void
+     */
+    public function merge(ContainerInterface $container)
+    {
+        if ($this->isLocked() or $container->isLocked()) {
+            throw new ContainerLockedException('cannot merge a locked container');
+        }
+
+        $this->parameters->merge($container->getParameters());
+        $this->services = array_merge((array)$this->services, (array)$container->getServices());
+    }
+
+    /**
+     * getServices
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getServices()
+    {
+        return $this->services;
+    }
+
+    /**
+     * isLocked
+     *
+     * @access public
+     * @return mixed
+     */
+    public function isLocked()
+    {
+        return $this->locked;
     }
 
     /**
@@ -96,17 +159,6 @@ class Container implements ContainerInterface, InspectableInterface
     public function getParam($parameter)
     {
         return $this->parameters->get($parameter);
-    }
-
-    /**
-     * parameters
-     *
-     * @access public
-     * @return Parameters
-     */
-    public function parameters()
-    {
-        return $this->parameters;
     }
 
     /**

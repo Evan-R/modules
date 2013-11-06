@@ -28,11 +28,17 @@ interface ContainerInterface
 
     public function getParam($parameter);
 
-    public function parameters();
+    public function getParameters();
 
     public function setService($service, $class = null, $arguments = null);
 
     public function getService($service);
 
+    public function getServices();
+
     public function hasService($service);
+
+    public function merge(ContainerInterface $container);
+
+    public function isLocked();
 }

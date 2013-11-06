@@ -12,20 +12,22 @@
 namespace Selene\Components\DependencyInjection;
 
 /**
- * @interface ParameterInterface
+ * @interface ContainerAwareInterface ContainerAwareInterface
+ *
  * @package Selene\Components\DependencyInjection
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
-interface ParameterInterface
+interface ContainerAwareInterface
 {
-    public function set($param, $value);
-
-    public function get($param, $default = null);
-
-    public function has($param);
-
-    public function getParameters();
-
-
-    public function merge(ParameterInterface $parameters);
+    /**
+     * setContainer
+     *
+     * @param ContainerInterface $container
+     *
+     * @access public
+     * @return void
+     */
+    public function setContainer(ContainerInterface $container = null);
 }

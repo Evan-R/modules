@@ -318,9 +318,16 @@ class Definition implements DefinitionInterface
     protected function setClass($class = null)
     {
         if (null !== $class) {
-            $this->parent = get_parent_class($class);
+            $this->parent = ($classname = get_parent_class($class)) ? $this->stripClassName($classname) : $classname;
         }
-        $this->class = $class;
+        $this->class = $this->stripClassName($class);
+    }
+
+    private function stripClassName($classname)
+    {
+        // comoposer autoload will fail if a class is requested
+        // multiple times but with mixed NS separators
+        return str_replace('\\\\', '\\', $classname);
     }
 
     /**

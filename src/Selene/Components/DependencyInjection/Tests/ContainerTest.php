@@ -19,6 +19,7 @@ use Selene\Components\DependencyInjection\Tests\Stubs\FooService;
 use Selene\Components\DependencyInjection\Tests\Stubs\BarService;
 use Selene\Components\DependencyInjection\Tests\Stubs\ServiceFactory;
 use Selene\Components\DependencyInjection\Tests\Stubs\SetterAwareService;
+use Selene\Components\DependencyInjection\Tests\Stubs\LockedContainerStub;
 
 /**
  * @class ContainerTest extends TestCase ContainerTest
@@ -217,5 +218,45 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(__NAMESPACE__.'\Stubs\BarService', $barService);
         $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $barService->getFoo());
+    }
+
+    /**
+     * @test
+     */
+    public function testMergeContainers()
+    {
+        $container = new Container;
+        $container->setParam('foo', 'foo');
+        $container->setService('foo', 'FooClass');
+
+        $this->container->setParam('bar', 'bar');
+        $this->container->setService('bar', 'BarClass');
+
+        $this->container->merge($container);
+
+        $this->assertTrue($this->container->hasService('foo'));
+        $this->assertTrue($this->container->hasService('bar'));
+
+        $this->assertEquals('foo', $this->container->getParam('@foo'));
+        $this->assertEquals('bar', $this->container->getParam('@bar'));
+    }
+
+    /**
+     * @test
+     * @expectedException Selene\Components\DependencyInjection\Exception\ContainerLockedException
+     */
+    public function testMergeContainerSouldRaiseExceptionWhenContainerToBeMergedIsLocked()
+    {
+        $this->container->merge(new LockedContainerStub());
+    }
+
+    /**
+     * @test
+     * @expectedException Selene\Components\DependencyInjection\Exception\ContainerLockedException
+     */
+    public function testMergeContainerSouldRaiseExceptionWhenMergingContainerIsLocked()
+    {
+        $container = new LockedContainerStub();
+        $container->merge($this->container);
     }
 }

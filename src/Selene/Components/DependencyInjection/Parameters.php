@@ -22,6 +22,8 @@ namespace Selene\Components\DependencyInjection;
  */
 class Parameters implements ParameterInterface
 {
+    private $parameters = [];
+
     /**
      * add
      *
@@ -48,6 +50,34 @@ class Parameters implements ParameterInterface
     {
         return $this->has($param = $this->escapeKey($param)) ?
             $this->parameters[$param] : (null !== $default ? $default : $param);
+    }
+
+    /**
+     * merge
+     *
+     * @param ParameterInterface $parameters
+     *
+     * @access public
+     * @return mixed
+     */
+    public function merge(ParameterInterface $parameters)
+    {
+        if ($this === $parameters) {
+            throw new \InvalidArgumentException('%s: cannot merge same instance', get_class($this));
+        }
+
+        $this->parameters = array_merge($this->parameters, $parameters->getParameters());
+    }
+
+    /**
+     * getParameters
+     *
+     * @access public
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
     }
 
     /**
