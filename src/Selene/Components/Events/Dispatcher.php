@@ -12,6 +12,7 @@
 namespace Selene\Components\Events;
 
 use Selene\Components\DependencyInjection\ContainerInterface;
+use Selene\Components\DependencyInjection\ContainerAwareInterface;
 
 /**
  * @class Dispatcher implements DispatcherInterface
@@ -22,7 +23,7 @@ use Selene\Components\DependencyInjection\ContainerInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Dispatcher implements DispatcherInterface
+class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 {
     /**
      * events
@@ -72,7 +73,7 @@ class Dispatcher implements DispatcherInterface
      * @access public
      * @return void
      */
-    public function setContainer(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
