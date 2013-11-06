@@ -3,7 +3,7 @@
 ```php
 <?php
 
-use Selene\Component\DependencyInjection;
+use Selene\Components\DependencyInjection;
 
 $container = new Container;
 ```

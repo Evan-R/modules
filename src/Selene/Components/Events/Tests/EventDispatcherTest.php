@@ -121,7 +121,7 @@ class EventDispatcherTest extends TestCase
 
         $dispatcher = new Dispatcher($container);
 
-        $dispatcher->on('foo', 'some_service');
+        $dispatcher->on('foo', '$some_service');
         $result = $dispatcher->dispatch('foo');
 
         if (empty($result)) {
@@ -148,7 +148,7 @@ class EventDispatcherTest extends TestCase
 
         $dispatcher = new Dispatcher($container);
 
-        $dispatcher->on('foo', 'some_service@doHandle');
+        $dispatcher->on('foo', '$some_service@doHandle');
         $result = $dispatcher->dispatch('foo');
 
         if (empty($result)) {
@@ -214,7 +214,7 @@ class EventDispatcherTest extends TestCase
     /**
      * @test
      */
-    public function testDispatchUntill()
+    public function testDispatchUntil()
     {
 
         $dispatcher = new Dispatcher();
@@ -247,7 +247,7 @@ class EventDispatcherTest extends TestCase
             }
         );
 
-        $result = $dispatcher->untill('foo');
+        $result = $dispatcher->until('foo');
         $this->assertSame(['boom'], $result);
     }
 
@@ -331,9 +331,9 @@ class EventDispatcherTest extends TestCase
 
         $dispatcher = new Dispatcher($container);
 
-        $dispatcher->on('foo', 'some_service');
-        $dispatcher->on('foo', 'some_service@responde');
-        $dispatcher->off('foo', 'some_service');
+        $dispatcher->on('foo', '$some_service');
+        $dispatcher->on('foo', '$some_service@responde');
+        $dispatcher->off('foo', '$some_service');
 
         $result = $dispatcher->dispatch('foo');
         $this->assertSame([true], $result);

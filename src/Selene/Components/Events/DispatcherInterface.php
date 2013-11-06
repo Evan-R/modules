@@ -22,6 +22,11 @@ namespace Selene\Components\Events;
 interface DispatcherInterface
 {
     /**
+     * @var string;
+     */
+    const EVTHANDLER_SEPARATOR = '@';
+
+    /**
      * on
      *
      * @param mixed $
@@ -65,7 +70,7 @@ interface DispatcherInterface
     public function dispatch($event, $parameter = []);
 
     /**
-     * untill
+     * until
      *
      * @param mixed $event
      * @param mixed $parameter
@@ -73,7 +78,7 @@ interface DispatcherInterface
      * @access public
      * @return mixed
      */
-    public function untill($event, $parameter = []);
+    public function until($event, $parameter = []);
 
     /**
      * getEventHandlers

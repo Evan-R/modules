@@ -12,7 +12,9 @@
 namespace Selene\Components\DependencyInjection;
 
 /**
- * @class Container implements InspectableInterface Container
+ * @class Container implements ContainerInterface, InspectableInterface
+ *
+ * @see ContainerInterface
  * @see InspectableInterface
  *
  * @package Selene\Components\DependencyInjection
@@ -137,6 +139,7 @@ class Container implements ContainerInterface, InspectableInterface
         if ($this->hasService($service)) {
             return $this->resolveService($service);
         }
+
         throw new \Exception(sprintf('service %s not found', $service));
     }
 
@@ -178,7 +181,7 @@ class Container implements ContainerInterface, InspectableInterface
      */
     public function isReference($reference)
     {
-        return 0 === strrpos($reference, '$') && $this->hasService(substr($reference, 1));
+        return 0 === strrpos($reference, static::SERVICE_REF_INDICATOR) && $this->hasService(substr($reference, 1));
     }
 
     /**
@@ -301,7 +304,6 @@ class Container implements ContainerInterface, InspectableInterface
         $arguments = [];
 
         if (!empty($args)) {
-
             foreach ($args as $argument) {
 
                 if (!is_string($argument)) {
@@ -316,7 +318,6 @@ class Container implements ContainerInterface, InspectableInterface
 
                 $arguments[] = $this->parameters->get($argument);
             }
-
         }
         return $arguments;
     }

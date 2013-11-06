@@ -14,21 +14,16 @@ namespace Selene\Components\Events;
 use Selene\Components\DependencyInjection\ContainerInterface;
 
 /**
- * @class Dispatcher
+ * @class Dispatcher implements DispatcherInterface
  * @see DispatcherInterface
  *
  * @package Selene\Components\Events
  * @version $Id$
- * @author Thomas Appel <mail@thomas-appel.com
+ * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
 class Dispatcher implements DispatcherInterface
 {
-    /**
-     * @var string;
-     */
-    const EVTHANDLER_SEPARATOR = '@';
-
     /**
      * events
      *
@@ -86,7 +81,7 @@ class Dispatcher implements DispatcherInterface
      * Attach an eventhandler
      *
      * @param string $event        the event name
-     * @param mixed  $eventHandler a callable or string `class@method`
+     * @param mixed  $eventHandler a callable or string `$service@method`
      * @param int    $priority     the priority with the handler being called
      * (handlers with higher values will be called first)
      *
@@ -97,10 +92,30 @@ class Dispatcher implements DispatcherInterface
     {
         $service = null;
         $method = null;
-        if (!is_callable($eventHandler)) {
-            extract($this->getEventHandlerFromClassString($event, $eventHandler));
+
+        if (null !== $eventHandler and !is_callable($eventHandler)) {
+            if ($this->isCallableService($eventHandler)) {
+                extract($this->getEventHandlerFromServiceString($event, $eventHandler));
+            } else {
+                throw new \InvalidArgumentException(
+                    sprintf('%s::on() expects argument 2 to be valid callback', __CLASS__)
+                );
+            }
         }
         $this->bindEvent($event, $eventHandler, $priority, $service, $method);
+    }
+
+    /**
+     * isCallableService
+     *
+     * @param mixed $eventHandler
+     *
+     * @access private
+     * @return bool
+     */
+    private function isCallableService($eventHandler)
+    {
+        return is_string($eventHandler) && 0 === strpos($eventHandler, ContainerInterface::SERVICE_REF_INDICATOR);
     }
 
     /**
@@ -121,7 +136,7 @@ class Dispatcher implements DispatcherInterface
         $method = null;
 
         if (!is_callable($eventHandler)) {
-            extract($this->getEventHandlerFromClassString($event, $eventHandler));
+            extract($this->getEventHandlerFromServiceString($event, $eventHandler));
         }
 
         $handler = $eventHandler;
@@ -162,7 +177,7 @@ class Dispatcher implements DispatcherInterface
      */
     public function addSubscriber(SubscriberInterface $subscriber)
     {
-        foreach ($subscriber::getSubscriptions() as $event => $handles) {
+        foreach ($subscriber->getSubscriptions() as $event => $handles) {
             foreach ($this->listSubscriptions($subscriber, $event, $handles) as $subscription) {
                 call_user_func_array([$this, 'on'], $subscription);
             }
@@ -197,7 +212,7 @@ class Dispatcher implements DispatcherInterface
      * @access protected
      * @return array
      */
-    protected function listSubscriptions($subscriber, $event, array $eventSubscriptions, array &$list = [])
+    private function listSubscriptions($subscriber, $event, array $eventSubscriptions, array &$list = [])
     {
         if (is_array(current($eventSubscriptions))) {
             foreach ($eventSubscriptions as $subscription) {
@@ -268,7 +283,7 @@ class Dispatcher implements DispatcherInterface
      * @access public
      * @return array
      */
-    public function untill($event, $parameters = [])
+    public function until($event, $parameters = [])
     {
         return $this->dispatch($event, $parameters, true);
     }
@@ -313,7 +328,7 @@ class Dispatcher implements DispatcherInterface
      * @access protected
      * @return void
      */
-    protected function bindEvent($event, $eventHandler, $priority = 10, $service = null, $method = null)
+    private function bindEvent($event, $eventHandler, $priority = 10, $service = null, $method = null)
     {
         $handler = compact('event', 'priority');
         $handler['eventHandler'] =& $eventHandler;
@@ -333,7 +348,7 @@ class Dispatcher implements DispatcherInterface
      * @access protected
      * @return mixed
      */
-    protected function sort($event)
+    private function sort($event)
     {
         if (isset($this->sorted[$event])) {
             return;
@@ -357,9 +372,9 @@ class Dispatcher implements DispatcherInterface
      * @access protected
      * @return boolean always returns true
      */
-    protected function detachEventByHandler($event, $eventHandler)
+    private function detachEventByHandler($event, $eventHandler)
     {
-        if ($isClass = is_string($eventHandler)) {
+        if ($isService = $this->isCallableService($eventHandler)) {
             $classHandler = implode(
                 static::EVTHANDLER_SEPARATOR,
                 $this->extractService($eventHandler)
@@ -367,7 +382,7 @@ class Dispatcher implements DispatcherInterface
         }
 
         foreach ($this->handlers[$event] as $index => &$handler) {
-            if ($isClass and isset($handler['uses']) and $classHandler === $handler['uses']) {
+            if ($isService and isset($handler['uses']) and $classHandler === $handler['uses']) {
                 unset($this->handlers[$event][$index]);
             } elseif ($eventHandler === $handler['eventHandler']) {
                 unset($this->handlers[$event][$index]);
@@ -378,21 +393,21 @@ class Dispatcher implements DispatcherInterface
     }
 
     /**
-     * getEventHandlerFromClassString
+     * getEventHandlerFromServiceString
      *
      * @param mixed $eventHandler
      *
      * @access protected
      * @return array
      */
-    protected function getEventHandlerFromClassString($event, $eventHandler)
+    private function getEventHandlerFromServiceString($event, $eventHandler)
     {
         if (is_string($eventHandler)) {
             extract($this->extractService($eventHandler));
 
             if (!$this->container) {
                 throw new \InvalidArgumentException(
-                    sprintf('No container is set yet')
+                    'Dispatcher tried to call service from service container, but no service container was found'
                 );
             }
 
@@ -414,13 +429,15 @@ class Dispatcher implements DispatcherInterface
      * @access protected
      * @return array
      */
-    protected function extractService($eventHandler)
+    private function extractService($eventHandler)
     {
         list($service, $method) = array_pad(
             explode(static::EVTHANDLER_SEPARATOR, $eventHandler),
             2,
             'handleEvent'
         );
+
+        $service = substr($service, strlen(ContainerInterface::SERVICE_REF_INDICATOR));
         return compact('service', 'method');
     }
 }

@@ -22,6 +22,8 @@ interface ContainerInterface
 
     const SCOPE_PROTOTYPE = 'prototype';
 
+    const SERVICE_REF_INDICATOR = '$';
+
     public function setParam($param, $definition);
 
     public function getParam($parameter);

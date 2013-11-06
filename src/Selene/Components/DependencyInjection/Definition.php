@@ -296,7 +296,6 @@ class Definition implements DefinitionInterface
         return (bool)$this->factory;
     }
 
-
     /**
      * getFactory
      *
