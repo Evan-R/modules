@@ -94,7 +94,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         $service = null;
         $method = null;
 
-        if (null !== $eventHandler and !is_callable($eventHandler)) {
+        if (null !== $eventHandler && !is_callable($eventHandler)) {
             if ($this->isCallableService($eventHandler)) {
                 extract($this->getEventHandlerFromServiceString($event, $eventHandler));
             } else {
@@ -161,7 +161,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     public function off($event, $eventHandler = null)
     {
-        if (!is_null($eventHandler) and $this->detachEventByHandler($event, $eventHandler)) {
+        if (!is_null($eventHandler) && $this->detachEventByHandler($event, $eventHandler)) {
             return;
         }
 
@@ -259,7 +259,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 
             extract($handler);
 
-            if ($isEvent and $parameters->isPropagationStopped()) {
+            if ($isEvent && $parameters->isPropagationStopped()) {
                 break;
             }
 
@@ -268,7 +268,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
             $results[] = $res;
 
             // stop on first result;
-            if (!is_null($res) and $stopOnFirstResult) {
+            if (!is_null($res) && $stopOnFirstResult) {
                 break;
             }
         }
@@ -383,7 +383,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         }
 
         foreach ($this->handlers[$event] as $index => &$handler) {
-            if ($isService and isset($handler['uses']) and $classHandler === $handler['uses']) {
+            if ($isService && isset($handler['uses']) && $classHandler === $handler['uses']) {
                 unset($this->handlers[$event][$index]);
             } elseif ($eventHandler === $handler['eventHandler']) {
                 unset($this->handlers[$event][$index]);

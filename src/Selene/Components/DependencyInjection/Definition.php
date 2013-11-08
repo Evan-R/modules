@@ -160,7 +160,7 @@ class Definition implements DefinitionInterface
      */
     public function addScope($scope)
     {
-        if ($this->scopeIsContainer() and
+        if ($this->scopeIsContainer() &&
             (ContainerInterface::SCOPE_PROTOTYPE === (ContainerInterface::SCOPE_PROTOTYPE & $scope))
         ) {
             throw new \InvalidArgumentException('cannot add prototype scope to a container scope');

@@ -61,14 +61,35 @@ if (!function_exists('arraySet')) {
     }
 }
 
+if (!function_exists('array_column')) {
+
+    /**
+     * array_column
+     *
+     * @see http://www.php.net/manual/en/function.array-walk.php
+     * @return array
+     */
+    function array_column($array, $key, $index = null)
+    {
+        $out = [];
+        array_walk(
+            $array,
+            function ($item) use ($key, $index, &$out) {
+                $index ? $out[$item[$index]] = $item[$key] : $out[] = $item[$key];
+            }
+        );
+        return $out;
+    };
+}
+
 if (!function_exists('arrayPluck')) {
     /**
      * array_pluck
      *
      * @param mixed $key
      * @param mixed $array
-     * @access
-     * @return mixed
+     *
+     * @return array
      */
     function arrayPluck($key, array $array)
     {

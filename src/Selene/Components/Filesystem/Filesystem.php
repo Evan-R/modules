@@ -247,7 +247,7 @@ class Filesystem
      */
     public function copy($source, $target = null, $replace = false)
     {
-        if (!$this->isFile($source) and !$this->isDir($source)) {
+        if (!$this->isFile($source) && !$this->isDir($source)) {
             throw new IOException(sprintf('%s: no such file or directory', $source));
         }
 
@@ -286,7 +286,7 @@ class Filesystem
     {
         foreach ($this->ensureTraversable($file) as $item) {
 
-            if (!$this->isLink($item) and $this->isDir($item) and $recursive) {
+            if (!$this->isLink($item) && $this->isDir($item) && $recursive) {
                 $this->chmod(
                     $this->getIterator($item, FilesystemIterator::CURRENT_AS_PATHNAME),
                     $permission,
@@ -315,14 +315,14 @@ class Filesystem
         }
 
         foreach ($this->ensureTraversable($file) as $item) {
-            if ($this->isLink($item) and function_exists('lchown')) {
+            if ($this->isLink($item) && function_exists('lchown')) {
                 if (true !== @lchown($item, $owner)) {
                     throw new IOException(sprintf('could not change owner on link %s', $item));
                 }
                 continue;
             }
 
-            if ($recursive and !$this->isLink($item) and $this->isDir($item)) {
+            if ($recursive && !$this->isLink($item) && $this->isDir($item)) {
                 $this->chown($this->getIterator($item, FilesystemIterator::CURRENT_AS_PATHNAME), $owner, true);
             }
 
@@ -348,14 +348,14 @@ class Filesystem
         }
 
         foreach ($this->ensureTraversable($file) as $item) {
-            if ($this->isLink($item) and function_exists('lchgrp')) {
+            if ($this->isLink($item) && function_exists('lchgrp')) {
                 if (true !== @lchgrp($item, $owner)) {
                     throw new IOException(sprintf('could not change group on link %s', $item));
                 }
                 continue;
             }
 
-            if ($recursive and !$this->isLink($item) and $this->isDir($item)) {
+            if ($recursive && !$this->isLink($item) && $this->isDir($item)) {
                 $this->chgrp($this->getIterator($item, FilesystemIterator::CURRENT_AS_PATHNAME), $group, true);
             }
 
@@ -388,7 +388,7 @@ class Filesystem
      */
     public function isDir($file)
     {
-        return stream_is_local($file) and is_dir($file);
+        return stream_is_local($file) && is_dir($file);
     }
 
     /**
@@ -427,7 +427,7 @@ class Filesystem
      */
     public function isFile($file)
     {
-        return stream_is_local($file) and is_file($file);
+        return stream_is_local($file) && is_file($file);
     }
 
     /**
@@ -440,7 +440,7 @@ class Filesystem
      */
     public function isLink($file)
     {
-        return stream_is_local($file) and is_link($file);
+        return stream_is_local($file) && is_link($file);
     }
 
     /**
@@ -484,7 +484,7 @@ class Filesystem
      */
     public function uidExists($uid)
     {
-        if (is_numeric($uid) and false !== @posix_getpwuid((int)$uid)) {
+        if (is_numeric($uid) && false !== @posix_getpwuid((int)$uid)) {
             return true;
         }
 
@@ -501,7 +501,7 @@ class Filesystem
      */
     public function gidExists($gid)
     {
-        if (is_numeric($gid) and false !== @posix_getgrgid((int)$gid)) {
+        if (is_numeric($gid) && false !== @posix_getgrgid((int)$gid)) {
             return true;
         }
 
@@ -643,7 +643,7 @@ class Filesystem
      */
     public function rename($source, $target, $overwrite = false)
     {
-        if (!$overwrite and $this->exists($target)) {
+        if (!$overwrite && $this->exists($target)) {
             throw new IOException(sprintf('Use overwrite to rename %s to existing file %s', $source, $target));
         }
         if (true !== @rename($source, $target)) {

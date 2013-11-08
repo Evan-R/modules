@@ -118,6 +118,33 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function testArrayColumn()
+    {
+        $in = [
+            [
+                'id' => '12',
+                'name' => 'rand',
+                'handle' => 'xkd23',
+            ],
+            [
+                'id' => '14',
+                'name' => 'band',
+                'handle' => 'xkd25',
+            ],
+            [
+                'id' => '22',
+                'name' => 'land',
+                'handle' => 'xkd77',
+            ],
+        ];
+
+        $this->assertEquals(['12', '14', '22'], array_column($in, 'id'));
+        $this->assertEquals(['xkd23' => '12', 'xkd25' => '14', 'xkd77' => '22'], array_column($in, 'id', 'handle'));
+    }
+
+    /**
+     * @test
+     */
     public function testArrayNumeric()
     {
         $this->assertTrue(arrayNumeric([1, 2, 3]));

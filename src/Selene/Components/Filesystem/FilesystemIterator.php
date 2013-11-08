@@ -57,7 +57,9 @@ class FilesystemIterator extends \FilesystemIterator
     {
 
         if ($flags & (\FilesystemIterator::CURRENT_AS_SELF|\FilesystemIterator::CURRENT_AS_PATHNAME)) {
-            throw new \InvalidArgumentException(sprintf('%s only supports FilesystemIterator::CURRENT_AS_FILEINFO', __CLASS__));
+            throw new \InvalidArgumentException(
+                sprintf('%s only supports FilesystemIterator::CURRENT_AS_FILEINFO', __CLASS__)
+            );
         }
 
         $this->currentPath = $path;
@@ -74,7 +76,11 @@ class FilesystemIterator extends \FilesystemIterator
      */
     public function current()
     {
-        $info = new SplFileInfo(parent::current()->getPathname(), $this->getSubPath(), $this->getSubPathname(parent::current()->getBasename()));
+        $info = new SplFileInfo(
+            parent::current()->getPathname(),
+            $this->getSubPath(),
+            $this->getSubPathname(parent::current()->getBasename())
+        );
         return $info;
     }
 
@@ -114,4 +120,3 @@ class FilesystemIterator extends \FilesystemIterator
         $this->subPath = $this->substitutePaths($path, $this->currentPath);
     }
 }
-

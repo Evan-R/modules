@@ -352,7 +352,7 @@ class Directory extends AbstractFileObject
      */
     public function ignore($expression)
     {
-        if (!is_array($expression) and !is_string($expression)) {
+        if (!is_array($expression) && !is_string($expression)) {
             throw new \InvalidArgumentException('Argument 1 must be string or array');
         }
 
@@ -475,7 +475,7 @@ class Directory extends AbstractFileObject
                 continue;
             }
             // add file to collection:
-            if ($fileInfo->isFile() and true !== $ignorefiles and $this->isIncludedFile($fileInfo->getBaseName())) {
+            if ($fileInfo->isFile() && true !== $ignorefiles && $this->isIncludedFile($fileInfo->getBaseName())) {
                 $collection->add($fileInfo);
                 continue;
             }
@@ -508,7 +508,7 @@ class Directory extends AbstractFileObject
      */
     private function countRecursion(&$count)
     {
-        if (isset($this->depthsFilter) and $count) {
+        if (isset($this->depthsFilter) && $count) {
             $count = false;
             $this->depthsFilter--;
         }

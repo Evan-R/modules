@@ -141,8 +141,10 @@ abstract class AbstractFileObject implements ArrayableInterface, JsonableInterfa
      * @access public
      * @return string
      */
-    public function getRealPath($file = null){
-        return is_null($file) ? (string)$this : ($this->files->isAbsolutePath($file) ? $file : (string)$this.DIRECTORY_SEPARATOR.$file);
+    public function getRealPath($file = null)
+    {
+        return is_null($file) ? (string)$this : ($this->files->isAbsolutePath($file) ? $file :
+            (string)$this.DIRECTORY_SEPARATOR.$file);
     }
 
     /**

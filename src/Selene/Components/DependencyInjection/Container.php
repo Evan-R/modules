@@ -205,7 +205,7 @@ class Container implements ContainerInterface, InspectableInterface
      */
     public function hasService($service)
     {
-        return is_string($service) and isset($this->services[$service]);
+        return is_string($service) && isset($this->services[$service]);
     }
 
     /**

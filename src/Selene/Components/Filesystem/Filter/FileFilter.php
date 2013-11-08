@@ -80,7 +80,7 @@ class FileFilter extends AbstractFilter
      */
     protected function isRegexp($pattern)
     {
-        return preg_match('#^[^a-zA-Z0-9]#', $pattern) and (substr($pattern, 0, 1) === substr($pattern, -1));
+        return preg_match('#^[^a-zA-Z0-9]#', $pattern) && (substr($pattern, 0, 1) === substr($pattern, -1));
     }
 
     /**
