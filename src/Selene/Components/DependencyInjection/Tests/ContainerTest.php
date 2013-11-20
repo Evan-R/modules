@@ -225,7 +225,7 @@ class ContainerTest extends TestCase
      */
     public function testMergeContainers()
     {
-        $container = new Container;
+        $container = new Container(null, 'merge.container');
         $container->setParam('foo', 'foo');
         $container->setService('foo', 'FooClass');
 
@@ -258,5 +258,27 @@ class ContainerTest extends TestCase
     {
         $container = new LockedContainerStub();
         $container->merge($this->container);
+    }
+
+    /**
+     * @test
+     * @expectedException \LogicException
+     */
+    public function testMergeContainerSouldRaiseExceptionWhenMergingContainerWithTheSameName()
+    {
+        $container = new Container;
+        $container->merge($this->container);
+    }
+
+    /**
+     * @test
+     */
+    public function testContainerShouldBeServiceable()
+    {
+        $container = new Container();
+        $this->assertSame($this->container, $this->container->getService(ContainerInterface::APP_CONTAINER_SERVICE));
+
+        $container = new Container(null, 'foo.container');
+        $this->assertSame($container, $container->getService('foo.container'));
     }
 }

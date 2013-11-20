@@ -11,7 +11,7 @@
 
 namespace Selene\Components\DependencyInjection;
 
-use Selene\Components\DependencyInjection\Exception\ContainerLockedException;
+use \Selene\Components\DependencyInjection\Exception\ContainerLockedException;
 
 /**
  * @class Container implements ContainerInterface, InspectableInterface
@@ -48,15 +48,24 @@ class Container implements ContainerInterface, InspectableInterface
     protected $locked;
 
     /**
+     * name
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
      *
      * @param Parameters $parameters
      *
      * @access public
      */
-    public function __construct(Parameters $parameters = null)
+    public function __construct(Parameters $parameters = null, $name = self::APP_CONTAINER_SERVICE)
     {
+        $this->name = $name;
         $this->locked = false;
         $this->setParameters($parameters);
+        $this->injectService($this->name, $this);
     }
 
     public function inspect()
@@ -94,6 +103,17 @@ class Container implements ContainerInterface, InspectableInterface
     }
 
     /**
+     * getName
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * merge
      *
      * @param ContainerInterface $container
@@ -105,6 +125,10 @@ class Container implements ContainerInterface, InspectableInterface
     {
         if ($this->isLocked() or $container->isLocked()) {
             throw new ContainerLockedException('cannot merge a locked container');
+        }
+
+        if ($this->getName() === $container->getName()) {
+            throw new \LogicException(sprintf('cannot merge containers sharing the same name %s', $this->getName()));
         }
 
         $this->parameters->merge($container->getParameters());
