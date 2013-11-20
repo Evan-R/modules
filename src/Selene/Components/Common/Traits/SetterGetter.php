@@ -22,29 +22,6 @@ namespace Selene\Components\Common\Traits;
  */
 trait SetterGetter
 {
-    /**
-     * setDefault
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function setDefault(array &$resource, $attribute, $value = null, $default = null)
-    {
-        $resource[$attribute] = !$value ? $default : $value;
-    }
-
-    /**
-     * getDefault
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function getDefault(array &$resource, $attribute, $default = null)
-    {
-        if (isset($resource[$attribute])) {
-            return $resource[$attribute];
-        }
-
-        return $default;
-    }
+    use Setter;
+    use Getter;
 }
