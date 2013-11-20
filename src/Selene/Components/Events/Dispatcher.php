@@ -365,7 +365,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     }
 
     /**
-     * Finds a matching handler an unsets the handler for the given event.
+     * Finds a matching handler and unsets the handler for the given event.
      *
      * @param string $event        the event name
      * @param mixed  $eventHandler the event handler

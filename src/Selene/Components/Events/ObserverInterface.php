@@ -27,5 +27,4 @@ interface ObserverInterface extends SplObserver
      * @see http://php.net/manual/en/class.splobserver.php
      */
     public function notify(ObserveableInterface $subject);
-
 }
