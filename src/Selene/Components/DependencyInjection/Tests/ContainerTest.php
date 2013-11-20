@@ -11,15 +11,15 @@
 
 namespace Selene\Components\DependencyInjection\Tests;
 
-use Mockery as m;
-use Selene\Components\TestSuite\TestCase;
-use Selene\Components\DependencyInjection\Container;
-use Selene\Components\DependencyInjection\ContainerInterface;
-use Selene\Components\DependencyInjection\Tests\Stubs\FooService;
-use Selene\Components\DependencyInjection\Tests\Stubs\BarService;
-use Selene\Components\DependencyInjection\Tests\Stubs\ServiceFactory;
-use Selene\Components\DependencyInjection\Tests\Stubs\SetterAwareService;
-use Selene\Components\DependencyInjection\Tests\Stubs\LockedContainerStub;
+use \Mockery as m;
+use \Selene\Components\TestSuite\TestCase;
+use \Selene\Components\DependencyInjection\Container;
+use \Selene\Components\DependencyInjection\ContainerInterface;
+use \Selene\Components\DependencyInjection\Tests\Stubs\FooService;
+use \Selene\Components\DependencyInjection\Tests\Stubs\BarService;
+use \Selene\Components\DependencyInjection\Tests\Stubs\ServiceFactory;
+use \Selene\Components\DependencyInjection\Tests\Stubs\SetterAwareService;
+use \Selene\Components\DependencyInjection\Tests\Stubs\LockedContainerStub;
 
 /**
  * @class ContainerTest extends TestCase ContainerTest
@@ -280,5 +280,17 @@ class ContainerTest extends TestCase
 
         $container = new Container(null, 'foo.container');
         $this->assertSame($container, $container->getService('foo.container'));
+    }
+
+    /**
+     * @test
+     */
+    public function testResolveAliasedService()
+    {
+        $this->container->injectService('my.service', $service = new \StdClass);
+
+        $this->container->alias('my.service', 'alias.service');
+        $this->assertSame($service, $this->container->getService('my.service'));
+        $this->assertSame($service, $this->container->getService('alias.service'));
     }
 }

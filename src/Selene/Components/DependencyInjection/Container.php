@@ -34,6 +34,13 @@ class Container implements ContainerInterface, InspectableInterface
     protected $parameters;
 
     /**
+     * aliases
+     *
+     * @var mixed
+     */
+    protected $aliases;
+
+    /**
      * services
      *
      * @var mixed
@@ -66,6 +73,7 @@ class Container implements ContainerInterface, InspectableInterface
         $this->locked = false;
         $this->setParameters($parameters);
         $this->injectService($this->name, $this);
+        $this->aliases = new Aliases;
     }
 
     public function inspect()
@@ -203,6 +211,20 @@ class Container implements ContainerInterface, InspectableInterface
     }
 
     /**
+     * alias
+     *
+     * @param mixed $service
+     * @param mixed $alias
+     *
+     * @access public
+     * @return mixed
+     */
+    public function alias($service, $alias)
+    {
+        $this->aliases->add($alias, $service);
+    }
+
+    /**
      * getService
      *
      * @param mixed $service
@@ -212,6 +234,8 @@ class Container implements ContainerInterface, InspectableInterface
      */
     public function getService($service)
     {
+        $service = $this->aliases->get($service);
+
         if ($this->hasService($service)) {
             return $this->resolveService($service);
         }

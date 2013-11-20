@@ -162,3 +162,26 @@ All serices are lazy. A service gets resolved the first time it is called.
 <?php
 $service = $container->getService('my_service');
 ```
+
+### Aliases
+
+Serivices my also be aliased and resolved by their alias.
+
+```php
+<?php
+$container->alias('my_service', 'my_alias');
+```
+
+
+### Container as service dependecy
+
+By default the container will set itself as `app.container` service, but you may
+choose a different name if you have multiple containers. 
+
+```php
+<?php
+$container = new Container(null, 'my.container');
+```
+
+
+
