@@ -11,8 +11,8 @@
 
 namespace Selene\Components\Events;
 
-use Selene\Components\DependencyInjection\ContainerInterface;
-use Selene\Components\DependencyInjection\ContainerAwareInterface;
+use Selene\Components\DI\ContainerInterface;
+use Selene\Components\DI\ContainerAwareInterface;
 
 /**
  * @class Dispatcher implements DispatcherInterface

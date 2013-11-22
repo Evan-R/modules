@@ -14,7 +14,7 @@
   },
   "require-dev": {
     "selene/testsuite":"dev-development",
-    "selene/dependency-injection":"dev-development"
+    "selene/di":"dev-development"
   },
   "autoload": {
     "psr-0": {"Selene\\Components\\Events\\": ""}
@@ -30,7 +30,7 @@
     },
     {
       "type":"vcs",
-      "url":"git://github.com/seleneapp/dependency-injection.git"
+      "url":"git://github.com/seleneapp/.git"
     }
   ],
   "target-dir": "Selene/Components/Events",

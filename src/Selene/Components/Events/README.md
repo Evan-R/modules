@@ -83,7 +83,7 @@ container](https://github.com/seleneapp/dependency-injection).
 <?php
 
 use Selene\Component\Events\Dispatche;
-use Selene\Component\DependencyInjection\Container;
+use Selene\Component\DI\Container;
 
 $container = new Container;
 

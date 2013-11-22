@@ -16,7 +16,7 @@ use Selene\Components\TestSuite\TestCase;
 use Selene\Components\Events\Dispatcher;
 use Selene\Components\Events\Tests\Stubs\EventStub;
 use Selene\Components\Events\Tests\Stubs\EventSubscriberStub;
-use Selene\Components\DependencyInjection\ContainerInterface;
+use Selene\Components\DI\ContainerInterface;
 
 class EventDispatcherTest extends TestCase
 {
@@ -116,7 +116,7 @@ class EventDispatcherTest extends TestCase
             }
         );
 
-        $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
+        $container = m::mock('Selene\Components\DI\ContainerInterface');
         $container->shouldReceive('getService')->with('some_service')->andReturn($class);
 
         $dispatcher = new Dispatcher($container);
@@ -143,7 +143,7 @@ class EventDispatcherTest extends TestCase
             }
         );
 
-        $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
+        $container = m::mock('Selene\Components\DI\ContainerInterface');
         $container->shouldReceive('getService')->with('some_service')->andReturn($class);
 
         $dispatcher = new Dispatcher($container);
@@ -326,7 +326,7 @@ class EventDispatcherTest extends TestCase
                 }
             );
 
-        $container = m::mock('Selene\Components\DependencyInjection\ContainerInterface');
+        $container = m::mock('Selene\Components\DI\ContainerInterface');
         $container->shouldReceive('getService')->with('some_service')->andReturn($class);
 
         $dispatcher = new Dispatcher($container);
