@@ -16,5 +16,5 @@ after_script:
   - git clone https://github.com/dflydev/git-subsplit.git git-subsplit
   - cd git-subsplit
   - sudo ./install.sh
-  - cd ../build/build.sh  
+  - cd - && sh build/build.sh  
   - rm -rf git-subsplit
