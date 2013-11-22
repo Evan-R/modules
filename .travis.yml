@@ -15,7 +15,7 @@ script: phpunit --configuration phpunit.xml.dist
 after_script:
   - git clone https://github.com/apenwarr/git-subtree.git git-subtree
   - cd git-subtree && ls -la
-  - sudo ./install.sh
+  - sudo sh install.sh
   - cd -   
   - git clone https://github.com/dflydev/git-subsplit.git git-subsplit
   - cd git-subsplit
