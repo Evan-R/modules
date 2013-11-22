@@ -12,9 +12,12 @@
 namespace Selene\Components\Common\Traits;
 
 /**
- * @class Getter
+ * @trait Getter
+ *
  * @package Selene\Components\Common\Traits
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 trait Getter
 {
@@ -29,7 +32,6 @@ trait Getter
         if (isset($resource[$attribute])) {
             return $resource[$attribute];
         }
-
         return $default;
     }
 }

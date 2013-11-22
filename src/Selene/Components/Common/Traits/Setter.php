@@ -12,9 +12,12 @@
 namespace Selene\Components\Common\Traits;
 
 /**
- * @class Getter
+ * @trait Setter
+ *
  * @package Selene\Components\Common\Traits
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 trait Setter
 {
