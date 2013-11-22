@@ -15,7 +15,6 @@ script: phpunit --configuration phpunit.xml.dist
 after_script:
   - git clone https://github.com/dflydev/git-subsplit.git git-subsplit
   - cd git-subsplit
-  - ./install.sh
-  - cd -  
-  - ./build/build.sh
+  - sudo ./install.sh
+  - cd ../build/build.sh  
   - rm -rf git-subsplit
