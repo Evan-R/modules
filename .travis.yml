@@ -12,13 +12,13 @@ before_script:
   - sh ./.travis_install.sh  
 script: phpunit --configuration phpunit.xml.dist
 
-after_script:
-  - git clone https://github.com/apenwarr/git-subtree.git git-subtree
-  - cd git-subtree && ls -la
-  - sudo sh install.sh
-  - cd -   
-  - git clone https://github.com/dflydev/git-subsplit.git git-subsplit
-  - cd git-subsplit
-  - sudo ./install.sh
-  - cd - && sh build/build.sh  
-  - rm -rf git-subsplit
+#after_script:
+#  - git clone https://github.com/apenwarr/git-subtree.git git-subtree
+#  - cd git-subtree && ls -la
+#  - sudo sh install.sh
+#  - cd -   
+#  - git clone https://github.com/dflydev/git-subsplit.git git-subsplit
+#  - cd git-subsplit
+#  - sudo ./install.sh
+#  - cd - && sh build/build.sh  
+#  - rm -rf git-subsplit
