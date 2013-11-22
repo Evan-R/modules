@@ -5,7 +5,7 @@
 ```php
 <?php
 
-use Selene\Components\DependencyInjection;
+use Selene\Components\DI;
 
 $container = new Container;
 ```
@@ -22,8 +22,8 @@ $container = new Container;
 $container->setParam('my.param', 'param value');
 $container->setParam('my.options', [1, 2, 3]);
 
-$container->getParam('@my.param'); // 'param value'
-$container->getParam('@my.options'); // [1, 2, 3]
+$container->getParam('my.param'); // 'param value'
+$container->getParam('my.options'); // [1, 2, 3]
 ```                                               
 
 ---------
@@ -58,10 +58,10 @@ $container->injectService('service_id', $instance);
 $container->setParam('my.param', 'param value');
 
 // passing a parameter to the constructor of a service:
-$container->setService('my_service', 'Acme\FooService', ['@my.param']);
+$container->setService('my_service', 'Acme\FooService', ['%my.param%']);
 // or
 $container->setService('my_service', 'Acme\FooService')
-	->addArgument('@my.param');
+	->addArgument('%my.param%');
 
 // passing a service reference to the constructor of a service:
 
@@ -86,14 +86,14 @@ $container->setParam('my.options', [1, 2, 3]);
 
 // passing a parameter to a setter method of a service
 $container->setService('my_service', 'Acme\FooService')
-	->addSetter('setOptions', ['@my.options'])
+	->addSetter('setOptions', ['%my.options%'])
 
 // passing a service reference to a setter method of a service
 
 $container->setService('other_service', 'Acme\OtherService');
 
 $container->setService('my_service', 'Acme\ServiceNeedsOtherService')
-	->addSetter('setOtherService', ['$other_service']);
+	->addSetter('setOtherService', ['%other_service%']);
 ```                                               
 #### Factories
 
@@ -124,8 +124,8 @@ $container->setParam('foo.factory', 'Acme\Foo\ServiceFactory');
 
 $container
 	->setService('foo_service')
-	->setFactory('@foo.factory', 'makeFooService')
-	->addArgument('@foo.options');
+	->setFactory('%foo.factory%', 'makeFooService')
+	->addArgument('%foo.options%');
 
 ```
 ---------
@@ -172,6 +172,18 @@ Serivices my also be aliased and resolved by their alias.
 $container->alias('my_service', 'my_alias');
 ```
 
+### Service Inheritance
+
+```php
+<?php
+
+$container->setParam('Acme\AbstractServiceClass', ['$foo_service']);
+$container->setService('concrete_service', 'Acme\ConcreteServiceClass');
+
+```
+
+Now, all services that inherit directly from `Acme\AbstractServiceClass` will
+get `foo_service` as the first constructor argument.
 
 ### Container as service dependecy
 

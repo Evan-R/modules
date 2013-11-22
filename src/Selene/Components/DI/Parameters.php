@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DependencyInjection package
+ * This File is part of the Selene\Components\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,20 +9,34 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DependencyInjection;
+namespace Selene\Components\DI;
 
 /**
  * @class Parameters implements ParameterInterface Parameters
  * @see ParameterInterface
  *
- * @package Selene\Components\DependencyInjection
+ * @package Selene\Components\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
 class Parameters implements ParameterInterface
 {
-    private $parameters = [];
+    private $parameters;
+
+    private $parsedKeys;
+
+    /**
+     * __construct
+     *
+     * @access public
+     * @return mixed
+     */
+    public function __construct()
+    {
+        $this->parameters = [];
+        $this->parsedKeys = [];
+    }
 
     /**
      * add
@@ -35,7 +49,7 @@ class Parameters implements ParameterInterface
      */
     public function set($param, $value)
     {
-        $this->parameters[$this->getKey($param)] = $value;
+        $this->parameters[$param] = $value;
     }
 
     /**
@@ -48,7 +62,7 @@ class Parameters implements ParameterInterface
      */
     public function get($param, $default = null)
     {
-        return $this->has($param = $this->escapeKey($param)) ?
+        return $this->has($param) ?
             $this->parameters[$param] : (null !== $default ? $default : $param);
     }
 
@@ -67,6 +81,7 @@ class Parameters implements ParameterInterface
         }
 
         $this->parameters = array_merge($this->parameters, $parameters->getParameters());
+        $this->parsedKeys = array_merge($this->parsedKeys, $parameters->getKeys());
     }
 
     /**
@@ -78,6 +93,11 @@ class Parameters implements ParameterInterface
     public function getParameters()
     {
         return $this->parameters;
+    }
+
+    public function getKeys()
+    {
+        return $this->parsedKeys;
     }
 
     /**
@@ -93,13 +113,21 @@ class Parameters implements ParameterInterface
         return array_key_exists($param, $this->parameters);
     }
 
+    /**
+     * replaceString
+     *
+     * @param mixed $string
+     *
+     * @access public
+     * @return mixed
+     */
+    public function replaceString($string)
+    {
+        return str_replace(array_keys($this->parameters), $this->parameters, $string);
+    }
+
     private function escapeKey($param)
     {
         return str_replace('\\', '\\\\', $param);
-    }
-
-    private function getKey($param)
-    {
-        return '@'.$this->escapeKey($param);
     }
 }

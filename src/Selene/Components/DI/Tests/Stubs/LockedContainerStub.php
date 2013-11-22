@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DependencyInjection\Tests\Stubs package
+ * This File is part of the Selene\Components\DI\Tests\Stubs package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DependencyInjection\Tests\Stubs;
+namespace Selene\Components\DI\Tests\Stubs;
 
-use Selene\Components\DependencyInjection\Container;
-use Selene\Components\DependencyInjection\Parameters;
+use Selene\Components\DI\Container;
+use Selene\Components\DI\Parameters;
 
 /**
  * @class LockedContainerStub
- * @package Selene\Components\DependencyInjection\Tests\Stubs
+ * @package Selene\Components\DI\Tests\Stubs
  * @version $Id$
  */
 class LockedContainerStub extends Container

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DependencyInjection package
+ * This File is part of the Selene\Components\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DependencyInjection;
+namespace Selene\Components\DI;
 
 /**
  * @class Definition implements DefinitionInterface Definition
  * @see DefinitionInterface
  *
- * @package Selene\Components\DependencyInjection
+ * @package Selene\Components\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -244,7 +244,7 @@ class Definition implements DefinitionInterface
      */
     public function addSetter($method, array $arguments)
     {
-        $this->setters[] = compact('method', 'arguments');
+        $this->setters[] = $setters = compact('method', 'arguments');
         return $this;
     }
 

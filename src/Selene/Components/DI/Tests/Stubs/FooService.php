@@ -1,6 +1,6 @@
 <?php
 
-namespace Selene\Components\DependencyInjection\Tests\Stubs;
+namespace Selene\Components\DI\Tests\Stubs;
 
 class FooService
 {

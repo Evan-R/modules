@@ -15,7 +15,7 @@
     "selene/testsuite":"dev-development"
   },
   "autoload": {
-    "psr-0": {"Selene\\Components\\DependencyInjection\\": ""}
+    "psr-0": {"Selene\\Components\\DI\\": ""}
   },
   "repositories": [
     {
@@ -27,6 +27,6 @@
       "url":"git://github.com/seleneapp/common.git"
     }
   ],
-  "target-dir": "Selene/Components/DependencyInjection",
+  "target-dir": "Selene/Components/DI",
   "minimum-stability": "dev"
 }

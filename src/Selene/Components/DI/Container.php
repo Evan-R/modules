@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DependencyInjection package
+ * This File is part of the Selene\Components\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,9 +9,10 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DependencyInjection;
+namespace Selene\Components\DI;
 
-use \Selene\Components\DependencyInjection\Exception\ContainerLockedException;
+use \Selene\Components\DI\Exception\ContainerLockedException;
+use \Selene\Components\DI\Exception\ContainerResolveException;
 
 /**
  * @class Container implements ContainerInterface, InspectableInterface
@@ -19,7 +20,7 @@ use \Selene\Components\DependencyInjection\Exception\ContainerLockedException;
  * @see ContainerInterface
  * @see InspectableInterface
  *
- * @package Selene\Components\DependencyInjection
+ * @package Selene\Components\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -60,6 +61,8 @@ class Container implements ContainerInterface, InspectableInterface
      * @var string
      */
     protected $name;
+
+    protected static $paramDelimitter = '%';
 
     /**
      *
@@ -176,7 +179,20 @@ class Container implements ContainerInterface, InspectableInterface
      */
     public function setParam($param, $definition)
     {
-        $this->parameters->set($param, $definition);
+        $this->parameters->set($this->paramKey($param), $definition);
+    }
+
+    /**
+     * paramKey
+     *
+     * @param mixed $param
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function paramKey($param)
+    {
+        return sprintf('%s%s%s', static::$paramDelimitter, $param, static::$paramDelimitter);
     }
 
     /**
@@ -190,7 +206,7 @@ class Container implements ContainerInterface, InspectableInterface
      */
     public function getParam($parameter)
     {
-        return $this->parameters->get($parameter);
+        return $this->parameters->get($this->paramKey($parameter));
     }
 
     /**
@@ -240,7 +256,7 @@ class Container implements ContainerInterface, InspectableInterface
             return $this->resolveService($service);
         }
 
-        throw new \Exception(sprintf('service %s not found', $service));
+        throw new ContainerResolveException(sprintf('service `%s` not found', $service));
     }
 
     /**
@@ -281,7 +297,8 @@ class Container implements ContainerInterface, InspectableInterface
      */
     public function isReference($reference)
     {
-        return 0 === strrpos($reference, static::SERVICE_REF_INDICATOR) && $this->hasService(substr($reference, 1));
+        return $reference instanceof Reference ||
+        (0 === strrpos($reference, static::SERVICE_REF_INDICATOR) && $this->hasService(substr($reference, 1)));
     }
 
     /**
@@ -369,7 +386,7 @@ class Container implements ContainerInterface, InspectableInterface
         $args = $definition->getArguments();
 
         if ($parentClass = $definition->getParent()) {
-            if ($parameters = $this->parameters->get('@'.$parentClass)) {
+            if ($parameters = $this->parameters->get($this->paramKey($parentClass))) {
                 $args = array_unique(array_merge($parameters, $args));
             }
         }
@@ -406,13 +423,13 @@ class Container implements ContainerInterface, InspectableInterface
         if (!empty($args)) {
             foreach ($args as $argument) {
 
-                if (!is_string($argument)) {
-                    $arguments[] = $argument;
+                if ($this->isReference($argument)) {
+                    $arguments[] = $this->getService($this->getNameFromReference($argument));
                     continue;
                 }
 
-                if ($this->isReference($argument)) {
-                    $arguments[] = $this->getService($this->getNameFromReference($argument));
+                if (!is_string($argument)) {
+                    $arguments[] = $argument;
                     continue;
                 }
 

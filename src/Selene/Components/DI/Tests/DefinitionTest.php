@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DependencyInjection\Tests package
+ * This File is part of the Selene\Components\DI\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DependencyInjection\Tests;
+namespace Selene\Components\DI\Tests;
 
 use Selene\Components\TestSuite\TestCase;
-use Selene\Components\DependencyInjection\Container;
-use Selene\Components\DependencyInjection\Definition;
-use Selene\Components\DependencyInjection\ContainerInterface;
+use Selene\Components\DI\Container;
+use Selene\Components\DI\Definition;
+use Selene\Components\DI\ContainerInterface;
 
 /**
  * @class ContainerTest extends TestCase ContainerTest
  * @see TestCase
  *
- * @package Selene\Components\DependencyInjection\Tests
+ * @package Selene\Components\DI\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
