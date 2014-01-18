@@ -12,6 +12,7 @@
 namespace Selene\Components\DI\Tests;
 
 use \Mockery as m;
+//use \AspectMock\Test as test;
 use \Selene\Components\TestSuite\TestCase;
 use \Selene\Components\DI\Container;
 use \Selene\Components\DI\Reference;
@@ -48,11 +49,19 @@ class ContainerTest extends TestCase
      */
     public function testContainerSetParams()
     {
+        //$p = test::double('Selene\Components\DI\Parameters', ['set' => null, 'get' => 'foo']);
+
         $this->container->setParam('foo.service.class', 'foo');
+        //$p->verifyInvoked('set');
         $this->assertSame('foo', $this->container->getParam('foo.service.class'));
+        //$p->verifyInvoked('get');
+
+        //$p = test::double('Selene\Components\DI\Parameters', ['set' => null, 'get' => ['opt1', 'opt2']]);
 
         $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
+        //$p->verifyInvoked('set');
         $this->assertSame($opts, $this->container->getParam('foo.options'));
+        //$p->verifyInvoked('get');
     }
 
     /**
@@ -97,7 +106,11 @@ class ContainerTest extends TestCase
 
         $this->container->setService('foo_service', '%foo.class%', ['%foo.options%']);
 
-        $fooClass = $this->container->getService('foo_service');
+        try {
+            $fooClass = $this->container->getService('foo_service');
+        } catch (\Exception $e) {
+            $this->fail(sprintf('%s | [line]: %d | [FILE]: %s', $e->getMessage(), $e->getLine(), $e->getFile()));
+        }
 
         $this->assertInstanceOf($fooclass, $fooClass);
         $this->assertSame($opts, $fooClass->getOptions());
@@ -143,80 +156,11 @@ class ContainerTest extends TestCase
     /**
      * @test
      */
-    public function testParameterInheritance()
-    {
-        $abstract = __NAMESPACE__.'\Stubs\AbstractService';
-
-        $this->container->setParam('foo.service.class', $fooclass = __NAMESPACE__.'\Stubs\FooService');
-        $this->container->setParam('inh.service.class', __NAMESPACE__.'\Stubs\InheritedService');
-        $this->container->setParam($abstract, ['$foo_service']);
-        $this->container->setService('foo_service', '%foo.service.class%');
-        $this->container->setService('inh_service', '%inh.service.class%');
-
-        $service = $this->container->getService('inh_service');
-        $this->assertInstanceOf($fooclass, $service->foo);
-    }
-
-    /**
-     * @test
-     */
-    public function testConstructClassWithFactorySetArgs()
-    {
-        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
-
-        $this->container->setService('foo_service', null, ['%foo.options%'])
-            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeFoo');
-
-        $fooService = $this->container->getService('foo_service');
-
-        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $fooService, 'factory.with.args');
-        $this->assertSame($opts, $fooService->getOptions(), 'factory.with.args');
-    }
-
-    /**
-     * @test
-     */
-    public function testConstructClassWithFactoryAddArgs()
-    {
-        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
-        $this->container->setService('foo_service', null)
-            ->addArgument('%foo.options%')
-            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeFoo');
-
-        $fooService = $this->container->getService('foo_service');
-
-        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $fooService, 'factory.add.args');
-        $this->assertSame($opts, $fooService->getOptions(), 'factory.add.args');
-    }
-
-    /**
-     * @test
-     */
     public function testInjectServiceInstance()
     {
         $service = m::mock('Acme\InjectedService');
         $this->container->injectService('injected_service', $service);
         $this->assertSame($service, $this->container->getService('injected_service'));
-    }
-
-    /**
-     * @test
-     */
-    public function testConstructClassWithFactoryDependOnOtherService()
-    {
-        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
-        $this->container->setParam('foo.class', __NAMESPACE__.'\Stubs\FooService');
-
-        $this->container->setService('foo_service', '%foo.class%', ['%foo.options%']);
-
-        $this->container->setService('bar_service', null)
-            ->addArgument('$foo_service')
-            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeBar');
-
-        $barService = $this->container->getService('bar_service');
-
-        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\BarService', $barService);
-        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $barService->getFoo());
     }
 
     /**
@@ -286,10 +230,82 @@ class ContainerTest extends TestCase
      */
     public function testResolveAliasedService()
     {
+        //$a = test::double('Selene\Components\DI\Aliases', ['add' => null, 'get' => 'my.service']);
         $this->container->injectService('my.service', $service = new \StdClass);
 
         $this->container->alias('my.service', 'alias.service');
-        $this->assertSame($service, $this->container->getService('my.service'));
-        $this->assertSame($service, $this->container->getService('alias.service'));
+        //$a->verifyInvoked('add');
+        $s = $this->container->getService('alias.service');
+        //$a->verifyInvoked('get');
+        $this->assertSame($service, $s);
+    }
+
+    /**
+     * @test
+     */
+    public function testConstructClassWithFactoryDependOnOtherService()
+    {
+        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
+        $this->container->setParam('foo.class', __NAMESPACE__.'\Stubs\FooService');
+
+        $this->container->setService('foo_service', '%foo.class%', ['%foo.options%']);
+
+        $this->container->setService('bar_service', null)
+            ->addArgument('$foo_service')
+            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeBar');
+
+        $barService = $this->container->getService('bar_service');
+
+        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\BarService', $barService);
+        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $barService->getFoo());
+    }
+
+    /**
+     * @test
+     */
+    //public function testParameterInheritance()
+    //{
+    //    $abstract = __NAMESPACE__.'\Stubs\AbstractService';
+
+    //    $this->container->setParam('foo.service.class', $fooclass = __NAMESPACE__.'\Stubs\FooService');
+    //    $this->container->setParam('inh.service.class', __NAMESPACE__.'\Stubs\InheritedService');
+    //    $this->container->setParam($abstract, ['$foo_service']);
+    //    $this->container->setService('foo_service', '%foo.service.class%');
+    //    $this->container->setService('inh_service', '%inh.service.class%');
+
+    //    $service = $this->container->getService('inh_service');
+    //    $this->assertInstanceOf($fooclass, $service->foo);
+    //}
+
+    /**
+     * @test
+     */
+    public function testConstructClassWithFactorySetArgs()
+    {
+        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
+
+        $this->container->setService('foo_service', null, ['%foo.options%'])
+            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeFoo');
+
+        $fooService = $this->container->getService('foo_service');
+
+        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $fooService, 'factory.with.args');
+        $this->assertSame($opts, $fooService->getOptions(), 'factory.with.args');
+    }
+
+    /**
+     * @test
+     */
+    public function testConstructClassWithFactoryAddArgs()
+    {
+        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
+        $this->container->setService('foo_service', null)
+            ->addArgument('%foo.options%')
+            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeFoo');
+
+        $fooService = $this->container->getService('foo_service');
+
+        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $fooService, 'factory.add.args');
+        $this->assertSame($opts, $fooService->getOptions(), 'factory.add.args');
     }
 }

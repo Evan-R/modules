@@ -62,6 +62,18 @@ class Container implements ContainerInterface, InspectableInterface
      */
     protected $name;
 
+    /**
+     * resolve
+     *
+     * @var mixed
+     */
+    protected $resolve;
+
+    /**
+     * paramDelimitter
+     *
+     * @var string
+     */
     protected static $paramDelimitter = '%';
 
     /**
@@ -76,9 +88,18 @@ class Container implements ContainerInterface, InspectableInterface
         $this->locked = false;
         $this->setParameters($parameters);
         $this->injectService($this->name, $this);
+        $this->resolve = false;
         $this->aliases = new Aliases;
     }
 
+    /**
+     * inspect
+     *
+     * @param InspectorInterface $inspector
+     *
+     * @access public
+     * @return mixed
+     */
     public function inspect()
     {
         return null;
@@ -158,89 +179,6 @@ class Container implements ContainerInterface, InspectableInterface
     }
 
     /**
-     * isLocked
-     *
-     * @access public
-     * @return mixed
-     */
-    public function isLocked()
-    {
-        return $this->locked;
-    }
-
-    /**
-     * setParam
-     *
-     * @param mixed $param
-     * @param mixed $definition
-     *
-     * @access public
-     * @return mixed
-     */
-    public function setParam($param, $definition)
-    {
-        $this->parameters->set($this->paramKey($param), $definition);
-    }
-
-    /**
-     * paramKey
-     *
-     * @param mixed $param
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function paramKey($param)
-    {
-        return sprintf('%s%s%s', static::$paramDelimitter, $param, static::$paramDelimitter);
-    }
-
-    /**
-     * getParam
-     *
-     * @param mixed $parameter
-     * @param mixed $definition
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getParam($parameter)
-    {
-        return $this->parameters->get($this->paramKey($parameter));
-    }
-
-    /**
-     * setService
-     *
-     * @param string $service
-     * @param string $class
-     *
-     * @access public
-     * @return Definition
-     */
-    public function setService($service, $class = null, $arguments = null)
-    {
-        $this->services[$this->parameters->get($service)] =
-            $definition = $this->getDefinition($this->parameters->get($class), $arguments);
-
-        return $definition;
-    }
-
-    /**
-     * alias
-     *
-     * @param mixed $service
-     * @param mixed $alias
-     *
-     * @access public
-     * @return mixed
-     */
-    public function alias($service, $alias)
-    {
-        $this->aliases->add($alias, $service);
-    }
-
-    /**
      * getService
      *
      * @param mixed $service
@@ -281,10 +219,100 @@ class Container implements ContainerInterface, InspectableInterface
      * @access public
      * @return voic
      */
-    public function injectService($service, $instance)
+    public function injectService($service, $instance, $scope = ContainerInterface::SCOPE_CONTAINER)
     {
-        $this->services[$service] = $this->getDefinition(get_class($instance));
+        $this->services[$service] = $this->getDefinition(get_class($instance), null, $scope);
         $this->services[$service]->setResolved($instance);
+    }
+
+    /**
+     * isLocked
+     *
+     * @access public
+     * @return mixed
+     */
+    public function isLocked()
+    {
+        return $this->locked;
+    }
+
+    /**
+     * setParam
+     *
+     * @param mixed $param
+     * @param mixed $definition
+     *
+     * @access public
+     * @return mixed
+     */
+    public function setParam($param, $definition)
+    {
+        $this->parameters->set($param, $definition);
+    }
+
+    /**
+     * getParam
+     *
+     * @param mixed $parameter
+     * @param mixed $definition
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getParam($param)
+    {
+        return $this->parameters->get($param);
+    }
+
+    /**
+     * setService
+     *
+     * @param string $service
+     * @param string $class
+     *
+     * @access public
+     * @return Definition
+     */
+    public function setService($service, $class = null, $arguments = null, $scope = ContainerInterface::SCOPE_CONTAINER)
+    {
+        if (isset($this->parameters[$class])) {
+            $class = $this->parameters[$class];
+        }
+
+        $this->services[$service] =
+            $definition = $this->getDefinition($class, $arguments, $scope);
+
+        return $definition;
+    }
+
+    /**
+     * alias for set service.
+     *
+     * @param mixed $service
+     * @param mixed $class
+     * @param mixed $arguments
+     * @param mixed $scope
+     *
+     * @access public
+     * @return mixed
+     */
+    public function set($service, $class = null, $arguments = null, $scope = ContainerInterface::SCOPE_CONTAINER)
+    {
+        return $this->setService($service, $class, $arguments, $scope);
+    }
+
+    /**
+     * alias
+     *
+     * @param mixed $service
+     * @param mixed $alias
+     *
+     * @access public
+     * @return mixed
+     */
+    public function alias($service, $alias)
+    {
+        $this->aliases->add($alias, $service);
     }
 
     /**
@@ -298,7 +326,7 @@ class Container implements ContainerInterface, InspectableInterface
     public function isReference($reference)
     {
         return $reference instanceof Reference ||
-        (0 === strrpos($reference, static::SERVICE_REF_INDICATOR) && $this->hasService(substr($reference, 1)));
+        (is_string($reference) && strStartsWith(static::SERVICE_REF_INDICATOR, $reference) && $this->hasService(substr($reference, 1)));
     }
 
     /**
@@ -317,27 +345,41 @@ class Container implements ContainerInterface, InspectableInterface
             return $definition->getResolved();
         }
 
-        $params = $this->resolveServiceArgs($definition);
-        $instance;
+        if (isset($this->resolve[$service])) {
+            throw new \RuntimeException(
+                sprintf('Circular reference on %s while resolving', $service)
+            );
+        }
 
-        if ($definition->hasFactory()) {
-            $instance = $this->getInstanceFromFactory($definition);
+        if ($this->hasMethod($service)) {
+            $instance = $this->$method();
         } else {
+            $this->resolve[$service] = true;
 
-            if (count($params) > 0) {
-                $instance = $this->setClassArgs($definition->getClass(), $params);
+            $params = $this->resolveServiceArgs($definition);
+            $instance;
+
+            if ($definition->hasFactory()) {
+                $instance = $this->getInstanceFromFactory($definition);
             } else {
-                $class = $definition->getClass();
-                $instance = new $class;
+
+                $class = $this->parameters->resolveParam($definition->getClass());
+
+                if (count($params) > 0) {
+                    $instance = $this->setClassArgs($class, $params);
+                } else {
+                    $instance = new $class;
+                }
+            }
+
+            $this->postProcessInstance($definition, $instance);
+
+            if ($definition->scopeIsContainer()) {
+                $definition->setResolved($instance);
             }
         }
 
-        $this->postProcessInstance($definition, $instance);
-
-        if ($definition->scopeIsContainer()) {
-            $definition->setResolved($instance);
-        }
-
+        unset($this->resolve[$service]);
         return $instance;
     }
 
@@ -370,7 +412,10 @@ class Container implements ContainerInterface, InspectableInterface
     protected function getInstanceFromFactory(Definition $definition)
     {
         extract($definition->getFactory());
-        return call_user_func_array($class.'::'.$method, $this->resolveServiceArgs($definition));
+
+        $args = $this->resolveServiceArgs($definition);
+        array_unshift($args, $definition->getClass());
+        return call_user_func_array($class.'::'.$method, $args);
     }
 
     /**
@@ -386,13 +431,12 @@ class Container implements ContainerInterface, InspectableInterface
         $args = $definition->getArguments();
 
         if ($parentClass = $definition->getParent()) {
-            if ($parameters = $this->parameters->get($this->paramKey($parentClass))) {
+            if (($parameters = $this->parameters->get($parentClass)) && is_array($parameters)) {
                 $args = array_unique(array_merge($parameters, $args));
             }
         }
 
         return $args;
-
     }
 
     /**
@@ -421,21 +465,18 @@ class Container implements ContainerInterface, InspectableInterface
         $arguments = [];
 
         if (!empty($args)) {
-            foreach ($args as $argument) {
+
+            foreach ($this->parameters->resolveParam($args) as $argument) {
 
                 if ($this->isReference($argument)) {
                     $arguments[] = $this->getService($this->getNameFromReference($argument));
                     continue;
                 }
 
-                if (!is_string($argument)) {
-                    $arguments[] = $argument;
-                    continue;
-                }
-
-                $arguments[] = $this->parameters->get($argument);
+                $arguments[] = $argument;
             }
         }
+
         return $arguments;
     }
 
@@ -461,9 +502,9 @@ class Container implements ContainerInterface, InspectableInterface
      * @access protected
      * @return Definition
      */
-    protected function getDefinition($class = null, $arguments = null)
+    protected function getDefinition($class = null, $arguments = null, $scope = null)
     {
-        return new Definition($class, $arguments);
+        return new Definition($class, $arguments, $scope);
     }
 
     /**
@@ -495,9 +536,40 @@ class Container implements ContainerInterface, InspectableInterface
                 return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6]);
             case 8:
                 return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7]);
+            case 9:
+                return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8]);
+            case 10:
+                return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8], $args[9]);
             default:
                 throw new \InvalidArgumentException('no arguments or argument limit exceeded');
                 break;
         }
+    }
+
+    /**
+     * hasMethod
+     *
+     * @param mixed $service
+     * @param string $prefix
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function hasMethod($service, $prefix = 'get_')
+    {
+        return method_exists($this, static::camelCaseStr($prefix.$service));
+    }
+
+    /**
+     * camelCaseStr
+     *
+     * @param mixed $str
+     *
+     * @access public
+     * @return string
+     */
+    public static function camelCaseStr($str)
+    {
+        return strCamelCase('get.'.$str, ['_' => ' ', '.' => '_ ', '\\' => '_ ']);
     }
 }

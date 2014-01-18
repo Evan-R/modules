@@ -30,4 +30,13 @@ interface ContainerAwareInterface
      * @return void
      */
     public function setContainer(ContainerInterface $container = null);
+
+    /**
+     * getContainer
+     *
+     *
+     * @access public
+     * @return ContainerInteface An instance of a DI Container.
+     */
+    public function getContainer();
 }

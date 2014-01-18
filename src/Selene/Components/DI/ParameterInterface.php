@@ -16,15 +16,15 @@ namespace Selene\Components\DI;
  * @package Selene\Components\DI
  * @version $Id$
  */
-interface ParameterInterface
+interface ParameterInterface extends \ArrayAccess
 {
     public function set($param, $value);
 
-    public function get($param, $default = null);
+    public function get($param);
 
     public function has($param);
 
-    public function getParameters();
+    public function all();
 
 
     public function merge(ParameterInterface $parameters);

@@ -18,12 +18,12 @@ namespace Selene\Components\DI\Tests\Stubs;
  */
 class ServiceFactory
 {
-    public static function makeFoo(array $options = [])
+    public static function makeFoo($class, array $options = [])
     {
         return new FooService($options);
     }
 
-    public static function makeBar(FooService $foo)
+    public static function makeBar($class, FooService $foo)
     {
         return new BarService($foo);
     }

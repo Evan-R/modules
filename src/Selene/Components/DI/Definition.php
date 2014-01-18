@@ -71,7 +71,7 @@ class Definition implements DefinitionInterface
      *
      * @access public
      */
-    public function __construct($class = null, $arguments = null)
+    public function __construct($class = null, $arguments = null, $scope = ContainerInterface::SCOPE_CONTAINER)
     {
         $this->setClass($class);
         $this->setArguments($arguments);

@@ -11,6 +11,9 @@
 
 namespace Selene\Components\DI\Loaders;
 
+use \DOMXpath;
+use \DOMDocument;
+
 /**
  * @class XmlLoader
  * @package Selene\Components\DI\Loaders
@@ -46,14 +49,37 @@ class XmlLoader
 
     }
 
-    private function parseParameters()
+    private function parseParameters(DOMDocument $xml)
+    {
+        $params = $xml->getElementsByTagName('parameters');
+        $paramNode = $params[0];
+
+        foreach ($paramNode->childNodes as $parameter) {
+            $this->container->setParam((string)$parameter->getAttribute('name'), $this->getParameterValue($parameter));
+        }
+    }
+
+    /**
+     * getParameterValue
+     *
+     * @param DOMElement $parameter
+     *
+     * @access private
+     * @return mixed
+     */
+    private function getParameterValue(DOMElement $parameter)
     {
 
     }
 
     private function parseServices()
     {
+        $services = $xml->getElementsByTagName('services');
+        $serviceNode = $services[0];
 
+        foreach ($serviceNode->childNodes as $service) {
+
+        }
     }
 
     /**
