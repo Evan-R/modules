@@ -59,6 +59,16 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
                 ['foo' => ['bar'=> ['baz' => ['boom' => 'baz']]]],
                 'baz'
             ],
+            [
+                'foo.bar.0',
+                ['foo' => ['bar' => [1, 2, 3]]],
+                1
+            ],
+            [
+                'foo.bar.1',
+                ['foo' => ['bar' => [1, 2, 3]]],
+                2
+            ]
         ];
     }
 
@@ -81,6 +91,8 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
         arraySet('service.location.locale', 'en', $array);
         arraySet('service.location.name', 'myservice', $array);
         arraySet('service.namespace', 'myserviceNS', $array);
+        arraySet('service.location.0', 'in1', $array);
+        arraySet('service.location.1', 'in2', $array);
 
         $this->assertTrue(isset($array['foo']) && $array['foo'] === 'bar');
         $this->assertTrue(isset($array['service']));
@@ -307,6 +319,24 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function testStrEscapeStr()
+    {
+        $this->assertSame('%%foo%%', strEscapeStr('%foo%', '%'));
+        $this->assertSame('this is @@foo@@ and %bar%', strEscapeStr('this is @foo@ and %bar%', '@'));
+    }
+
+    /**
+     * @test
+     */
+    public function testStrUnescapeStr()
+    {
+        $this->assertSame('%foo%', strUnescapeStr('%%foo%%', '%'));
+        $this->assertSame('this is @foo@ and %bar%', strUnescapeStr('this is @@foo@@ and %bar%', '@'));
+    }
+
+    /**
+     * @test
+     */
     public function testClearValue()
     {
         $this->assertNull(clearValue(''));
@@ -358,5 +388,34 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue(containedAndEndsWith(['foo', 'baz', 'bar'], 'Barfoo'));
         $this->assertFalse(containedAndEndsWith(['foo', 'baz', 'bar'], 'BarFoo'));
+    }
+
+    /**
+     * @test
+     * @dataProvider strRandLengthProvider
+     */
+    public function testStrRand($length)
+    {
+        $this->assertSame($length, strlen(strRand($length)));
+    }
+
+    /**
+     * @test
+     * @dataProvider strRandLengthProvider
+     */
+    public function testStrQuickRand($length)
+    {
+        $this->assertSame($length, strlen(strQuickRand($length)));
+    }
+
+    public function strRandLengthProvider()
+    {
+        return [
+            [12],
+            [22],
+            [40],
+            [25],
+            [125]
+        ];
     }
 }

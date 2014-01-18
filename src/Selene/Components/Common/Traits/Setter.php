@@ -29,6 +29,11 @@ trait Setter
      */
     protected function setDefault(array &$resource, $attribute, $value = null, $default = null)
     {
-        $resource[$attribute] = !$value ? $default : $value;
+        $resource[$attribute] = $value ?: $default;
+    }
+
+    protected function setDefaultArray(array &$resource, $attribute, $default = null)
+    {
+        return arraySet($resource, $attribute ?: $default);
     }
 }

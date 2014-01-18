@@ -234,7 +234,7 @@ if (!function_exists('clearValue')) {
      */
     function clearValue($value)
     {
-        return ((is_string($value) && 0 === strlen(trim($value))) || is_null($value)) ? null : $value;
+        return is_string($value) && 0 === strlen(trim($value)) ? null : $value;
     }
 }
 
@@ -278,9 +278,9 @@ if (!function_exists('strCamelCase')) {
      * @access
      * @return mixed
      */
-    function strCamelCase($str)
+    function strCamelCase($str, $replace = ['-' => ' ', '_' => ' '])
     {
-        return lcfirst(strCamelCaseAll($str));
+        return lcfirst(strCamelCaseAll($str, $replace));
     }
 }
 
@@ -292,9 +292,9 @@ if (!function_exists('strCamelCaseAll')) {
      *
      * @return string
      */
-    function strCamelCaseAll($string)
+    function strCamelCaseAll($string, array $replace = ['-' => ' ', '_' => ' '])
     {
-        return str_replace(' ', null, ucwords(str_replace(['-', '_'], ' ', $string)));
+        return strtr(ucwords(strtr($string, $replace)), [' ' => '']);
     }
 }
 
@@ -308,7 +308,7 @@ if (!function_exists('strLowDash')) {
      */
     function strLowDash($string)
     {
-        return strtolower(preg_replace('/[A-Z]/', '_$0', $string));
+        return strtolower(preg_replace('#[A-Z]#', '_$0', $string));
     }
 }
 
@@ -523,6 +523,68 @@ if (!function_exists('strConcat')) {
 
 }
 
+
+if (!function_exists('strEscapeStr')) {
+    function strEscapeStr($str, $needle)
+    {
+        return str_replace($needle, $needle.$needle, $str);
+    }
+}
+
+if (!function_exists('strUnescapeStr')) {
+
+    function strUnescapeStr($str, $needle)
+    {
+        return str_replace($needle.$needle, $needle, $str);
+    }
+}
+if (!function_exists('strWrapStr')) {
+
+    function strWrapStr($str, $begin, $end = null)
+    {
+        return sprintf('%s%s%s', $begin, $str, $end ?: $begin);
+    }
+}
+
+if (!function_exists('strRand')) {
+    /**
+     * Generates a random string with the given length.
+     *
+     * @param integer $length
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeExceptionn
+     *
+     * @access
+     * @return string
+     */
+    function strRand($length)
+    {
+        if (!is_int($length)) {
+            throw new \InvalidArgumentException(
+                sprintf('strRand expects first argument to be integer, instead saw %s.'. gettype($length))
+            );
+        }
+
+        if (function_exists('openssl_random_pseudo_bytes')) {
+            if (null === ($bytes = openssl_random_pseudo_bytes($length * 2))) {
+                throw new \RuntimeException('Cannot generate random string');
+            }
+            return substr(str_replace(['/', '=', '+'], '', base64_encode($bytes)), 0, $length);
+        } else {
+            return strQuickRand($length);
+        }
+    }
+}
+
+if (!function_exists('strQuickRand')) {
+    function strQuickRand($length)
+    {
+        $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        return substr(str_shuffle(str_repeat($chars, 5)), 0, $length);
+    }
+}
+
 if (!function_exists('getRequire')) {
 
     /**
@@ -535,5 +597,12 @@ if (!function_exists('getRequire')) {
     function getRequire($file)
     {
         return require($file);
+    }
+}
+
+if (!function_exists('fluent')) {
+    function fluent($object)
+    {
+        return $object;
     }
 }

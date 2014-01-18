@@ -34,4 +34,51 @@ trait Getter
         }
         return $default;
     }
+
+    /**
+     * getDefaultArray
+     *
+     * @param array $resource
+     * @param mixed $attribute
+     * @param mixed $default
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function getDefaultArray(array &$resource, $attribute, $default = null)
+    {
+        return arrayGet($resource, $attribute) ?: $default;
+    }
+
+    /**
+     * getDefaultUsingKey
+     *
+     * @param array $resource
+     * @param mixed $attribute
+     * @param mixed $default
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function getDefaultUsingKey(array &$resource, $attribute, $default = null)
+    {
+        if ($this->hasKey($resource, $attribute)) {
+            return $resource[$attribute];
+        }
+        return $default;
+    }
+
+    /**
+     * hasKey
+     *
+     * @param mixed $resource
+     * @param mixed $key
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function hasKey(array $resource, $key)
+    {
+        return array_key_exists($key, $resource);
+    }
 }
