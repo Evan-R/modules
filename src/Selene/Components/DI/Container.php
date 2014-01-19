@@ -358,14 +358,14 @@ class Container implements ContainerInterface, InspectableInterface
         } else {
             $this->resolve[$service] = true;
 
-            $params = $this->resolveServiceArgs($definition);
             $instance;
+            $definition->setClass($class = $this->parameters->resolveParam($definition->getClass()));
+            $params = $this->resolveServiceArgs($definition);
 
             if ($definition->hasFactory()) {
                 $instance = $this->getInstanceFromFactory($definition);
             } else {
 
-                $class = $this->parameters->resolveParam($definition->getClass());
 
                 if (count($params) > 0) {
                     $instance = (new \ReflectionClass($class))->newInstanceArgs($params);

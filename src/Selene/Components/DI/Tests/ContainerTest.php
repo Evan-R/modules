@@ -263,19 +263,20 @@ class ContainerTest extends TestCase
     /**
      * @test
      */
-    //public function testParameterInheritance()
-    //{
-    //    $abstract = __NAMESPACE__.'\Stubs\AbstractService';
+    public function testParameterInheritance()
+    {
+        $abstract = __NAMESPACE__.'\Stubs\AbstractService';
 
-    //    $this->container->setParam('foo.service.class', $fooclass = __NAMESPACE__.'\Stubs\FooService');
-    //    $this->container->setParam('inh.service.class', __NAMESPACE__.'\Stubs\InheritedService');
-    //    $this->container->setParam($abstract, ['$foo_service']);
-    //    $this->container->setService('foo_service', '%foo.service.class%');
-    //    $this->container->setService('inh_service', '%inh.service.class%');
+        $this->container->setParam('foo.service.class', $fooclass = __NAMESPACE__.'\Stubs\FooService');
+        $this->container->setParam('inh.service.class', __NAMESPACE__.'\Stubs\InheritedService');
+        $this->container->setParam($abstract, [new Reference('foo_service')]);
 
-    //    $service = $this->container->getService('inh_service');
-    //    $this->assertInstanceOf($fooclass, $service->foo);
-    //}
+        $this->container->setService('foo_service', '%foo.service.class%');
+        $this->container->setService('inh_service', '%inh.service.class%');
+
+        $service = $this->container->getService('inh_service');
+        $this->assertInstanceOf($fooclass, $service->foo);
+    }
 
     /**
      * @test

@@ -30,9 +30,9 @@ class Reference
      *
      * @access public
      */
-    public function __construct($service)
+    public function __construct($id)
     {
-        $this->service = $service;
+        $this->id = $id;
     }
 
     /**
@@ -43,7 +43,7 @@ class Reference
      */
     public function get()
     {
-        return $this->service;
+        return $this->id;
     }
 
     /**
@@ -54,6 +54,6 @@ class Reference
      */
     public function __toString()
     {
-        return sprintf('$%s', $this->service);
+        return sprintf('$%s', $this->id);
     }
 }

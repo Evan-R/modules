@@ -124,7 +124,7 @@ class ParametersTest extends TestCase
         $parameters = $this->getParameters($params);
 
         $parameters->resolve();
-        //var_dump($parameters->all());
+        $this->assertEquals(['bar', 'fuzz'], $parameters->get('foo.params'), 'Parameters should be resolved to ["bar", "fuzz"]');
     }
 
     /**

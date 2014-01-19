@@ -73,7 +73,7 @@ class Definition implements DefinitionInterface
      */
     public function __construct($class = null, $arguments = null, $scope = ContainerInterface::SCOPE_CONTAINER)
     {
-        $this->setClass($class);
+        $this->class = $class;
         $this->setArguments($arguments);
         $this->setScope(ContainerInterface::SCOPE_CONTAINER);
     }
@@ -315,14 +315,23 @@ class Definition implements DefinitionInterface
      * @access protected
      * @return void
      */
-    protected function setClass($class = null)
+    public function setClass($class = null)
     {
-        if (null !== $class) {
+        if (null !== $class && class_exists($class)) {
             $this->parent = ($classname = get_parent_class($class)) ? $this->stripClassName($classname) : $classname;
         }
+
         $this->class = $this->stripClassName($class);
     }
 
+    /**
+     * stripClassName
+     *
+     * @param mixed $classname
+     *
+     * @access private
+     * @return mixed
+     */
     private function stripClassName($classname)
     {
         // comoposer autoload will fail if a class is requested
