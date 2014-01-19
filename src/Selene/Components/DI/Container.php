@@ -326,7 +326,9 @@ class Container implements ContainerInterface, InspectableInterface
     public function isReference($reference)
     {
         return $reference instanceof Reference ||
-        (is_string($reference) && strStartsWith(static::SERVICE_REF_INDICATOR, $reference) && $this->hasService(substr($reference, 1)));
+            (is_string($reference) &&
+            strStartsWith(static::SERVICE_REF_INDICATOR, $reference) && $this->hasService(substr($reference, 1))
+        );
     }
 
     /**
@@ -366,7 +368,7 @@ class Container implements ContainerInterface, InspectableInterface
                 $class = $this->parameters->resolveParam($definition->getClass());
 
                 if (count($params) > 0) {
-                    $instance = $this->setClassArgs($class, $params);
+                    $instance = (new \ReflectionClass($class))->newInstanceArgs($params);
                 } else {
                     $instance = new $class;
                 }
@@ -505,45 +507,6 @@ class Container implements ContainerInterface, InspectableInterface
     protected function getDefinition($class = null, $arguments = null, $scope = null)
     {
         return new Definition($class, $arguments, $scope);
-    }
-
-    /**
-     * Create a new Class instance with its arguments
-     *
-     * @param string $class
-     * @param array $args
-     *
-     * @access protected
-     * @throws \InvalidArgumentException
-     * @return Object
-     */
-    protected function setClassArgs($class, $args)
-    {
-        switch (count($args)) {
-            case 1:
-                return new $class($args[0]);
-            case 2:
-                return new $class($args[0], $args[1]);
-            case 3:
-                return new $class($args[0], $args[1], $args[2]);
-            case 4:
-                return new $class($args[0], $args[1], $args[2], $args[3]);
-            case 5:
-                return new $class($args[0], $args[1], $args[2], $args[3], $args[4]);
-            case 6:
-                return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5]);
-            case 7:
-                return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6]);
-            case 8:
-                return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7]);
-            case 9:
-                return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8]);
-            case 10:
-                return new $class($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8], $args[9]);
-            default:
-                throw new \InvalidArgumentException('no arguments or argument limit exceeded');
-                break;
-        }
     }
 
     /**
