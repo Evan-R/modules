@@ -106,6 +106,16 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(
             isset($array['service']['location']['name']) && $array['service']['location']['name'] === 'myservice'
         );
+
+        $data = [];
+
+        arraySet('foo', 'bar', $data);
+        arraySet('baz', ['doo'], $data);
+        arraySet('baz.some', 'goo', $data);
+        arraySet('baz.glue', 'fuxk', $data);
+
+        var_dump($data);
+
     }
 
     /**

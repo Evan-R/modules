@@ -52,7 +52,8 @@ if (!function_exists('arraySet')) {
         $pointer = &$input;
 
         while (count($keys) > 0) {
-            $pointer[$key = array_shift($keys)] = isset($pointer[$key]) ? $pointer[$key] : [];
+            $key = array_shift($keys);
+            $pointer[$key] = isset($pointer[$key]) ? $pointer[$key] : [];
             $pointer = &$pointer[$key];
         }
 
