@@ -25,12 +25,20 @@ class EventDispatcherTest extends TestCase
      */
     protected $object;
 
+    protected function createDispatcher(ContainerInterface $container = null)
+    {
+        if (null === $container) {
+            return new Dispatcher();
+        }
+        return new Dispatcher($container);
+    }
+
     /**
      * @test
      */
     public function testBindEvent()
     {
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
 
         $dispatcher->on(
             'foo',
@@ -56,7 +64,7 @@ class EventDispatcherTest extends TestCase
      */
     public function testDispatchPriority()
     {
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
 
         $dispatcher->on(
             'foo',
@@ -95,7 +103,7 @@ class EventDispatcherTest extends TestCase
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('doHandleEvent')->andReturn(true);
 
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
         $dispatcher->on('foo', [$class, 'doHandleEvent']);
         $result = $dispatcher->dispatch('foo');
 
@@ -119,7 +127,7 @@ class EventDispatcherTest extends TestCase
         $container = m::mock('Selene\Components\DI\ContainerInterface');
         $container->shouldReceive('getService')->with('some_service')->andReturn($class);
 
-        $dispatcher = new Dispatcher($container);
+        $dispatcher = $this->createDispatcher($container);
 
         $dispatcher->on('foo', '$some_service');
         $result = $dispatcher->dispatch('foo');
@@ -146,7 +154,7 @@ class EventDispatcherTest extends TestCase
         $container = m::mock('Selene\Components\DI\ContainerInterface');
         $container->shouldReceive('getService')->with('some_service')->andReturn($class);
 
-        $dispatcher = new Dispatcher($container);
+        $dispatcher = $this->createDispatcher($container);
 
         $dispatcher->on('foo', '$some_service@doHandle');
         $result = $dispatcher->dispatch('foo');
@@ -162,7 +170,7 @@ class EventDispatcherTest extends TestCase
     public function testBindOnce()
     {
         $counter = 0;
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
 
         $dispatcher->once(
             'foo',
@@ -184,7 +192,7 @@ class EventDispatcherTest extends TestCase
      */
     public function testStopEventPropagation()
     {
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
         $dispatcher->on(
             'foo',
             function ($event) {
@@ -217,7 +225,7 @@ class EventDispatcherTest extends TestCase
     public function testDispatchUntil()
     {
 
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
 
         $dispatcher->on(
             'foo',
@@ -256,7 +264,7 @@ class EventDispatcherTest extends TestCase
      */
     public function testDetachEvent()
     {
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
         $dispatcher->on(
             'foo',
             $foo = function () {
@@ -282,7 +290,7 @@ class EventDispatcherTest extends TestCase
      */
     public function testDetachEventWithBoundCallable()
     {
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
 
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('handleEvent')->andReturnUsing(
@@ -329,7 +337,7 @@ class EventDispatcherTest extends TestCase
         $container = m::mock('Selene\Components\DI\ContainerInterface');
         $container->shouldReceive('getService')->with('some_service')->andReturn($class);
 
-        $dispatcher = new Dispatcher($container);
+        $dispatcher = $this->createDispatcher($container);
 
         $dispatcher->on('foo', '$some_service');
         $dispatcher->on('foo', '$some_service@responde');
@@ -347,7 +355,7 @@ class EventDispatcherTest extends TestCase
         };
         $baz = function () {
         };
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
         $dispatcher->on('foo', $foo);
         $dispatcher->on('bar', $bar);
         $dispatcher->on('baz', $baz);
@@ -362,7 +370,7 @@ class EventDispatcherTest extends TestCase
      */
     public function testAddSubscriber()
     {
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
         $dispatcher->addSubscriber(new EventSubscriberStub);
         $result = $dispatcher->dispatch('foo.event');
 
@@ -376,7 +384,7 @@ class EventDispatcherTest extends TestCase
      */
     public function testRemoveObserver()
     {
-        $dispatcher = new Dispatcher();
+        $dispatcher = $this->createDispatcher();
         $dispatcher->addSubscriber($observer = new EventSubscriberStub);
         $result = $dispatcher->dispatch('foo.event');
 

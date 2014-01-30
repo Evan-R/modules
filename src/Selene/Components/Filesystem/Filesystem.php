@@ -16,8 +16,11 @@ use Selene\Components\Filesystem\Exception\IOException;
 
 /**
  * @class Filesystem
- * @package
+ *
+ * @package Selene\Components\Filesystem
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 class Filesystem
 {
@@ -88,6 +91,8 @@ class Filesystem
     protected $copyStartOffset;
 
     /**
+     * Creates a new Filesystem instance.
+     *
      * @param int $directoryPermissions
      * @param int $filePermissions
      *
@@ -111,13 +116,14 @@ class Filesystem
     }
 
     /**
-
-     * mkdir
+     * Create a directory
      *
-     * @param mixed $param
+     * @param string  $dir
+     * @param integer $permissions
+     * @param boolean $recursive
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function mkdir($dir, $permissions = 0755, $recursive = true)
     {
@@ -126,17 +132,16 @@ class Filesystem
         } catch (\Exception $e) {
             throw new IOException($e->getMessage());
         }
-
-        return $this;
     }
 
     /**
-     * rmdir
+     * Removes a directory.
      *
-     * @param mixed $dir
+     * @param string $dir the directory path.
      *
+     * @throws \Selene\Components\Filesystem\Exception\IOException
      * @access public
-     * @return mixed
+     * @return void
      */
     public function rmdir($directory)
     {
@@ -149,11 +154,11 @@ class Filesystem
     }
 
     /**
-     * flush
+     * Removes all conatining files and directories within the given directory.
      *
-     *
+     * @throws \Selene\Components\Filesystem\Exception\IOException
      * @access public
-     * @return mixed
+     * @return void
      */
     public function flush($directory)
     {
@@ -169,9 +174,9 @@ class Filesystem
     }
 
     /**
-     * isEmpty
+     * Check if a directory is empty.
      *
-     * @param string $directory
+     * @param string $directory path to the directory.
      *
      * @access public
      * @return bool
@@ -185,13 +190,15 @@ class Filesystem
     }
 
     /**
-     * touch
+     * Touches a file.
      *
-     * @param mixed $file
-     * @param mixed $permissions
+     * @param string  $file  the file path.
+     * @param integer $time  the modifytime as unix timestamp.
+     * @param integer $atime the accesstime as unix timestamp.
      *
+     * @throws \Selene\Components\Filesystem\Exception\IOException
      * @access public
-     * @return boolean
+     * @return boolean true if touching of the file was successful.
      */
     public function touch($file, $time = null, $atime = null)
     {
@@ -205,9 +212,9 @@ class Filesystem
     }
 
     /**
-     * unlink
+     * Deletes a file.
      *
-     * @param mixed $file
+     * @param string $file the file path.
      *
      * @access public
      * @return mixed
@@ -236,14 +243,18 @@ class Filesystem
     }
 
     /**
-     * copy
+     * Copies a file or directory to a target destination.
      *
-     * @param string $source
-     * @param string $target
-     * @param bool   $replace
+     * If $target is null, copy() will copy the file or directory to its
+     * parent directory and will enumerate its name.
      *
+     * @param string  $source
+     * @param string  $target
+     * @param boolean $replace
+     *
+     * @throws \Selene\Components\Filesystem\Exception\IOException
      * @access public
-     * @return void
+     * @return integer returns the total count of bytes that where copied.
      */
     public function copy($source, $target = null, $replace = false)
     {
@@ -273,12 +284,13 @@ class Filesystem
     }
 
     /**
-     * chmod
+     * Set file permissions.
      *
-     * @param mixed $file
-     * @param int   $permission
-     * @param mixed $recursive
+     * @param string  $file
+     * @param integer $permission
+     * @param boolean $recursive
      *
+     * @throws \Selene\Components\Filesystem\Exception\IOException
      * @access public
      * @return void
      */
@@ -305,6 +317,7 @@ class Filesystem
      *
      * @param mixed $param
      *
+     * @throws \Selene\Components\Filesystem\Exception\IOException
      * @access public
      * @return mixed
      */
@@ -363,6 +376,39 @@ class Filesystem
                 throw new IOException(sprintf('could not change group on %s', $item));
             }
         }
+    }
+
+    /**
+     * mask
+     *
+     * @param mixed $file
+     * @param mixed $mode
+     *
+     * @access public
+     * @return mixed
+     */
+    public function mask($file, $mode = null)
+    {
+        $cmask = $mode ?: ($this->isFile($file) ? 0666 : ($this->isDir($file) ? 0775 : $mode));
+
+        if (null === $cmask) {
+            throw new \InvalidArgumentException(sprintf('%s is not a file or a directory', $file));
+        }
+
+        return $this->chmod($file, $this->getMask($cmask));
+    }
+
+    /**
+     * getMask
+     *
+     * @param mixed $cmask
+     *
+     * @access public
+     * @return integer
+     */
+    public function getMask($cmask)
+    {
+        return $cmask & ~umask();
     }
 
     /**
@@ -585,6 +631,7 @@ class Filesystem
     protected function rmRecursive($dir)
     {
         $iterator = new FilesystemIterator($dir, FilesystemIterator::CURRENT_AS_SELF|FilesystemIterator::SKIP_DOTS);
+
         foreach ($iterator as $fileInfo) {
 
             if ($fileInfo->isFile() or $fileInfo->isLink()) {
@@ -701,12 +748,13 @@ class Filesystem
     }
 
     /**
-     * enum
+     * Enumerate a directory or file name based on its occurrance of the parent
+     * directory.
      *
-     * @param string $file
-     * @param int    $start
-     * @param string $prefix
-     * @param bool   $pad
+     * @param string $file    the paht of the file or directory.
+     * @param integer $start  the enumeration base.
+     * @param string  $prefix the enumeration static prefix, e.g. "copy".
+     * @param boolean $pad    there's a prefix and paddin is true, it will add.
      *
      * @access public
      * @return string
@@ -723,35 +771,32 @@ class Filesystem
     }
 
     /**
-     * enum
+     * Enumerate a directory name based on its occurrance of the parent
+     * directory.
      *
-     * @param string $file
-     * @param int    $start
-     * @param string $prefix
-     * @param bool   $pad
-     *
+     * @param string $dir the path of directory.
+     * @see \Selene\Components\Filesystem::enum()
      * @access protected
      * @return string
      */
-    protected function enumDir($file, $start, $prefix = null, $pad = true)
+    protected function enumDir($dir, $start, $prefix = null, $pad = true)
     {
         $prefix = is_null($prefix) ?
             $prefix :
             ($pad ? str_pad($prefix, strlen($prefix) + 2, ' ', STR_PAD_BOTH) : $prefix);
         $i = $start;
-        while (is_dir(sprintf("%s%s%d", $file, $prefix, $i))) {
+        while (is_dir(sprintf("%s%s%d", $dir, $prefix, $i))) {
             $i++;
         }
-        return sprintf("%s%s%d", $file, $prefix, $i);
+        return sprintf("%s%s%d", $dir, $prefix, $i);
     }
 
     /**
-     * enumFile
+     * Enumerate a file name based on its occurrance of the parent
+     * directory.
      *
-     * @param string $file
-     * @param int    $start
-     * @param string $prefix
-     * @param bool   $pad
+     * @param string $file the path of file.
+     * @see \Selene\Components\Filesystem::enum()
      *
      * @access protected
      * @return string

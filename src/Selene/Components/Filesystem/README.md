@@ -172,6 +172,21 @@ $filesystem->chgrp('target_dir', 'new_group', true);
 $filesystem->chgrp('target_dir', 20 /*the gid*/, true);
 ```
 
+### Set appropriate file permissions using umask
+```php
+<?php
+
+// for files:
+$filesystem->mask('target_file');
+// or
+$filesystem->mask('target_file', 0666);
+
+// for directories:
+$filesystem->mask('target_dir');
+// or
+$filesystem->mask('target_file', 0755);
+```
+
 ## TODO: Working with files and directories
 
 ### The directory object `Directory`

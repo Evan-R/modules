@@ -11,8 +11,9 @@
 
 namespace Selene\Components\Events;
 
-use Selene\Components\DI\ContainerInterface;
-use Selene\Components\DI\ContainerAwareInterface;
+use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\DI\ContainerAwareInterface;
+use \Selene\Components\DI\Traits\ContainerAwareTrait;
 
 /**
  * @class Dispatcher implements DispatcherInterface
@@ -25,6 +26,8 @@ use Selene\Components\DI\ContainerAwareInterface;
  */
 class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * events
      *
@@ -47,13 +50,6 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     private $sorted = [];
 
     /**
-     * container
-     *
-     * @var mixed
-     */
-    private $container;
-
-    /**
      * Create a new event dispatcher instance.
      *
      * @param ContainerInterace $container
@@ -62,20 +58,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     public function __construct(ContainerInterface $container = null)
     {
-        $this->container = $container;
-    }
-
-    /**
-     * Set the ioc container.
-     *
-     * @param ContainerInterface $container an IoC container implementation
-     *
-     * @access public
-     * @return void
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
+        $this->setContainer($container);
     }
 
     /**
@@ -89,7 +72,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      * @access public
      * @return void
      */
-    public function on($event, $eventHandler, $priority = 10)
+    public function on($event, $eventHandler, $priority = null)
     {
         $service = null;
         $method = null;
@@ -104,19 +87,6 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
             }
         }
         $this->bindEvent($event, $eventHandler, $priority, $service, $method);
-    }
-
-    /**
-     * isCallableService
-     *
-     * @param mixed $eventHandler
-     *
-     * @access private
-     * @return bool
-     */
-    private function isCallableService($eventHandler)
-    {
-        return is_string($eventHandler) && 0 === strpos($eventHandler, ContainerInterface::SERVICE_REF_INDICATOR);
     }
 
     /**
@@ -178,8 +148,8 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     public function addSubscriber(SubscriberInterface $subscriber)
     {
-        foreach ($subscriber->getSubscriptions() as $event => $handles) {
-            foreach ($this->listSubscriptions($subscriber, $event, $handles) as $subscription) {
+        foreach (forward_static_call([$subscriber, 'getSubscriptions']) as $event => $handles) {
+            foreach ($this->listSubscriptions($subscriber, $event, (array)$handles) as $subscription) {
                 call_user_func_array([$this, 'on'], $subscription);
             }
         }
@@ -196,39 +166,11 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     public function removeSubscriber(SubscriberInterface $subscriber)
     {
         foreach ($subscriber::getSubscriptions() as $event => $handles) {
-            foreach ($this->listSubscriptions($subscriber, $event, $handles) as $subscription) {
+            foreach ($this->listSubscriptions($subscriber, $event, (array)$handles) as $subscription) {
                 array_pop($subscription);
                 call_user_func_array([$this, 'off'], $subscription);
             }
         }
-    }
-
-    /**
-     * listObserverSubscriptions
-     *
-     * @param mixed $observer
-     * @param mixed $event
-     * @param array $eventSubscriptions
-     *
-     * @access protected
-     * @return array
-     */
-    private function listSubscriptions($subscriber, $event, array $eventSubscriptions, array &$list = [])
-    {
-        if (is_array(current($eventSubscriptions))) {
-            foreach ($eventSubscriptions as $subscription) {
-                $this->listSubscriptions($subscriber, $event, $subscription, $list);
-            }
-
-            return $list;
-        }
-
-        list($method, $priority) = array_pad($eventSubscriptions, 2, 10);
-        $eventHandler = [$subscriber, $method];
-
-        $list[] = compact('event', 'eventHandler', 'priority');
-
-        return $list;
     }
 
     /**
@@ -320,19 +262,64 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     }
 
     /**
+     * isCallableService
+     *
+     * @param mixed $eventHandler
+     *
+     * @access private
+     * @return bool
+     */
+    private function isCallableService($eventHandler)
+    {
+        return is_string($eventHandler) && 0 === strpos($eventHandler, ContainerInterface::SERVICE_REF_INDICATOR);
+    }
+
+    /**
+     * listObserverSubscriptions
+     *
+     * @param mixed $observer
+     * @param mixed $event
+     * @param array $eventSubscriptions
+     *
+     * @access protected
+     * @return array
+     */
+    private function listSubscriptions($subscriber, $event, array $eventSubscriptions, array &$list = [])
+    {
+        if (is_array(current($eventSubscriptions))) {
+            foreach ($eventSubscriptions as $subscription) {
+                $this->listSubscriptions($subscriber, $event, $subscription, $list);
+            }
+
+            return $list;
+        }
+
+        list($method, $priority) = array_pad($eventSubscriptions, 2, 10);
+        $eventHandler = [$subscriber, $method];
+
+        $list[] = compact('event', 'eventHandler', 'priority');
+
+        return $list;
+    }
+
+    /**
      * Bind the Eventhandler to the dispatcher
      *
-     * @param string $event        the event name
-     * @param mixed  $eventHandler a callable
-     * @param int    $priority     event fire priority
+     * @param string    $event        the event name
+     * @param callable  $eventHandler a callable
+     * @param int       $priority     event fire priority
      *
      * @access protected
      * @return void
      */
-    private function bindEvent($event, $eventHandler, $priority = 10, $service = null, $method = null)
+    private function bindEvent($event, callable $eventHandler, $priority = null, $service = null, $method = null)
     {
         $handler = compact('event', 'priority');
         $handler['eventHandler'] =& $eventHandler;
+
+        if (null === $priority) {
+            $priority = $this->findPriority($event);
+        }
 
         if (!is_null($service)) {
             $handler['uses'] = implode(static::EVTHANDLER_SEPARATOR, [$service, $method]);
@@ -344,6 +331,28 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     }
 
     /**
+     * findPriority
+     *
+     * @param mixed $event
+     *
+     * @access private
+     * @return mixed
+     */
+    private function findPriority($event)
+    {
+        if (!$this->sorted) {
+            $this->sort($event);
+        }
+
+        if (isset($this->handlers[$event])) {
+            $handler = $this->handlers[$event][count($this->handlers[$event]) - 1];
+            return $handler['priority'] - 1;
+        }
+
+        return 0;
+    }
+
+    /**
      * Sort eventhandler by their priority.
      *
      * @access protected
@@ -351,7 +360,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     private function sort($event)
     {
-        if (isset($this->sorted[$event])) {
+        if (isset($this->sorted[$event]) || !isset($this->handlers[$event])) {
             return;
         }
 
@@ -367,8 +376,8 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     /**
      * Finds a matching handler and unsets the handler for the given event.
      *
-     * @param string $event        the event name
-     * @param mixed  $eventHandler the event handler
+     * @param string    $event        the event name
+     * @param callable  $eventHandler the event handler
      *
      * @access protected
      * @return boolean always returns true

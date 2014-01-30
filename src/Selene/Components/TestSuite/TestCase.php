@@ -11,7 +11,8 @@
 
 namespace Selene\Components\TestSuite;
 
-use Mockery as m;
+use \Mockery as m;
+//use \AspectMock\Test as test;
 
 /**
  * Class: TestCase
@@ -30,6 +31,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         m::close();
+        //test::clean();
     }
     /**
      * Get a property values of a none public object property.

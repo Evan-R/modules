@@ -244,6 +244,20 @@ class Directory extends AbstractFileObject
     }
 
     /**
+     * mask
+     *
+     * @param mixed $mode
+     *
+     * @access public
+     * @return mixed
+     */
+    public function mask($mode = null)
+    {
+        $this->files->mask((string)$this, $mode ?: 0755);
+        return $this;
+    }
+
+    /**
      * flushes all files in the directory
      *
      * @access public

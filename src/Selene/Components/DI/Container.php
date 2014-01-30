@@ -368,7 +368,12 @@ class Container implements ContainerInterface, InspectableInterface
 
 
                 if (count($params) > 0) {
-                    $instance = (new \ReflectionClass($class))->newInstanceArgs($params);
+                    $reflection = new \ReflectionClass($class);
+                    if ((bool)$reflection->getConstructor()) {
+                        $instance = $reflection->newInstanceArgs($params);
+                    } else {
+                        $instance = $reflection->newInstance();
+                    }
                 } else {
                     $instance = new $class;
                 }

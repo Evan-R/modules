@@ -12,7 +12,7 @@
 namespace Selene\Components\DI;
 
 /**
- * @class Definition implements DefinitionInterface Definition
+ * @class Definition implements DefinitionInterface
  * @see DefinitionInterface
  *
  * @package Selene\Components\DI
@@ -317,11 +317,25 @@ class Definition implements DefinitionInterface
      */
     public function setClass($class = null)
     {
-        if (null !== $class && class_exists($class)) {
-            $this->parent = ($classname = get_parent_class($class)) ? $this->stripClassName($classname) : $classname;
+        if (null === $class) {
+            return;
         }
 
+        $this->parent = ($classname = get_parent_class($class)) ? $this->stripClassName($classname) : $classname;
         $this->class = $this->stripClassName($class);
+    }
+
+    /**
+     * parent
+     *
+     * @param mixed $parentService
+     *
+     * @access public
+     * @return mixed
+     */
+    public function setParent(Definition $parent)
+    {
+
     }
 
     /**
