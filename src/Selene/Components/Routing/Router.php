@@ -69,6 +69,8 @@ class Router implements RouterInterface
      */
     protected $filters;
 
+    protected $actionSet;
+
     /**
      * filters
      *
@@ -77,18 +79,14 @@ class Router implements RouterInterface
     protected $filterEvents;
 
     /**
-     *
-     * @param RouteCollectionInterface $routes
+     * @param ResolverInterface $resolver
      * @param RouteMatcherInterface $matcher
      *
      * @access public
+     * @return mixed
      */
-    public function __construct(
-        RouteCollectionInterface $routes,
-        ResolverInterface $resolver,
-        RouteMatcherInterface $matcher = null
-    ) {
-        $this->routes    = $routes;
+    public function __construct(ResolverInterface $resolver, RouteMatcherInterface $matcher = null)
+    {
         $this->resolver  = $resolver;
         $this->matcher   = $matcher ? : new RouteMatcher;
 
@@ -96,20 +94,31 @@ class Router implements RouterInterface
         $this->filtersEvents = [];
 
         $this->booted = false;
+        $this->actionSet = false;
     }
 
     /**
-     * fromCollectionBuilder
-     *
-     * @param RouteBuilder $builder
-     * @param RouteMatcherInterface $matcher
+     * setRoutes
      *
      * @access public
-     * @return Router
+     * @return void
      */
-    public static function fromCollectionBuilder(RouteBuilder $builder, RouteMatcherInterface $matcher = null)
+    public function setRoutes(RouteCollectionInterface $routes)
     {
-        return new static($builder->getRoutes(), $matcher ?: new RouteMatcher);
+        $this->routes = $routes;
+    }
+
+    /**
+     * setRoutes
+     *
+     * @param RouteCollectionInterface $routes
+     *
+     * @access public
+     * @return mixed
+     */
+    public function setRoutesFromBuilder(RouteBuilder $builder)
+    {
+        $this->routes = $builder->getRoutes();
     }
 
     /**
@@ -222,20 +231,46 @@ class Router implements RouterInterface
             throw new RouteNotFoundException(sprintf('Route not found for %s', $request->getRequestUri()));
         }
 
-        $event = $this->prepareDispatchRoute($route, $request);
+        $this->prepareDispatchRoute($route, $request);
 
         if ($result = $this->fireBeforeEvents($route, $request)) {
-            return $result;
+            $this->abortBeforeDispatch($route, $request);
+            return;
         }
 
         $event = $this->fireRouteDispatchEvent($route, $request);
 
-        if ($result = $this->fireAfterEvents($route, $request)) {
-            return $result;
-        }
-
         return $event->getResponse();
     }
+
+    /**
+     * abortBeforeDispatch
+     *
+     * @param Route $route
+     * @param Request $request
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function abortBeforeDispatch(Route $route, Request $request)
+    {
+        $this->events->dispatch('router_abort', new RouteDispatchEvent($route, $request));
+    }
+
+    /**
+     * fireAbortAfter
+     *
+     * @param Route $route
+     * @param Request $request
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function fireAbortAfter(Route $route, Request $request)
+    {
+        return null;
+    }
+
 
     /**
      * fireRouteDispatchEvent
@@ -329,7 +364,43 @@ class Router implements RouterInterface
         if ($filter = $this->findRouteFilters($route, static::ROUTE_AFTER)) {
             $this->registerRouteFilterEvents($route, $filters, static::ROUTE_AFTER);
         }
+
+        $this->prepareAction();
     }
+
+    /**
+     * prepareAction
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function prepareAction()
+    {
+        if ($this->actionSet) {
+            return;
+        }
+
+        $this->events->on('router_dispatch', [$this, 'getControllerAction']);
+    }
+
+    /**
+     * getControllerAction
+     *
+     * @param mixed $event
+     *
+     * @access protected
+     * @return mixed
+     */
+    public function getControllerAction(RouteDispatchEvent $event)
+    {
+        $action = $this->resolver->find(
+            $route = $event->getRoute()->getAction(),
+            $event->getRequest()->getMethod()
+        );
+
+        $event->setResponse(call_user_func_array($action, $route->getParameters()));
+    }
+
 
     /**
      * getRouteFilterEventName
