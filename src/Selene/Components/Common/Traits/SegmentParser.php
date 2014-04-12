@@ -58,7 +58,7 @@ trait SegmentParser
      * @access public
      * @return mixed
      */
-    public function parseSegment($descriptor)
+    public function parse($descriptor)
     {
         if (!isset($this->parsed[$descriptor])) {
             if (false !== strpos($descriptor, static::$namespaceSeparator)) {
@@ -69,6 +69,16 @@ trait SegmentParser
             $this->parsed[$descriptor] = $parsed;
         }
         return $this->parsed[$descriptor];
+    }
+
+    public static function setNamespaceSeparator($separator)
+    {
+        static::$namespaceSeparator = $separator;
+    }
+
+    public static function setSegmentSeparator($separator)
+    {
+        static::$segmentSeparator = $separator;
     }
 
     /**
@@ -110,7 +120,7 @@ trait SegmentParser
         $parts = explode(static::$namespaceSeparator, $descriptor);
         $namespace = array_shift($parts);
 
-        $temp = $this->parseSegment(array_shift($parts));
+        $temp = $this->parse(array_shift($parts));
         array_shift($temp);
         array_unshift($temp, $namespace);
         $temp;

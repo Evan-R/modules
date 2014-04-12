@@ -54,6 +54,6 @@ class Reference
      */
     public function __toString()
     {
-        return sprintf('$%s', $this->id);
+        return $this->id;
     }
 }

@@ -18,6 +18,10 @@ namespace Selene\Components\DI\Tests\Stubs;
  */
 class SetterAwareService
 {
+    public $foo;
+
+    public $name;
+
     public function setFoo(FooService $foo)
     {
         $this->foo = $foo;

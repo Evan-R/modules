@@ -9,9 +9,9 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Core\Stack;
+namespace Selene\Components\Kernel\Stack;
 
-use \Selene\Components\Core\AppCoreInterface;
+use \Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @class Builder
@@ -38,7 +38,7 @@ class Builder
      * @access public
      * @return mixed
      */
-    public function resolve(AppCoreInterface $app)
+    public function resolve(HttpKernelInterface $app)
     {
         $params = [$app];
 
@@ -46,7 +46,7 @@ class Builder
 
             $middleware = array_shift($definition);
 
-            if ($middleware instanceof AppCoreInterface) {
+            if ($middleware instanceof HttpKernelInterface) {
                 $app = $middleware;
             } elseif (is_string($middleware) && class_exists($middleware)) {
                 array_unshift($definition, $app);
@@ -58,7 +58,7 @@ class Builder
             array_unshift($params, $app);
         }
 
-        return new StackedCore($app, $params);
+        return new KernelStack($app, $params);
     }
 
     /**
@@ -74,7 +74,7 @@ class Builder
     {
         $reflection = new \ReflectionClass($class);
 
-        if (!$reflection->implementsInterface($interface = 'Selene\Components\Core\AppCoreInterface')) {
+        if (!$reflection->implementsInterface($interface = 'Symfony\Component\HttpKernel\HttpKernelInterface')) {
             throw new \InvalidArgumentException(
                 sprintf('Middleware must implement %s.', $interface)
             );

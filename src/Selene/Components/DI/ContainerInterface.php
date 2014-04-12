@@ -11,6 +11,8 @@
 
 namespace Selene\Components\DI;
 
+use \Selene\Components\DI\Resolve\ResolveStrategyCollection;
+
 /**
  * @interface ContainerInterface
  * @package Selene\Components\DI
@@ -26,37 +28,45 @@ interface ContainerInterface
 
     const APP_CONTAINER_SERVICE = 'app.container';
 
-    public function setParam($param, $definition);
+    ///**
+    // * Return the name of the serviceable container.
+    // *
+    // * The name defaults to `staic::APP_CONTAINER_SERVICE`
+    // *
+    // * @access public
+    // * @return string
+    // */
+    //public function getName();
 
-    public function getParam($parameter);
+    //public function setParameter($param, $definition);
 
-    /**
-     * Get the parameter collection of the service.
-     *
-     * @access public
-     * @return Parameters
-     */
+    //public function getParameter($parameter);
+
+    ///**
+    // * Get the parameter collection of the service.
+    // *
+    // * @access public
+    // * @return Parameters
+    // */
     public function getParameters();
 
-    /**
-     * Return the name of the serviceable container.
-     *
-     * The name defaults to `staic::APP_CONTAINER_SERVICE`
-     *
-     * @access public
-     * @return string
-     */
-    public function getName();
+    //public function setAalias($alias, $id);
 
-    public function setService($service, $class = null, $arguments = null);
+    //public function getAlias($alias);
 
-    public function getService($service);
+    public function define($service, $class = null, array $arguments = [], $scope = self::SCOPE_CONTAINER);
 
-    public function getServices();
+    public function get($id);
 
-    public function hasService($service);
+    public function inject($id, $instance, $scope = self::SCOPE_CONTAINER);
+
+    public function getDefinitions();
+
+    public function hasDefinition($id);
 
     public function merge(ContainerInterface $container);
 
     public function isLocked();
+
+    public function compile(ResolveStrategyCollection $strategies = null);
 }

@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Tests;
+namespace Selene\Components\Common\Tests\Helper;
 
 use Mockery as m;
 
@@ -113,9 +113,6 @@ class HelperFunctionsTest extends \PHPUnit_Framework_TestCase
         arraySet('baz', ['doo'], $data);
         arraySet('baz.some', 'goo', $data);
         arraySet('baz.glue', 'fuxk', $data);
-
-        var_dump($data);
-
     }
 
     /**

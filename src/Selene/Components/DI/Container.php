@@ -11,6 +11,8 @@
 
 namespace Selene\Components\DI;
 
+use \Selene\Components\Common\Traits\Getter;
+use \Selene\Components\DI\Resolver\Resolver;
 use \Selene\Components\DI\Exception\ContainerLockedException;
 use \Selene\Components\DI\Exception\ContainerResolveException;
 
@@ -25,519 +27,567 @@ use \Selene\Components\DI\Exception\ContainerResolveException;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Container implements ContainerInterface, InspectableInterface
+class Container extends BaseContainer
 {
-    /**
-     * parameters
-     *
-     * @var Parameters
-     */
-    protected $parameters;
+    //use Getter;
 
-    /**
-     * aliases
-     *
-     * @var mixed
-     */
-    protected $aliases;
+    ///**
+    // * parameters
+    // *
+    // * @var Parameters
+    // */
+    //protected $parameters;
 
-    /**
-     * services
-     *
-     * @var mixed
-     */
-    protected $services;
+    ///**
+    // * aliases
+    // *
+    // * @var mixed
+    // */
+    //protected $aliases;
 
-    /**
-     * locked
-     *
-     * @var boolean
-     */
-    protected $locked;
+    ///**
+    // * compiled
+    // *
+    // * @var mixed
+    // */
+    //protected $compiled;
 
-    /**
-     * name
-     *
-     * @var string
-     */
-    protected $name;
+    ///**
+    // * services
+    // *
+    // * @var mixed
+    // */
+    //protected $instances;
 
-    /**
-     * resolve
-     *
-     * @var mixed
-     */
-    protected $resolve;
+    //protected $services;
 
-    /**
-     * paramDelimitter
-     *
-     * @var string
-     */
-    protected static $paramDelimitter = '%';
+    //protected $classes;
 
-    /**
-     *
-     * @param Parameters $parameters
-     *
-     * @access public
-     */
-    public function __construct(Parameters $parameters = null, $name = self::APP_CONTAINER_SERVICE)
-    {
-        $this->name = $name;
-        $this->locked = false;
-        $this->setParameters($parameters);
-        $this->injectService($this->name, $this);
-        $this->resolve = false;
-        $this->aliases = new Aliases;
-    }
+    //protected $definitions;
 
-    /**
-     * inspect
-     *
-     * @param InspectorInterface $inspector
-     *
-     * @access public
-     * @return mixed
-     */
-    public function inspect()
-    {
-        return null;
-    }
+    ///**
+    // * locked
+    // *
+    // * @var boolean
+    // */
+    //protected $locked;
 
-    /**
-     * setParameter
-     *
-     * @param Parameters $parameters
-     *
-     * @access protected
-     * @return void
-     */
-    public function setParameters(Parameters $parameters = null)
-    {
-        if (null === $parameters) {
-            $parameters = new Parameters;
-        }
-        $this->parameters = $parameters;
-    }
+    ///**
+    // * name
+    // *
+    // * @var string
+    // */
+    //protected $name;
 
-    /**
-     * getParameters
-     *
-     * @param mixed $param
-     *
-     * @access public
-     * @return ParameterInterface
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
+    ///**
+    // * resolve
+    // *
+    // * @var mixed
+    // */
+    //protected $resolve;
 
-    /**
-     * getName
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
+    ///**
+    // * paramDelimitter
+    // *
+    // * @var string
+    // */
+    //protected static $paramDelimitter = '%';
 
-    /**
-     * merge
-     *
-     * @param ContainerInterface $container
-     *
-     * @access public
-     * @return void
-     */
-    public function merge(ContainerInterface $container)
-    {
-        if ($this->isLocked() or $container->isLocked()) {
-            throw new ContainerLockedException('cannot merge a locked container');
-        }
+    ///**
+    // *
+    // * @param Parameters $parameters
+    // *
+    // * @access public
+    // */
+    //public function __construct(Parameters $parameters = null, $name = self::APP_CONTAINER_SERVICE)
+    //{
+    //    $this->name = $name;
+    //    $this->locked = false;
+    //    $this->resolve = [];
 
-        if ($this->getName() === $container->getName()) {
-            throw new \LogicException(sprintf('cannot merge containers sharing the same name %s', $this->getName()));
-        }
+    //    $this->classes = [];
+    //    $this->instances = [];
+    //    $this->services = [];
+    //    $this->definitions = [];
 
-        $this->parameters->merge($container->getParameters());
-        $this->services = array_merge((array)$this->services, (array)$container->getServices());
-    }
+    //    $this->setAliases();
+    //    $this->setParameters($parameters);
 
-    /**
-     * getServices
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getServices()
-    {
-        return $this->services;
-    }
+    //    $this->injectService($this->name, $this);
+    //}
 
-    /**
-     * getService
-     *
-     * @param mixed $service
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getService($service)
-    {
-        $service = $this->aliases->get($service);
+    //protected function setAliases()
+    //{
+    //    $this->aliases = new Aliases;
+    //}
 
-        if ($this->hasService($service)) {
-            return $this->resolveService($service);
-        }
+    ///**
+    // * inspect
+    // *
+    // * @param InspectorInterface $inspector
+    // *
+    // * @access public
+    // * @return mixed
+    // */
+    //public function inspect()
+    //{
+    //    return null;
+    //}
 
-        throw new ContainerResolveException(sprintf('service `%s` not found', $service));
-    }
+    //public function resolve()
+    //{
+    //    if ($this->compiled) {
+    //        return;
+    //    }
 
-    /**
-     * hasService
-     *
-     * @param string $service
-     *
-     * @access public
-     * @return boolean
-     */
-    public function hasService($service)
-    {
-        return is_string($service) && isset($this->services[$service]);
-    }
+    //    $this->parameters->resolve();
 
-    /**
-     * injectService
-     *
-     * @param string $service
-     * @param object $instance
-     *
-     * @access public
-     * @return voic
-     */
-    public function injectService($service, $instance, $scope = ContainerInterface::SCOPE_CONTAINER)
-    {
-        $this->services[$service] = $this->getDefinition(get_class($instance), null, $scope);
-        $this->services[$service]->setResolved($instance);
-    }
-
-    /**
-     * isLocked
-     *
-     * @access public
-     * @return mixed
-     */
-    public function isLocked()
-    {
-        return $this->locked;
-    }
-
-    /**
-     * setParam
-     *
-     * @param mixed $param
-     * @param mixed $definition
-     *
-     * @access public
-     * @return mixed
-     */
-    public function setParam($param, $definition)
-    {
-        $this->parameters->set($param, $definition);
-    }
-
-    /**
-     * getParam
-     *
-     * @param mixed $parameter
-     * @param mixed $definition
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getParam($param)
-    {
-        return $this->parameters->get($param);
-    }
-
-    /**
-     * setService
-     *
-     * @param string $service
-     * @param string $class
-     *
-     * @access public
-     * @return Definition
-     */
-    public function setService($service, $class = null, $arguments = null, $scope = ContainerInterface::SCOPE_CONTAINER)
-    {
-        if (isset($this->parameters[$class])) {
-            $class = $this->parameters[$class];
-        }
-
-        $this->services[$service] =
-            $definition = $this->getDefinition($class, $arguments, $scope);
-
-        return $definition;
-    }
-
-    /**
-     * alias for set service.
-     *
-     * @param mixed $service
-     * @param mixed $class
-     * @param mixed $arguments
-     * @param mixed $scope
-     *
-     * @access public
-     * @return mixed
-     */
-    public function set($service, $class = null, $arguments = null, $scope = ContainerInterface::SCOPE_CONTAINER)
-    {
-        return $this->setService($service, $class, $arguments, $scope);
-    }
-
-    /**
-     * alias
-     *
-     * @param mixed $service
-     * @param mixed $alias
-     *
-     * @access public
-     * @return mixed
-     */
-    public function alias($service, $alias)
-    {
-        $this->aliases->add($alias, $service);
-    }
-
-    /**
-     * isReference
-     *
-     * @param string $reference
-     *
-     * @access public
-     * @return boolean
-     */
-    public function isReference($reference)
-    {
-        return $reference instanceof Reference ||
-            (is_string($reference) &&
-            strStartsWith(static::SERVICE_REF_INDICATOR, $reference) && $this->hasService(substr($reference, 1))
-        );
-    }
-
-    /**
-     * resolveService
-     *
-     * @param string $service
-     *
-     * @access protected
-     * @return Object the service instance
-     */
-    protected function resolveService($service)
-    {
-        $definition = $this->services[$service];
-
-        if ($definition->isResolved()) {
-            return $definition->getResolved();
-        }
-
-        if (isset($this->resolve[$service])) {
-            throw new \RuntimeException(
-                sprintf('Circular reference on %s while resolving', $service)
-            );
-        }
-
-        if ($this->hasMethod($service)) {
-            $instance = $this->$method();
-        } else {
-            $this->resolve[$service] = true;
-
-            $instance;
-            $definition->setClass($class = $this->parameters->resolveParam($definition->getClass()));
-            $params = $this->resolveServiceArgs($definition);
-
-            if ($definition->hasFactory()) {
-                $instance = $this->getInstanceFromFactory($definition);
-            } else {
+    //    $resolver = new Resolver;
+    //    $resolver->resolve($this);
+    //}
 
 
-                if (count($params) > 0) {
-                    $reflection = new \ReflectionClass($class);
-                    if ((bool)$reflection->getConstructor()) {
-                        $instance = $reflection->newInstanceArgs($params);
-                    } else {
-                        $instance = $reflection->newInstance();
-                    }
-                } else {
-                    $instance = new $class;
-                }
-            }
+    ///**
+    // * setParameter
+    // *
+    // * @param Parameters $parameters
+    // *
+    // * @access protected
+    // * @return void
+    // */
+    //public function setParameters(Parameters $parameters = null)
+    //{
+    //    $this->parameters = $parameters ?: new Parameters;
+    //}
 
-            $this->postProcessInstance($definition, $instance);
+    ///**
+    // * getParameters
+    // *
+    // * @param mixed $param
+    // *
+    // * @access public
+    // * @return ParameterInterface
+    // */
+    //public function getParameters()
+    //{
+    //    return $this->parameters;
+    //}
 
-            if ($definition->scopeIsContainer()) {
-                $definition->setResolved($instance);
-            }
-        }
+    ///**
+    // * getName
+    // *
+    // * @access public
+    // * @return mixed
+    // */
+    //public function getName()
+    //{
+    //    return $this->name;
+    //}
 
-        unset($this->resolve[$service]);
-        return $instance;
-    }
+    ///**
+    // * merge
+    // *
+    // * @param ContainerInterface $container
+    // *
+    // * @access public
+    // * @return void
+    // */
+    //public function merge(ContainerInterface $container)
+    //{
+    //    if ($this->isLocked() or $container->isLocked()) {
+    //        throw new ContainerLockedException('cannot merge a locked container');
+    //    }
 
-    /**
-     * postProcessInstance
-     *
-     * @param Definition $definition
-     * @param Object $instance
-     *
-     * @access protected
-     * @return void
-     */
-    protected function postProcessInstance(Definition $definition, $instance)
-    {
-        if ($definition->hasSetters()) {
-            foreach ($definition->getSetters() as $setter) {
-                call_user_func_array([$instance, $setter['method']], $this->resolveArgs($setter['arguments']));
-            }
-        }
-    }
+    //    if ($this->getName() === $container->getName()) {
+    //        throw new \LogicException(sprintf('cannot merge containers sharing the same name %s', $this->getName()));
+    //    }
 
-    /**
-     * getInstanceFromFactory
-     *
-     * @param Definition $definition
-     *
-     * @access protected
-     * @return Object
-     */
-    protected function getInstanceFromFactory(Definition $definition)
-    {
-        extract($definition->getFactory());
+    //    $this->parameters->merge($container->getParameters());
+    //    $this->services = array_merge((array)$this->services, (array)$container->getServices());
+    //}
 
-        $args = $this->resolveServiceArgs($definition);
-        array_unshift($args, $definition->getClass());
-        return call_user_func_array($class.'::'.$method, $args);
-    }
+    ///**
+    // * getServices
+    // *
+    // * @access public
+    // * @return mixed
+    // */
+    //public function getServices()
+    //{
+    //    return $this->services;
+    //}
 
-    /**
-     * getDefinitionArguments
-     *
-     * @param Definition $definition
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function getDefinitionArguments(Definition $definition)
-    {
-        $args = $definition->getArguments();
+    //public function getServiceDefinitions()
+    //{
+    //    return $this->definitions;
+    //}
 
-        if ($parentClass = $definition->getParent()) {
-            if (($parameters = $this->parameters->get($parentClass)) && is_array($parameters)) {
-                $args = array_unique(array_merge($parameters, $args));
-            }
-        }
+    ///**
+    // * getService
+    // *
+    // * @param mixed $service
+    // *
+    // * @access public
+    // * @return mixed
+    // */
+    //public function getService($service)
+    //{
+    //    $service = $this->getAlias($service);
 
-        return $args;
-    }
+    //    if (isset($this->services[$service])) {
+    //        return $this->services[$service];
+    //    }
 
-    /**
-     * resolveServiceArgs
-     *
-     * @param Definition $definition
-     *
-     * @access protected
-     * @return array
-     */
-    protected function resolveServiceArgs(Definition $definition)
-    {
-        return $this->resolveArgs($this->getDefinitionArguments($definition));
-    }
+    //    if ($this->hasDefinition($service)) {
+    //        return $this->resolveService($service);
+    //    }
 
-    /**
-     * resolveArgs
-     *
-     * @param array $args
-     *
-     * @access protected
-     * @return array
-     */
-    protected function resolveArgs(array $args)
-    {
-        $arguments = [];
+    //    throw new ContainerResolveException(sprintf('service `%s` not found', $service));
+    //}
 
-        if (!empty($args)) {
+    ///**
+    // * getAlias
+    // *
+    // * @param mixed $service
+    // *
+    // * @access public
+    // * @return mixed
+    // */
+    //public function getAlias($service)
+    //{
+    //    return $this->aliases->get($service);
+    //}
 
-            foreach ($this->parameters->resolveParam($args) as $argument) {
+    ///**
+    // * hasService
+    // *
+    // * @param string $service
+    // *
+    // * @access public
+    // * @return boolean
+    // */
+    //public function hasDefinition($service)
+    //{
+    //    return is_string($service) && isset($this->definitions[$service]);
+    //}
 
-                if ($this->isReference($argument)) {
-                    $arguments[] = $this->getService($this->getNameFromReference($argument));
-                    continue;
-                }
+    ///**
+    // * injectService
+    // *
+    // * @param string $service
+    // * @param object $instance
+    // *
+    // * @access public
+    // * @return voic
+    // */
+    //public function injectService($service, $instance, $scope = ContainerInterface::SCOPE_CONTAINER)
+    //{
+    //    $this->services[$service] = $instance;
+    //    $this->definitions[$service] = $this->getDefinition(get_class($instance), null, $scope);
+    //}
 
-                $arguments[] = $argument;
-            }
-        }
+    ///**
+    // * isLocked
+    // *
+    // * @access public
+    // * @return mixed
+    // */
+    //public function isLocked()
+    //{
+    //    return $this->locked;
+    //}
 
-        return $arguments;
-    }
+    ///**
+    // * setParam
+    // *
+    // * @param mixed $param
+    // * @param mixed $definition
+    // *
+    // * @access public
+    // * @return mixed
+    // */
+    //public function setParam($param, $definition)
+    //{
+    //    $this->parameters->set($param, $definition);
+    //}
 
-    /**
-     * getNameFromReference
-     *
-     * @param mixed $reference
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function getNameFromReference($reference)
-    {
-        return substr($reference, 1);
-    }
+    ///**
+    // * getParam
+    // *
+    // * @param mixed $parameter
+    // * @param mixed $definition
+    // *
+    // * @access public
+    // * @return mixed
+    // */
+    //public function getParam($param)
+    //{
+    //    return $this->parameters->get($param);
+    //}
 
-    /**
-     * getDefinition
-     *
-     * @param mixed $class
-     * @param mixed $arguments
-     *
-     * @access protected
-     * @return Definition
-     */
-    protected function getDefinition($class = null, $arguments = null, $scope = null)
-    {
-        return new Definition($class, $arguments, $scope);
-    }
+    ///**
+    // * setService
+    // *
+    // * @param string $service
+    // * @param string $class
+    // *
+    // * @access public
+    // * @return Definition
+    // */
+    //public function setService($service, $class = null, $arguments = null, $scope = ContainerInterface::SCOPE_CONTAINER)
+    //{
+    //    $definition = $this->getDefinition(($factory = is_callable($class)) ? null : $class, $arguments, $scope);
 
-    /**
-     * hasMethod
-     *
-     * @param mixed $service
-     * @param string $prefix
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function hasMethod($service, $prefix = 'get_')
-    {
-        return method_exists($this, static::camelCaseStr($prefix.$service));
-    }
+    //    if ($factory) {
+    //        $definition->setFactory($class);
+    //    }
 
-    /**
-     * camelCaseStr
-     *
-     * @param mixed $str
-     *
-     * @access public
-     * @return string
-     */
-    public static function camelCaseStr($str)
-    {
-        return strCamelCase('get.'.$str, ['_' => ' ', '.' => '_ ', '\\' => '_ ']);
-    }
+    //    $this->definitions[$service] = $definition;
+    //    return $definition;
+    //}
+
+    //public function getClassDefinitions()
+    //{
+    //    return $this->classes;
+    //}
+
+    ///**
+    // * alias
+    // *
+    // * @param mixed $service
+    // * @param mixed $alias
+    // *
+    // * @access public
+    // * @return mixed
+    // */
+    //public function alias($service, $alias)
+    //{
+    //    $this->aliases->add($alias, $service);
+    //}
+
+    ///**
+    // * isReference
+    // *
+    // * @param string $reference
+    // *
+    // * @access public
+    // * @return boolean
+    // */
+    //public function isReference($reference)
+    //{
+    //    return $reference instanceof Reference ||
+    //        (is_string($reference) &&
+    //        (0 === strpos($reference, static::SERVICE_REF_INDICATOR) && $this->hasDefinition(substr($reference, 1)))
+    //    );
+    //}
+
+    ///**
+    // * resolveService
+    // *
+    // * @param string $service
+    // *
+    // * @access protected
+    // * @return Object the service instance
+    // */
+    //protected function resolveService($service)
+    //{
+    //    $definition = $this->definitions[$service];
+
+    //    if (isset($this->resolve[$service])) {
+    //        throw new \RuntimeException(
+    //            sprintf('Circular reference on %s while resolving', $service)
+    //        );
+    //    }
+
+    //    if ($this->hasMethod($service)) {
+    //        $instance = $this->$method();
+    //    } else {
+    //        $this->resolve[$service] = true;
+
+    //        $instance;
+    //        $definition->setClass($class = $this->parameters->resolveParam($definition->getClass()));
+    //        $params = $this->resolveServiceArgs($definition);
+
+    //        if ($definition->hasFactory()) {
+    //            $instance = $this->getInstanceFromFactory($definition);
+    //        } else {
+
+    //            if (count($params) > 0) {
+    //                $reflection = new \ReflectionClass($class);
+    //                if ((bool)$reflection->getConstructor()) {
+    //                    $instance = $reflection->newInstanceArgs($params);
+    //                } else {
+    //                    $instance = $reflection->newInstance();
+    //                }
+    //            } else {
+    //                $instance = new $class;
+    //            }
+    //        }
+
+    //        $this->postProcessInstance($definition, $instance);
+
+    //        if ($definition->scopeIsContainer()) {
+    //            $this->services[$service] = $instance;
+    //        }
+    //    }
+
+    //    unset($this->resolve[$service]);
+    //    return $instance;
+    //}
+
+    ///**
+    // * postProcessInstance
+    // *
+    // * @param Definition $definition
+    // * @param Object $instance
+    // *
+    // * @access protected
+    // * @return void
+    // */
+    //protected function postProcessInstance(Definition $definition, $instance)
+    //{
+    //    if ($definition->hasSetters()) {
+    //        foreach ($definition->getSetters() as $setter) {
+    //            call_user_func_array([$instance, key($setter)], $this->resolveArgs($setter[key($setter)]));
+    //        }
+    //    }
+    //}
+
+    ///**
+    // * getInstanceFromFactory
+    // *
+    // * @param Definition $definition
+    // *
+    // * @access protected
+    // * @return Object
+    // */
+    //protected function getInstanceFromFactory(Definition $definition)
+    //{
+    //    $factory = $definition->getFactory();
+
+    //    $args = $this->resolveServiceArgs($definition);
+    //    array_unshift($args, $definition->getClass());
+
+    //    if (!is_callable($factory)) {
+    //        $factory = sprintf('%s::%s', $factory['class'], $factory['method']);
+    //    }
+
+    //    return call_user_func_array($factory, $args);
+    //}
+
+    ///**
+    // * getDefinitionArguments
+    // *
+    // * @param Definition $definition
+    // *
+    // * @access protected
+    // * @return mixed
+    // */
+    //protected function getDefinitionArguments(Definition $definition)
+    //{
+    //    $args = $definition->getArguments();
+
+    //    if ($parentClass = $definition->getParent()) {
+    //        if (($parameters = $this->parameters->get($parentClass)) && is_array($parameters)) {
+    //            $args = array_unique(array_merge($parameters, $args));
+    //        }
+    //    }
+
+    //    return $args;
+    //}
+
+    ///**
+    // * resolveServiceArgs
+    // *
+    // * @param Definition $definition
+    // *
+    // * @access protected
+    // * @return array
+    // */
+    //protected function resolveServiceArgs(Definition $definition)
+    //{
+    //    return $this->resolveArgs($this->getDefinitionArguments($definition));
+    //}
+
+    ///**
+    // * resolveArgs
+    // *
+    // * @param array $args
+    // *
+    // * @access protected
+    // * @return array
+    // */
+    //protected function resolveArgs(array $args)
+    //{
+    //    $arguments = [];
+
+    //    if (!empty($args)) {
+
+    //        foreach ($this->parameters->resolveParam($args) as $argument) {
+
+    //            if ($this->isReference($argument)) {
+    //                $arguments[] = $arg = $this->getService($this->getNameFromReference($argument));
+    //                continue;
+    //            }
+
+    //            $arguments[] = $argument;
+    //        }
+    //    }
+
+    //    return $arguments;
+    //}
+
+    ///**
+    // * getNameFromReference
+    // *
+    // * @param mixed $reference
+    // *
+    // * @access protected
+    // * @return mixed
+    // */
+    //protected function getNameFromReference($reference)
+    //{
+    //    return $reference instanceof Reference ? (string)$reference : substr($reference, 1);
+    //}
+
+    ///**
+    // * getDefinition
+    // *
+    // * @param mixed $class
+    // * @param mixed $arguments
+    // *
+    // * @access protected
+    // * @return Definition
+    // */
+    //protected function getDefinition($class = null, $arguments = null, $scope = null)
+    //{
+    //    return new Definition($class, $arguments, $scope);
+    //}
+
+    ///**
+    // * hasMethod
+    // *
+    // * @param mixed $service
+    // * @param string $prefix
+    // *
+    // * @access protected
+    // * @return mixed
+    // */
+    //protected function hasMethod($service, $prefix = 'get_')
+    //{
+    //    return method_exists($this, static::camelCaseStr($prefix.$service));
+    //}
+
+    ///**
+    // * camelCaseStr
+    // *
+    // * @param mixed $str
+    // *
+    // * @access public
+    // * @return string
+    // */
+    //public static function camelCaseStr($str)
+    //{
+    //    return strCamelCase('get.'.$str, ['_' => ' ', '.' => 'Nss ', '\\' => 'Dbs ']);
+    //}
 }

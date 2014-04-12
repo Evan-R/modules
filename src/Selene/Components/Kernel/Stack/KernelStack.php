@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Core\Stack;
+namespace Selene\Components\Kernel\Stack;
 
-use \Selene\Components\Net\Request;
-use \Selene\Components\Net\Response;
-use \Selene\Components\Core\AppCoreInterface;
-use \Selene\Components\Core\ShutdownInterface;
+use \Symfony\Component\HttpFoundation\Request;
+use \Symfony\Component\HttpFoundation\Response;
+use \Symfony\Component\HttpKernel\HttpKernelInterface;
+use \Symfony\Component\HttpKernel\TerminableInterface;
 
 /**
  * @class StackedCore implements AppCoreInterface
@@ -25,7 +25,7 @@ use \Selene\Components\Core\ShutdownInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class StackedCore implements AppCoreInterface, ShutdownInterface
+class KernelStack implements HttpKernelInterface, TerminableInterface
 {
     /**
      * app
@@ -47,7 +47,7 @@ class StackedCore implements AppCoreInterface, ShutdownInterface
      *
      * @access public
      */
-    public function __construct(AppCoreInterface $app, array $middlewares = [])
+    public function __construct(HttpKernelInterface $app, array $middlewares = [])
     {
         $this->app = $app;
         $this->middlewares = $middlewares;
@@ -63,9 +63,9 @@ class StackedCore implements AppCoreInterface, ShutdownInterface
      * @access public
      * @return Response
      */
-    public function handleRequest(Request $request, $type = self::REQUEST, $catch = self::CORE_CATCH_EXCEPTIONS)
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        return $this->app->handleRequest($request, $type, $catch);
+        return $this->app->handle($request, $type, $catch);
     }
 
     /**
@@ -77,14 +77,14 @@ class StackedCore implements AppCoreInterface, ShutdownInterface
      * @access public
      * @return void
      */
-    public function shutDown(Request $request = null, Response $response = null)
+    public function terminate(Request $request, Response $response)
     {
         $iterator = new \ArrayIterator($this->middlewares);
         $valid = count($this->middlewares);
 
         foreach ($this->middlewares as $middleware) {
-            if ($middleware instanceof ShutdownInterface) {
-                $middleware->shutdown($request, $response);
+            if ($middleware instanceof TerminableInterface) {
+                $middleware->terminate($request, $response);
             }
         }
     }

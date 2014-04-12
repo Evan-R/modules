@@ -18,68 +18,138 @@ use \Selene\Components\Common\Traits\Getter;
  * @package Selene\Components\DI
  * @version $Id$
  */
-class Aliases
+class Aliases implements \ArrayAccess
 {
     use Getter;
+
     /**
-     * name
+     * aliases
      *
-     * @var string
+     * @var array
      */
     private $aliases;
 
     /**
-     * __construct
-     *
-     * @param mixed $name
-     * @param mixed $service
+     * @param array $aliases
      *
      * @access public
-     * @return mixed
      */
     public function __construct(array $aliases = [])
     {
-        $this->setAliases($aliases);
+        $this->aliases = $aliases;
     }
 
     /**
-     * add
+     * set
      *
-     * @param mixed $alias
-     * @param mixed $service
+     * @param string $alias
+     * @param string $service
      *
+     * @api
      * @access public
      * @return void
      */
-    public function add($alias, $service)
+    public function set($alias, $id)
     {
-        $this->aliases[$alias] = $service;
+        $this->aliases[strtolower($alias)] = $id instanceof Alias ? $id : new Alias(strtolower($id));
     }
 
     /**
-     * get
+     * Get an alias set on this collection.
+     * If the alias is not set, the inpput string will be returened instead.
      *
-     * @param mixed $alias
-     * @param mixed $default
+     * If you need to explicitly check if an alias exists, `use Aliases::has()` or
+     * `isset($aliases[$alias])` respectively.
      *
+     * @param string $alias
+     *
+     * @api
      * @access public
-     * @return string
+     * @return string|Alias if the alias exists, an alias object will be
+     * returned, otherwise the input string gets passed through.
      */
     public function get($alias)
     {
+        $alias = strtolower($alias);
         return $this->getDefault($this->aliases, $alias, $alias);
     }
 
     /**
-     * setAliases
+     * Check it an Alias exists.
      *
-     * @param array $aliases
+     * @param string $alias
      *
-     * @access private
+     * @api
+     * @access public
+     * @return bool
+     */
+    public function has($alias)
+    {
+        return isset($this->aliases[strtolower($alias)]);
+    }
+
+    /**
+     * Get all aliases.
+     *
+     * @api
+     * @access public
+     * @return array
+     */
+    public function all()
+    {
+        return $this->aliases;
+    }
+
+    /**
+     * offsetSet
+     *
+     * @param string $alias
+     * @param string $id
+     *
+     * @access public
      * @return void
      */
-    private function setAliases(array $aliases = [])
+    public function offsetSet($alias, $id)
     {
-        $this->aliases = $aliases;
+        return $this->set($alias, $id);
+    }
+
+    /**
+     * offsetGet
+     *
+     * @param string $alias
+     *
+     * @access public
+     * @return Alias
+     */
+    public function offsetGet($alias)
+    {
+        return $this->get($alias);
+    }
+
+    /**
+     * offsetExists
+     *
+     * @param mixed $alias
+     *
+     * @access public
+     * @return bool
+     */
+    public function offsetExists($alias)
+    {
+        return $this->has($alias);
+    }
+
+    /**
+     * offsetUnset
+     *
+     * @param mixed $alias
+     *
+     * @access public
+     * @return mixed
+     */
+    public function offsetUnset($alias)
+    {
+        unset($this->aliases[$alias]);
     }
 }

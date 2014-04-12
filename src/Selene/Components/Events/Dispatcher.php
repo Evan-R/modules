@@ -58,7 +58,10 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     public function __construct(ContainerInterface $container = null)
     {
-        $this->setContainer($container);
+        $this->sorted = [];
+        $this->handler = [];
+        $this->observers = [];
+        $this->container = $container;
     }
 
     /**

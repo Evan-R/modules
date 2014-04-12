@@ -263,6 +263,8 @@ class Parameters implements ParameterInterface
 
         $this->resolved = true;
         $this->resolvedParams = $resolved;
+
+        return $this;
     }
 
     /**
