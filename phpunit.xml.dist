@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="true"
-    backupStaticAttributes="true"
-    bootstrap="vendor/autoload.php"
+<phpunit backupGlobals="false"
+    backupStaticAttributes="false"
+    bootstrap="tests/phpunit/bootstrap.php"
     colors="true"
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
     processIsolation="false"
-    stopOnFailure="false"
+    stopOnFailure="true"
     syntaxCheck="true">
   <testsuites>
     <testsuite name="Testsuite">
@@ -16,19 +16,22 @@
     <testsuite name="Common">
       <directory>src/Selene/Components/Common/Tests/</directory>
     </testsuite>
-    <!--
-    <testsuite name="Configuration">
-      <directory>src/Selene/Components/Configuration/Tests/</directory>
+    <testsuite name="Config">
+      <directory>src/Selene/Components/Config/Tests/</directory>
     </testsuite>
+    <!--
     <testsuite name="Console">
       <directory>src/Selene/Components/Console/Tests/</directory>
     </testsuite>
     -->
-    <testsuite name="Mail">
-      <directory>src/Selene/Components/Mail/Tests/</directory>
-    </testsuite>
+    <!--<testsuite name="Mail">-->
+      <!--<directory>src/Selene/Components/Mail/Tests/</directory>-->
+    <!--</testsuite>-->
     <testsuite name="Routing">
       <directory>src/Selene/Components/Routing/Tests/</directory>
+    </testsuite>
+    <testsuite name="Web">
+      <directory>src/Selene/Components/Web/Tests/</directory>
     </testsuite>
     <testsuite name="Cryptography">
       <directory>src/Selene/Components/Cryptography/Tests/</directory>
@@ -48,9 +51,14 @@
     <testsuite name="Cache">
       <directory>src/Selene/Components/Cache/Tests/</directory>
     </testsuite>
+    <testsuite name="Package">
+      <directory>src/Selene/Components/Package/Tesst/</directory>
+    </testsuite>
+    <!--
     <testsuite name="Stream">
       <directory>src/Selene/Stream/Tests/</directory>
     </testsuite>
+    -->
   </testsuites>
   <!--
   <logging>

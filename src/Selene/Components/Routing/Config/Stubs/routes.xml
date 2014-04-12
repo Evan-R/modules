@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<router>
+
+  <route name="index" method="GET" path="/">
+    <action value="some.controller:indexAction"/>
+    <filter type="before" name="auth"/>
+  </route>
+
+  <routes path="/some" base-name="some">
+    <route name="index" method="GET" path="/">
+      <action value="some.controller:indexAction"/>
+      <filter type="before" name="auth"/>
+    </route>
+  </routes>
+</router>
