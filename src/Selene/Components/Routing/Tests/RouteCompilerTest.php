@@ -33,13 +33,13 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldReturnTheStaticPath()
     {
-        $route = new Route('foo.bar', '/{bar?}', 'GET');
+        $route = $this->newRoute('foo.bar', '/{bar?}', 'GET');
 
         $args = Compiler::compile($route);
 
         $this->assertEquals('/', $args['static_path']);
 
-        $route = new Route('foo.bar', '/foo/bar', 'GET');
+        $route = $this->newRoute('foo.bar', '/foo/bar', 'GET');
 
         $args = Compiler::compile($route);
 
@@ -51,7 +51,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
      */
     public function routesSouldBeAddableBam()
     {
-        $route = new Route('foo.bar', '/foo/{bar}/bar/{baz}', 'GET');
+        $route = $this->newRoute('foo.bar', '/foo/{bar}/bar/{baz}', 'GET');
 
         $args = Compiler::compile($route);
 
@@ -63,7 +63,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
      */
     public function routesSouldBeAddable()
     {
-        $route = new Route('foo', '/bam/{bar}/{baz?}', 'GET', [
+        $route = $this->newRoute('foo', '/bam/{bar}/{baz?}', 'GET', [
             '_host' => '{domain}.domain.com',
             '_constraints' => ['bar' => '(\d+)']
 
@@ -78,7 +78,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
      */
     public function numericVarsShouldThrowException()
     {
-        $route = new Route('foo', '/bam/{1}/{2}', 'GET');
+        $route = $this->newRoute('foo', '/bam/{1}/{2}', 'GET');
 
         try {
             $args = Compiler::compile($route);
@@ -96,7 +96,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
      */
     public function doublicateVarsShouldThrowException()
     {
-        $route = new Route('foo', '/bam/{bar}/{bar}', 'GET');
+        $route = $this->newRoute('foo', '/bam/{bar}/{bar}', 'GET');
 
         try {
             $args = Compiler::compile($route);
@@ -114,7 +114,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
      */
     public function optionalHostVarsShouldThrowException()
     {
-        $route = new Route('foo', '/bam/{bar}/{baz?}', 'GET', [
+        $route = $this->newRoute('foo', '/bam/{bar}/{baz?}', 'GET', [
             '_host' => '{domain?}.domain.com',
         ]);
 
@@ -135,7 +135,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldCompileToValidRegexp($pattern, $regexp, $path, $host = false, $requirement = null)
     {
-        $route = new Route('index', $pattern, 'GET');
+        $route = $this->newRoute('index', $pattern, 'GET');
 
         if ($host) {
             $route->setHost($host['pattern']);
@@ -249,5 +249,50 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 ['domain', 'mobile|m']
             ]
         ];
+    }
+
+    protected function newRoute($name, $path, $method = 'GET', array $requirements = [])
+    {
+        $host = isset($requirements['_host']) ? $requirements['_host'] : null;
+
+        $route = m::mock('Selene\Components\Routing\Route');
+        $route->constraints = ['host' => [], 'route' => []];
+
+        $route->shouldReceive('getPath')->andReturn($path);
+        $route->shouldReceive('getName')->andReturn($name);
+        $route->shouldReceive('getMethods')->andReturn((array)$method);
+
+        $route->shouldReceive('getHost')->andReturnUsing(function () use (&$host, $route) {
+            return $host;
+        });
+
+        $route->shouldReceive('hasHost')->andReturnUsing(function () use (&$host, $route) {
+            return (bool)$host;
+        });
+
+        $route->shouldReceive('setHost')->andReturnUsing(function ($hostName) use (&$host, $route) {
+            $host = $hostName;
+            return $route;
+        });
+
+        $route->shouldReceive('getParamConstraint')->andReturnUsing(function ($param) use ($route) {
+            return isset($route->constraints['route'][$param]) ? $route->constraints['route'][$param] : null;
+        });
+
+        $route->shouldReceive('setParamConstraint')->andReturnUsing(function ($param, $attr) use ($route) {
+            $route->constraints['route'][$param] = $attr;
+            return $route;
+        });
+
+        $route->shouldReceive('getHostConstraint')->andReturnUsing(function ($param) use ($route) {
+            return isset($route->constraints['host'][$param]) ? $route->constraints['host'][$param] : null;
+        });
+
+        $route->shouldReceive('setHostConstraint')->andReturnUsing(function ($param, $attr) use ($route) {
+            $route->constraints['host'][$param] = $attr;
+            return $route;
+        });
+
+        return $route;
     }
 }
