@@ -6,6 +6,7 @@ use \Symfony\Component\HttpFoundation\Request;
 use \Selene\Components\Events\DispatcherInterface;
 use \Selene\Components\Routing\Events\RouteFilterEvent;
 use \Selene\Components\Routing\Events\RouteDispatchEvent;
+use \Selene\Components\Routing\Events\RouteFilterAfterEvent;
 use \Selene\Components\Routing\Exception\RouteNotFoundException;
 use \Selene\Components\Routing\Controller\ResolverInterface;
 
@@ -238,9 +239,9 @@ class Router implements RouterInterface
             return;
         }
 
-        $event = $this->fireRouteDispatchEvent($route, $request);
-
-        return $event->getResponse();
+        return $this
+            ->fireRouteDispatchEvent($route, $request)
+            ->getResponse();
     }
 
     /**
@@ -254,23 +255,8 @@ class Router implements RouterInterface
      */
     protected function abortBeforeDispatch(Route $route, Request $request)
     {
-        $this->events->dispatch('router_abort', new RouteDispatchEvent($route, $request));
+        $this->events->dispatch('router_abort', new RouteFilterAbortEvent($route, $request));
     }
-
-    /**
-     * fireAbortAfter
-     *
-     * @param Route $route
-     * @param Request $request
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function fireAbortAfter(Route $route, Request $request)
-    {
-        return null;
-    }
-
 
     /**
      * fireRouteDispatchEvent
@@ -283,7 +269,26 @@ class Router implements RouterInterface
      */
     protected function fireRouteDispatchEvent(Route $route, Request $request)
     {
-        $this->events->dispatch('router_dispatch', $event = new RouteDispatchEvent($route, $request));
+        $this->events->dispatch('router_dispatch', $event = $this->prepareDispatchEvent($route, $request));
+        return $event;
+    }
+
+    /**
+     * prepareDispatchEvent
+     *
+     * @param Route $route
+     * @param Request $request
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function prepareDispatchEvent(Route $route, Request $request)
+    {
+        $event = new RouteDispatchEvent($route, $request);
+
+        $this->setControllerAction($event);
+        $this->fireAfterEvents($event);
+
         return $event;
     }
 
@@ -311,11 +316,11 @@ class Router implements RouterInterface
      * @access protected
      * @return mixed
      */
-    protected function fireAfterEvents(Route $route, Request $request)
+    protected function fireAfterEvents(RouteDispatchEvent $event)
     {
-        $event = $this->getRouteFilterEventName($route, static::ROUTE_BEFORE);
-
-        return $this->events->until($event, new RouteFilterEvent($route, $request));
+        $route = $event->getRoute();
+        $eventName = $this->getRouteFilterEventName($route, static::ROUTE_BEFORE);
+        $results = $this->events->dispatch($eventName, new RouteFilterAfterEvent($event));
     }
 
     /**
@@ -365,7 +370,7 @@ class Router implements RouterInterface
             $this->registerRouteFilterEvents($route, $filters, static::ROUTE_AFTER);
         }
 
-        $this->prepareAction();
+        //$this->prepareAction();
     }
 
     /**
@@ -391,10 +396,11 @@ class Router implements RouterInterface
      * @access protected
      * @return mixed
      */
-    public function getControllerAction(RouteDispatchEvent $event)
+    public function setControllerAction(RouteDispatchEvent $event)
     {
+        $route = $event->getRoute();
         $action = $this->resolver->find(
-            $route = $event->getRoute()->getAction(),
+            $route->getAction(),
             $event->getRequest()->getMethod()
         );
 

@@ -31,10 +31,14 @@ class Kernel implements HttpKernelInterface
 
     private $events;
 
+    protected $responseStack;
+
     public function __construct(DispatcherInterface $events, RouterInterface $router)
     {
         $this->events = $events;
         $this->router = $router;
+        $this->responseStack = new \SplStack;
+        $this->setUpRouterEvents();
     }
 
     /**
@@ -63,7 +67,7 @@ class Kernel implements HttpKernelInterface
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         $this->router->dispatch($request);
-        return null;
+        return $this->filterResponse();
     }
 
     public function terminate(Request $request, Response $response)
@@ -89,7 +93,23 @@ class Kernel implements HttpKernelInterface
     protected function setUpRouterEvents()
     {
         $this->events->on('router_dispatch', function ($event) {
-
+            $this->responseStack->push($event);
         });
+    }
+
+    /**
+     * filterResponse
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function filterResponse()
+    {
+        if (!$this->responseStack->count()) {
+            throw new \Exception();
+        }
+
+        $event = $this->responseStack->pop();
+        return $event->getResponse();
     }
 }

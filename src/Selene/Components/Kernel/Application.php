@@ -85,13 +85,17 @@ class Application implements HttpKernelInterface, TerminableInterface, Container
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
+        $this->getRequestStack()->push($request);
+
         try {
             $this->boot();
-            $response = $this->getApplicationStack()->handle($request, $type, $catch);
+            $response = $this->getKernelStack()->handle($request, $type, $catch);
 
         } catch (\Exception $e) {
             var_dump($e->getMessage());
         }
+
+        return $response;
     }
 
     /**
@@ -114,7 +118,7 @@ class Application implements HttpKernelInterface, TerminableInterface, Container
      * @access protected
      * @return mixed
      */
-    protected function getApplicationStack()
+    protected function getKernelStack()
     {
         return $this->getContainer()->get('app_kernel.stack');
     }
@@ -187,19 +191,13 @@ class Application implements HttpKernelInterface, TerminableInterface, Container
      * @access protected
      * @return mixed
      */
-    protected function getKernel()
+    public function getKernel()
     {
         return $this->getContainer()->get('app_kernel');
     }
 
-    /**
-     * getKernelStack
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getKernelStack()
+    public function getRequestStack()
     {
-        return $this->getContainer()->get('app_kernel.stack');
+        return $this->getContainer()->get('request_stack');
     }
 }

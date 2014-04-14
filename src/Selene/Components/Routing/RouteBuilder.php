@@ -89,7 +89,7 @@ class RouteBuilder
         );
 
         if ($this->inGroup()) {
-            $route->setParent($this->concatGroupNames());
+            $names = $route->setParent($this->concatGroupNames());
             $this->setGroupRequirements($route);
         }
 
@@ -230,7 +230,7 @@ class RouteBuilder
             $requirements = null;
         }
 
-        $this->pushGroupRequirements($this->filterGroupRequirements($requirements));
+        $this->enterGroup($name, $root, $requirements);
 
         if (null !== $builder) {
             call_user_func_array($builder, [$this]);
@@ -238,19 +238,6 @@ class RouteBuilder
         }
 
         return $this;
-    }
-
-    /**
-     * pushGroupRequirements
-     *
-     * @param array $requirements
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function pushGroupRequirements($requirements)
-    {
-        $this->groupRequirements->push((array)$requirements);
     }
 
     /**
@@ -415,7 +402,7 @@ class RouteBuilder
      * @access protected
      * @return mixed
      */
-    protected function enterGroup($name, $root)
+    protected function enterGroup($name, $root, $requirements = null)
     {
         $rn = $rn = trim($name, static::NAME_SEPARATOR);
         $rp = $rp = trim($root, static::PATH_SEPARATOR);
@@ -424,6 +411,8 @@ class RouteBuilder
         $real_path = $this->inGroup() ? $this->concatGroupPaths() . static::PATH_SEPARATOR . $rp : $rp;
 
         $this->groups->push(compact('name', 'root', 'real_name', 'real_path'));
+
+        $this->groupRequirements->push((array)$requirements);
     }
 
     /**
