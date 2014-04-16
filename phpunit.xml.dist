@@ -16,22 +16,11 @@
     <testsuite name="Common">
       <directory>src/Selene/Components/Common/Tests/</directory>
     </testsuite>
-    <testsuite name="Config">
-      <directory>src/Selene/Components/Config/Tests/</directory>
-    </testsuite>
-    <!--
-    <testsuite name="Console">
-      <directory>src/Selene/Components/Console/Tests/</directory>
-    </testsuite>
-    -->
-    <!--<testsuite name="Mail">-->
-      <!--<directory>src/Selene/Components/Mail/Tests/</directory>-->
-    <!--</testsuite>-->
     <testsuite name="Routing">
       <directory>src/Selene/Components/Routing/Tests/</directory>
     </testsuite>
-    <testsuite name="Web">
-      <directory>src/Selene/Components/Web/Tests/</directory>
+    <testsuite name="View">
+      <directory>src/Selene/Components/View/Tests/</directory>
     </testsuite>
     <testsuite name="Cryptography">
       <directory>src/Selene/Components/Cryptography/Tests/</directory>
@@ -42,23 +31,12 @@
     <testsuite name="Events">
       <directory>src/Selene/Components/Events/Tests/</directory>
     </testsuite>
-    <testsuite name="Foundation">
-      <directory>src/Selene/Components/Foundation/Tests/</directory>
-    </testsuite>
     <testsuite name="Filesystem">
       <directory>src/Selene/Components/Filesystem/Tests/</directory>
     </testsuite>
     <testsuite name="Cache">
       <directory>src/Selene/Components/Cache/Tests/</directory>
     </testsuite>
-    <testsuite name="Package">
-      <directory>src/Selene/Components/Package/Tesst/</directory>
-    </testsuite>
-    <!--
-    <testsuite name="Stream">
-      <directory>src/Selene/Stream/Tests/</directory>
-    </testsuite>
-    -->
   </testsuites>
   <!--
   <logging>
