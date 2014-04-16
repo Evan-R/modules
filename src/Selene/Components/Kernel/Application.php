@@ -31,7 +31,7 @@ use \Selene\Components\DI\Traits\ContainerAwareTrait;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Application implements HttpKernelInterface, TerminableInterface, ContainerAwareInterface
+abstract class Application implements HttpKernelInterface, TerminableInterface, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
@@ -92,7 +92,8 @@ class Application implements HttpKernelInterface, TerminableInterface, Container
             $response = $this->getKernelStack()->handle($request, $type, $catch);
 
         } catch (\Exception $e) {
-            var_dump($e->getMessage());
+            throw $e;
+            return;
         }
 
         return $response;
@@ -110,7 +111,28 @@ class Application implements HttpKernelInterface, TerminableInterface, Container
         if ($this->booted) {
             return;
         }
+
+        $this->registerPackages();
     }
+
+    /**
+     * registerPackages
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function registerPackages()
+    {
+        foreach ($this->getPackages() as $packageClass) {
+            $package = new $packageClass($this);
+            $package->setContainer($this->getContainer());
+            $package->register($this->getContainer());
+        }
+    }
+
+    abstract protected function getPackages();
+
+    abstract protected function getAppRoot();
 
     /**
      * getApplicationStack

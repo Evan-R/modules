@@ -36,6 +36,8 @@ class RouteBuilder
 
     const METHOD_DELETE = 'DELETE';
 
+    const ROOT = 1200;
+
     /**
      * groups
      *
@@ -88,12 +90,11 @@ class RouteBuilder
             $requirements
         );
 
-        if ($this->inGroup()) {
-            $names = $route->setParent($this->concatGroupNames());
-            $this->setGroupRequirements($route);
-        }
-
         $this->collection->add($route);
+
+        if ($this->inGroup()) {
+            $route->setParent($this->concatGroupNames());
+        }
 
         return $route;
     }
@@ -223,14 +224,16 @@ class RouteBuilder
      * @access public
      * @return mixed
      */
-    public function group($name, $root, $requirements = null, callable $builder = null)
+    public function group($path, $filters = null, callable $builder = null)
     {
-        if (is_callable($requirements)) {
+        if (is_callable($filters)) {
             $builder = $requirements;
             $requirements = null;
         }
 
-        $this->enterGroup($name, $root, $requirements);
+        list ($name, $path) = $this->getGroupRootPathAndName($root);
+
+        $this->enterGroup($name, $path, $requirements);
 
         if (null !== $builder) {
             call_user_func_array($builder, [$this]);
@@ -241,16 +244,46 @@ class RouteBuilder
     }
 
     /**
+     * getGroupRootPath
+     *
+     * @param mixed $name
+     *
+     * @throws \InvalidArgumentException if root path was not found
+     * @access protected
+     * @return string
+     */
+    protected function getGroupRootPathAndName($name)
+    {
+        if ($this->collection->has($name)) {
+            return [$name, $this->collection->get($name)->getPath()];
+        }
+        return [$name, static::PATH_SEPARATOR];
+    }
+
+    /**
      * getGroupRequirement
      *
      * @access protected
      * @return mixed
      */
-    protected function setGroupRequirements(Route $route)
+    protected function setGroupRequirements()
     {
+        $parts = $this->groups->top();
+
+        $requirements = $this->groupRequirements->top();
+
+        if (!($route = $this->collection->get($parts['real_name']))) {
+            return;
+        }
+
         foreach ($this->groupRequirements->top() as $key => $req) {
             $route->setRequirement($key, $req);
         }
+    }
+
+    protected function findGroupRoot($name)
+    {
+        return $this->collection->get($name);
     }
 
     /**
@@ -355,7 +388,9 @@ class RouteBuilder
         $parts = [];
 
         foreach ($this->groups as $token) {
-            $parts[] =  trim($token['name'], static::NAME_SEPARATOR);
+            if (null !== $token['name']) {
+                $parts[] =  trim($token['name'], static::NAME_SEPARATOR);
+            }
         }
 
         return implode(static::NAME_SEPARATOR, array_reverse($parts));
@@ -372,8 +407,8 @@ class RouteBuilder
     protected function getRouteName($name)
     {
         if ($this->inGroup()) {
-            $separator = static::NAME_SEPARATOR;
             $baseName = $this->getRealName();
+            $separator = strlen($baseName) ? static::NAME_SEPARATOR : '';
         } else {
             $baseName = '';
             $separator = '';
@@ -404,13 +439,16 @@ class RouteBuilder
      */
     protected function enterGroup($name, $root, $requirements = null)
     {
-        $rn = $rn = trim($name, static::NAME_SEPARATOR);
-        $rp = $rp = trim($root, static::PATH_SEPARATOR);
+        $rn = trim($name, static::NAME_SEPARATOR);
+        $rp = static::PATH_SEPARATOR.trim($root, static::PATH_SEPARATOR);
 
-        $real_name = $this->inGroup() ? $this->concatGroupNames() . static::NAME_SEPARATOR . $rn : $rn;
-        $real_path = $this->inGroup() ? $this->concatGroupPaths() . static::PATH_SEPARATOR . $rp : $rp;
+        $real_name = ltrim(
+            $this->inGroup() ? $this->concatGroupNames() . static::NAME_SEPARATOR . $rn : $rn,
+            static::NAME_SEPARATOR
+        );
+        $real_path = $this->inGroup() ? $this->concatGroupPaths() . $rp : $rp;
 
-        $this->groups->push(compact('name', 'root', 'real_name', 'real_path'));
+        $this->groups->push($c = compact('name', 'root', 'real_name', 'real_path'));
 
         $this->groupRequirements->push((array)$requirements);
     }
@@ -424,7 +462,8 @@ class RouteBuilder
      */
     protected function getRealName()
     {
-        return $this->inGroup() ? $this->groups->top()['real_name'] : '';
+        $name = $this->inGroup() ? $this->groups->top()['real_name'] : '';
+        return $name;
     }
 
     /**
@@ -447,10 +486,14 @@ class RouteBuilder
      */
     protected function leaveGroup()
     {
-        if ($this->groups->count()) {
-            $this->groups->pop();
-            $this->groupRequirements->pop();
+        if (!$this->inGroup()) {
+            return;
         }
+
+        $this->setGroupRequirements();
+
+        $this->groups->pop();
+        $this->groupRequirements->pop();
     }
 
     /**

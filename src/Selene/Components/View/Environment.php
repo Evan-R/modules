@@ -99,6 +99,20 @@ class Environment implements EnvironmentInterface
     }
 
     /**
+     * registerTemplatePath
+     *
+     * @param mixed $alias
+     * @param mixed $path
+     *
+     * @access public
+     * @return void
+     */
+    public function registerTemplatePaths(array $paths)
+    {
+        $this->tempateResolver->setPackagePaths($paths);
+    }
+
+    /**
      * findEngine
      *
      * @param mixed $template

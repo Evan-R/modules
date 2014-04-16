@@ -11,7 +11,7 @@
 
 namespace Selene\Components\Package;
 
-use \Selene\Components\Core\Application;
+use \Selene\Components\Kernel\Application;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;

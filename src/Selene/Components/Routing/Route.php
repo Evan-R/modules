@@ -116,8 +116,10 @@ class Route implements Serializable
      */
     public function setBeforeFilters($filters)
     {
-        foreach (explode('|', $filters) as $filer) {
-            $this->requirements['_before'] = trim((string)$filter);
+        foreach (explode('|', $filters) as $filter) {
+            if (!in_array($filter, $this->requirements['_before'])) {
+                $this->requirements['_before'][] = trim((string)$filter);
+            }
         }
 
         return $this;
@@ -144,8 +146,10 @@ class Route implements Serializable
      */
     public function setAfterFilters($filters)
     {
-        foreach (explode('|', $filters) as $filer) {
-            $this->requirements['_after'] = trim((string)$filter);
+        foreach (explode('|', $filters) as $filter) {
+            if (!in_array($filter, $this->requirements['_after'])) {
+                $this->requirements['_after'][] = trim((string)$filter);
+            }
         }
 
         return $this;
@@ -863,6 +867,8 @@ class Route implements Serializable
         $this->requirements = array_merge(
             [
                 '_host' => null,
+                '_before' => [],
+                '_after' => [],
                 '_constraints' => []
             ],
             $this->requirements

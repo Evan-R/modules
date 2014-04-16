@@ -7,6 +7,7 @@ use \Selene\Components\Events\DispatcherInterface;
 use \Selene\Components\Routing\Events\RouteFilterEvent;
 use \Selene\Components\Routing\Events\RouteDispatchEvent;
 use \Selene\Components\Routing\Events\RouteFilterAfterEvent;
+use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
 use \Selene\Components\Routing\Exception\RouteNotFoundException;
 use \Selene\Components\Routing\Controller\ResolverInterface;
 
@@ -207,9 +208,9 @@ class Router implements RouterInterface
      */
     protected function registerRouteFilterEvents(Route $route, array $filters, $type)
     {
-        foreach ($filters as $name => $filter) {
-            if ($this->hasFilter($name)) {
-                $this->events->on($this->getRouteFilterEventName($route, $type), $filter);
+        foreach ($filters as $filter) {
+            if ($this->hasFilter($filter)) {
+                $this->events->on($this->getRouteFilterEventName($route, $type), $this->filters[$filter]);
             }
         }
     }
@@ -459,11 +460,12 @@ class Router implements RouterInterface
     protected function findRouteFilters(Route $route, $type = self::ROUTE_BEFORE)
     {
         $currentRoute = $route;
+
         $method = $type === static::ROUTE_BEFORE ? 'getBeforeFilters' : 'getAfterFilters';
 
         while ($currentRoute) {
 
-            if (null !== ($filters = call_user_func([$currentRoute, $method]))) {
+            if (null !== ($filters = call_user_func([$currentRoute, $method])) && (!empty($filters))) {
                 return $filters;
             }
 

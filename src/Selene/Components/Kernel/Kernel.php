@@ -27,12 +27,34 @@ use \Selene\Components\DI\Traits\ContainerAwareTrait;
  */
 class Kernel implements HttpKernelInterface
 {
+    /**
+     * router
+     *
+     * @var mixed
+     */
     private $router;
 
+    /**
+     * events
+     *
+     * @var mixed
+     */
     private $events;
 
+    /**
+     * responseStack
+     *
+     * @var mixed
+     */
     protected $responseStack;
 
+    /**
+     * @param DispatcherInterface $events
+     * @param RouterInterface $router
+     *
+     * @access public
+     * @return mixed
+     */
     public function __construct(DispatcherInterface $events, RouterInterface $router)
     {
         $this->events = $events;
@@ -64,14 +86,43 @@ class Kernel implements HttpKernelInterface
         return $this->router;
     }
 
+    /**
+     * handle
+     *
+     * @param Request $request
+     * @param mixed $type
+     * @param mixed $catch
+     *
+     * @access public
+     * @return Response
+     */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        $this->router->dispatch($request);
-        return $this->filterResponse();
+        try {
+            $response = $this->handleRequest($request, $type, $catch);
+        } catch (\Exception $e) {
+            if ($catch) {
+                return $this->handleRequestException($e);
+            }
+            throw $e;
+        }
+
+        return $response;
     }
 
+    /**
+     * terminate
+     *
+     * @param Request $request
+     * @param Response $response
+     *
+     * @access public
+     * @return mixed
+     */
     public function terminate(Request $request, Response $response)
     {
+        $this->booted = false;
+
         return null;
     }
 
@@ -85,6 +136,24 @@ class Kernel implements HttpKernelInterface
     }
 
     /**
+     * handleRequest
+     *
+     * @param Request $request
+     * @param mixed $type
+     * @param mixed $catch
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function handleRequest(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    {
+        $this->router->dispatch($request);
+
+        return $this->filterResponse();
+    }
+
+
+    /**
      * setUpRouterEvents
      *
      * @access protected
@@ -93,6 +162,10 @@ class Kernel implements HttpKernelInterface
     protected function setUpRouterEvents()
     {
         $this->events->on('router_dispatch', function ($event) {
+            $this->responseStack->push($event);
+        });
+
+        $this->events->on('router_abort', function ($event) {
             $this->responseStack->push($event);
         });
     }
@@ -110,6 +183,18 @@ class Kernel implements HttpKernelInterface
         }
 
         $event = $this->responseStack->pop();
-        return $event->getResponse();
+        $response = $event->getResponse();
+
+        if ($response instanceof Response) {
+            return $response;
+        }
+
+        return new Response($response);
+    }
+
+    protected function handleRequestException(\Exception $e)
+    {
+        throw $e;
+        die;
     }
 }
