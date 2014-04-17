@@ -46,10 +46,5 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load(__DIR__.'/../config/config.xml');
 
         $container->compile();
-
-        $p = $container->getParameters();
-        var_dump($p['test_concat']);
-        var_dump($p['test_array']);
-        var_dump($p['foo_str']);
     }
 }

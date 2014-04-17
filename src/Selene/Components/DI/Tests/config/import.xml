@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>
+  <parameters>
+    <parameter id="imported_param">imported</parameter>
+  </parameters>
+</container>

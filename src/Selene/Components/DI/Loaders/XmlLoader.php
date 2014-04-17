@@ -63,11 +63,24 @@ class XmlLoader
      */
     public function load($resource)
     {
-        $xml = $this->loadXml($resource);
+        $xml = $this->loader->load($resource);
 
-        $this->parseImports($xml);
+        $this->parseImports($xml, $resource);
         $this->parseParameters($xml);
         $this->parseServices($xml);
+    }
+
+    /**
+     * supports
+     *
+     * @param mixed $format
+     *
+     * @access public
+     * @return mixed
+     */
+    public function supports($format)
+    {
+        return strtolower($format) === 'xml';
     }
 
     /**
@@ -75,28 +88,19 @@ class XmlLoader
      *
      * @param DOMDocument $xml
      *
-     * @access public
+     * @access private
      * @return void
      */
-    public function parseImports(DOMDocument $xml)
+    private function parseImports(DOMDocument $xml, $file)
     {
-        $imports = $xml->getElementsByTagName('imports');
-        $items = $imports->item(0);
+        foreach ($xml->xpath('//imports/import') as $import) {
 
-        if (!$items) {
-            return;
-        }
-
-        foreach ($items->childNodes as $import) {
-
-            if (1 !== $parameter->nodeType) {
-                continue;
-            }
-
-            if (file_exists($file = $import->nodeValue)) {
+            if (file_exists($file = dirname($file).DIRECTORY_SEPARATOR.$import->nodeValue)) {
                 $loader = new static($this->container, $this->loader);
                 $loader->load($file);
             }
+
+            var_dump($file);
         }
     }
 
@@ -110,57 +114,24 @@ class XmlLoader
      */
     private function parseParameters(DOMDocument $xml)
     {
-        $params = $xml->getElementsByTagName('parameters');
-
-        foreach ($params->item(0)->childNodes as $parameter) {
-
-            if (1 !== $parameter->nodeType) {
-                continue;
-            }
-
+        foreach ($xml->xpath('//parameters/parameter') as $parameter) {
             $this->container->setParameter($parameter->getAttribute('id'), $this->getPhpValue($parameter));
         }
     }
 
     /**
-     * getParameterValue
-     *
-     * @param DOMElement $parameter
+     * parseServices
      *
      * @access private
      * @return void
      */
-    private function getParameterValue(DOMElement $parameter)
+    private function parseServices($xml)
     {
-        if ($this->paramIsArray($parameter)) {
-            return [];
+        $services = $xml->xpath('//services/service');
+
+        foreach ($services as $service) {
+            $this->setServiceDefinition($service);
         }
-
-        return $this->getPhpValue($parameter);
-    }
-
-    /**
-     * getPhpValue
-     *
-     * @param mixed $parameter
-     *
-     * @access private
-     * @return mixed
-     */
-    private function getPhpValue($parameter)
-    {
-        $type = $parameter->getAttribute('type');
-
-        if ('array' === $type) {
-            return $this->getParameterArray($parameter);
-        } elseif ('string' === $type) {
-            return (string)$parameter->nodeValue;
-        } elseif ('constant' === $type && defined($const = (string)$parameter->nodeValue)) {
-            return constant($const);
-        } elseif ('concat' === $type) {
-            return $this->concatParameters($parameter);
-        }
-        return $this->getValueFromString((string)$parameter->nodeValue);
     }
 
     /**
@@ -203,6 +174,7 @@ class XmlLoader
         $parts = [];
 
         foreach ($parameter->xpath('items/item') as $item) {
+
             if ($value = $this->getAttributeValue($item, 'use', false)) {
                 $parts[] = $value;
             } else {
@@ -228,6 +200,122 @@ class XmlLoader
     }
 
     /**
+     * setServiceDefinition
+     *
+     * @param mixed $service
+     *
+     * @access private
+     * @return void
+     */
+    private function setServiceDefinition($service)
+    {
+        $def = new ServiceDefinition;
+        $id  = $this->getAttributeValue($service, 'id');
+
+
+        if ($alias = $this->getAttributeValue($service, 'alias')) {
+            $this->container->setAlias($alias, $id);
+        }
+
+        if ($file = $this->getAttributeValue($service, 'file')) {
+            $def->setFile($file);
+        }
+
+        if ($injected = $this->getAttributeValue($service, 'injected')) {
+            $def->setInjected($injected);
+        }
+
+        if ($internal = $this->getAttributeValue($service, 'internal')) {
+            $def->setInternal($internal);
+        }
+
+        if ($abstract = $this->getAttributeValue($service, 'abstract')) {
+            $def->setAbstract($abstract);
+        }
+
+        if (null !== ($scope = $this->getAttributeValue($service, 'scope'))) {
+            $def->setScope($scope);
+        }
+
+        if ($class = $this->getAttributeValue($service, 'class', false)) {
+            $def->setClass($class);
+        } elseif ($factory = $this->getAttributeValue($service, 'factory', false)) {
+            $def->setFactory($factory);
+        } else {
+            throw new \RuntimeException(
+                sprintf('either service class or factory is missing for service id %s', $id)
+            );
+        }
+
+        $def->setArguments($this->getArguments($service));
+
+        $this->setServiceCallers($service, $def);
+
+        $this->container->setDefinition($id, $def);
+    }
+
+    /**
+     * getArguments
+     *
+     * @param DOMElement $node
+     *
+     * @access private
+     * @return array
+     */
+    private function getArguments(DOMElement $node)
+    {
+        $arguments = [];
+
+        foreach ($node->xpath('arguments/argument') as $argument) {
+
+            $arguments[] = $this->getPhpValue($argument);
+        }
+
+        return $arguments;
+    }
+
+    /**
+     * setServiceCallers
+     *
+     * @param DOMElement $service
+     * @param ServiceDefinition $def
+     *
+     * @access private
+     * @return void
+     */
+    private function setServiceCallers(DOMElement $service, ServiceDefinition $def)
+    {
+        foreach ($service->xpath('setters/setter') as $setter) {
+
+            $def->addSetter($this->getAttributeValue($setter, 'calls'), $this->getArguments($setter));
+        }
+    }
+
+    /**
+     * getPhpValue
+     *
+     * @param mixed $parameter
+     *
+     * @access private
+     * @return mixed
+     */
+    private function getPhpValue($parameter)
+    {
+        $type = $parameter->getAttribute('type');
+
+        if ('array' === $type) {
+            return $this->getParameterArray($parameter);
+        } elseif ('string' === $type) {
+            return (string)$parameter->nodeValue;
+        } elseif ('constant' === $type && defined($const = (string)$parameter->nodeValue)) {
+            return constant($const);
+        } elseif ('concat' === $type) {
+            return $this->concatParameters($parameter);
+        }
+        return $this->getValueFromString((string)$parameter->nodeValue);
+    }
+
+    /**
      * getValueFromString
      *
      * @param mixed $val
@@ -249,161 +337,5 @@ class XmlLoader
         }
 
         return $val;
-    }
-
-    /**
-     * parseServices
-     *
-     * @access private
-     * @return void
-     */
-    private function parseServices($xml)
-    {
-        $services = $xml->xpath('//services/service');
-
-        foreach ($services as $service) {
-            $this->setServiceDefinition($service);
-        }
-    }
-
-    /**
-     * setServiceDefinition
-     *
-     * @param mixed $service
-     *
-     * @access private
-     * @return void
-     */
-    private function setServiceDefinition($service)
-    {
-        $def = new ServiceDefinition;
-        $id  = $this->getAttributeValue($service, 'id');
-
-        $this->setServiceArguments($service, $def);
-
-        if ($alias = $this->getAttributeValue($service, 'alias')) {
-            $this->container->setAlias($alias, $id);
-        }
-
-        if ($file = $this->getAttributeValue($service, 'file')) {
-            $def->setFile($file);
-        }
-
-        if ($internal = $this->getAttributeValue($service, 'internal')) {
-            $def->setInternal($internal);
-        }
-
-        if ($injected = $this->getAttributeValue($service, 'injected')) {
-            $def->setInjected($injected);
-        }
-
-        if ($abstract = $this->getAttributeValue($service, 'abstract')) {
-            $def->setAbstract($abstract);
-        }
-
-        if (null !== ($scope = $this->getAttributeValue($service, 'scope'))) {
-            $def->setScope($scope);
-        }
-
-        if ($factory = $this->getAttributeValue($service, 'factory')) {
-            $def->setFactory($factory);
-        } elseif ($class = $this->getAttributeValue($service, 'class')) {
-            $def->setClass($class);
-        } else {
-            throw new \RuntimeException(sprintf('either service class or factory is missing for service id %s', $id));
-        }
-
-        $this->setServiceCallers($service, $def);
-
-        $this->container->setDefinition($id, $def);
-    }
-
-    /**
-     * setServiceArguments
-     *
-     * @param DOMElement $service
-     * @param ServiceDefinition $def
-     *
-     * @access private
-     * @return void
-     */
-    private function setServiceArguments(DOMElement $service, ServiceDefinition $def)
-    {
-        $def->setArguments($this->getArguments($service));
-    }
-
-    /**
-     * getArguments
-     *
-     * @param DOMElement $node
-     *
-     * @access private
-     * @return mixed
-     */
-    private function getArguments(DOMElement $node)
-    {
-        $arguments = [];
-
-        foreach ($node->xpath('arguments/argument') as $argument) {
-            $arguments[] = $this->getPhpValue($argument);
-        }
-
-        return $arguments;
-    }
-
-    /**
-     * setServiceCallers
-     *
-     * @param DOMElement $service
-     * @param ServiceDefinition $def
-     *
-     * @access private
-     * @return mixed
-     */
-    private function setServiceCallers(DOMElement $service, ServiceDefinition $def)
-    {
-        foreach ($service->xpath('setters/setter') as $setter) {
-            $def->addSetter($this->getAttributeValue($setter, 'calls'), $this->getArguments($setter));
-        }
-    }
-
-    /**
-     * loadXml
-     *
-     * @param mixed $file
-     *
-     * @access protected
-     * @return DOMDocument
-     */
-    protected function loadXml($file)
-    {
-        $xml = $this->loader->load($file);
-        return $xml;
-    }
-
-    /**
-     * paramIsArray
-     *
-     * @param DOMElement $param
-     *
-     * @access private
-     * @return boolean
-     */
-    private function paramIsArray(DOMElement $param)
-    {
-        return 'array' === $param->getAttribute('type');
-    }
-
-    /**
-     * supports
-     *
-     * @param mixed $format
-     *
-     * @access public
-     * @return mixed
-     */
-    public function supports($format)
-    {
-        return strtolower($format) === 'xml';
     }
 }

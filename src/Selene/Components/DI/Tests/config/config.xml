@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <container>
+
+  <imports>
+    <import>import.xml</import>
+  </imports>
+
   <parameters>
+
 
     <parameter id="foo_service.class">Acme\FooService</parameter>
     <parameter id="foo.service.name">foo</parameter>

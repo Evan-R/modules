@@ -270,7 +270,8 @@ class BaseContainer implements ContainerInterface
         }
 
         // treat internal services as undefiend.
-        if (!$this->hasDefinition($id) || $this->getDefinition($id)->isInternal()) {
+        if (!$this->hasDefinition($id) || (empty($this->building) && $this->getDefinition($id)->isInternal())) {
+
             throw new ContainerResolveException(sprintf('A service with id %s was is not defined', $id));
         }
 
