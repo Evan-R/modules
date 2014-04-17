@@ -10,11 +10,14 @@
     stopOnFailure="true"
     syntaxCheck="true">
   <testsuites>
-    <testsuite name="Testsuite">
-      <directory>src/Selene/Components/TestSuite/Tests/</directory>
-    </testsuite>
     <testsuite name="Common">
       <directory>src/Selene/Components/Common/Tests/</directory>
+    </testsuite>
+    <testsuite name="Config">
+      <directory>src/Selene/Components/Config/Tests/</directory>
+    </testsuite>
+    <testsuite name="Cache">
+      <directory>src/Selene/Components/Cache/Tests/</directory>
     </testsuite>
     <testsuite name="Routing">
       <directory>src/Selene/Components/Routing/Tests/</directory>
@@ -34,8 +37,8 @@
     <testsuite name="Filesystem">
       <directory>src/Selene/Components/Filesystem/Tests/</directory>
     </testsuite>
-    <testsuite name="Cache">
-      <directory>src/Selene/Components/Cache/Tests/</directory>
+    <testsuite name="Testsuite">
+      <directory>src/Selene/Components/TestSuite/Tests/</directory>
     </testsuite>
   </testsuites>
   <!--

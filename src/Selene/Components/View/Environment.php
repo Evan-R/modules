@@ -51,24 +51,6 @@ class Environment implements EnvironmentInterface
     }
 
     /**
-     * setTemplateResolver
-     *
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function setTemplateResolver($root = null, TemplateResolverInterface $templates = null)
-    {
-        if (null === $root && null === $templates) {
-            throw new \InvalidArgumentException('either root or templateresolver must be given');
-        } elseif (null === $root) {
-            $this->templateResolver = $templates;
-        } else {
-            $this->templateResolver = new TemplateResolver($root);
-        }
-    }
-
-    /**
      * render
      *
      * @param mixed $template
@@ -77,7 +59,7 @@ class Environment implements EnvironmentInterface
      * @access public
      * @return string
      */
-    public function render($template, $context = null)
+    public function render($template, array $context = [])
     {
         list ($file, $engine) = $this->findEngine($template);
 
@@ -124,8 +106,26 @@ class Environment implements EnvironmentInterface
     {
         foreach ($this->templateResolver->resolve($template) as $fileInfo) {
             if ($engine = $this->engineResolver->resolve($fileInfo->getExtension())) {
-                return [$fileInfo->getPathInfo(), $engine];
+                return [(string)$fileInfo, $engine];
             }
+        }
+    }
+
+    /**
+     * setTemplateResolver
+     *
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function setTemplateResolver($root = null, TemplateResolverInterface $templates = null)
+    {
+        if (null === $root && null === $templates) {
+            throw new \InvalidArgumentException('either root or templateresolver must be given');
+        } elseif (null === $root) {
+            $this->templateResolver = $templates;
+        } else {
+            $this->templateResolver = new TemplateResolver($root);
         }
     }
 }

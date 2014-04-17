@@ -23,7 +23,7 @@ class Reference
      *
      * @var mixed
      */
-    private $service;
+    private $id;
 
     /**
      * @param DefinitionInterface $definition

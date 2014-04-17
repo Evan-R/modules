@@ -30,14 +30,14 @@ class Parameters implements ParameterInterface
      *
      * @var array
      */
-    private $parameters;
+    protected $parameters;
 
     /**
-     * resolvedParams
+     * resolved
      *
-     * @var array
+     * @var boolean
      */
-    private $resolvedParams;
+    protected $resolved;
 
     /**
      * resolving
@@ -47,11 +47,11 @@ class Parameters implements ParameterInterface
     private $resolving;
 
     /**
-     * resolved
+     * resolvedParams
      *
-     * @var boolean
+     * @var array
      */
-    private $resolved;
+    private $resolvedParams;
 
     /**
      * Initialize parameter collection with data.
@@ -182,41 +182,6 @@ class Parameters implements ParameterInterface
     {
         unset($this->parameters[$key = strtolower($param)]);
         unset($this->resolvedParams[$key]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetExists($param)
-    {
-        return $this->has($param);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($param)
-    {
-        return $this->remove($param);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($param, $value)
-    {
-        return $this->set($param, $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Selene\Components\DI\Exception\ParameterNotFoundException
-     * @return mixed
-     */
-    public function offsetGet($param)
-    {
-        return $this->get($param);
     }
 
     /**
@@ -419,6 +384,57 @@ class Parameters implements ParameterInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function offsetExists($param)
+    {
+        return $this->has($param);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetUnset($param)
+    {
+        return $this->remove($param);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetSet($param, $value)
+    {
+        return $this->set($param, $value);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws \Selene\Components\DI\Exception\ParameterNotFoundException
+     * @return mixed
+     */
+    public function offsetGet($param)
+    {
+        return $this->get($param);
+    }
+
+
+    /**
+     * Return a reference to the current used parameters.
+     *
+     * @access private
+     * @return array Reference to $this->resolvedParams or $this->parameters
+     */
+    protected function &getParameters()
+    {
+        if ($this->resolved) {
+            return $this->resolvedParams;
+        }
+
+        return $this->parameters;
+    }
+
+    /**
      * Check for circular references while resolving a value.
      *
      * @param mixed $value
@@ -440,20 +456,5 @@ class Parameters implements ParameterInterface
         }
 
         return $res;
-    }
-
-    /**
-     * Return a reference to the current used parameters.
-     *
-     * @access private
-     * @return array Reference to $this->resolvedParams or $this->parameters
-     */
-    private function &getParameters()
-    {
-        if ($this->resolved) {
-            return $this->resolvedParams;
-        }
-
-        return $this->parameters;
     }
 }

@@ -75,15 +75,20 @@ class Finder implements ResolverInterface, ContainerAwareInterface
             $action = $this->getControllerAction($controller, $method, $path);
         }
 
+        $instance = null;
+
         if ($this->container && $this->container->hasDefinition($controller)) {
-            return [$this->container->get($controller), $action];
+            $instance = $this->container->get($controller);
+        } elseif (class_exists($controller)) {
+            $instance = new $controller;
+        } else {
+            throw new \RuntimeException('no controller found');
         }
 
-        if (class_exists($controller)) {
-            return [new $controller, $action];
+        if ($this->container && $instance instanceof ContainerAwareInterface) {
+            $instance->setContainer($this->container);
         }
-
-        throw new \RuntimeException('no controller found');
+        return [$instance, $action];
     }
 
     /**

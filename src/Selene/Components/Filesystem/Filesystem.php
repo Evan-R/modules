@@ -12,6 +12,7 @@
 namespace Selene\Components\Filesystem;
 
 use FilesystemIterator;
+use \Selene\Components\Common\Traits\PathHelper;
 use Selene\Components\Filesystem\Exception\IOException;
 
 /**
@@ -24,6 +25,8 @@ use Selene\Components\Filesystem\Exception\IOException;
  */
 class Filesystem
 {
+    use PathHelper;
+
     /**
      * @var string
      */
@@ -435,32 +438,6 @@ class Filesystem
     public function isDir($file)
     {
         return stream_is_local($file) && is_dir($file);
-    }
-
-    /**
-     * isAbsolutePath
-     *
-     * @param string $file
-     *
-     * @access public
-     * @return bool
-     */
-    public function isAbsolutePath($file)
-    {
-        return strspn($file, '/\\', 0, 1) or null !== parse_url($file, PHP_URL_SCHEME);
-    }
-
-    /**
-     * isRelativePath
-     *
-     * @param string $file
-     *
-     * @access public
-     * @return bool
-     */
-    public function isRelativePath($file)
-    {
-        return !$this->isAbsolutePath($file);
     }
 
     /**

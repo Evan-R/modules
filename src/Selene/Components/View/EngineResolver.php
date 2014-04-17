@@ -63,7 +63,7 @@ class EngineResolver implements EngineResolverInterface
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('No suitable engine found for template %s', $template));
+        throw new \InvalidArgumentException(sprintf('No suitable engine found for extension %s', $extension));
     }
 
     /**
@@ -77,7 +77,7 @@ class EngineResolver implements EngineResolverInterface
      */
     public function addEngine(EngineInterface $engine)
     {
-        $this->engines = $engine;
+        $this->engines[] = $engine;
     }
 
     /**

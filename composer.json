@@ -16,7 +16,7 @@
     "dsp/v6tools":"dev-master",
     "monolog/monolog":"dev-master",
     "ircmaxell/password-compat":"1.0.*",
-    "filp/whoops": "1.*",
+    "twig/twig": "~1.12",
     "psr/log": "~1.0"
   },
   "require-dev": {

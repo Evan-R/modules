@@ -30,7 +30,7 @@ interface EnvironmentInterface
      * @access public
      * @return string
      */
-    public function render($template, $context = null);
+    public function render($template, array $context = []);
 
     /**
      * registerEngine

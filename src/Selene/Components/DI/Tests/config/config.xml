@@ -2,13 +2,44 @@
 
 <container>
   <parameters>
-    <parameter name="foo.service.class">Acme\FooService</parameter>
-    <parameter name="foo.service.name">foo</parameter>
+
+    <parameter id="foo_service.class">Acme\FooService</parameter>
+    <parameter id="foo.service.name">foo</parameter>
+
+    <parameter id="dsp" type="constant">DIRECTORY_SEPARATOR</parameter>
+    <parameter id="foo_str">%dsp%foo%dsp%bar</parameter>
+
+    <parameter id="test_array" type="array">
+      <items>
+        <item key="foo" use="%foo.service.name%"/>
+        <item key="bar">/../views</item>
+        <item key="bam">100</item>
+      </items>
+    </parameter>
+
+    <parameter id="test_concat" type="concat">
+      <items>
+        <item use="%foo.service.name%"/>
+        <item>/../views</item>
+      </items>
+    </parameter>
+    <parameter id="bool_true" >true</parameter>
+    <parameter id="bool_false" >false</parameter>
+    <parameter id="int" >100</parameter>
+    <parameter id="float" >1.2</parameter>
+
   </parameters>
+
   <services>
-    <arguments>
-      <argument name="@foo"/>
-      <argument name="$foo"/>
-    </arguments>
+    <service id="foo_service" class="%foo_service.class%">
+      <arguments>
+        <argument>%foo%</argument>
+        <argument>$foo</argument>
+      </arguments>
+      <setters>
+        <setter calls="setFoo"></setter>
+        <setter calls="setBar"></setter>
+      </setters>
+    </service>
   </services>
 </container>

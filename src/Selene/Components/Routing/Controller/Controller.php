@@ -57,8 +57,8 @@ abstract class Controller extends BaseController implements ContainerAwareInterf
      * @access public
      * @return mixed
      */
-    protected function render($view)
+    protected function render($view, array $context = [])
     {
-        return $this->getContainer()->get('view')->render($view);
+        return $this->getContainer()->get('view')->render($view, $context);
     }
 }

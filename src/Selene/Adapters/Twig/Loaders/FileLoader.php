@@ -20,18 +20,44 @@ use \Twig_LoaderInterface as LoaderInterface;
  */
 class FileLoader implements LoaderInterface
 {
+    /**
+     * getSource
+     *
+     * @param mixed $source
+     *
+     * @access public
+     * @return mixed
+     */
     public function getSource($source)
     {
-        return $source;
+        return file_get_contents($source);
     }
 
+    /**
+     * getCacheKey
+     *
+     * @param mixed $name
+     *
+     * @access public
+     * @return mixed
+     */
     public function getCacheKey($name)
     {
-        return $name;
+        $key = hash('sha256', $name);
+        return $key;
     }
 
+    /**
+     * isFresh
+     *
+     * @param mixed $name
+     * @param mixed $time
+     *
+     * @access public
+     * @return mixed
+     */
     public function isFresh($name, $time)
     {
-        return true;
+        return filemtime($name) < $time;
     }
 }

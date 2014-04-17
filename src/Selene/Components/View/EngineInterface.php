@@ -30,7 +30,7 @@ interface EngineInterface
      * @access public
      * @return string
      */
-    public function render($file, $context = null);
+    public function render($file, array $context = []);
 
     /**
      * supports

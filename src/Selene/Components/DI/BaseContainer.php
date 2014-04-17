@@ -88,7 +88,7 @@ class BaseContainer implements ContainerInterface
      */
     public function getParameter($parameter)
     {
-        $this->parameters->get($parameter);
+        return $this->parameters->get($parameter);
     }
 
     /**
@@ -101,7 +101,7 @@ class BaseContainer implements ContainerInterface
      */
     public function hasParameter($parameter)
     {
-        $this->parameters->has($parameter);
+        return $this->parameters->has($parameter);
     }
 
     /**
@@ -177,7 +177,7 @@ class BaseContainer implements ContainerInterface
      */
     public function compile(ResolveStrategyCollection $strategies = null)
     {
-        $this->parameters = new LockedParameters($this->parameters->resolve()->all());
+        $this->parameters = new StaticParameters($this->parameters->resolve()->all());
     }
 
     /**
@@ -414,8 +414,9 @@ class BaseContainer implements ContainerInterface
         return $reference instanceof Reference ||
             (is_string($reference) &&
             (
-                0 === strpos($reference, static::SERVICE_REF_INDICATOR) &&
-                $this->hasDefinition($this->getReferenceId($reference))
+                0 === strpos($reference, static::SERVICE_REF_INDICATOR)
+                //0 === strpos($reference, static::SERVICE_REF_INDICATOR) &&
+                //$this->hasDefinition($this->getReferenceId($reference))
             )
         );
     }
@@ -517,7 +518,7 @@ class BaseContainer implements ContainerInterface
         }
 
         if (!class_exists($class = $this->parameters->resolveParam($definition->getClass()))) {
-            throw new RuntimeException(sprintf('Class %s does not exist', $class));
+            throw new \RuntimeException(sprintf('Class %s does not exist', $class));
         }
 
         $parent = $definition->hasParent() ?
@@ -624,8 +625,8 @@ class BaseContainer implements ContainerInterface
         foreach ($callers as $caller) {
 
             if (!method_exists($instance, $method = key($caller))) {
-                throw BadMethodCallException(
-                    sprintf('the method %s does not exist on this object %s', $method, get_class($instance))
+                throw new BadMethodCallException(
+                    sprintf('method %s::%s() does not exist', get_class($instance), $method)
                 );
             }
 

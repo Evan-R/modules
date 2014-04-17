@@ -60,10 +60,11 @@ class TwigEngine implements EngineInterface
      * @access public
      * @return string
      */
-    public function render($file, $context = null)
+    public function render($file, array $context = [])
     {
-        $this->env->loadTemplate($file);
-        return $this->env->render($context);
+        $template = $this->env->loadTemplate($file);
+
+        return $template->render($context);
     }
 
     /**
