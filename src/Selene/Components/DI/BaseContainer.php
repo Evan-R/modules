@@ -14,6 +14,8 @@ namespace Selene\Components\DI;
 use \DomainException;
 use \BadMethodCallException;
 use \InvalidArgumentException;
+use \Selene\Components\Common\Data\BaseList;
+use \Selene\Components\Common\Data\ListInterface;
 use \Selene\Components\DI\Definition\ClassDefinition;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 use \Selene\Components\DI\Definition\DefinitionInterface;
@@ -32,19 +34,61 @@ use \Selene\Components\DI\Resolve\ResolveStrategyCollection;
  */
 class BaseContainer implements ContainerInterface
 {
+    /**
+     * aliases
+     *
+     * @var \Selene\Components\DI\Aliases
+     */
     protected $aliases;
 
+    /**
+     * definitions
+     *
+     * @var array
+     */
     protected $definitions;
 
+    /**
+     * services
+     *
+     * @var array
+     */
     protected $services;
 
+    /**
+     * classes
+     *
+     * @var array
+     */
     protected $classes;
 
+    /**
+     * instances
+     *
+     * @var array
+     */
     protected $instances;
 
+    /**
+     * injected
+     *
+     * @var array
+     */
     protected $injected;
 
+    /**
+     * building
+     *
+     * @var array
+     */
     protected $building;
+
+    /**
+     * resources
+     *
+     * @var \Selene\Components\Common\Data\ListInterface
+     */
+    protected $resources;
 
     /**
      * Create a new Container.
@@ -54,14 +98,53 @@ class BaseContainer implements ContainerInterface
      *
      * @access public
      */
-    public function __construct(ParameterInterace $parameters = null, $name = null)
+    public function __construct(ParameterInterace $parameters = null, ListInterface $resources = null)
     {
+        $this->resources = $resources ?: new BaseList;
         $this->parameters = $parameters ?: new Parameters;
         $this->services = [];
         $this->definitions = [];
         $this->injected = [];
         $this->building = [];
         $this->setAliases();
+    }
+
+    /**
+     * addFileResource
+     *
+     * @param mixed $file
+     *
+     * @access public
+     * @return void
+     */
+    public function addFileResource($file)
+    {
+        $this->resources->add($file);
+    }
+
+    /**
+     * getFileResources
+     *
+     *
+     * @access public
+     * @return ListInterface
+     */
+    public function getFileResources()
+    {
+        return $this->resources;
+    }
+
+    /**
+     * hasFileResource
+     *
+     * @param mixed $file
+     *
+     * @access public
+     * @return boolean
+     */
+    public function hasFileResource($file)
+    {
+        return isset($file, $this->resources);
     }
 
     /**
@@ -430,7 +513,7 @@ class BaseContainer implements ContainerInterface
      */
     public function isLocked()
     {
-        return $this->parameters instanceof LockedParameters;
+        return $this->parameters instanceof StaticParameters;
     }
 
     /**

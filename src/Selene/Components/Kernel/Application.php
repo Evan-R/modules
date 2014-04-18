@@ -130,6 +130,29 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
         }
     }
 
+    /**
+     * initializeContainer
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function initializeContainer()
+    {
+        $containerClass = $this->getContainerClass();
+        $this->container = new $containerClass;
+    }
+
+    /**
+     * getContainerClass
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getContainerClass()
+    {
+        return 'Selene\Components\DI\BaseContainer';
+    }
+
     abstract protected function getPackages();
 
     abstract protected function getAppRoot();

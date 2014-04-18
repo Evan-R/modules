@@ -50,9 +50,11 @@ interface ContainerInterface
     // */
     public function getParameters();
 
-    //public function setAalias($alias, $id);
+    public function setAlias($alias, $id);
 
-    //public function getAlias($alias);
+    public function getAlias($alias);
+
+    public function addFileResource($file);
 
     public function define($service, $class = null, array $arguments = [], $scope = self::SCOPE_CONTAINER);
 

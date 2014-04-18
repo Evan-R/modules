@@ -14,7 +14,7 @@ namespace Selene\Components\DI\Tests\Loader;
 
 use \Mockery as m;
 use \Selene\Components\DI\BaseContainer;
-use \Selene\Components\DI\Loaders\XmlLoader;
+use \Selene\Components\DI\Loader\XmlLoader;
 
 /**
  * @class XmlLoaderTest
@@ -34,7 +34,20 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $loader = new XmlLoader(m::mock('\Selene\Components\DI\ContainerInterface'));
-        $this->assertInstanceof('\Selene\Components\DI\Loaders\XmlLoader', $loader);
+        $this->assertInstanceof('\Selene\Components\DI\Loader\XmlLoader', $loader);
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldSupportXml()
+    {
+
+        $container = m::mock('\Selene\Components\DI\ContainerInterface');
+        $loader = new XmlLoader($container);
+
+        $this->assertTrue($loader->supports('xml'));
+        $this->assertFalse($loader->supports('php'));
     }
 
     /**
@@ -42,9 +55,13 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testTestCase()
     {
-        $loader = new XmlLoader($container = new BaseContainer);
-        $loader->load(__DIR__.'/../config/config.xml');
+        $file = __DIR__.'/../config/config.xml';
 
-        $container->compile();
+        $container = new BaseContainer;
+
+        $loader = new XmlLoader($container);
+        $loader->load($file);
+
+        $this->assertTrue($container->hasFileResource($file));
     }
 }

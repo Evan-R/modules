@@ -59,6 +59,19 @@ class BaseList implements \ArrayAccess, \Countable, \Serializable, \IteratorAggr
     }
 
     /**
+     * push
+     *
+     * @param mixed $value
+     *
+     * @access public
+     * @return void
+     */
+    public function add($value)
+    {
+        $this->data[] = $value;
+    }
+
+    /**
      * insert
      *
      * @param int $index

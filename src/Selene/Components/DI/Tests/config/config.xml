@@ -10,14 +10,14 @@
 
 
     <parameter id="foo_service.class">Acme\FooService</parameter>
-    <parameter id="foo.service.name">foo</parameter>
+    <parameter id="foo_service.name">foo</parameter>
 
     <parameter id="dsp" type="constant">DIRECTORY_SEPARATOR</parameter>
     <parameter id="foo_str">%dsp%foo%dsp%bar</parameter>
 
     <parameter id="test_array" type="array">
       <items>
-        <item key="foo" use="%foo.service.name%"/>
+        <item key="foo" use="%foo_service.name%"/>
         <item key="bar">/../views</item>
         <item key="bam">100</item>
       </items>

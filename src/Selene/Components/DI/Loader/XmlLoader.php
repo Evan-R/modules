@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Loaders package
+ * This File is part of the Selene\Components\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Loaders;
+namespace Selene\Components\DI\Loader;
 
 use \Selene\Components\Xml\XmlLoader as XmlFileLoader;
 use \Selene\Components\Xml\Dom\DOMElement;
@@ -19,11 +19,14 @@ use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 
 /**
- * @class XmlLoader
- * @package Selene\Components\DI\Loaders
+ * @class XmlLoader XmlLoader
+ *
+ * @package Selene\Components\DI
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
-class XmlLoader
+class XmlLoader extends ConfigLoader
 {
     /**
      * loader
@@ -31,13 +34,6 @@ class XmlLoader
      * @var mixed
      */
     private $loader;
-
-    /**
-     * container
-     *
-     * @var ContainerInterface
-     */
-    private $container;
 
     /**
      * __construct
@@ -49,7 +45,7 @@ class XmlLoader
      */
     public function __construct(ContainerInterface $container, XmlFileLoader $loader = null)
     {
-        $this->container = $container;
+        parent::__construct($container);
         $this->loader = $loader ?: new XmlFileLoader;
     }
 
@@ -64,6 +60,8 @@ class XmlLoader
     public function load($resource)
     {
         $xml = $this->loader->load($resource);
+
+        $this->container->addFileResource($resource);
 
         $this->parseImports($xml, $resource);
         $this->parseParameters($xml);
@@ -99,8 +97,6 @@ class XmlLoader
                 $loader = new static($this->container, $this->loader);
                 $loader->load($file);
             }
-
-            var_dump($file);
         }
     }
 
@@ -217,24 +213,14 @@ class XmlLoader
             $this->container->setAlias($alias, $id);
         }
 
-        if ($file = $this->getAttributeValue($service, 'file')) {
-            $def->setFile($file);
-        }
+        foreach (['file', 'injected', 'internal', 'abstract', 'scope'] as $attribute) {
 
-        if ($injected = $this->getAttributeValue($service, 'injected')) {
-            $def->setInjected($injected);
-        }
+            if ($value = $this->getAttributeValue($service, $attribute)) {
 
-        if ($internal = $this->getAttributeValue($service, 'internal')) {
-            $def->setInternal($internal);
-        }
+                $method = 'set'.ucfirst($attribute);
+                call_user_func($dev, $method, $value);
+            }
 
-        if ($abstract = $this->getAttributeValue($service, 'abstract')) {
-            $def->setAbstract($abstract);
-        }
-
-        if (null !== ($scope = $this->getAttributeValue($service, 'scope'))) {
-            $def->setScope($scope);
         }
 
         if ($class = $this->getAttributeValue($service, 'class', false)) {
