@@ -53,7 +53,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testTestCase()
+    public function itShouldLoadXmlFilesAndConfigureTheContainer()
     {
         $file = __DIR__.'/../config/config.xml';
 
@@ -63,5 +63,10 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load($file);
 
         $this->assertTrue($container->hasFileResource($file));
+        $this->assertTrue($container->hasFileResource(dirname($file).'/import.xml'));
+
+        $this->assertTrue($container->hasParameter('imported_param'));
+        $this->assertTrue($container->hasParameter('foo_service.class'));
+        $this->assertTrue($container->hasDefinition('foo_service'));
     }
 }

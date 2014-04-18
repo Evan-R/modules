@@ -74,11 +74,11 @@ class XmlLoader extends ConfigLoader
      * @param mixed $format
      *
      * @access public
-     * @return mixed
+     * @return boolean
      */
     public function supports($format)
     {
-        return strtolower($format) === 'xml';
+        return 'xml' === strtolower($format);
     }
 
     /**
@@ -171,11 +171,11 @@ class XmlLoader extends ConfigLoader
 
         foreach ($parameter->xpath('items/item') as $item) {
 
-            if ($value = $this->getAttributeValue($item, 'use', false)) {
-                $parts[] = $value;
-            } else {
-                $parts[] = $this->getValueFromString($item->nodeValue);
+            if (!($value = $this->getAttributeValue($item, 'use', false))) {
+                $value = $this->getValueFromString($item->nodeValue);
             }
+
+            $parts[] = $value;
         }
         return implode('', $parts);
     }
