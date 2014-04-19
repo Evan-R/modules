@@ -344,9 +344,6 @@ class BaseContainer implements ContainerInterface
      */
     public function get($id)
     {
-        if (isset($this->services[$id = $this->resolveId($id)])) {
-            return $this->services[$id];
-        }
 
         if (method_exists($this, $method = sprintf('get%sService', static::camelCaseStr($id)))) {
             return $this->{$method}($id);
@@ -356,6 +353,10 @@ class BaseContainer implements ContainerInterface
         if (!$this->hasDefinition($id) || (empty($this->building) && $this->getDefinition($id)->isInternal())) {
 
             throw new ContainerResolveException(sprintf('A service with id %s was is not defined', $id));
+        }
+
+        if (isset($this->services[$id = $this->resolveId($id)])) {
+            return $this->services[$id];
         }
 
         if ($this->getDefinition($id)->isAbstract()) {

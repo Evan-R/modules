@@ -21,77 +21,10 @@ use \Selene\Components\DI\Tests\Stubs\FooService;
 use \Selene\Components\DI\Tests\Stubs\BarService;
 use \Selene\Components\DI\Tests\Stubs\ChildService;
 use \Selene\Components\DI\Tests\Stubs\ParentService;
+use \Selene\Components\DI\Exception\ContainerResolveException;
 
 class BaseContainerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @test
-     */
-    public function testGetInstance()
-    {
-        //$foo = __NAMESPACE__.'\\Stubs\FooService';
-        //$class = m::mock($cn = '\BaseContainerTestMockClass');
-        //$container = $this->createContainer();
-
-        //$container->setClass($cn);
-
-        //$this->assertInstanceOf(
-        //    $cn,
-        //    $container->getInstance($cn),
-        //    sprintf('->getInstance() should be return object that is an instance of %s.', $cn)
-        //);
-
-        //$this->assertFalse(
-        //    $container->getInstance($cn) === $container->getInstance($cn),
-        //    '->getInstance() should not return the same instance.'
-        //);
-
-        //$container->setClass($cn)->setScope(ContainerInterface::SCOPE_CONTAINER);
-
-        //$this->assertSame(
-        //    $container->getInstance($cn),
-        //    $container->getInstance($cn),
-        //    '->getInstance() should return the same instance.'
-        //);
-
-
-        //$container = $this->createContainer();
-
-        //$container->setClass($bar = __NAMESPACE__.'\\Stubs\\BarService');
-        //$instance = $container->getInstance($bar);
-
-        //$this->assertInstanceOf(
-        //    $foo,
-        //    $instance->getFoo(),
-        //    sprintf('->getInstance() should set required arguments %s.', $foo)
-        //);
-
-        //$this->assertSame(
-        //    $args = [],
-        //    $instance->getFoo()->getOptions(),
-        //    sprintf('->getInstance() should set required arguments %s.', var_export($args, true))
-        //);
-
-        //$container = $this->createContainer();
-        //$container->setClass($bar);
-        //$container->setClass($foo, [$args = ['a' => 'b']]);
-
-        //$instance = $container->getInstance($bar);
-
-        //$this->assertSame(
-        //    $args,
-        //    $instance->getFoo()->getOptions(),
-        //    sprintf('->getInstance() should set required arguments %s.', var_export($args, true))
-        //);
-
-        //$instance = $container->getInstance($bar, [$arg = new FooService]);
-
-        //$this->assertSame(
-        //    $arg,
-        //    $instance->getFoo(),
-        //    sprintf('->getInstance() should set required arguments %s.', var_export($arg, true))
-        //);
-    }
 
     /**
      * @test
@@ -144,6 +77,32 @@ class BaseContainerTest extends \PHPUnit_Framework_TestCase
             $this->fail($e->getMessage());
         }
         $this->fail('->inject() injecting a service wirth prototype scope should throw an exception');
+    }
+
+    /**
+     * @test
+     */
+    public function internalServicesShouldNotDirectlyRetrieveable()
+    {
+        $container = $this->createContainer();
+
+        $args = $this->getDefaultMockArgs('FooServiceClass', [], [
+            ['isInternal', null, true]
+            ]);
+        $def = $this->getDefinitionMock($args);
+
+        $container->setDefinition('foo.service', $def);
+
+        try {
+            $container->get('foo.service');
+        } catch (ContainerResolveException $e) {
+            $this->assertSame('A service with id foo.service was is not defined', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+            return;
+        }
+        $this->fail('you loose');
     }
 
     /**
@@ -381,9 +340,9 @@ class BaseContainerTest extends \PHPUnit_Framework_TestCase
      * @access protected
      * @return BaseContainer Container instance
      */
-    protected function createContainer(ParameterInterface $params = null, $name = 'basecontainer')
+    protected function createContainer(ParameterInterface $params = null, $list = null, $name = 'basecontainer')
     {
-        return new BaseContainer($params, $name);
+        return new BaseContainer($params, $list, $name);
     }
 
     /**
