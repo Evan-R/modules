@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Loader package
+ * This File is part of the Selene\Components\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -11,20 +11,26 @@
 
 namespace Selene\Components\DI\Loader;
 
+use \Selene\Components\Config\Loader\ConfigLoader;
+
 /**
- * @class CallableLoader
- * @package Selene\Components\DI\Loader
+ * @class CallableLoader extends ConfigLoader
+ * @see ConfigLoader
+ *
+ * @package Selene\Components\DI
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 class CallableLoader extends ConfigLoader
 {
     /**
-     * load
+     * Load a callable entity resuorce.
      *
-     * @param mixed $resource
+     * @param callable $resource
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function load($resource)
     {
@@ -32,12 +38,8 @@ class CallableLoader extends ConfigLoader
     }
 
     /**
-     * supports
-     *
-     * @param mixed $type
-     *
-     * @access public
-     * @return boolean
+     * {@inheritdoc}
+     * @param callable $format
      */
     public function supports($type)
     {
@@ -45,7 +47,7 @@ class CallableLoader extends ConfigLoader
     }
 
     /**
-     * loadFromCallable
+     * Exeutes the callable resource.
      *
      * @param callable $callable
      *
@@ -62,7 +64,7 @@ class CallableLoader extends ConfigLoader
     }
 
     /**
-     * findResourceOrigin
+     * Find the filepath of the callable entity.
      *
      * @param callable $callable
      *

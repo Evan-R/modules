@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Loader package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,27 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Loader;
+namespace Selene\Components\Config\Loader;
 
 use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\Config\Loader\FileLoaderInterface;
 
+/**
+ * @abstract class ConfigLoader implements FileLoaderInterface
+ * @see FileLoaderInterface
+ * @abstract
+ *
+ * @package Selene\Components\Config
+ * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
+ */
 abstract class ConfigLoader implements FileLoaderInterface
 {
+    /**
+     * container
+     *
+     * @var \Selene\Components\DI\ContainerInterface
+     */
     protected $container;
 
     /**

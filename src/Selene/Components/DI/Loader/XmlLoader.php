@@ -16,7 +16,7 @@ use \Selene\Components\Xml\Dom\DOMDocument;
 use \Selene\Components\DI\Reference;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\Xml\Builder;
-use \Selene\Components\Xml\Traits\XmlLoaderTrait;
+use \Selene\Components\Config\Loader\AbstractXmlLoader;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 
 /**
@@ -27,44 +27,13 @@ use \Selene\Components\DI\Definition\ServiceDefinition;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class XmlLoader extends ConfigLoader
+class XmlLoader extends AbstractXmlLoader
 {
-    use XmlLoaderTrait {
-        XmlLoaderTrait::create as private createNew;
-        XmlLoaderTrait::getErrors as private getXmlErrors;
-        XmlLoaderTrait::load as private loadXml;
-        XmlLoaderTrait::getOption as private getXmlOption;
-        XmlLoaderTrait::setOption as private setXmlOption;
-        XmlLoaderTrait::handleXmlErrors as private handleXmlRuntimeErrors;
-    }
-
     /**
-     * loader
-     *
-     * @var mixed
-     */
-    private $loader;
-
-    /**
-     * __construct
-     *
-     * @param ContainerInterface $container
-     *
-     * @access public
-     * @return mixed
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        parent::__construct($container);
-        $this->setXmlOption('simplexml', false);
-        $this->setXmlOption('from_string', false);
-    }
-
-    /**
-     * load
+     * Loads the resource file into the container.
      *
      * @TODO add DTD schema check.
-     * @param mixed $resource
+     * @param string $resource the xml file resource.
      *
      * @access public
      * @return void
@@ -81,12 +50,8 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * supports
-     *
-     * @param mixed $format
-     *
-     * @access public
-     * @return boolean
+     * {@inheritdoc}
+     * @param string $format
      */
     public function supports($format)
     {
@@ -94,9 +59,9 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * parseImports
+     * Parse imported resources.
      *
-     * @param DOMDocument $xml
+     * @param DOMDocument $xml the resource Document
      *
      * @access private
      * @return void
@@ -106,16 +71,16 @@ class XmlLoader extends ConfigLoader
         foreach ($xml->xpath('//imports/import') as $import) {
 
             if (file_exists($file = dirname($file).DIRECTORY_SEPARATOR.$import->nodeValue)) {
-                $loader = new static($this->container, $this->loader);
+                $loader = new static($this->container);
                 $loader->load($file);
             }
         }
     }
 
     /**
-     * parseParameters
+     * Parse parameter nodes of the resource file.
      *
-     * @param DOMDocument $xml
+     * @param DOMDocument $xml the reource Document.
      *
      * @access private
      * @return void
@@ -128,7 +93,7 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * parseServices
+     * paser service nodes of the resource file.
      *
      * @access private
      * @return void
@@ -143,9 +108,9 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * concatParameter
+     * Parse a parameter with type array.
      *
-     * @param DOMElement $parameter
+     * @param DOMElement $parameter the parameter node.
      *
      * @access private
      * @return array
@@ -170,9 +135,9 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * concatParameter
+     * Parse a parameter node marked as concat.
      *
-     * @param DOMElement $parameter
+     * @param DOMElement $parameter the parameter node.
      *
      * @access private
      * @return string
@@ -193,14 +158,15 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * getAttributeValue
+     * Gets a value from a no attribute,
      *
-     * @param mixed $node
-     * @param mixed $attr
-     * @param mixed $default
+     * @param DOMElement $node the node the contains the attribute.
+     * @param string     $attr the name of the attribute.
+     * @param mixed      $default the default value to return if no attribute was
+     * found.
      *
      * @access private
-     * @return mixed
+     * @return mixed will return a corresponding php value.
      */
     private function getAttributeValue(DOMElement $node, $attr, $default = null)
     {
@@ -208,14 +174,14 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * setServiceDefinition
+     * Set service definitions on the container based on the xml service nodes.
      *
-     * @param mixed $service
+     * @param DOMElement $service the service node.
      *
      * @access private
      * @return void
      */
-    private function setServiceDefinition($service)
+    private function setServiceDefinition(DOMElement $service)
     {
         $def = new ServiceDefinition;
         $id  = $this->getAttributeValue($service, 'id');
@@ -253,9 +219,9 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * getArguments
+     * Get all arguments contained on a <arguments> node.
      *
-     * @param DOMElement $node
+     * @param DOMElement $node the <arguments> node.
      *
      * @access private
      * @return array
@@ -273,10 +239,12 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * setServiceCallers
+     * Set method callers for a service definition based on the setters nodes
+     * of the service node.
      *
-     * @param DOMElement $service
-     * @param ServiceDefinition $def
+     * @param DOMElement $service the service node.
+     * @param \Selene\Components\DI\Definition\ServiceDefinition $def the
+     * service definition.
      *
      * @access private
      * @return void
@@ -290,14 +258,14 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * getPhpValue
+     * Get a corresponding php value from a parameter node.
      *
-     * @param mixed $parameter
+     * @param DOMElement $parameter the parameter node.
      *
      * @access private
      * @return mixed
      */
-    private function getPhpValue($parameter)
+    private function getPhpValue(DOMElement $parameter)
     {
         $type = $parameter->getAttribute('type');
 
@@ -314,10 +282,10 @@ class XmlLoader extends ConfigLoader
     }
 
     /**
-     * getValueFromString
+     * Get corresponding php value from a string derived from an xml node.
      *
-     * @param mixed $val
-     * @param mixed $default
+     * @param string $val the input value
+     * @param mixed  $default the value to return if conversion fails.
      *
      * @access private
      * @return mixed

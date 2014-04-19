@@ -1,0 +1,15 @@
+{
+  "name": "selene/config",
+  "description": "Configration component",
+  "license": "MIT",
+  "authors": [
+    {
+    "name": "Thomas Appel",
+    "email": "mail@thomas-appel.com"
+  }
+  ],
+  "require": {
+    "selene/filesystem":"dev-master"
+  },
+  "minimum-stability": "dev"
+}

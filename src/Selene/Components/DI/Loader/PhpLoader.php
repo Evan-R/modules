@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Loader package
+ * This File is part of the Selene\Components\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -11,15 +11,21 @@
 
 namespace Selene\Components\DI\Loader;
 
+use \Selene\Components\Config\Loader\ConfigLoader;
+
 /**
- * @class PhpLoader
- * @package Selene\Components\DI\Loader
+ * @class PhpLoader extends ConfigLoader
+ * @see ConfigLoader
+ *
+ * @package Selene\Components\DI
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 class PhpLoader extends ConfigLoader
 {
     /**
-     * load
+     * Load a php file resource.
      *
      * @param mixed $resource
      *
@@ -35,12 +41,8 @@ class PhpLoader extends ConfigLoader
     }
 
     /**
-     * supports
-     *
-     * @param mixed $format
-     *
-     * @access public
-     * @return boolean
+     * {@inheritdoc}
+     * @param string $format
      */
     public function supports($format)
     {
