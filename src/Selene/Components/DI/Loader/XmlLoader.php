@@ -11,11 +11,11 @@
 
 namespace Selene\Components\DI\Loader;
 
-use \Selene\Components\Xml\XmlLoader as XmlFileLoader;
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
 use \Selene\Components\DI\Reference;
 use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\Xml\Traits\XmlLoaderTrait;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 
 /**
@@ -28,6 +28,15 @@ use \Selene\Components\DI\Definition\ServiceDefinition;
  */
 class XmlLoader extends ConfigLoader
 {
+    use XmlLoaderTrait {
+        XmlLoaderTrait::create as private createNew;
+        XmlLoaderTrait::getErrors as private getXmlErrors;
+        XmlLoaderTrait::load as private loadXml;
+        XmlLoaderTrait::getOption as private getXmlOption;
+        XmlLoaderTrait::setOption as private setXmlOption;
+        XmlLoaderTrait::handleXmlErrors as private handleXmlRuntimeErrors;
+    }
+
     /**
      * loader
      *
@@ -43,10 +52,11 @@ class XmlLoader extends ConfigLoader
      * @access public
      * @return mixed
      */
-    public function __construct(ContainerInterface $container, XmlFileLoader $loader = null)
+    public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
-        $this->loader = $loader ?: new XmlFileLoader;
+        $this->setXmlOption('simplexml', false);
+        $this->setXmlOption('from_string', false);
     }
 
     /**
@@ -62,7 +72,7 @@ class XmlLoader extends ConfigLoader
     {
         $this->container->addFileResource($resource);
 
-        $xml = $this->loader->load($resource);
+        $xml = $this->loadXml($resource);
 
         $this->parseImports($xml, $resource);
         $this->parseParameters($xml);
@@ -214,7 +224,7 @@ class XmlLoader extends ConfigLoader
             $this->container->setAlias($alias, $id);
         }
 
-        foreach (['file', 'injected', 'internal', 'abstract', 'scope'] as $attribute) {
+        foreach (['file', 'parent', 'injected', 'internal', 'abstract', 'scope'] as $attribute) {
 
             if ($value = $this->getAttributeValue($service, $attribute)) {
 
