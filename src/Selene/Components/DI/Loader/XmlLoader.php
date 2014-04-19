@@ -52,16 +52,17 @@ class XmlLoader extends ConfigLoader
     /**
      * load
      *
+     * @TODO add DTD schema check.
      * @param mixed $resource
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function load($resource)
     {
-        $xml = $this->loader->load($resource);
-
         $this->container->addFileResource($resource);
+
+        $xml = $this->loader->load($resource);
 
         $this->parseImports($xml, $resource);
         $this->parseParameters($xml);
@@ -136,7 +137,7 @@ class XmlLoader extends ConfigLoader
      * @param DOMElement $parameter
      *
      * @access private
-     * @return mixed
+     * @return array
      */
     private function getParameterArray(DOMElement $parameter)
     {
@@ -163,7 +164,7 @@ class XmlLoader extends ConfigLoader
      * @param DOMElement $parameter
      *
      * @access private
-     * @return mixed
+     * @return string
      */
     private function concatParameters(DOMElement $parameter)
     {

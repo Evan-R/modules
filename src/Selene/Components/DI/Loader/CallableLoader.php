@@ -67,11 +67,14 @@ class CallableLoader extends ConfigLoader
      * @param callable $callable
      *
      * @access private
-     * @return mixed
+     * @return string
      */
     private function findResourceOrigin(callable $callable)
     {
-        $reflection = is_array($callable) ? new \ReflectionObject($callable[0]) : new \ReflectionFunction($callable);
+        $reflection = is_array($callable) ? new \ReflectionObject($callable[0]) :
+            ((is_string($callable) && false !== strpos($callable, '::')) ? new \ReflectionMethod($callable) :
+            new \ReflectionFunction($callable));
+
         return $reflection->getFileName();
     }
 }
