@@ -326,4 +326,25 @@ class Builder
                 return clearValue(trim($value));
         };
     }
+
+    /**
+     * getPhpValue
+     *
+     * @param mixed $value
+     *
+     * @access public
+     * @return mixed
+     */
+    public static function getPhpValue($val, $default = null)
+    {
+        if (0 === strlen($val)) {
+            return $default;
+        } elseif (is_numeric($val)) {
+            return false !== strpos($val, '.') ? floatVal($val) : intVal($val);
+        } elseif (($lval = strtolower($val)) === 'true' || $lval === 'false') {
+            return $lval === 'true' ? true : false;
+        }
+
+        return $val;
+    }
 }

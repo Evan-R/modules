@@ -15,6 +15,7 @@ use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
 use \Selene\Components\DI\Reference;
 use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\Xml\Builder;
 use \Selene\Components\Xml\Traits\XmlLoaderTrait;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 
@@ -323,16 +324,10 @@ class XmlLoader extends ConfigLoader
      */
     private function getValueFromString($val, $default = null)
     {
-        if (0 === strlen($val)) {
-            return $default;
-        } elseif ($this->container->isReference($val)) {
+        if ($this->container->isReference($val)) {
             return new Reference(substr($val, strlen(ContainerInterface::SERVICE_REF_INDICATOR)));
-        } elseif (is_numeric($val)) {
-            return false !== strpos($val, '.') ? floatVal($val) : intVal($val);
-        } elseif (($lval = strtolower($val)) === 'true' || $lval === 'false') {
-            return $lval === 'true' ? true : false;
         }
 
-        return $val;
+        return Builder::getPhpValue($val, $default);
     }
 }
