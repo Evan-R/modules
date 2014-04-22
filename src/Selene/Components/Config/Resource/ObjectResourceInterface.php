@@ -12,26 +12,18 @@
 namespace Selene\Components\Config\Resource;
 
 /**
- * @class DirectoryResource extends Resource
- * @see Resource
- *
+ * @interface ObjectResourceInterface
  * @package Selene\Components\Config\Resource
  * @version $Id$
- * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
-class DirectoryResource extends AbstractResource
+interface ObjectResourceInterface extends ResourceInterface
 {
     /**
-     * isValid
+     * getObjectReflection
      *
-     * @param integer $timestamp
      *
      * @access public
-     * @return mixed
+     * @return \ReflectionObject
      */
-    public function exists()
-    {
-        return is_dir($this->resource);
-    }
+    public function getObjectReflection();
 }

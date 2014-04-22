@@ -29,8 +29,10 @@ interface ResourceInterface
     public function isValid($timestamp);
 
     /**
-     * Should return the resources file path.
-     * @return string
+     * exists
+     *
+     * @access public
+     * @return boolean
      */
-    public function getPath();
+    public function exists();
 }

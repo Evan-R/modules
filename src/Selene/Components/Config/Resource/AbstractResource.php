@@ -11,8 +11,6 @@
 
 namespace Selene\Components\Config\Resource;
 
-use \Selene\Components\Filesystem\Filesystem;
-
 /**
  * @class AbstractResource implements ResourceInterface
  * @see ResourceInterface
@@ -24,13 +22,6 @@ use \Selene\Components\Filesystem\Filesystem;
  */
 abstract class AbstractResource implements ResourceInterface
 {
-    /**
-     * fs
-     *
-     * @var \Selene\Components\Filesystem\Filesystem
-     */
-    protected $fs;
-
     /**
      * resource
      *
@@ -44,10 +35,9 @@ abstract class AbstractResource implements ResourceInterface
      *
      * @access public
      */
-    public function __construct($file, Filesystem $files = null)
+    public function __construct($resource)
     {
-        $this->resource = $file;
-        $this->fs = $files;
+        $this->resource = $resource;
     }
 
     /**
@@ -59,16 +49,42 @@ abstract class AbstractResource implements ResourceInterface
      * @abstract
      * @return boolean
      */
-    abstract public function isValid($timestamp);
+    public function isValid($timestamp)
+    {
+        return $this->exists() && filemtime($this->getPath()) < $timestamp;
+    }
+
+    /**
+     * getResource
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getResource()
+    {
+        return $this->resource;
+    }
 
     /**
      * getPath
      *
      * @access public
-     * @return string
+     * @return mixed
      */
     public function getPath()
     {
-        return $this->resource;
+        return $this->getResource();
+    }
+
+    /**
+     * __toString
+     *
+     *
+     * @access public
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getPath();
     }
 }

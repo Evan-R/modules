@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Components\Config\Resource package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -12,25 +12,22 @@
 namespace Selene\Components\Config\Resource;
 
 /**
- * @class FileResource extends AbstractResource
- * @see AbstractResource
+ * @interface LoaderResolverInterface
  *
  * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class FileResource extends AbstractResource
+interface LoaderResolverInterface
 {
     /**
-     * exists
+     * Resolves a loader for a given resource
      *
+     * @param mixed $resource
      *
      * @access public
-     * @return boolean
+     * @return \Selene\Components\Config\Resource\LoaderInterface
      */
-    public function exists()
-    {
-        return is_file($this->getPath());
-    }
+    public function resolve($resource);
 }

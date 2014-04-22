@@ -12,44 +12,47 @@
 namespace Selene\Components\Config\Tests\Resource;
 
 use \Mockery as m;
-use \Selene\Components\TestSuite\TestCase;
+use \org\bovigo\vfs\vfsStream;
 use \Selene\Components\Config\Resource\FileResource;
-use \Selene\Components\Filesystem\Filesystem;
 
 /**
  * @class FileResourceTest
  * @package Selene\Components\Config\Tests\Resource
  * @version $Id$
  */
-class FileResourceTest extends TestCase
+class FileResourceTest extends \PHPUnit_Framework_TestCase
 {
+    protected $root;
 
-    protected static $fsCompare = 'isFile';
+    protected $path;
+
+    protected function setUp()
+    {
+        $this->root = vfsStream::setUp('testdrive/resources');
+        $this->path = vfsStream::url('testdrive/resources');
+    }
 
     protected function tearDown()
     {
         m::close();
-        parent::tearDown();
+    }
+
+    /** @test */
+    public function itShouldBeInstantiable()
+    {
+        $resource = new FileResource('somefile');
+        $this->assertInstanceof('\Selene\Components\Config\Resource\FileResource', $resource);
     }
 
     /**
      * @test
      * @dataProvider validationProvider
      */
-    public function testIsValid($file, $isFile, $retval = true, $filemtime = null, $timestamp = null)
+    public function itShouldReportIfItIsValid($file, $isFile, $retval = true, $filemtime = null, $timestamp = null)
     {
-        $fs = m::mock('Selene\Components\Filesystem\Filesystem');
-        $fs->shouldReceive(static::$fsCompare)->with($file)->andReturn($isFile);
+        $file = $this->createResourceFile($file, $filemtime, $isFile);
 
-        if ($isFile) {
-            $fs->shouldReceive('fileMTime')->andReturn($filemtime);
-        } else {
-            $fs->shouldReceive('fileMTime')->andReturnUsing(function () {
-                $this->fail('->isValid() timestamp comparision should not occurre if resource is not a file');
-            });
-        }
-
-        $resource = $this->getResource($file, $fs);
+        $resource = $this->getResource($file);
 
         $this->assertSame($retval, $resource->isValid($timestamp));
     }
@@ -60,7 +63,7 @@ class FileResourceTest extends TestCase
     public function testGetPath()
     {
         $resource = $this->getResource($file = '/some/fime');
-        $this->assertEquals($file, $resource->getPath());
+        $this->assertEquals($file, (string)$resource);
     }
 
     /**
@@ -70,15 +73,31 @@ class FileResourceTest extends TestCase
      */
     public function validationProvider()
     {
-        return [
-            ['/some/file', false, false],
-            ['/some/file', true, false, 1, 0],
-            ['/some/file', true, true, 0, 1]
+        $time = time();
+
+        $providers = [
+            ['fileAA', false, false],
+            ['fileBB', true, false, $time, $time - 1000],
+            ['fileCC', true, true, $time - 1000, $time]
         ];
+
+        return $providers;
     }
 
-    protected function getResource($file, $fs = null)
+    protected function createResourceFile($file, $timestamp, $isFile = true)
     {
-        return new FileResource($file, $fs);
+        $file = $this->path.DIRECTORY_SEPARATOR.$file;
+
+        if (!$isFile) {
+            return $file;
+        }
+        touch($file, $timeStamp);
+
+        return $file;
+    }
+
+    protected function getResource($file)
+    {
+        return new FileResource($file);
     }
 }

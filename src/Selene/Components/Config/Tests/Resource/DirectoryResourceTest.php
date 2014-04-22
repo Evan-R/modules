@@ -17,19 +17,34 @@ use \Selene\Components\Config\Resource\DirectoryResource;
 class DirectoryResourceTest extends FileResourceTest
 {
 
-    protected static $fsCompare = 'isDir';
-
-    protected function getResource($file, $fs = null)
-    {
-        return new DirectoryResource($file, $fs);
-    }
-
     public function validationProvider()
     {
+        $time = time();
         return [
-            ['/some/dir', false, false],
-            ['/some/dir', true, false, 1, 0],
-            ['/some/dir', true, true, 0, 1]
+            ['dirA', false, false],
+            ['dirB', true, false, $time, $time - 10],
+            ['dirB', true, true, $time - 10, $time]
         ];
+    }
+
+    protected function createResourceFile($file, $timestamp, $isFile = true)
+    {
+        $file = $this->path.DIRECTORY_SEPARATOR.$file;
+
+        if (!$isFile) {
+            return $file;
+        }
+
+        mkdir($file, 0775, true);
+
+        $child = $this->root->getChild('resources')->getChild(basename($file));
+        $child->lastModified($timestamp);
+
+        return $file;
+    }
+
+    protected function getResource($file)
+    {
+        return new DirectoryResource($file);
     }
 }
