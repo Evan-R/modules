@@ -12,23 +12,10 @@
 namespace Selene\Components\Config\Validator\Nodes;
 
 /**
- * @class Scalar
+ * @interface RootNodeInterface
  * @package Selene\Components\Config\Validator\Nodes
  * @version $Id$
  */
-abstract class ScalarNode extends Node
+interface RootNodeInterface
 {
-    protected $type;
-
-    /**
-     * @param NodeInterface $parent
-     *
-     * @access public
-     * @return mixed
-     */
-    public function __construct($type = null)
-    {
-        $this->type = $type;
-        $this->required = true;
-    }
 }

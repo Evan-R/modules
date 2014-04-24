@@ -11,7 +11,7 @@
 
 namespace Selene\Components\Config\Tests\Validator\Stubs;
 
-use \Selene\Components\Config\Resource\Validator\Nodes\Node as AbstractNode;
+use \Selene\Components\Config\Validator\Nodes\Node as AbstractNode;
 
 /**
  * @class NodeStub

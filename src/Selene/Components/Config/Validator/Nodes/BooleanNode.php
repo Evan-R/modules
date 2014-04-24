@@ -20,6 +20,40 @@ namespace Selene\Components\Config\Validator\Nodes;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class BooleanNode extends Node
+class BooleanNode extends ScalarNode
 {
+    /**
+     * @access public
+     * @return mixed
+     */
+    public function __construct()
+    {
+        parent::__construct('boolean');
+    }
+
+    /**
+     * defaultValue
+     *
+     * @param mixed $val
+     *
+     * @access public
+     * @return mixed
+     */
+    public function defaultValue($val)
+    {
+        return parent::defaultValue((bool)$val);
+    }
+
+    /**
+     * validateType
+     *
+     * @param mixed $value
+     *
+     * @access public
+     * @return mixed
+     */
+    public function validateType($value)
+    {
+        return is_bool($value);
+    }
 }

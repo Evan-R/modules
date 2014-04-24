@@ -12,23 +12,19 @@
 namespace Selene\Components\Config\Validator\Nodes;
 
 /**
- * @class Scalar
+ * @class NumericNode
  * @package Selene\Components\Config\Validator\Nodes
  * @version $Id$
  */
-abstract class ScalarNode extends Node
+class NumericNode extends ScalarNode
 {
-    protected $type;
-
-    /**
-     * @param NodeInterface $parent
-     *
-     * @access public
-     * @return mixed
-     */
-    public function __construct($type = null)
+    public function validateType($value)
     {
-        $this->type = $type;
-        $this->required = true;
+        return is_numeric($value);
+    }
+
+    protected function getInvalidTypeMessage($value = null)
+    {
+        return sprintf('%s needs to be numeric', $this->getKey());
     }
 }

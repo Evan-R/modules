@@ -11,6 +11,10 @@
 
 namespace Selene\Components\Config\Validator\Nodes;
 
+use \Selene\Components\Config\Validator\Exception\ValidationException;
+use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
+use \Selene\Components\Config\Validator\Exception\MissingValueException;
+
 /**
  * @abstract class Node implements NodeInterface
  * @see NodeInterface
@@ -24,18 +28,46 @@ namespace Selene\Components\Config\Validator\Nodes;
 abstract class Node implements NodeInterface
 {
     /**
+     * key
+     *
+     * @var string
+     */
+    protected $key;
+
+    /**
+     * default
+     *
+     * @var mixed
+     */
+    protected $default;
+
+    /**
+     * required
+     *
+     * @var boolean
+     */
+    protected $required;
+
+    /**
+     * allowEmpty
+     *
+     * @var mixed
+     */
+    protected $allowEmpty;
+
+    /**
+     * builder
+     *
+     * @var mixed
+     */
+    protected $builder;
+
+    /**
      * parent
      *
      * @var NodeInterface
      */
     protected $parent;
-
-    /**
-     * children
-     *
-     * @var array
-     */
-    protected $children;
 
     /**
      * @param NodeInterface $parent
@@ -45,7 +77,106 @@ abstract class Node implements NodeInterface
     public function __construct(NodeInterface $parent = null)
     {
         $this->children = [];
-        $this->parent = $parent ? $this->setParent($parent) : $parent;
+        $this->required = true;
+
+        if (null !== $parent) {
+            $this->setParent($parent);
+        }
+    }
+
+    /**
+     * required
+     *
+     * @access public
+     * @return mixed
+     */
+    public function optional()
+    {
+        $this->required = false;
+        return $this;
+    }
+
+    public function isOptional()
+    {
+        return false === $this->required;
+    }
+
+    /**
+     * getDefault
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getDefault()
+    {
+        return $this->default;
+    }
+
+    /**
+     * defaultValue
+     *
+     *
+     * @access public
+     * @return mixed
+     */
+    public function defaultValue($value)
+    {
+        $this->default = $value;
+        return $this;
+    }
+
+    /**
+     * setBuilder
+     *
+     * @param mixed $builder
+     *
+     * @access public
+     * @return mixed
+     */
+    public function setBuilder($builder)
+    {
+        $this->builder = $builder;
+        return $this;
+    }
+
+    /**
+     * getBuilder
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getBuilder()
+    {
+        if ($this->hasParent()) {
+            return $this->getParent()->getBuilder();
+        }
+
+        return $this->builder;
+    }
+
+    /**
+     * setName
+     *
+     * @param mixed $name
+     *
+     * @access public
+     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface this instance
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
+        return $this;
+    }
+
+    /**
+     * getKey
+     *
+     * @access public
+     * @return string
+     */
+    public function getKey()
+    {
+        return $this->key;
     }
 
     /**
@@ -54,12 +185,13 @@ abstract class Node implements NodeInterface
      * @param NodeInterface $node
      *
      * @access public
-     * @return NodeInterface this instance
+     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface this instance
      */
     public function setParent(NodeInterface $node)
     {
-        $this->parent = $node;
+        $this->parent =& $node;
         $node->addChild($this);
+
         return $this;
     }
 
@@ -67,7 +199,7 @@ abstract class Node implements NodeInterface
      * getParent
      *
      * @access public
-     * @return void
+     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface the parent node
      */
     public function getParent()
     {
@@ -85,88 +217,65 @@ abstract class Node implements NodeInterface
         return null !== $this->parent;
     }
 
-    /**
-     * getChildren
-     *
-     * @access public
-     * @return array
-     */
-    public function getChildren()
+    public function notEmpty()
     {
-        return $this->children;
-    }
-
-    /**
-     * hasChildren
-     *
-     * @access public
-     * @return boolean
-     */
-    public function hasChildren()
-    {
-        return 0 < count($this->children);
-    }
-
-    /**
-     * getFirstChild
-     *
-     * @access public
-     * @return Nodeinterface
-     */
-    public function getFirstChild()
-    {
-        if ($this->hasChildren()) {
-            return current($this->children);
-        }
-    }
-
-    /**
-     * getLastChild
-     *
-     * @access public
-     * @return NodeInterface
-     */
-    public function getLastChild()
-    {
-        if ($this->hasChildren()) {
-            return end($this->children);
-        }
-    }
-
-    /**
-     * addChild
-     *
-     * @param NodeInterface $node
-     *
-     * @access public
-     * @return NodeInterface this instance
-     */
-    public function addChild(NodeInterface $node)
-    {
-        if ($node->getParent() !== $this) {
-            $node->setParent($this);
-        } else {
-            $this->children[] = $node;
-        }
-
+        $this->allowEmpty = false;
         return $this;
     }
 
+
     /**
-     * hasChild
+     * validateType
      *
-     * @param NodeInterface $child
+     * @param mixed $value
+     *
+     * @access public
+     * @abstract
+     * @return boolean
+     */
+    abstract public function validateType($value);
+
+    /**
+     * validate
+     *
+     * @param mixed $value
      *
      * @access public
      * @return mixed
      */
-    public function hasChild(NodeInterface $child)
+    public function validate($value = null)
     {
-        $found = array_filter($this->children, function ($c) use ($child) {
-            return $c === $child;
-        });
+        $empty = false;
 
-        return (bool)$found;
+        if (null === $value || ($empty = empty($value))) {
+
+            if ($empty && false === $this->allowEmpty) {
+                throw new MissingValueException(
+                    sprintf('%s may not be empty', $this->getKey())
+                );
+            }
+
+            if ($this->isOptional()) {
+
+                if (empty($value) && null === $this->getDefault()) {
+                    throw new MissingValueException(
+                        sprintf('optional key %s with empty value must have a default value', $this->getKey())
+                    );
+                }
+
+                return true;
+            }
+
+            throw new MissingValueException(
+                sprintf('%s is required but missing', $this->getKey())
+            );
+        }
+
+        if (!$this->validateType($value)) {
+            throw new InvalidTypeException($this->getInvalidTypeMessage($value));
+        }
+
+        return true;
     }
 
     /**
@@ -180,9 +289,53 @@ abstract class Node implements NodeInterface
      */
     public function __call($method, $arguments)
     {
-        if ($class = class_exists(__NAMESPACE__.'\\'.ucfirst(strtolower($method).'Node'))) {
-            array_unshift($arguments, $this);
-            return (new \ReflectionClass($class))->newInstanceArgs($arguments);
+        if (($builder = $this->getBuilder()) && method_exists($builder, $method)) {
+            return call_user_func_array([$builder, $method], $arguments);
         }
+
+        throw new \BadMethodCallException(
+            sprintf('call to undefined method %s::%s', get_class($this), $method)
+        );
+    }
+
+    /**
+     * mergeValue
+     *
+     * @param mixed $value
+     *
+     * @access public
+     * @return mixed
+     */
+    public function mergeValue($value)
+    {
+        return $value;
+    }
+
+    /**
+     * getInvalidTypeMessage
+     *
+     * @param mixed $value
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function getInvalidTypeMessage($value = null)
+    {
+        return sprintf('invalid value for %s', $this->getKey());
+    }
+
+    /**
+     * callOnBuilder
+     *
+     * @param mixed $builder
+     * @param mixed $method
+     * @param mixed $arguments
+     *
+     * @access private
+     * @return mixed
+     */
+    private function callOnBuilder($builder, $method, $arguments)
+    {
+        return call_user_func_array([$builder, $method], $arguments);
     }
 }

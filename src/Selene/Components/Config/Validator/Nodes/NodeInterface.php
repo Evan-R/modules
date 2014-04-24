@@ -21,10 +21,12 @@ namespace Selene\Components\Config\Validator\Nodes;
  */
 interface NodeInterface
 {
+    public function setBuilder($builder);
+
     /**
      * setParent
      *
-     * @param NodeInterface $node
+     * @param \Selene\Components\Config\Validator\Nodes\NodeInterface $node
      *
      * @access public
      * @return void
@@ -47,45 +49,4 @@ interface NodeInterface
      * @return boolean
      */
     public function hasParent();
-
-    /**
-     * hasChildren
-     *
-     *
-     * @access public
-     * @return boolean
-     */
-    public function hasChildren();
-
-    /**
-     * addChildren
-     *
-     * @access public
-     * @return void
-     */
-    public function addChild(NodeInterface $node);
-
-    /**
-     * getChildren
-     *
-     * @access public
-     * @return array
-     */
-    public function getChildren();
-
-    /**
-     * getFirstChild
-     *
-     * @access public
-     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface
-     */
-    public function getFirstChild();
-
-    /**
-     * getLastChild
-     *
-     * @access public
-     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface
-     */
-    public function getLastChild();
 }

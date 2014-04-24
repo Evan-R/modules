@@ -12,23 +12,27 @@
 namespace Selene\Components\Config\Validator\Nodes;
 
 /**
- * @class Scalar
+ * @class IntergerNode
  * @package Selene\Components\Config\Validator\Nodes
  * @version $Id$
  */
-abstract class ScalarNode extends Node
+class IntergerNode extends NumericNode
 {
-    protected $type;
+    public function validateType($value)
+    {
+        return is_int($value);
+    }
 
     /**
-     * @param NodeInterface $parent
+     * getInvalidTypeMessage
      *
-     * @access public
-     * @return mixed
+     * @param mixed $value
+     *
+     * @access protected
+     * @return string
      */
-    public function __construct($type = null)
+    protected function getInvalidTypeMessage($value = null)
     {
-        $this->type = $type;
-        $this->required = true;
+        return sprintf('%s needs to be type of integer, instead saw %s', $this->getKey(), gettype($value));
     }
 }

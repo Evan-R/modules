@@ -19,7 +19,7 @@ class NodeTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $node = new NodeStub;
-        $this->assertInstanceOf('Selene\Components\Config\Resource\Validator\Nodes\NodeInterface', $node);
+        $this->assertInstanceOf('Selene\Components\Config\Validator\Nodes\NodeInterface', $node);
     }
 
     /** @test */

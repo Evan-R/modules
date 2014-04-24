@@ -34,8 +34,23 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldAddNnodes()
     {
-        //$builder = new Builder;
+        $builder = new Builder;
+        $builder->root()
+            ->boolean('falsy or truthy')
+                ->optional()
+                ->defaultValue(true)
+            ->end()
+            ->boolean('Faaaaaaack')
+                ->optional()
+                ->defaultValue(true)
+            ->end()
+            ->dict('dict')
+                ->dict('otherDict')
+                    ->dict('yetAnotherDict')
+                    ->end()
+                ->end()
+            ->end();
 
-        //$builder->root();
+        var_dump($builder);
     }
 }

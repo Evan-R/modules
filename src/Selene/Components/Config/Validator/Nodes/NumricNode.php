@@ -12,23 +12,40 @@
 namespace Selene\Components\Config\Validator\Nodes;
 
 /**
- * @class Scalar
+ * @class NumricNode
  * @package Selene\Components\Config\Validator\Nodes
  * @version $Id$
  */
-abstract class ScalarNode extends Node
+abstract class NumricNode extends ScalarNode
 {
-    protected $type;
+    protected $min;
+
+    protected $max;
 
     /**
-     * @param NodeInterface $parent
+     * range
+     *
+     * @param mixed $min
+     * @param mixed $max
      *
      * @access public
      * @return mixed
      */
-    public function __construct($type = null)
+    public function range($min, $max)
     {
-        $this->type = $type;
-        $this->required = true;
+        $this->min($min);
+        return $this->max($min);
+    }
+
+    public function max($max)
+    {
+        $this->max = $max;
+        return $this;
+    }
+
+    public function min($min)
+    {
+        $this->min = $min;
+        return $this;
     }
 }

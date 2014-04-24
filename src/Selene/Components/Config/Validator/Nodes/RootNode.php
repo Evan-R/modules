@@ -16,7 +16,7 @@ namespace Selene\Components\Config\Validator\Nodes;
  * @package Selene\Components\Config\Validator\Nodes
  * @version $Id$
  */
-class RootNode extends Node
+class RootNode extends DictNode implements RootNodeInterface
 {
     /**
      * key
@@ -67,5 +67,10 @@ class RootNode extends Node
         throw new \BadMethodCallException(
             sprintf('root node %s has no parent', $this->getKey())
         );
+    }
+
+    public function validateType($value)
+    {
+        return true;
     }
 }
