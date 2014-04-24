@@ -117,7 +117,7 @@ class Builder
 
             $name = $child->getName();
             $oname = $name;
-            $name = is_null($prefix) ? $name : $this->prefixKey($prefix, $name);
+            $name = is_null($prefix) ? $name : static::prefixKey($prefix, $name);
 
             if (count($children) < 2) {
                 $result[$name] = static::parseXML($child, $nestedValues);
@@ -140,10 +140,10 @@ class Builder
                 $equals = $this->getEqualNodes($child, $prefix);
 
                 if (count($equals) > 1) {
-                    if ($this->isEqualOrPluralOf($parentName, $oname)) {
+                    if (static::isEqualOrPluralOf($parentName, $oname)) {
                         $result[] = static::parseXML($child, $nestedValues);
                     } else {
-                        $plural = $this->pluralize($oname);
+                        $plural = static::pluralize($oname);
                         $plural = is_null($prefix) ? $plural : $this->prefixKey($prefix, $plural);
                         if (isset($result[$plural]) && is_array($result[$plural])) {
                             $result[$plural][] = static::parseXML($child, $nestedValues);
