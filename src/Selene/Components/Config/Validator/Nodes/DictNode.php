@@ -134,7 +134,7 @@ class DictNode extends ArrayNode implements \Iterator
      */
     protected function getInvalidTypeMessage($value = null)
     {
-        return sprintf('%s my not contain numeric keys', $this->getKey());
+        return sprintf('%s may not contain numeric keys', $this->getKey());
     }
 
     /**

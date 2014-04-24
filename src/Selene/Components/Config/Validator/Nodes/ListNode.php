@@ -192,6 +192,44 @@ class ListNode extends ArrayNode implements \IteratorAggregate
     }
 
     /**
+     * getInvalidTypeMessage
+     *
+     * @param mixed $value
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getInvalidTypeMessage($value = null)
+    {
+        if (is_array($value)) {
+            $keys = $this->getInvalidKeys($value);
+            $string = implode('", "', $keys);
+            return sprintf('invalid key%s "%s" in %s', count($keys) < 2 ? '' : 's', $string, $this->getKey());
+        }
+
+        return parent::getInvalidTypeMessage($value);
+    }
+
+    /**
+     * getInvalidKeys
+     *
+     * @param array $values
+     *
+     * @access private
+     * @return string
+     */
+    private function getInvalidKeys(array $values)
+    {
+        $keys = array_keys($values);
+
+        $strings = array_filter($keys, function ($key) {
+            return !is_int($key);
+        });
+
+        return $strings;
+    }
+
+    /**
      * getIterator
      *
      *
