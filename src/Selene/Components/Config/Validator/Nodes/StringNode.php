@@ -101,7 +101,7 @@ class StringNode extends ScalarNode
         $this->validateLength($value);
         $this->validateRegexp($value);
 
-        return $this;
+        return true;
     }
 
 
@@ -109,19 +109,19 @@ class StringNode extends ScalarNode
     {
         $len = strlen($value);
 
-        if (null !== $this->maxLen && null !== $this->minLen) {
+        if (is_int($this->maxLen) && is_int($this->minLen)) {
             if (!($len >= $this->minLen && $this->maxLen >= $len)) {
                 throw new \OutOfRangeException(
                     sprintf('value lenght must be within the range of %s and %s', $this->minLen, $this->maxLen)
                 );
             }
-        } elseif (null !== $this->maxLen) {
-            if (!( $this->maxLen >= $len )) {
+        } elseif (is_int($this->maxLen)) {
+            if (!($this->maxLen >= $len )) {
                 throw new \LengthException(
                     sprintf('value must not exceed a length of %s', $this->maxLen)
                 );
             }
-        } elseif (null !== $this->minLen) {
+        } elseif (is_int($this->minLen)) {
             if (!($len >= $this->minLen)) {
                 throw new \LengthException(
                     sprintf('value must not deceed a length of %s', $this->minLen)

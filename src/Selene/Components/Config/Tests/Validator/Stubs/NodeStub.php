@@ -11,7 +11,7 @@
 
 namespace Selene\Components\Config\Tests\Validator\Stubs;
 
-use \Selene\Components\Config\Validator\Nodes\Node as AbstractNode;
+use \Selene\Components\Config\Validator\Nodes\ScalarNode as AbstractNode;
 
 /**
  * @class NodeStub
@@ -29,5 +29,18 @@ class NodeStub extends AbstractNode
     public function node()
     {
         return new static($this);
+    }
+
+    /**
+     * validateType
+     *
+     * @param mixed $type
+     *
+     * @access public
+     * @return mixed
+     */
+    public function validateType($type = null)
+    {
+        return true;
     }
 }

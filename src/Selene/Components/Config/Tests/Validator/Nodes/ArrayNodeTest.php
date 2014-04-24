@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator\Nodes package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -12,8 +12,18 @@
 namespace Selene\Components\Config\Tests\Validator\Nodes;
 
 use \Selene\Components\Config\Tests\Validator\Stubs\NodeStub;
+use \Selene\Components\Config\Tests\Validator\Stubs\ArrayNodeStub as ArrayNode;
 
-class NodeTest extends \PHPUnit_Framework_TestCase
+/**
+ * @class ArrayNodeTest extends \PHPUnit_Framework_TestCase
+ * @see \PHPUnit_Framework_TestCase
+ *
+ * @package Selene\Components\Config
+ * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
+ */
+class ArrayNodeTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
@@ -25,7 +35,7 @@ class NodeTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldGetItsParent()
     {
-        $node = new NodeStub;
+        $node = new ArrayNode;
         $nodeB = new NodeStub;
         $nodeC = new NodeStub;
 
@@ -44,7 +54,7 @@ class NodeTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldSetItsChild()
     {
-        $node = new NodeStub;
+        $node = new ArrayNode;
         $nodeB = new NodeStub;
         $nodeC = new NodeStub;
 
@@ -58,5 +68,25 @@ class NodeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($node, $nodeB->getParent(), 'parent node of $nodeB should be $node');
 
         $this->assertEquals([$nodeB, $nodeC], $node->getChildren());
+    }
+
+    /** @test */
+    public function itShouldHaveChild()
+    {
+        $node = new ArrayNode;
+        $childB = new NodeStub;
+        $childC = new NodeStub;
+
+        $this->assertFalse($node->hasChild($childB));
+        $this->assertFalse($node->hasChild($childC));
+
+        $node->addChild($childB);
+
+        $this->assertTrue($node->hasChild($childB));
+        $this->assertFalse($node->hasChild($childC));
+
+        $node->addChild($childC);
+
+        $this->assertTrue($node->hasChild($childC));
     }
 }

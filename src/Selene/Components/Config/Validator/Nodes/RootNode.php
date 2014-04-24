@@ -19,17 +19,9 @@ namespace Selene\Components\Config\Validator\Nodes;
 class RootNode extends DictNode implements RootNodeInterface
 {
     /**
-     * key
+     * Always return false
      *
-     * @var string
-     */
-    protected $key = 'root';
-
-    /**
-     * hasParent
-     *
-     * @access public
-     * @return mixed
+     * {@inheritdoc}
      */
     public function hasParent()
     {
@@ -37,9 +29,7 @@ class RootNode extends DictNode implements RootNodeInterface
     }
 
     /**
-     * setParent
-     *
-     * @param NodeInterface $node
+     * {@inheritdoc}
      *
      * @throws \BadMethodCallException every time it is called
      * @access public
@@ -56,7 +46,7 @@ class RootNode extends DictNode implements RootNodeInterface
     }
 
     /**
-     * getParent
+     * {@inheritdoc}
      *
      * @throws \BadMethodCallException every time it is called
      * @access public
@@ -67,10 +57,5 @@ class RootNode extends DictNode implements RootNodeInterface
         throw new \BadMethodCallException(
             sprintf('root node %s has no parent', $this->getKey())
         );
-    }
-
-    public function validateType($value)
-    {
-        return true;
     }
 }

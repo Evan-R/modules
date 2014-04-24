@@ -22,18 +22,16 @@ namespace Selene\Components\Config\Validator\Nodes;
  */
 class FloatNode extends NumericNode
 {
+    /**
+     * {@inheritdoc}
+     */
     public function validateType($value)
     {
         return is_float($value);
     }
 
     /**
-     * getInvalidTypeMessage
-     *
-     * @param mixed $value
-     *
-     * @access protected
-     * @return string
+     * {@inheritdoc}
      */
     protected function getInvalidTypeMessage($value = null)
     {

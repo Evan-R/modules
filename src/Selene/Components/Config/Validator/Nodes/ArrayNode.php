@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator\Nodes package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -12,13 +12,13 @@
 namespace Selene\Components\Config\Validator\Nodes;
 
 /**
- * @abstract class ArrayNode extends Node implements ParentableInterface, \IteratorAggregate
+ * @abstract class ArrayNode extends Node implements ParentableInterface
  * @see ParentableInterface
  * @see \IteratorAggregate
  * @see Node
  * @abstract
  *
- * @package Selene\Components\Config\Validator\Nodes
+ * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -33,7 +33,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
     protected $children;
 
     /**
-     * getChildren
+     * Get all child nodes
      *
      * @access public
      * @return array
@@ -44,7 +44,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
     }
 
     /**
-     * hasChildren
+     * Check it this node has children
      *
      * @access public
      * @return boolean
@@ -55,7 +55,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
     }
 
     /**
-     * getFirstChild
+     * Get the first child node
      *
      * @access public
      * @return Nodeinterface
@@ -68,7 +68,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
     }
 
     /**
-     * getLastChild
+     * Get the last child node
      *
      * @access public
      * @return NodeInterface
@@ -81,7 +81,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
     }
 
     /**
-     * getKeys
+     * Get all keys of all childnodes.
      *
      * @access public
      * @return array
@@ -98,9 +98,9 @@ abstract class ArrayNode extends Node implements ParentableInterface
     }
 
     /**
-     * addChild
+     * Adds a childnode.
      *
-     * @param NodeInterface $node
+     * @param \Selene\Components\Config\Validator\Nodes\NodeInterface $node
      *
      * @access public
      * @return NodeInterface this instance
@@ -117,9 +117,26 @@ abstract class ArrayNode extends Node implements ParentableInterface
     }
 
     /**
-     * hasChild
+     * Check if a node is a child.
      *
-     * @param NodeInterface $child
+     * @param \Selene\Components\Config\Validator\Nodes\NodeInterface $node
+     *
+     * @access public
+     * @return mixed
+     */
+    public function hasChild(NodeInterface $child)
+    {
+        $found = array_filter($this->children, function ($c) use ($child) {
+            return $c === $child;
+        });
+
+        return (bool)$found;
+    }
+
+    /**
+     * Get a child node by it's key
+     *
+     * @param mixed $key
      *
      * @access public
      * @return mixed
@@ -134,19 +151,13 @@ abstract class ArrayNode extends Node implements ParentableInterface
     }
 
     /**
-     * hasChild
+     * checkExceedingKeys
      *
-     * @param NodeInterface $child
+     * @param array $value
      *
-     * @access public
-     * @return mixed
+     * @access protected
+     * @abstract
+     * @return void
      */
-    public function hasChild(NodeInterface $child)
-    {
-        $found = array_filter($this->children, function ($c) use ($child) {
-            return $c === $child;
-        });
-
-        return (bool)$found;
-    }
+    abstract protected function checkExceedingKeys(array $value);
 }

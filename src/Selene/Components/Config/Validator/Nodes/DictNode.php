@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator\Nodes package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -14,16 +14,49 @@ namespace Selene\Components\Config\Validator\Nodes;
 use \Selene\Components\Config\Validator\Exception\ValidationException;
 
 /**
- * @class DictNode
- * @package Selene\Components\Config\Validator\Nodes
+ * @class DictNode extends ArrayNode implements \Iterator
+ * @see \Iterator
+ * @see ArrayNode
+ *
+ * @package Selene\Components\Config
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 class DictNode extends ArrayNode implements \Iterator
 {
-    private $current;
-
+    /**
+     * key
+     *
+     * @var string
+     */
     protected $key;
 
+    /**
+     * current
+     *
+     * @var int
+     */
+    private $current;
+
+    /**
+     * keySeparator
+     *
+     * @var string
+     */
+    private static $keySepearator = '-::-';
+
+    /**
+     * pattern
+     *
+     * @var string
+     */
+    private static $pattern = '~-::-[0-9]+-::-~';
+
+    /**
+     * Create a new DictNode object.
+     * @access public
+     */
     public function __construct()
     {
         $this->current = 0;
@@ -31,12 +64,7 @@ class DictNode extends ArrayNode implements \Iterator
     }
 
     /**
-     * validateType
-     *
-     * @param mixed $value
-     *
-     * @access public
-     * @return boolean
+     * {@inheritdoc}
      */
     public function validateType($value)
     {
@@ -44,14 +72,100 @@ class DictNode extends ArrayNode implements \Iterator
             return false;
         }
 
-        $keys = '-::-'.implode('-::-', array_keys($value)).'-::-';
-        return is_array($value) && !preg_match('/-::-[0-9]+-::-/', $keys);
+        $keys = $this->concatKeys($value, static::$keySepearator);
+
+        return is_array($value) && !(bool)preg_match(static::$pattern, $keys);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validate($value = null)
     {
         $valid = parent::validate($value);
 
+        $this->checkExceedingKeys($value);
+
+        return $valid;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function current()
+    {
+        return $this->children[$this->current];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function key()
+    {
+        return $this->children[$this->current]->getKey();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function valid()
+    {
+        return isset($this->children[$this->current]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function next()
+    {
+        $this->current++;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rewind()
+    {
+        $this->current = 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getInvalidTypeMessage($value = null)
+    {
+        return sprintf('%s my not contain numeric keys', $this->getKey());
+    }
+
+    /**
+     * Concatenate all array keys
+     *
+     * @param array $value
+     *
+     * @access private
+     * @return string
+     */
+    private function concatKeys(array $value, $separator)
+    {
+        $keys = array_keys($value);
+
+        array_push($keys, $separator);
+        array_unshift($keys, $separator);
+
+        return implode($separator, $keys);
+    }
+
+    /**
+     * checkExceedingKeys
+     *
+     * @param array $value
+     *
+     * @throws ValidationException
+     * @access protected
+     * @return void
+     */
+    protected function checkExceedingKeys(array $value)
+    {
         foreach ((array)$value as $key => $val) {
             if (null === $this->getChildByKey($key)) {
                 throw new ValidationException(
@@ -59,38 +173,5 @@ class DictNode extends ArrayNode implements \Iterator
                 );
             }
         }
-
-        return $valid;
-    }
-
-
-    public function current()
-    {
-        return $this->children[$this->current];
-    }
-
-    public function key()
-    {
-        return $this->children[$this->current]->getKey();
-    }
-
-    public function valid()
-    {
-        return isset($this->children[$this->current]);
-    }
-
-    public function next()
-    {
-        $this->current++;
-    }
-
-    public function rewind()
-    {
-        $this->current = 0;
-    }
-
-    protected function getInvalidTypeMessage($value = null)
-    {
-        return sprintf('%s my not contain numeric keys', $this->getKey());
     }
 }

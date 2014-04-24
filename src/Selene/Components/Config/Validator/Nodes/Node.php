@@ -247,7 +247,7 @@ abstract class Node implements NodeInterface
     {
         $empty = false;
 
-        if (null === $value || ($empty = empty($value))) {
+        if (null === $value || ($empty = $this->isEmptyValue($value))) {
 
             if ($empty && false === $this->allowEmpty) {
                 throw new MissingValueException(
@@ -257,7 +257,7 @@ abstract class Node implements NodeInterface
 
             if ($this->isOptional()) {
 
-                if (empty($value) && null === $this->getDefault()) {
+                if ($this->isEmptyValue($value) && null === $this->getDefault()) {
                     throw new MissingValueException(
                         sprintf('optional key %s with empty value must have a default value', $this->getKey())
                     );
@@ -276,6 +276,19 @@ abstract class Node implements NodeInterface
         }
 
         return true;
+    }
+
+    /**
+     * isEmptyValue
+     *
+     * @param mixed $value
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function isEmptyValue($value = null)
+    {
+        return is_string($value) ? (!strlen(trim($value)) > 0) : empty($value);
     }
 
     /**
@@ -317,7 +330,7 @@ abstract class Node implements NodeInterface
      * @param mixed $value
      *
      * @access protected
-     * @return mixed
+     * @return string
      */
     protected function getInvalidTypeMessage($value = null)
     {

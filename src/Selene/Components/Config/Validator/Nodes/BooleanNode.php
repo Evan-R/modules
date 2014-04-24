@@ -12,7 +12,7 @@
 namespace Selene\Components\Config\Validator\Nodes;
 
 /**
- * @class BooleanNode extends Node
+ * @class BooleanNode extends ScalarNode
  * @see Node
  *
  * @package Selene\Components\Config
@@ -23,8 +23,8 @@ namespace Selene\Components\Config\Validator\Nodes;
 class BooleanNode extends ScalarNode
 {
     /**
+     * Create a new boolean node.
      * @access public
-     * @return mixed
      */
     public function __construct()
     {
@@ -32,12 +32,7 @@ class BooleanNode extends ScalarNode
     }
 
     /**
-     * defaultValue
-     *
-     * @param mixed $val
-     *
-     * @access public
-     * @return mixed
+     * {@inheritdoc}
      */
     public function defaultValue($val)
     {
@@ -45,15 +40,23 @@ class BooleanNode extends ScalarNode
     }
 
     /**
-     * validateType
-     *
-     * @param mixed $value
-     *
-     * @access public
-     * @return mixed
+     * {@inheritdoc}
      */
     public function validateType($value)
     {
         return is_bool($value);
+    }
+
+    /**
+     * isEmptyValue
+     *
+     * @param mixed $value
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function isEmptyValue($value = null)
+    {
+        return is_string($value) ? (!strlen(trim($value)) > 0) : null === $value;
     }
 }

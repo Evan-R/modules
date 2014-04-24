@@ -35,22 +35,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     public function itShouldAddNnodes()
     {
         $builder = new Builder;
-        $builder->root()
+        $b = $builder->root()
             ->boolean('falsy or truthy')
                 ->optional()
                 ->defaultValue(true)
-            ->end()
-            ->boolean('Faaaaaaack')
-                ->optional()
-                ->defaultValue(true)
-            ->end()
-            ->dict('dict')
-                ->dict('otherDict')
-                    ->dict('yetAnotherDict')
-                    ->end()
-                ->end()
-            ->end();
-
-        var_dump($builder);
+                ->end();
+        $this->assertInstanceof('Selene\Components\Config\Validator\Builder', $b);
     }
 }

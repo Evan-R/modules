@@ -24,9 +24,12 @@ use \Selene\Components\Config\Validator\Nodes\NodeInterface;
 use \Selene\Components\Config\Validator\Nodes\ParentableInterface;
 
 /**
- * @class Builder
- * @package Selene\Components\Config\Validator
+ * @class Builder Builder
+ *
+ * @package Selene\Components\Config
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 class Builder
 {
@@ -60,7 +63,7 @@ class Builder
      * getValidator
      *
      * @access public
-     * @return Validator
+     * @return \Selene\Components\Config\Validator\TreeValidatorInterface
      */
     public function getValidator()
     {
@@ -77,41 +80,29 @@ class Builder
      */
     public function setRoot($name = null)
     {
-        $this->root = $this->current = new DictNode;
+        $this->root = $this->current = new RootNode;
         $this->root->setKey($name ?: 'root');
         $this->root->setBuilder($this);
 
         return $this;
     }
 
-    public function toArray()
+    /**
+     * getRoot
+     *
+     * @access public
+     * @return NodeInterface
+     */
+    public function getRoot()
     {
-        $tree = [$key = $this->root->getKey() => ['children' => []]];
-
-        foreach ($this->root->getChildren() as $child) {
-            $tree[$key]['children'][] = $this->nodeToArray($child);
-        }
-
-        return $tree;
-    }
-
-    protected function nodeToArray($node)
-    {
-        $cn = [$node->getKey() => get_class($node)];
-        if ($node instanceof ParentableInterface) {
-            $cn['children'] = [];
-            foreach ($node->getChildren() as $child) {
-                $cn['children'][] = $this->nodeToArray($child);
-            }
-        }
-        return $cn;
+        return $this->root;
     }
 
     /**
-     * root
+     * Initializes the root node.
      *
      * @access public
-     * @return mixed
+     * @return \Selene\Components\Config\Validator\Builder
      */
     public function root()
     {
@@ -120,7 +111,7 @@ class Builder
     }
 
     /**
-     * boolean
+     * Adds a BooleanNode
      *
      * @param mixed $key
      *
@@ -134,7 +125,7 @@ class Builder
     }
 
     /**
-     * integer
+     * Adds a IntegerNode
      *
      * @param mixed $key
      *
@@ -148,7 +139,7 @@ class Builder
     }
 
     /**
-     * float
+     * Adds a FloatNode
      *
      * @param mixed $key
      *
@@ -162,7 +153,7 @@ class Builder
     }
 
     /**
-     * dict
+     * Adds a DictNode
      *
      * @param mixed $key
      *
@@ -176,7 +167,7 @@ class Builder
     }
 
     /**
-     * values
+     * Adds a ListNode
      *
      * @param mixed $key
      *
@@ -190,7 +181,7 @@ class Builder
     }
 
     /**
-     * string
+     * Adds a StringNode
      *
      * @param mixed $key
      *
@@ -204,7 +195,7 @@ class Builder
     }
 
     /**
-     * enum
+     * Adds an enum node
      *
      * @param mixed $key
      *
@@ -218,14 +209,20 @@ class Builder
     }
 
     /**
-     * end
+     * Close the current node.
      *
      * @access public
      * @throws \BadMethodCallException if current node is already root
-     * @return $this
+     * @return \Selene\Components\Config\Validator\Builder
      */
     public function end()
     {
+        if (!$this->current->hasParent()) {
+            throw new \BadMethodCallException(
+                sprintf('node %s is already root', (string)$this->current->getKey())
+            );
+        }
+
         $this->current = $this->current->getParent();
         return $this;
     }
