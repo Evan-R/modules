@@ -23,6 +23,36 @@ namespace Selene\Components\Config\Validator\Nodes;
 class FloatNode extends NumericNode
 {
     /**
+     * Sets a minimum value
+     *
+     * @param float $value
+     *
+     * @access public
+     * @return FloatNode
+     */
+    public function min($value)
+    {
+        $this->min = (float)$value;
+
+        return $this;
+    }
+
+    /**
+     * Sets a maximum value
+     *
+     * @param float $value
+     *
+     * @access public
+     * @return FloatNode
+     */
+    public function max($value)
+    {
+        $this->max = (float)$value;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function validateType($value)

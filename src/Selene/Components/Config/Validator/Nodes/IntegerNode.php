@@ -16,8 +16,41 @@ namespace Selene\Components\Config\Validator\Nodes;
  * @package Selene\Components\Config\Validator\Nodes
  * @version $Id$
  */
-class IntergerNode extends NumericNode
+class IntegerNode extends NumericNode
 {
+    /**
+     * Sets a minimum value
+     *
+     * @param int $value
+     *
+     * @access public
+     * @return IntergerNode
+     */
+    public function min($value)
+    {
+        $this->min = (int)$value;
+
+        return $this;
+    }
+
+    /**
+     * Sets a maximum value
+     *
+     * @param int $value
+     *
+     * @access public
+     * @return IntegerNode
+     */
+    public function max($value)
+    {
+        $this->max = (int)$value;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function validateType($value)
     {
         return is_int($value);

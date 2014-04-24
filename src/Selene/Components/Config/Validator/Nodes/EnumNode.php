@@ -68,7 +68,7 @@ class EnumNode extends ScalarNode
 
         if (!in_array($value, $def = (array)$this->defaultValues)) {
             throw new ValidationException(
-                sprintf('allowed values: "%s, but value "%s" given', implode('", "', $def), $value)
+                sprintf('allowed values: "%s", but value "%s" given', implode('", "', $def), $value)
             );
         }
 

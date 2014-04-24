@@ -105,6 +105,16 @@ class StringNode extends ScalarNode
     }
 
 
+    /**
+     * validateLength
+     *
+     * @param string $value
+     *
+     * @throws \OutOfRangeException if both max and min length constraints do not match
+     * @throws \LengthException if max or min length constraints do not match
+     * @access protected
+     * @return void
+     */
     protected function validateLength($value)
     {
         $len = strlen($value);
@@ -128,8 +138,6 @@ class StringNode extends ScalarNode
                 );
             }
         }
-
-        return true;
     }
 
     /**

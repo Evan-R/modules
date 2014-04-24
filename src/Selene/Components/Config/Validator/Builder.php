@@ -17,7 +17,7 @@ use \Selene\Components\Config\Validator\Nodes\ScalarNode;
 use \Selene\Components\Config\Validator\Nodes\DictNode;
 use \Selene\Components\Config\Validator\Nodes\ListNode;
 use \Selene\Components\Config\Validator\Nodes\FloatNode;
-use \Selene\Components\Config\Validator\Nodes\IntergerNode;
+use \Selene\Components\Config\Validator\Nodes\IntegerNode;
 use \Selene\Components\Config\Validator\Nodes\StringNode;
 use \Selene\Components\Config\Validator\Nodes\BooleanNode;
 use \Selene\Components\Config\Validator\Nodes\NodeInterface;
@@ -134,7 +134,7 @@ class Builder
      */
     public function integer($key = null)
     {
-        $node = new IntergerNode;
+        $node = new IntegerNode;
         return $this->addNode($node, $key);
     }
 
