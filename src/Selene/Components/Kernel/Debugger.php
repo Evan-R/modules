@@ -58,7 +58,7 @@ class Debugger
      * @access public
      * @return float|string
      */
-    public function getRuntime($asfloat = true)
+    public function getRuntime($asFloat = true)
     {
         if ($this->started) {
             $this->stop();

@@ -17,20 +17,61 @@ use \Selene\Components\DI\Loader\ConfigLoader;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\Xml\Builder;
 use \Selene\Components\Xml\Traits\XmlLoaderTrait;
+use \Selene\Components\Confgi\Loader\AbstractXmlLoader;
 
 /**
  * @class XmlLoader
  * @package Selene\Components\Routing\Loader
  * @version $Id$
  */
-class XmlLoader extends BaseXmlLoader
+class XmlLoader extends AbstractXmlLoader
 {
-    use XmlLoaderTrait {
-        XmlLoaderTrait::create as private createNew;
-        XmlLoaderTrait::getErrors as private getXmlErrors;
-        XmlLoaderTrait::load as private loadXml;
-        XmlLoaderTrait::getOption as private getXmlOption;
-        XmlLoaderTrait::setOption as private setXmlOption;
-        XmlLoaderTrait::handleXmlErrors as private handleXmlRuntimeErrors;
+    protected $builder;
+
+    /**
+     * @param ContainerInterface $container
+     * @param mixed $routerService
+     *
+     * @access public
+     * @return mixed
+     */
+    public function __construct(ContainerInterface $container, $routeBuilder = null)
+    {
+        $this->builder = $routeBuilder ?: new RouteBuilder;
+
+        parent::__construct($container);
+    }
+
+    /**
+     * load
+     *
+     * @param mixed $resource
+     *
+     * @access public
+     * @return mixed
+     */
+    public function load($resource)
+    {
+        $this->container->addFileResource($resource);
+        $xml = $this->loadXml($resource);
+
+        $this->parseImports($xml);
+        $this->parseRoutes($xml);
+
+    }
+
+    /**
+     * parseRoutes
+     *
+     * @param DOMDocument $xml
+     *
+     * @access protected
+     * @return void
+     */
+    protected function parseRoutes(DOMDocument $xml)
+    {
+        foreach ($xml->xpath('//routes') as $routeNode) {
+
+        }
     }
 }

@@ -17,8 +17,18 @@ use \Symfony\Component\HttpKernel\HttpKernelInterface;
 use \Symfony\Component\HttpKernel\TerminableInterface;
 use \Selene\Components\Events\DispatcherInterface;
 use \Selene\Components\Routing\RouterInterface;
+use \Selene\Components\DI\Builder;
+use \Selene\Components\DI\Dumper\ContainerDumper;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
+use \Selene\Components\Config\Cache as ConfigCache;
+use \Selene\Components\Kernel\KernelStack;
+use \Selene\Components\Kernel\StackBuilder as KernelStackBuilder;
+use \Selene\Components\Package\PackageRepository;
+use \Selene\Components\Config\Resource\Locator;
+use \Selene\Components\Config\Resource\LoaderResolver;
+use \Selene\Components\Config\Resource\DelegatingLoader;
+use \Selene\Components\DI\Loader\XmlLoader;
 
 /**
  * @class Application implements HttpKernelInterface, TerminableInterface, ContainerAwareInterface
@@ -36,9 +46,9 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
     use ContainerAwareTrait;
 
     /**
-     * denug
+     * debugger
      *
-     * @var array
+     * @var Selene\Components\Kernel\Debugger
      */
     protected $debugger;
 
@@ -52,9 +62,16 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
     /**
      * booted
      *
-     * @var mixed
+     * @var boolean
      */
     protected $booted;
+
+    /**
+     * packages
+     *
+     * @var \Selene\Components\Package\PackageRepository
+     */
+    protected $packages;
 
     /**
      * @param mixed $environment
@@ -76,17 +93,15 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
     /**
      * handle
      *
-     * @param Request $request
-     * @param mixed $type
-     * @param mixed $catch
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param int $type
+     * @param boolean $catch
      *
      * @access public
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        $this->getRequestStack()->push($request);
-
         try {
             $this->boot();
             $response = $this->getKernelStack()->handle($request, $type, $catch);
@@ -95,16 +110,14 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
             throw $e;
             return;
         }
-
         return $response;
     }
 
     /**
      * boot
      *
-     *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function boot()
     {
@@ -112,97 +125,83 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
             return;
         }
 
-        $this->registerPackages();
+        $this->initializePackages();
+        $this->initializeContainer();
+
+        $this->bootKernelStack();
+
+        $this->booted = true;
     }
 
     /**
-     * registerPackages
+     * getContainerServiceName
      *
-     * @access protected
+     * @access public
+     * @return string
+     */
+    public function getContainerServiceId()
+    {
+        return 'app.container';
+    }
+
+    /**
+     * terminate
+     *
+     * @param Request $request
+     * @param Response $response
+     *
+     * @access public
      * @return mixed
      */
-    protected function registerPackages()
+    public function terminate(Request $request, Response $response)
     {
-        foreach ($this->getPackages() as $packageClass) {
-            $package = new $packageClass($this);
-            $package->setContainer($this->getContainer());
-            $package->register($this->getContainer());
+        if ($this->debugger) {
+            $this->debugger->stop();
         }
     }
 
     /**
-     * initializeContainer
+     * getKernel
      *
      * @access protected
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\HttpKernelInterface
      */
-    protected function initializeContainer()
+    public function getKernel()
     {
-        $containerClass = $this->getContainerClass();
-        $this->container = new $containerClass;
+        return $this->getContainer()->get('app_kernel');
     }
 
     /**
-     * getContainerClass
+     * getKernelStack
      *
-     * @access protected
-     * @return string
+     * @access public
+     * @return \Selene\Components\Kernel\Stack
      */
-    protected function getContainerClass()
-    {
-        return 'Selene\Components\DI\BaseContainer';
-    }
-
-    abstract protected function getPackages();
-
-    abstract protected function getAppRoot();
-
-    /**
-     * getApplicationStack
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function getKernelStack()
+    public function getKernelStack()
     {
         return $this->getContainer()->get('app_kernel.stack');
     }
 
     /**
-     * initialize
+     * getRequestStack
      *
      * @access public
      * @return mixed
      */
-    public function initialize()
+    public function getRequestStack()
     {
-        $this->loadConfig();
+        return $this->getContainer()->get('request_stack');
     }
 
     /**
-     * initIalizeContainer
+     * isDebugging
      *
      * @access public
-     * @return mixed
+     * @return boolean
      */
-    public function getContainerConfig()
+    public function isDebugging()
     {
-        return;
-    }
-
-    /**
-     * getConfigLoader
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getConfigLoader()
-    {
-        if (null === $this->configLoader) {
-
-        }
-
-        return $this->configLoader();
+        return null !== $this->debugger;
     }
 
     /**
@@ -217,32 +216,182 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
     }
 
     /**
-     * terminate
+     * getContainerClass
      *
-     * @param Request $request
-     * @param Response $response
-     *
-     * @access public
-     * @return mixed
+     * @access protected
+     * @return string
      */
-    public function terminate(Request $request, Response $response)
+    protected function getContainerClass()
     {
-        return null;
+        return 'Selene\Components\DI\BaseContainer';
     }
 
     /**
-     * getKernel
+     * initializeContainer
+     *
+     * @access protected
+     * @return void
+     */
+    protected function initializeContainer()
+    {
+        $cache = new ConfigCache(
+            $file = $this->getContainerCachePath() . '/Container'.ucfirst($this->env).'.php',
+            $this->isDebugging()
+        );
+
+        if ($cache->isValid()) {
+            return $this->loadContainerCache($config);
+        }
+
+        $this->buildContainer($cache);
+
+        $cache->write('some nonesense', $this->container->getResources()->toArray());
+    }
+
+    /**
+     * buildContainer
+     *
+     * @param ConfigCache $cache
+     *
+     * @access protected
+     * @return void
+     */
+    protected function buildContainer(ConfigCache $cache)
+    {
+        $builder = new Builder(new ContainerDumper);
+        $builder->setContainerClass($this->getContainerClass());
+
+        $builder->build(function ($container) {
+
+            $this->setContainer($container);
+            $this->container->setParameter('app.root', $this->getApplicationRoot());
+            $this->container->inject($this->getContainerServiceId(), $container);
+
+            $configPaths = $this->getPackageConfig();
+
+            $locator = new Locator($configPaths);
+
+            $locator->setRootPath(
+                $this->getApplicationRoot().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'packages'
+            );
+            $resolver = new LoaderResolver([
+                new XmlLoader($this->container, $locator)
+            ]);
+            $loader = new DelegatingLoader($resolver);
+
+            $loader->load('config.xml');
+
+            $this->packages->build($container);
+        });
+
+        $this->container->compile();
+    }
+
+    /**
+     * loadContainerCache
+     *
+     * @access protected
+     * @return void
+     */
+    protected function loadContainerCache(ConfigCache $cache)
+    {
+        $file = (string)$cache;
+
+        $container = (basename($file));
+        $this->setContainer($container);
+    }
+
+    /**
+     * getDefaultParameters
      *
      * @access protected
      * @return mixed
      */
-    public function getKernel()
+    protected function getDefaultParameters()
     {
-        return $this->getContainer()->get('app_kernel');
+        return [
+            'app_kernel.root' => $this->getApplicationRoot()
+        ];
     }
 
-    public function getRequestStack()
+    /**
+     * bootKernelStack
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function bootKernelStack()
     {
-        return $this->getContainer()->get('request_stack');
+        $builder = new KernelStackBuilder($this->getKernel());
+        $this->packages->registerMiddlewares($builder);
+
+        $this->container->inject('app_kernel.stack', $stack = $builder->make());
     }
+
+    /**
+     * registerPackages
+     *
+     * @access protected
+     * @return void
+     */
+    protected function registerPackages()
+    {
+        $this->packages->register($this->container);
+    }
+
+    /**
+     * initializePackages
+     *
+     * @access protected
+     * @return void
+     */
+    protected function initializePackages()
+    {
+        $this->packages = $this->packages ?:
+            new PackageRepository($this->initPackages($this->getPackages()));
+    }
+
+    protected function getPackageConfig()
+    {
+        $paths = [];
+        foreach ($this->packages as $alias => $package) {
+            $paths[] = $alias;
+        }
+
+        return $paths;
+    }
+
+    protected function initPackages(array $packages)
+    {
+        $initialized = [];
+
+        foreach ($packages as $packageClass) {
+            if (class_exists($packageClass)) {
+                $initialized[] = new $packageClass;
+            }
+        }
+
+        return $initialized;
+    }
+
+
+    /**
+     * getPackages
+     *
+     *
+     * @access protected
+     * @abstract
+     * @return array
+     */
+    abstract protected function getPackages();
+
+    /**
+     * getContainerCachePath
+     *
+     *
+     * @access protected
+     * @abstract
+     * @return string
+     */
+    abstract protected function getContainerCachePath();
 }

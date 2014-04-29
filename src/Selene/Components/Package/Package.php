@@ -14,7 +14,13 @@ namespace Selene\Components\Package;
 use \Selene\Components\Kernel\Application;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
+use \Selene\Components\DI\Loader\XmlLoader;
+use \Selene\Components\DI\Loader\PhpLoader;
+use \Selene\Components\DI\Loader\CallableLoader;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
+use \Selene\Components\Config\Loader\DelegatingLoader;
+use \Selene\Components\Config\Loader\Resolver as LoaderResolver;
+use \Selene\Components\Config\Locator\FileLocator;
 
 /**
  * @abstract class Package implements PackageInterface, ContainerAwareInterface
@@ -73,26 +79,76 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
     protected static $lazy = false;
 
     /**
-     * @param AppCoreInterface $app
+     * alias
+     *
+     * @var string
+     */
+    protected $alias;
+
+    /**
+     * setApplication
+     *
+     * @param Application $app
      *
      * @access public
-     * @final
      * @return mixed
      */
-    final public function __construct(Application $app = null)
+    public function setApplication(Application $app)
     {
         $this->app = $app;
     }
 
     /**
-     * register
+     * getExtension
+     *
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getConfiguration()
+    {
+        $class = $this->getNamespace() . '\\Config\\Config';
+        return new $class;
+    }
+
+    /**
+     * getResourcePath
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getResourcePath()
+    {
+        return $this->getPath() . DIRECTORY_SEPARATOR . 'Resources';
+    }
+
+    /**
+     * getAlias
+     *
+     * @access public
+     * @return string
+     */
+    public function getAlias()
+    {
+        if (null === $this->alias) {
+            $name = $this->getName();
+            $base = 0 !== strrpos($name, 'Package') ? substr($name, 0, -strlen('Package')) : $name;
+
+            $this->alias = strLowDash($base);
+        }
+
+        return $this->alias;
+    }
+
+    /**
+     * build
      *
      * @param ContainerInterface $container
      *
      * @access public
      * @return void
      */
-    public function register(ContainerInterface $container)
+    public function build(ContainerInterface $container)
     {
     }
 
@@ -102,7 +158,7 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
      * @access public
      * @return void
      */
-    public function boot(ContainerInterface $container)
+    public function boot()
     {
     }
 
@@ -112,8 +168,19 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
      * @access public
      * @return void
      */
-    public function shutdown(ContainerInterface $container)
+    public function shutdown()
     {
+    }
+
+    /**
+     * getMeta
+     *
+     * @access public
+     * @return string
+     */
+    public function getMeta()
+    {
+        return $this->getPath().DIRECTORY_SEPARATOR.'meta.xml';
     }
 
     /**
@@ -129,6 +196,7 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
         }
         return $this->namespace;
     }
+
 
     /**
      * getName
@@ -177,17 +245,6 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
     }
 
     /**
-     * isLazy
-     *
-     * @access public
-     * @return mixed
-     */
-    public static function isLazy()
-    {
-        return static::$lazy;
-    }
-
-    /**
      * registerCommands
      *
      * @access public
@@ -196,5 +253,44 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
     public function registerCommands()
     {
 
+    }
+
+    /**
+     * registerMiddleWares
+     *
+     * @access public
+     * @return array|HttpKernelInterface
+     */
+    public function getMiddlewares($app)
+    {
+
+    }
+
+    /**
+     * supports
+     *
+     * @param mixed $type
+     *
+     * @access public
+     * @return mixed
+     */
+    public function provides($type = null)
+    {
+        if (null !== $type) {
+            return in_array($type, $this->getProviderTypes());
+        }
+
+        return $this->getProviderTypes();
+    }
+
+    /**
+     * getSupportedTypes
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function getProviderTypes()
+    {
+        return [];
     }
 }

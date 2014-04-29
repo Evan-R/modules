@@ -9,6 +9,39 @@
  * that was distributed with this package.
  */
 
+if (!function_exists('isTraversable')) {
+
+    /**
+     * isTraversable
+     *
+     * @param mixed $data
+     *
+     * @access
+     * @return boolean
+     */
+    function isTraversable($data)
+    {
+        return is_array($data) || $data instanceof \Traversable;
+    }
+}
+
+if (!function_exists('isXmlElement')) {
+
+    /**
+     * isXmlElement
+     *
+     * @param mixed $element
+     *
+     * @access
+     * @return boolean
+     */
+    function isXmlElement($element)
+    {
+        return $element instanceof \SimpleXmlElement || $element instanceof \DOMNode;
+    }
+}
+
+
 if (!function_exists('arrayGet')) {
     /**
      * array_get
@@ -188,6 +221,20 @@ if (!function_exists('tail')) {
     function tail(array $array)
     {
         return end($array);
+    }
+}
+
+if (!function_exists('arrayIsList')) {
+    /**
+     * array_numeric
+     *
+     * @param array $array
+     *
+     * @return boolean
+     */
+    function arrayIsList(array $array)
+    {
+        return ctype_digit(implode('', array_keys($array)));
     }
 }
 

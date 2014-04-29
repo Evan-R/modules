@@ -11,8 +11,12 @@
 
 namespace Selene\Components\Package;
 
-use \Selene\Components\Core\Application;
+
+use \Selene\Components\DI\Parameters;
 use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\Config\ConfigurationInterface;
+use \Symfony\Component\HttpKernel\HttpKernelInterface;
+use \Selene\Components\Kernel\StackBuilder as KernelStackBuilder;
 
 /**
  * @class PackageRepository
@@ -22,8 +26,15 @@ use \Selene\Components\DI\ContainerInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class PackageRepository implements PackageRepositoryInterface
+class PackageRepository implements PackageRepositoryInterface, \IteratorAggregate
 {
+    /**
+     * packages
+     *
+     * @var array
+     */
+    protected $aliases;
+
     /**
      * packages
      *
@@ -32,55 +43,35 @@ class PackageRepository implements PackageRepositoryInterface
     protected $packages;
 
     /**
-     * lazyPackages
-     *
-     * @var array
-     */
-    protected $lazyPackages;
-
-    /**
-     * loadedPackages
-     *
-     * @var array
-     */
-    protected $loadedPackages;
-
-    /**
-     * @param Application $app
+     * @param array $packages
      *
      * @access public
+     * @return mixed
      */
-    public function __construct(Application $app)
+    public function __construct(array $packages = [])
     {
-        $this->app = $app;
+        $this->aliases = [];
+        $this->packages = [];
+
+        $this->addPackages($packages);
     }
 
     /**
-     * getApplication
+     * addPackage
+     *
+     * @param PackageInterface $package
      *
      * @access public
-     * @return Application
+     * @return mixed
      */
-    public function getApplication()
+    public function add(PackageInterface $package)
     {
-        return $this->app;
+        $this->aliases[$package->getName()] = $package->getAlias();
+        $this->packages[$package->getAlias()] = $package;
     }
 
     /**
-     * Adds a single package to the packages array.
-     *
-     * @param mixed $package
-     *
-     * @access public
-     * @return void
-     */
-    public function add($package)
-    {
-        $this->packages[] = $package;
-    }
-
-    /**
-     * Add an array of packages.
+     * addPackages
      *
      * @param array $packages
      *
@@ -89,8 +80,53 @@ class PackageRepository implements PackageRepositoryInterface
      */
     public function addPackages(array $packages)
     {
-        array_unshift($this->packages, $packages);
-        $this->packages = call_user_func_array('array_push', $packages);
+        foreach ($packages as $package) {
+            $this->add($package);
+        }
+    }
+
+    /**
+     * has
+     *
+     * @param mixed $name
+     *
+     * @access public
+     * @return boolean
+     */
+    public function has($name)
+    {
+        return isset($this->packages[$this->getAlias($name)]);
+    }
+
+    /**
+     * get
+     *
+     * @param mixed $name
+     *
+     * @access public
+     * @return PackageInterce
+     */
+    public function get($name)
+    {
+        if (!$this->has($name)) {
+            return;
+        }
+
+        return $this->packages[$this->getAlias($name)];
+    }
+
+    /**
+     * getAlias
+     *
+     * @param mixed $name
+     *
+     * @access public
+     * @return string|null
+     */
+    public function getAlias($name)
+    {
+        return isset($this->aliases[$name]) ? $this->aliases[$name] :
+            (in_array($name, $this->aliases) ? $name : null);
     }
 
     /**
@@ -101,74 +137,69 @@ class PackageRepository implements PackageRepositoryInterface
      */
     public function all()
     {
-        $this->packages = array_unique($this->packages);
         return $this->packages;
     }
 
     /**
-     * Register packages
-     *
-     * @param ContainerAwareInterface $container
+     * Start the package build process.
+     * Load package config and start package bulding.
      *
      * @access public
-     * @throws \RuntimeException
-     * @return void
+     * @return mixed
      */
-    public function registerPackages(ContainerInterface $container)
+    public function build(ContainerInterface $container)
     {
-        foreach ($this->packages as $packageClass) {
-            $this->doLoadPackage($package = new $class($this->getApplication()), $container);
+        foreach ($this->packages as $package) {
+            $this->loadPackageConfig($container, $package);
+            $this->buildPackage($container, $package);
         }
     }
 
     /**
-     * registerLazyPackages
+     * Loads the specific confgiguration for a specific package.
      *
      * @param ContainerInterface $container
-     *
-     * @access public
-     * @return void
-     */
-    public function registerLazyPackages(ContainerInterface $container)
-    {
-
-    }
-
-    /**
-     * doLoadPackage
-     *
-     * @param PackageInterface $package
+     * @param PackageInterce $package
      *
      * @access protected
      * @return void
      */
-    protected function doLoadPackage(PackageInterface $package, ContainerInterface $container)
+    protected function loadPackageConfig(ContainerInterface $container, PackageInterface $package)
     {
-        $packageName = $package->getName();
-
-        if (array_key_exists($packageName, $this->loadedPackages)) {
-            throw new \RuntimeException(sprintf('Package %s is already registered', $name));
+        if (!($config = $package->getConfiguration()) instanceof ConfigurationInterface) {
+            return;
         }
 
-        if (true) {
-            $package->register($container);
+        $container->addObjectResource($config);
+
+        $parameters = $container->getParameters();
+        $containerClass = (new \ReflectionObject($container))->getName();
+        $packageContainer = new $container(new Parameters($parameters->getRaw()));
+
+        if ($packageContainer->hasParameter($name = 'package:'.$package->getAlias())) {
+            $values = $packageContainer->getParameter($name);
+        } else {
+            $values = [];
         }
 
-        $this->loadedPackages[$packageName] = $package;
+        $config->load($packageContainer, $values);
+
+        $container->merge($packageContainer);
     }
 
     /**
-     * doRegisterPackage
+     * buildPackage
      *
-     * @param PackageInterface $package
      * @param ContainerInterface $container
+     * @param PackageInterface $package
      *
      * @access protected
      * @return mixed
      */
-    protected function doRegisterPackage(PackageInterface $package, ContainerInterface $container)
+    protected function buildPackage(ContainerInterface $container, PackageInterface $package)
     {
-        $package->register($container);
+        $container->addFileResource($package->getMeta());
+        return $package->build($container);
     }
 
     /**
@@ -177,15 +208,73 @@ class PackageRepository implements PackageRepositoryInterface
      * @access public
      * @return mixed
      */
-    public function bootPackages()
+    public function boot()
     {
-        foreach ($this->loadedPackages as $package) {
+        foreach ($this->packages as $package) {
             $package->boot();
         }
     }
 
-    public function bootLazyPackages()
+    /**
+     * shutDown
+     *
+     * @access public
+     * @return void
+     */
+    public function shutDown()
     {
+        foreach ($this->packages as $package) {
+            $package->shutDown();
+        }
+    }
 
+    /**
+     * registerMiddleWares
+     *
+     * @access public
+     * @return void
+     */
+    public function registerMiddleWares(KernelStackBuilder $builder)
+    {
+        //foreach ($this->packages as $package) {
+
+        //    if (!$package->provides(PackageInterface::PROV_MIDDLEWARE)) {
+        //        continue;
+        //    }
+
+        //    $app = $this->app->getKernel();
+        //    $this->registerMiddleware($builder, $package->getMiddlewares($app));
+        //}
+    }
+
+    /**
+     * registerMiddleWare
+     *
+     * @param KernelStackBuilder $builder
+     * @param mixed $middlewares
+     *
+     * @access protected
+     * @return void
+     */
+    protected function registerMiddleWare(KernelStackBuilder $builder, $middlewares)
+    {
+        if (!is_array($middlewares)) {
+            $middlewares = [$middlewares];
+        }
+
+        foreach ($middlewares as $middleware) {
+            $builder->add($middleware);
+        }
+    }
+
+    /**
+     * getIterator
+     *
+     * @access public
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->packages);
     }
 }

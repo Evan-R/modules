@@ -143,7 +143,7 @@ class Parameters implements ParameterInterface
     public function merge(ParameterInterface $parameters)
     {
         if ($this === $parameters) {
-            throw new \LogicException('%s: cannot merge same instance', get_class($this));
+            throw new \LogicException(sprintf('%s: cannot merge same instance', get_class($this)));
         }
 
         $this->parameters = array_merge($this->parameters, $parameters->getRaw());

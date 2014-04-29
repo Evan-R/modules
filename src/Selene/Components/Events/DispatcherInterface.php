@@ -19,7 +19,7 @@ namespace Selene\Components\Events;
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT
  */
-interface DispatcherInterface
+interface DispatcherInterface extends SubscriberAwareInterface
 {
     /**
      * @var string;
@@ -89,24 +89,4 @@ interface DispatcherInterface
      * @return mixed
      */
     public function getEventHandlers($event = null);
-
-    /**
-     * addSubscriber
-     *
-     * @param SubscriberInterface $subscriber
-     *
-     * @access public
-     * @return mixed
-     */
-    public function addSubscriber(SubscriberInterface $subscriber);
-
-    /**
-     * renoveSubscriber
-     *
-     * @param SubscriberInterface $subscriber
-     *
-     * @access public
-     * @return mixed
-     */
-    public function removeSubscriber(SubscriberInterface $subscriber);
 }

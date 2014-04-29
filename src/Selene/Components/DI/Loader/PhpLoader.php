@@ -34,18 +34,21 @@ class PhpLoader extends ConfigLoader
      */
     public function load($resource)
     {
-        $container = $this->container;
-        $container->addFileResource($resource);
+        $file = $this->locator->locate($resource, false);
 
-        include $resource;
+        $container = $this->container;
+
+        include $file;
+
+        $container->addFileResource($file);
     }
 
     /**
      * {@inheritdoc}
      * @param string $format
      */
-    public function supports($format)
+    public function supports($resource)
     {
-        return 'php' === strtolower($format);
+        return is_string($resource) && 'php' ===  pathinfo(strtolower($resource), PATHINFO_EXTENSION);
     }
 }

@@ -43,6 +43,19 @@ class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Se
     }
 
     /**
+     * merge
+     *
+     * @param mixed $
+     *
+     * @access public
+     * @return mixed
+     */
+    public function merge(RouteCollection $routes)
+    {
+        $this->routes = array_merge($this->routes, $routes->raw());
+    }
+
+    /**
      * add
      *
      * @param Route $route

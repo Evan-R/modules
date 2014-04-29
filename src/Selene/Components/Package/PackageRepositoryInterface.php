@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Package;
 
+use \Selene\Components\DI\ContainerInterface;
+
 /**
  * @interface PackageRepositoryInterface
  *
@@ -21,4 +23,19 @@ namespace Selene\Components\Package;
  */
 interface PackageRepositoryInterface
 {
+    public function add(PackageInterface $package);
+
+    public function addPackages(array $packages);
+
+    public function get($name);
+
+    public function has($name);
+
+    public function all();
+
+    public function build(ContainerInterface $container);
+
+    public function boot();
+
+    public function shutDown();
 }

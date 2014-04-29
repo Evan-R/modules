@@ -4,6 +4,7 @@ namespace Selene\Components\Routing;
 
 use \Symfony\Component\HttpFoundation\Request;
 use \Selene\Components\Events\DispatcherInterface;
+use \Selene\Components\Events\Dispatcher;
 use \Selene\Components\Routing\Events\RouteFilterEvent;
 use \Selene\Components\Routing\Events\RouteDispatchEvent;
 use \Selene\Components\Routing\Events\RouteFilterAfterEvent;
@@ -87,10 +88,14 @@ class Router implements RouterInterface
      * @access public
      * @return mixed
      */
-    public function __construct(ResolverInterface $resolver, RouteMatcherInterface $matcher = null)
-    {
+    public function __construct(
+        ResolverInterface $resolver,
+        RouteMatcherInterface $matcher = null,
+        DispatcherInterface $events = null
+    ) {
         $this->resolver  = $resolver;
         $this->matcher   = $matcher ? : new RouteMatcher;
+        $this->events    = $events ? : new Dispatcher;
 
         $this->filters = [];
         $this->filtersEvents = [];

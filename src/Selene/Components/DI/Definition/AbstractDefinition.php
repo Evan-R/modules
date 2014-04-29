@@ -96,6 +96,13 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     protected $abstract;
 
     /**
+     * flags
+     *
+     * @var array
+     */
+    protected $flags;
+
+    /**
      * @param mixed $class
      * @param mixed $params
      * @param mixed $scope
@@ -335,6 +342,73 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     public function isInjected()
     {
         return $this->injected;
+    }
+
+    /**
+     * addFlag
+     *
+     * @param mixed $flag
+     *
+     * @access public
+     * @return DefinitionInterace this instance.
+     */
+    public function addFlag($flag)
+    {
+        $this->flags[] = new Flag($flag, $this);
+        return $this;
+    }
+
+    /**
+     * @param array $flags
+     *
+     * @access public
+     * @return mixed
+     */
+    public function addFlags(array $flags)
+    {
+        foreach ($flags as $flag) {
+            $this->addFlag($flag);
+        }
+
+        return $this;
+    }
+
+    /**
+     * setFlags
+     *
+     * @param array $flags
+     *
+     * @access public
+     * @return mixed
+     */
+    public function setFlags(array $flags)
+    {
+        $this->flags = [];
+        return $this->addFlags($flags);
+    }
+
+    /**
+     * hasFlag
+     *
+     * @param mixed $flag
+     *
+     * @access public
+     * @return boolean
+     */
+    public function hasFlag($flag)
+    {
+        return in_array($flag, $this->flags);
+    }
+
+    /**
+     * getFlags
+     *
+     * @access public
+     * @return array
+     */
+    public function getFlags()
+    {
+        return $this->flags;
     }
 
     /**

@@ -24,15 +24,21 @@ use \Selene\Components\DI\ContainerInterface;
 interface PackageInterface
 {
 
+    /** @var string */
+    const PROV_COMMAND = 'commands';
+
+    /** @var string */
+    const PROV_MIDDLEWARE = 'middleware';
+
     /**
-     * Registers components and serivces on the DI container.
+     * build
      *
      * @param ContainerInterface $container
      *
      * @access public
-     * @return void
+     * @return mixed
      */
-    public function register(ContainerInterface $container);
+    public function build(ContainerInterface $container);
 
     /**
      * boot up the package
@@ -40,7 +46,7 @@ interface PackageInterface
      * @access public
      * @return void
      */
-    public function boot(ContainerInterface $container);
+    public function boot();
 
     /**
      * bundle shutdown.
@@ -50,7 +56,7 @@ interface PackageInterface
      * @access public
      * @return void
      */
-    public function shutdown(ContainerInterface $container);
+    public function shutdown();
 
     /**
      * registerCommands
@@ -72,9 +78,17 @@ interface PackageInterface
      * getName
      *
      * @access public
-     * @return mixed
+     * @return string
      */
     public function getName();
+
+    /**
+     * getAlias
+     *
+     * @access public
+     * @return string
+     */
+    public function getAlias();
 
     /**
      * getNamespace
@@ -83,12 +97,4 @@ interface PackageInterface
      * @return mixed
      */
     public function getNamespace();
-
-    /**
-     * isLazy
-     *
-     * @access public
-     * @return boolean
-     */
-    public static function isLazy();
 }

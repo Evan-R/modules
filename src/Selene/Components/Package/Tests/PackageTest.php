@@ -24,30 +24,39 @@ use \Selene\Components\Package\Tests\Stubs\StubPackage;
  */
 class PackageTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function testGetName()
+
+    /** @test */
+    public function itShouldGetItsName()
     {
-        $package = new StubPackage(m::mock('Selene\Components\Core\Application'));
+        $package = new StubPackage;
         $this->assertSame('StubPackage', $package->getName());
     }
 
-    /**
-     * @test
-     */
-    public function testGetNamespace()
+    /** @test */
+    public function itShouldGetItsAlias()
     {
-        $package = new StubPackage(m::mock('Selene\Components\Core\Application'));
+        $package = new StubPackage;
+        $this->assertSame('stub', $package->getAlias());
+    }
+
+    /** @test */
+    public function itShouldGetItsNamespace()
+    {
+        $package = new StubPackage;
         $this->assertSame(__NAMESPACE__.'\\Stubs', $package->getNamespace());
     }
 
-    /**
-     * @test
-     */
-    public function testGetPath()
+    /** @test */
+    public function itShouldGetItsFilePath()
     {
-        $package = new StubPackage(m::mock('Selene\Components\Core\Application'));
+        $package = new StubPackage;
         $this->assertSame(__DIR__.DIRECTORY_SEPARATOR.'Stubs', $package->getPath());
+    }
+
+    /** @test */
+    public function itShouldGetItsMetaInfo()
+    {
+        $package = new StubPackage;
+        $this->assertSame(__DIR__.DIRECTORY_SEPARATOR.'Stubs'.DIRECTORY_SEPARATOR.'meta.xml', $package->getMeta());
     }
 }

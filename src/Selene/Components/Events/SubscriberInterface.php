@@ -21,5 +21,5 @@ namespace Selene\Components\Events;
  */
 interface SubscriberInterface
 {
-    public static function getSubscriptions();
+    public function getSubscriptions();
 }

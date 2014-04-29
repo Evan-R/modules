@@ -51,6 +51,8 @@ class Cache
      */
     protected $files;
 
+    private $fs;
+
     /**
      * @param mixed $file
      * @param Filesystem $files
@@ -141,13 +143,30 @@ class Cache
     {
         $fs = $this->getFs();
 
+        $fs->ensureFile($this->file);
         $fs->mask($this->file);
-        $fs->setContents($this->file, $content);
+        $fs->setContents($this->file, $data);
 
         if (null !== $manifest) {
-            $fs->mask($file = $this->file.'.manifest');
+            $file = $this->getManifest();
+            $fs->ensureFile($file);
+            $fs->mask($file);
             $fs->setContents($file, serialize($manifest));
         }
+    }
+
+    /**
+     * getManifest
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getManifest()
+    {
+        $ext = pathinfo($this->file, PATHINFO_EXTENSION);
+        $manifest = substr($this->file, 0, -strlen($ext)).'manifest';
+
+        return $manifest;
     }
 
     /**
@@ -159,7 +178,7 @@ class Cache
      */
     protected function validateManifest()
     {
-        if (!is_file($manifest = $this->file.'.manifest')) {
+        if (!is_file($manifest = $this->getManifest())) {
             return false;
         }
 

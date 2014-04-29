@@ -22,6 +22,8 @@ abstract class Loader implements LoaderInterface
 
     protected $resolver;
 
+    protected $resourcePath;
+
     public function __construct(LocatorInterface $locator)
     {
         $this->locator = $locator;
@@ -37,9 +39,37 @@ abstract class Loader implements LoaderInterface
         return $this->resolver;
     }
 
+    public function getResourcePath()
+    {
+        return $this->resourcePath;
+    }
+
+    public function setResourcePath($path)
+    {
+        $this->resourcePath = $path;
+    }
+
+    /**
+     * import
+     *
+     * @param mixed $resource
+     *
+     * @access public
+     * @return void
+     */
+    public function import($resource)
+    {
+        if ($this->supports($resource)) {
+            return $this->load($resource);
+        }
+
+
+        if ($resolver = $this->getResolver() && $loader = $this->getResolver()->resolve($resource)) {
+            $loader->load($resource);
+        }
+    }
+
     abstract public function load($resource);
 
     abstract public function supports($resource);
-
-    abstract public function import($resrouce);
 }

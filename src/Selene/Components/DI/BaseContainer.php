@@ -22,6 +22,8 @@ use \Selene\Components\DI\Definition\DefinitionInterface;
 use \Selene\Components\DI\Exception\ContainerResolveException;
 use \Selene\Components\DI\Exception\CircularReferenceException;
 use \Selene\Components\DI\Resolve\ResolveStrategyCollection;
+use \Selene\Components\Config\Resource\FileResource;
+use \Selene\Components\Config\Resource\ObjectResource;
 
 /**
  * @class BaseContainer implements ContainerInterface
@@ -91,6 +93,20 @@ class BaseContainer implements ContainerInterface
     protected $resources;
 
     /**
+     * packages
+     *
+     * @var mixed
+     */
+    protected $packages;
+
+    /**
+     * packageConfigs
+     *
+     * @var mixed
+     */
+    protected $packageConfigs;
+
+    /**
      * Create a new Container.
      *
      * @param ParameterInterace $parameters
@@ -98,7 +114,7 @@ class BaseContainer implements ContainerInterface
      *
      * @access public
      */
-    public function __construct(ParameterInterace $parameters = null, ListInterface $resources = null)
+    public function __construct(ParameterInterface $parameters = null, ListInterface $resources = null)
     {
         $this->resources = $resources ?: new BaseList;
         $this->parameters = $parameters ?: new Parameters;
@@ -106,6 +122,7 @@ class BaseContainer implements ContainerInterface
         $this->definitions = [];
         $this->injected = [];
         $this->building = [];
+        $this->packageConfigs = [];
         $this->setAliases();
     }
 
@@ -119,7 +136,20 @@ class BaseContainer implements ContainerInterface
      */
     public function addFileResource($file)
     {
-        $this->resources->add($file);
+        $this->resources->add(new FileResource($file));
+    }
+
+    /**
+     * addObjectResource
+     *
+     * @param mixed $object
+     *
+     * @access public
+     * @return void
+     */
+    public function addObjectResource($object)
+    {
+        $this->resources->add(new ObjectResource($object));
     }
 
     /**
@@ -129,9 +159,22 @@ class BaseContainer implements ContainerInterface
      * @access public
      * @return ListInterface
      */
-    public function getFileResources()
+    public function getResources()
     {
         return $this->resources;
+    }
+
+    /**
+     * registerPackage
+     *
+     * @param mixed $package
+     *
+     * @access public
+     * @return mixed
+     */
+    public function registerPackage($package)
+    {
+        $this->packages[$package->getAlias()] = $package->getExtension();
     }
 
     /**
@@ -224,6 +267,53 @@ class BaseContainer implements ContainerInterface
         $this->resolveStrategies->add($strategy);
     }
 
+
+    /**
+     * loadPackageConfig
+     *
+     * @access public
+     * @return mixed
+     */
+    public function addPackageConfig($package, array $values = [])
+    {
+        $this->packageConfigs[$package][] = $values;
+    }
+
+    /**
+     * getPackageConfig
+     *
+     * @param mixed $package
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getPackageConfig($package)
+    {
+        return isset($this->packageConfigs[$package]) ? $this->packageConfigs[$package] : [];
+    }
+
+    /**
+     * @access public
+     * @return mixed
+     */
+    public function getPackageConfigs()
+    {
+        return $this->packageConfigs;
+    }
+
+    /**
+     * getFlaggedDefinitions
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getFlaggedDefinitions()
+    {
+        return array_filter($this->getDefinitions(), function ($def) {
+            return (bool)$def->getFlags();
+        });
+    }
+
     /**
      * setResolveStrategies
      *
@@ -260,7 +350,11 @@ class BaseContainer implements ContainerInterface
      */
     public function compile(ResolveStrategyCollection $strategies = null)
     {
-        $this->parameters = new StaticParameters($this->parameters->resolve()->all());
+        foreach ($this->getFlaggedDefinitions() as $def) {
+            if ($def->hasFlag('kernel')) {
+                var_dump($def);
+            }
+        }
     }
 
     /**
@@ -533,7 +627,8 @@ class BaseContainer implements ContainerInterface
         }
 
         $this->parameters->merge($container->getParameters());
-        $this->services = array_merge((array)$this->services, (array)$container->getServices());
+        $this->definitions = array_merge((array)$this->definitions, (array)$container->getDefinitions());
+        $this->packageConfigs = array_merge($this->packageConfigs, $container->getPackageConfigs());
     }
 
     /**

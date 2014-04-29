@@ -44,6 +44,14 @@ class DelegatingLoader extends Loader
     /**
      * {@inheritdoc}
      */
+    public function getResourcePath()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function import($resource)
     {
         if ($loader = $this->getResolver()->resolve($resource)) {

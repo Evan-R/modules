@@ -76,4 +76,6 @@ interface LoaderInterface
      * @return string
      */
     public function getResourcePath();
+
+    public function setResourcePath($path);
 }

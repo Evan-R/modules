@@ -11,12 +11,14 @@
 
 namespace Selene\Components\DI\Loader;
 
+use \Selene\Components\Xml\Parser;
+use \Selene\Components\Xml\Loader\Loader as XmlFileLoader;
+use \Selene\Components\DI\Reference;
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
-use \Selene\Components\DI\Reference;
 use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\Xml\Builder;
-use \Selene\Components\Config\Loader\AbstractXmlLoader;
+use \Selene\Components\Config\Resource\Loader;
+use \Selene\Components\Config\Resource\LocatorInterface;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 
 /**
@@ -27,8 +29,24 @@ use \Selene\Components\DI\Definition\ServiceDefinition;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class XmlLoader extends AbstractXmlLoader
+class XmlLoader extends Loader
 {
+    protected $parser;
+
+    protected $xmlLoader;
+
+    /**
+     *
+     * @param LocatorInterface $locator
+     *
+     * @access public
+     */
+    public function __construct(ContainerInterface $container, LocatorInterface $locator)
+    {
+        parent::__construct($locator);
+        $this->container = $container;
+    }
+
     /**
      * Loads the resource file into the container.
      *
@@ -40,22 +58,113 @@ class XmlLoader extends AbstractXmlLoader
      */
     public function load($resource)
     {
-        $this->container->addFileResource($resource);
+        $file = $this->locator->locate($resource, false);
 
-        $xml = $this->loadXml($resource);
+        $this->checkPathIntegrity($file);
 
-        $this->parseImports($xml, $resource);
+        $this->container->addFileResource($file);
+
+        $xml = $this->loadXml($file);
+
+        // parse the imported xml files
+        $this->parseImports($xml, $file);
+
+        // parse the container parareters
         $this->parseParameters($xml);
+
+        // parse the container services
         $this->parseServices($xml);
+
+        // parse parameters that are marked as package nodes.
+        $this->parsePackageConfig($xml);
+
+        // parse the config parameters
+        $this->parseParams($xml);
+    }
+
+    /**
+     * parsePackageConfig
+     *
+     * @param mixed $xml
+     *
+     * @access protected
+     * @return void
+     */
+    protected function parsePackageConfig($xml)
+    {
+        foreach ($xml->xpath('../*[@package]|*[@package]') as $package) {
+
+            if (!$alias = $this->getAttributeValue($package, 'package', false)) {
+                continue;
+            }
+
+            $parameters = $this->container->getParameters();
+            $values = $parameters->has($name = 'package:'.$alias) ? $parameters->get($name) : [];
+
+            foreach ($package->xpath('*') as $item) {
+                $values[] = [$item->nodeName => $this->getParser()->parseDomElement($item)];
+            }
+
+            $parameters->set($name, $values);
+        }
     }
 
     /**
      * {@inheritdoc}
      * @param string $format
      */
-    public function supports($format)
+    public function supports($resource)
     {
-        return 'xml' === strtolower($format);
+        return is_string($resource) && 'xml' ===  pathinfo(strtolower($resource), PATHINFO_EXTENSION);
+    }
+
+    /**
+     * loadXml
+     *
+     * @param mixed $xml
+     *
+     * @access public
+     * @return mixed
+     */
+    public function loadXml($xml)
+    {
+        return $this->getXmlLoader()->load($xml);
+    }
+
+    /**
+     * getXmlLoader
+     *
+     * @access protected
+     * @return XmlLoader
+     */
+    protected function getXmlLoader()
+    {
+        if (null === $this->xmlLoader) {
+            $this->xmlLoader = new XmlFileLoader;
+            $this->xmlLoader->setOption('simplexml', false);
+            $this->xmlLoader->setOption('from_string', false);
+        }
+
+        return $this->xmlLoader;
+    }
+
+    /**
+     * getParser
+     *
+     * @access protected
+     * @return Parser
+     */
+    protected function getParser()
+    {
+        if (null === $this->parser) {
+            $this->parser = new Parser($this->getXmlLoader());
+            $this->parser->setPluralizer(function ($singular) {
+                return $singular . 's';
+            });
+            $this->parser->setMergeAttributes(true);
+        }
+
+        return $this->parser;
     }
 
     /**
@@ -63,18 +172,34 @@ class XmlLoader extends AbstractXmlLoader
      *
      * @param DOMDocument $xml the resource Document
      *
-     * @access private
+     * @access protected
      * @return void
      */
-    private function parseImports(DOMDocument $xml, $file)
+    protected function parseImports(DOMDocument $xml, $file)
     {
-        foreach ($xml->xpath('//imports/import') as $import) {
+        $this->setResourcePath(dirname($file));
 
-            if (file_exists($file = dirname($file).DIRECTORY_SEPARATOR.$import->nodeValue)) {
-                $loader = new static($this->container);
-                $loader->load($file);
-            }
+        foreach ($xml->xpath('//imports/import') as $import) {
+            $path = Parser::getElementText($import);
+            $this->import($path);
         }
+    }
+
+    /**
+     * checkImportPathIntegrity
+     *
+     * @param mixed $path
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function checkPathIntegrity($path)
+    {
+        if (stream_is_local($path) && is_file($path)) {
+            return true;
+        }
+
+        throw new \RuntimeException(sprintf('resource "%s" is not a local file', $path));
     }
 
     /**
@@ -85,11 +210,30 @@ class XmlLoader extends AbstractXmlLoader
      * @access private
      * @return void
      */
-    private function parseParameters(DOMDocument $xml)
+    protected function parseParameters(DOMDocument $xml)
     {
-        foreach ($xml->xpath('//parameters/parameter') as $parameter) {
+        foreach ($xml->xpath('/container/parameters/parameter') as $parameter) {
             $this->container->setParameter($parameter->getAttribute('id'), $this->getPhpValue($parameter));
         }
+    }
+
+    /**
+     * parseParams
+     *
+     * @param DOMDocument $xml
+     *
+     * @access private
+     * @return void
+     */
+    protected function parseParams(DOMDocument $xml)
+    {
+        $params = [];
+
+        foreach ($xml->xpath('/parameters') as $parameter) {
+            $params[] = Parser::parseDomElement($parameter);
+        }
+
+        return $params;
     }
 
     /**
@@ -100,7 +244,7 @@ class XmlLoader extends AbstractXmlLoader
      */
     private function parseServices($xml)
     {
-        $services = $xml->xpath('//services/service');
+        $services = $xml->xpath('/container/services/service');
 
         foreach ($services as $service) {
             $this->setServiceDefinition($service);
@@ -196,9 +340,13 @@ class XmlLoader extends AbstractXmlLoader
             if ($value = $this->getAttributeValue($service, $attribute)) {
 
                 $method = 'set'.ucfirst($attribute);
-                call_user_func($dev, $method, $value);
+                call_user_func([$def, $method], $value);
             }
 
+        }
+
+        foreach ($service->xpath('flags/flag') as $flagNode) {
+            $def->addFlag($flag = $flagNode->nodeValue);
         }
 
         if ($class = $this->getAttributeValue($service, 'class', false)) {
@@ -295,7 +443,6 @@ class XmlLoader extends AbstractXmlLoader
         if ($this->container->isReference($val)) {
             return new Reference(substr($val, strlen(ContainerInterface::SERVICE_REF_INDICATOR)));
         }
-
-        return Builder::getPhpValue($val, $default);
+        return Parser::getPhpValue($val, $default, $this->getParser());
     }
 }

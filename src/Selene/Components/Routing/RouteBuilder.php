@@ -127,6 +127,22 @@ class RouteBuilder
     }
 
     /**
+     * resource
+     *
+     * @param mixed $path
+     * @param mixed $requirements
+     *
+     * @access public
+     * @return RouteBuilder
+     */
+    public function resource($path, $controller, array $requirements = [])
+    {
+        unset($requirements['action']);
+        unset($requirements['_action']);
+
+    }
+
+    /**
      * getRoutes
      *
      *

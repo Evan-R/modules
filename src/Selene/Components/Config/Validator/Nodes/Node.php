@@ -78,6 +78,7 @@ abstract class Node implements NodeInterface
     {
         $this->children = [];
         $this->required = true;
+        $this->allowEmpty = true;
 
         if (null !== $parent) {
             $this->setParent($parent);
@@ -85,7 +86,7 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * required
+     * Mark this node as optional.
      *
      * @access public
      * @return mixed
@@ -96,13 +97,20 @@ abstract class Node implements NodeInterface
         return $this;
     }
 
+    /**
+     * Check if this node is optional.
+     *
+     *
+     * @access public
+     * @return boolean
+     */
     public function isOptional()
     {
         return false === $this->required;
     }
 
     /**
-     * getDefault
+     * Get the default value if any.
      *
      * @access public
      * @return mixed
@@ -113,11 +121,10 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * defaultValue
-     *
+     * Sets the default value of this node.
      *
      * @access public
-     * @return mixed
+     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface this instance
      */
     public function defaultValue($value)
     {
@@ -131,7 +138,7 @@ abstract class Node implements NodeInterface
      * @param mixed $builder
      *
      * @access public
-     * @return mixed
+     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface this instance
      */
     public function setBuilder($builder)
     {
@@ -140,10 +147,10 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * getBuilder
+     * Get the builder instance.
      *
      * @access public
-     * @return mixed
+     * @return \Selene\Components\Config\Validator\Builder
      */
     public function getBuilder()
     {
@@ -155,9 +162,9 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * setName
+     * Set the key of the node.
      *
-     * @param mixed $name
+     * @param string|int $name
      *
      * @access public
      * @return \Selene\Components\Config\Validator\Nodes\NodeInterface this instance
@@ -169,10 +176,10 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * getKey
+     * Get the key of the node.
      *
      * @access public
-     * @return string
+     * @return string|int
      */
     public function getKey()
     {
@@ -180,7 +187,7 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * setParent
+     * Set the parent node.
      *
      * @param NodeInterface $node
      *
@@ -196,7 +203,7 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * getParent
+     * Get the parent node.
      *
      * @access public
      * @return \Selene\Components\Config\Validator\Nodes\NodeInterface the parent node
@@ -207,7 +214,7 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * hasParent
+     * Check if this node has a parent node.
      *
      * @access public
      * @return boolean
@@ -217,15 +224,20 @@ abstract class Node implements NodeInterface
         return null !== $this->parent;
     }
 
+    /**
+     * Do not allow empty values.
+     *
+     * @access public
+     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface the parent node
+     */
     public function notEmpty()
     {
         $this->allowEmpty = false;
         return $this;
     }
 
-
     /**
-     * validateType
+     * Validates the type of the node.
      *
      * @param mixed $value
      *
@@ -236,39 +248,39 @@ abstract class Node implements NodeInterface
     abstract public function validateType($value);
 
     /**
-     * validate
+     * Validates a value against the nodes definition.
      *
      * @param mixed $value
      *
+     * @throws MissingValueException
+     * @throws InvalidTypeException
      * @access public
-     * @return mixed
+     * @return boolean
      */
     public function validate($value = null)
     {
-        $empty = false;
+        $empty = $this->isEmptyValue($value);
 
-        if (null === $value || ($empty = $this->isEmptyValue($value))) {
+        if ($this->isOptional()) {
+            if ($empty && null === $this->getDefault()) {
+                throw new MissingValueException(
+                    sprintf('optional key %s with empty value must have a default value', $this->getKey())
+                );
+            }
 
-            if ($empty && false === $this->allowEmpty) {
+        } else {
+
+            if (null === $value) {
+                throw new MissingValueException(
+                    sprintf('%s is required but missing', $this->getKey())
+                );
+            }
+
+            if ($empty) {
                 throw new MissingValueException(
                     sprintf('%s may not be empty', $this->getKey())
                 );
             }
-
-            if ($this->isOptional()) {
-
-                if ($this->isEmptyValue($value) && null === $this->getDefault()) {
-                    throw new MissingValueException(
-                        sprintf('optional key %s with empty value must have a default value', $this->getKey())
-                    );
-                }
-
-                return true;
-            }
-
-            throw new MissingValueException(
-                sprintf('%s is required but missing', $this->getKey())
-            );
         }
 
         if (!$this->validateType($value)) {
@@ -276,6 +288,19 @@ abstract class Node implements NodeInterface
         }
 
         return true;
+    }
+
+    /**
+     * mergeValue
+     *
+     * @param mixed $value
+     *
+     * @access public
+     * @return mixed
+     */
+    public function mergeValue($value)
+    {
+        return $value;
     }
 
     /**
@@ -309,19 +334,6 @@ abstract class Node implements NodeInterface
         throw new \BadMethodCallException(
             sprintf('call to undefined method %s::%s', get_class($this), $method)
         );
-    }
-
-    /**
-     * mergeValue
-     *
-     * @param mixed $value
-     *
-     * @access public
-     * @return mixed
-     */
-    public function mergeValue($value)
-    {
-        return $value;
     }
 
     /**

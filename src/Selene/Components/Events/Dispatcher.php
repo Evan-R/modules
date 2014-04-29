@@ -151,7 +151,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     public function addSubscriber(SubscriberInterface $subscriber)
     {
-        foreach (forward_static_call([$subscriber, 'getSubscriptions']) as $event => $handles) {
+        foreach ($subscriber->getSubscriptions() as $event => $handles) {
             foreach ($this->listSubscriptions($subscriber, $event, (array)$handles) as $subscription) {
                 call_user_func_array([$this, 'on'], $subscription);
             }

@@ -12,7 +12,6 @@
 namespace Selene\Components\TestSuite;
 
 use \Mockery as m;
-//use \AspectMock\Test as test;
 
 /**
  * Class: TestCase
@@ -31,8 +30,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         m::close();
-        //test::clean();
     }
+
     /**
      * Get a property values of a none public object property.
      *
@@ -102,10 +101,27 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         return defined('PHP_WINDOWS_VERSION_MAJOR');
     }
 
+    /**
+     * markSkippedIfWindows
+     *
+     * @access protected
+     * @return mixed
+     */
     protected function markSkippedIfWindows()
     {
         if ($this->isWindows()) {
             $this->markTestSkipped();
         }
+    }
+
+    /**
+     * giveUp
+     *
+     * @access protected
+     * @return void
+     */
+    protected function giveUp()
+    {
+        $this->fail('you lose');
     }
 }

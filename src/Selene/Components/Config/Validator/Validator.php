@@ -31,14 +31,43 @@ class Validator implements TreeValidatorInterface
     use Getter;
 
     /**
+     * root
+     *
+     * @var array
+     */
+    private $root;
+
+    /**
+     * config
+     *
+     * @var array
+     */
+    private $config;
+
+    /**
      * @param DictNode $root
      *
      * @access public
      * @return mixed
      */
-    public function __construct(DictNode $root)
+    public function __construct(DictNode $root, array $config = [])
     {
         $this->root = $root;
+        $this->config = $config;
+    }
+
+    /**
+     * load
+     *
+     * @param array $config
+     *
+     * @access public
+     * @return Validator
+     */
+    public function load(array $config)
+    {
+        $this->config = array_merge($this->config, $config);
+        return $this;
     }
 
     /**
@@ -55,14 +84,12 @@ class Validator implements TreeValidatorInterface
     /**
      * validate
      *
-     * @param array $values
-     *
      * @access public
      * @return array
      */
-    public function validate(array $values)
+    public function validate()
     {
-        return $this->doValidate($values, $this->root);
+        return $this->doValidate($this->config, $this->root);
     }
 
     /**

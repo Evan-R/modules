@@ -33,6 +33,13 @@ class DictNode extends ArrayNode implements \Iterator
     protected $key;
 
     /**
+     * leastKeys
+     *
+     * @var array
+     */
+    protected $hasAtLeast;
+
+    /**
      * current
      *
      * @var int
@@ -60,7 +67,21 @@ class DictNode extends ArrayNode implements \Iterator
     public function __construct()
     {
         $this->current = 0;
+        $this->requiredKeys = [];
         parent::__construct();
+    }
+
+    /**
+     * The node must container at least one of the given keys.
+     *
+     * @access public
+     * @return mixed
+     */
+    public function atLeastOne()
+    {
+        $this->hasAtLeast = true;
+
+        return $this;
     }
 
     /**
@@ -85,8 +106,39 @@ class DictNode extends ArrayNode implements \Iterator
         $valid = parent::validate($value);
 
         $this->checkExceedingKeys($value);
+        $this->validateLeastKeys($value);
 
         return $valid;
+    }
+
+    /**
+     * validateLeastKeys
+     *
+     * @param array $values
+     *
+     * @throws ValidationException
+     * @access protected
+     * @return void
+     */
+    protected function validateLeastKeys(array $values)
+    {
+        if (!$this->hasAtLeast) {
+            return;
+        }
+
+        $keys = $this->getKeys();
+
+        foreach (array_keys($values) as $key) {
+            if (!in_array($key, $keys)) {
+                throw new ValidationException(
+                    sprintf(
+                        '%s must contain at least one of these keys: "%s"',
+                        $this->getKey(),
+                        implode('", "', $keys)
+                    )
+                );
+            }
+        }
     }
 
     /**

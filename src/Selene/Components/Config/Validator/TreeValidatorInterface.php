@@ -27,6 +27,16 @@ interface TreeValidatorInterface
     public function getRoot();
 
     /**
+     * load
+     *
+     * @param array $config
+     *
+     * @access public
+     * @return mixed
+     */
+    public function load(array $config);
+
+    /**
      * validate
      *
      * @param array $values
@@ -34,5 +44,5 @@ interface TreeValidatorInterface
      * @access public
      * @return array
      */
-    public function validate(array $values);
+    public function validate();
 }

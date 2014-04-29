@@ -17,15 +17,24 @@ use \Symfony\Component\HttpKernel\HttpKernelInterface;
 use \Symfony\Component\HttpKernel\TerminableInterface;
 use \Selene\Components\Events\DispatcherInterface;
 use \Selene\Components\Routing\RouterInterface;
+use \Selene\Components\Http\RequestStack;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
+use \Selene\Components\Kernel\Stack\KernelStack;
+use \Selene\Components\Events\SubscriberInterface;
+use \Selene\Components\Routing\Events\RouteDispatchEvent;
+use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
 
 /**
- * @class Application
+ * @class Kernel implements HttpKernelInterface
+ * @see HttpKernelInterface
+ *
  * @package Selene\Components\Kernel
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
-class Kernel implements HttpKernelInterface
+class Kernel implements HttpKernelInterface, SubscriberInterface
 {
     /**
      * router
@@ -49,41 +58,30 @@ class Kernel implements HttpKernelInterface
     protected $responseStack;
 
     /**
+     * requestStack
+     *
+     * @var mixed
+     */
+    protected $requestStack;
+
+    /**
+     * Create a new Kernel instance.
+     *
      * @param DispatcherInterface $events
      * @param RouterInterface $router
      *
      * @access public
      * @return mixed
      */
-    public function __construct(DispatcherInterface $events, RouterInterface $router)
+    public function __construct(DispatcherInterface $events, RouterInterface $router, RequestStack $stack = null)
     {
         $this->events = $events;
         $this->router = $router;
+
+        $this->requestStack = $stack ?: new RequestStack;
         $this->responseStack = new \SplStack;
-        $this->setUpRouterEvents();
-    }
 
-    /**
-     * getEventDispatcher
-     *
-     *
-     * @access public
-     * @return DispatcherInterface
-     */
-    public function getEventDispatcher()
-    {
-        return $this->events;
-    }
-
-    /**
-     * getRouter
-     *
-     * @access public
-     * @return RouterInterface
-     */
-    public function getRouter()
-    {
-        return $this->router;
+        $this->events->addSubscriber($this);
     }
 
     /**
@@ -98,6 +96,8 @@ class Kernel implements HttpKernelInterface
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
+        $this->requestStack->push($request);
+
         try {
             $response = $this->handleRequest($request, $type, $catch);
         } catch (\Exception $e) {
@@ -126,6 +126,12 @@ class Kernel implements HttpKernelInterface
         return null;
     }
 
+    /**
+     * boot
+     *
+     * @access public
+     * @return mixed
+     */
     public function boot()
     {
         if ($this->booted) {
@@ -133,6 +139,46 @@ class Kernel implements HttpKernelInterface
         }
 
         $this->setUpRouterEvents();
+    }
+
+    /**
+     * onRouterDispatch
+     *
+     * @access public
+     * @return mixed
+     */
+    public function onRouterDispatch(RouteDispatchEvent $event)
+    {
+        $this->responseStack->push($event);
+    }
+
+    /**
+     * onRouterDispatch
+     *
+     * @param RouteFilterAbortEvent $event
+     *
+     * @access public
+     * @return mixed
+     */
+    public function onRouterAbort(RouteFilterAbortEvent $event)
+    {
+        $this->responseStack->push($event);
+    }
+
+    /**
+     * getSubscriptions
+     *
+     * @param mixed $
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getSubscriptions()
+    {
+        return [
+            'router_dispatch' => 'onRouterDispatch',
+            'router_abort'    => 'onRouterAbort'
+        ];
     }
 
     /**
@@ -147,6 +193,7 @@ class Kernel implements HttpKernelInterface
      */
     protected function handleRequest(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
+        var_dump('kernel handle');
         $this->router->dispatch($request);
 
         return $this->filterResponse();
@@ -157,17 +204,11 @@ class Kernel implements HttpKernelInterface
      * setUpRouterEvents
      *
      * @access protected
-     * @return mixed
+     * @return void
      */
     protected function setUpRouterEvents()
     {
-        $this->events->on('router_dispatch', function ($event) {
-            $this->responseStack->push($event);
-        });
-
-        $this->events->on('router_abort', function ($event) {
-            $this->responseStack->push($event);
-        });
+        $this->events->addSubscriber($this);
     }
 
     /**
@@ -179,7 +220,7 @@ class Kernel implements HttpKernelInterface
     protected function filterResponse()
     {
         if (!$this->responseStack->count()) {
-            throw new \Exception();
+            throw new \Exception('no response given');
         }
 
         $event = $this->responseStack->pop();

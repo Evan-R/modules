@@ -11,7 +11,7 @@
 
 namespace Selene\Components\Config\Resource;
 
-use \Selene\Components\Common\Traits\PathHelper;
+use \Selene\Components\FileSystem\Traits\PathHelperTrait;
 
 /**
  * @class FileLocator implements LocatorInterface
@@ -24,7 +24,7 @@ use \Selene\Components\Common\Traits\PathHelper;
  */
 class Locator implements LocatorInterface
 {
-    use PathHelper;
+    use PathHelperTrait;
 
     /**
      * @param array $paths
@@ -55,7 +55,7 @@ class Locator implements LocatorInterface
             }
         }
 
-        return $files;
+        return empty($files) && !$collection ? null : $files;
     }
 
     /**
