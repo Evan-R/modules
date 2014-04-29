@@ -1,0 +1,29 @@
+{
+  "name": "selene/xml",
+  "description": "selene xml utils",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Thomas Appel",
+      "email": "mail@thomas-appel.com"
+    }
+  ],
+  "require": {
+    "php":">=5.4.0",
+    "selene/common":"dev-development"
+  },
+  "require-dev": {
+    "mockery/mockery": "dev-master"
+  },
+  "autoload": {
+    "psr-0": {"Selene\\Components\\Xml\\": ""}
+  },
+  "repositories": [
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/common.git"
+    }
+  ],
+  "target-dir": "Selene/Components/Xml",
+  "minimum-stability": "dev"
+}
