@@ -11,9 +11,10 @@
 
 namespace Selene\Components\Filesystem;
 
-use FilesystemIterator;
-use \Selene\Components\Common\Traits\PathHelper;
-use Selene\Components\Filesystem\Exception\IOException;
+use \FilesystemIterator;
+use \Selene\Components\Filesystem\Exception\IOException;
+use \Selene\Components\Filesystem\Traits\FsHelperTrait;
+use \Selene\Components\Filesystem\Traits\PathHelperTrait;
 
 /**
  * @class Filesystem
@@ -25,7 +26,9 @@ use Selene\Components\Filesystem\Exception\IOException;
  */
 class Filesystem
 {
-    use PathHelper;
+    use PathHelperTrait, FsHelperTrait {
+        FsHelperTrait::mask as public getMask;
+    }
 
     /**
      * @var string
@@ -402,19 +405,6 @@ class Filesystem
     }
 
     /**
-     * getMask
-     *
-     * @param mixed $cmask
-     *
-     * @access public
-     * @return integer
-     */
-    public function getMask($cmask)
-    {
-        return $cmask & ~umask();
-    }
-
-    /**
      * exists
      *
      * @param mixed $param
@@ -688,6 +678,14 @@ class Filesystem
         $this->copyPrefix = $prefix;
     }
 
+    /**
+     * setCopyStartOffset
+     *
+     * @param mixed $offset
+     *
+     * @access public
+     * @return mixed
+     */
     public function setCopyStartOffset($offset)
     {
         $this->copyStartOffset = $offset;
@@ -722,6 +720,11 @@ class Filesystem
         }
 
         return $this->copyStartOffset;
+    }
+
+    public function getExtension($file)
+    {
+        return pathinfo($file, PATHINFO_EXTENSION);
     }
 
     /**

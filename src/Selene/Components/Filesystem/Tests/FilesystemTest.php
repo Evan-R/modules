@@ -35,10 +35,8 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue($this->fs->isDir($this->testDrive));
     }
 
-    /**
-     * @test
-     */
-    public function testIsDirecctoryShouldReportFalseOnFile()
+    /** @test */
+    public function isDirecctoryShouldReportFalseOnFile()
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_file';
         $this->assertFalse($this->fs->isDir($target));
@@ -518,6 +516,4 @@ class FilesystemTest extends FilesystemTestCase
             [null, false],
         ];
     }
-
-
 }
