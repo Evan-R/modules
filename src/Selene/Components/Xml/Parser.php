@@ -13,20 +13,143 @@ namespace Selene\Components\Xml;
 
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
+use \Selene\Components\Common\Traits\Getter;
 
 /**
  * @class Parser
  * @package Selene\Components\Xml
  * @version $Id$
  */
-class Parser
+class Parser implements ParserInterface
 {
+    use Getter;
+
     /**
      * pluralizer
      *
      * @var mixed
      */
-    private static $pluralizer;
+    private $pluralizer;
+
+    /**
+     * options
+     *
+     * @var array
+     */
+    private $options;
+
+    /**
+     * @param LoaderInterface $loader
+     *
+     * @access public
+     */
+    public function __construct(LoaderInterface $loader = null)
+    {
+        $this->loader = $loader ?: new Loader($this->getLoaderConfig());
+        $this->options = [];
+    }
+
+    /**
+     * getLoaderConfig
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function getLoaderConfig()
+    {
+        return [
+            'from_string' => false,
+            'simplexml' => false,
+            'dom_class' => __NAMESPACE__.'\\Dom\DOMDocument'
+        ];
+    }
+
+    /**
+     * setMergeAttributes
+     *
+     * @param mixed $merge
+     *
+     * @access public
+     * @return mixed
+     */
+    public function setMergeAttributes($merge)
+    {
+        return $this->options['merge_attributes'] = (bool)$merge;
+    }
+
+    /**
+     * setListAttribute
+     *
+     * @param mixed $attribute
+     *
+     * @access public
+     * @return mixed
+     */
+    public function setListKey($attribute)
+    {
+        return $this->options['list_key'] = $attribute;
+    }
+
+    /**
+     * setAttributesKey
+     *
+     * @param mixed $key
+     *
+     * @access public
+     * @return void
+     */
+    public function setAttributesKey($key)
+    {
+        $this->options['attribute_key'] = $key;
+    }
+
+    /**
+     * getAttributesKey
+     *
+     * @param mixed $key
+     *
+     * @access public
+     * @return string
+     */
+    public function getAttributesKey()
+    {
+        return $this->getDefault($this->options, 'list_key', '@attributes');
+    }
+
+    /**
+     * getListKey
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function getListKey()
+    {
+        return $this->getDefault($this->options, 'list_key', null);
+    }
+
+    /**
+     * isListKey
+     *
+     * @param mixed $name
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function isListKey($name)
+    {
+        return $this->getDefault($this->options, 'list_key', null) === $name;
+    }
+
+    /**
+     * mergeAttributes
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function mergeAttributes()
+    {
+        return $this->getDefault($this->options, 'merge_attributes', false);
+    }
 
     /**
      * setPluralizer
@@ -36,9 +159,9 @@ class Parser
      * @access public
      * @return void
      */
-    public static function setPluralizer(callable $pluralizer = null)
+    public function setPluralizer(callable $pluralizer = null)
     {
-        static::$pluralizer = $pluralizer;
+        $this->pluralizer = $pluralizer;
     }
 
     /**
@@ -49,19 +172,37 @@ class Parser
      * @access public
      * @return array
      */
-    public static function parse(\DOMDocument $xml, $mergeAttributes = true, array $arrayKeys = [])
+    public function parseDom(\DOMDocument $xml)
     {
         if (!$xml instanceof DOMDocument) {
-            $xml = static::convertDocument($xml);
+            $xml = $this->convertDocument($xml);
         }
 
         $root = $xml->documentElement;
 
-        $children = static::parseDomElement($root, $mergeAttributes);
+        $children = $this->parseDomElement($root);
 
         $results = [$xml->documentElement->nodeName => $children];
 
         return $results;
+    }
+
+    /**
+     * parse
+     *
+     * @param mixed $xml
+     *
+     * @access public
+     * @return array
+     */
+    public function parse($xml)
+    {
+        $opts = $this->getLoaderConfig();
+        $opts['from_sring'] = is_file($xml) && stream_is_local($xml) ? false : true;
+
+        $dom = $this->loader->load($xml, $opts);
+
+        return $this->parseDom($xml);
     }
 
     /**
@@ -72,15 +213,15 @@ class Parser
      * @access public
      * @return null|array
      */
-    public static function parseDomElement(DOMelement $xml, $mergeAttributes = true)
+    public function parseDomElement(DOMelement $xml)
     {
-        $attributes = static::parseElementAttributes($xml);
+        $attributes = $this->parseElementAttributes($xml);
 
         $hasAttributes = (bool)$attributes;
 
-        $text = static::prepareTextValue($xml, current($attributes));
+        $text = $this->prepareTextValue($xml, current($attributes));
 
-        $result = static::parseElementNodes($xml->xpath('./child::*'), $xml->nodeName, $mergeAttributes);
+        $result = $this->parseElementNodes($xml->xpath('./child::*'), $xml->nodeName);
 
         if ($hasAttributes) {
 
@@ -88,7 +229,7 @@ class Parser
                 $result['value'] = $text;
             }
 
-            if ($mergeAttributes) {
+            if ($this->mergeAttributes()) {
                 $attributes = $attributes['@attributes'];
             }
 
@@ -109,43 +250,6 @@ class Parser
     }
 
     /**
-     * parseElementAttributes
-     *
-     * @param DOMelement $xml
-     * @param string $attrKey
-     *
-     * @access private
-     * @return mixed
-     */
-    private static function parseElementAttributes(DOMelement $xml, $attrKey = '@attributes')
-    {
-        $elementAttrs = $xml->xpath('./@*');
-
-        if (0 === $elementAttrs->length) {
-            return [];
-        }
-
-        $attrs = [];
-
-        foreach ($elementAttrs as $key => $attribute) {
-
-            $namespace = $attribute->namespaceURI;
-
-            $value = static::getPhpValue($attribute->nodeValue);
-
-            if ($prefix = $attribute->prefix) {
-                $attName = static::prefixKey($attribute->nodeName, $prefix);
-            } else {
-                $attName  = $attribute->nodeName;
-            }
-
-            $attrs[$attName] = $value;
-        }
-
-        return [$attrKey => $attrs];
-    }
-
-    /**
      * getPhpValue
      *
      * @param mixed $value
@@ -153,10 +257,11 @@ class Parser
      * @access public
      * @return mixed
      */
-    public static function getPhpValue($val, $default = null, $mergeAttributes = true)
+    public static function getPhpValue($val, $default = null, ParserInterface $parser = null)
     {
-        if ($val instanceof \DOMElement) {
-            return static::parseDomElement($val, $mergeAttributes);
+        if ($val instanceof DOMElement) {
+            $parser = $parser ?: new static;
+            return $parser->parseDomElement($val);
         }
 
         if (0 === strlen($val)) {
@@ -181,7 +286,7 @@ class Parser
      * @access private
      * @return mixed
      */
-    public static function getElementText(DOMElement $element, $concat = true)
+    public static function getElementText(\DOMElement $element, $concat = true)
     {
         $textNodes = [];
 
@@ -199,12 +304,12 @@ class Parser
      * @param mixed $text
      * @param array $attributes
      */
-    private static function prepareTextValue(DOMElement $xml, $attributes = null)
+    private function prepareTextValue(DOMElement $xml, $attributes = null)
     {
         $text = static::getElementText($xml, true);
         return (isset($attributes['type']) && 'text' === $attributes['type']) ?
             clearValue($text) :
-            static::getPhpValue($text);
+            static::getPhpValue($text, null, $this);
     }
 
     /**
@@ -215,7 +320,7 @@ class Parser
      * @access private
      * @return array
      */
-    private static function parseElementNodes($children, $parentName = null, $mergeAttributes = true)
+    private function parseElementNodes($children, $parentName = null)
     {
         $result = [];
 
@@ -224,36 +329,35 @@ class Parser
             $nsURL = $child->namespaceURI ?: null;
 
             $oname = $child->nodeName;
-            $name = null === $prefix ? $oname : static::prefixKey($oname, $prefix);
-
-            if ($children->length < 2) {
-                $result[$name] = static::getPhpValue($child, null, $mergeAttributes);
-                break;
-            }
+            $name = null === $prefix ? $oname : $this->prefixKey($oname, $prefix);
 
             if (isset($result[$name])) {
                 if (is_array($result[$name]) && arrayNumeric($result[$name])) {
-                    $value = static::getPhpValue($child, null, $mergeAttributes);
-                    //$value = static::parseDomElement($child, $mergeAttributes);
+                    $value = static::getPhpValue($child, null, $this);
+
                     if (is_array($value) && arrayNumeric($value)) {
                         $result[$name] = array_merge($result[$name], $value);
                     } else {
                         $result[$name][] = $value;
                     }
+
                 } else {
                     continue;
                 }
             } else {
 
-                $equals = static::getEqualNodes($child, $prefix);
-                $value = static::getPhpValue($child, null, $mergeAttributes);
+                $equals = $this->getEqualNodes($child, $prefix);
+                $value = static::getPhpValue($child, null, $this);
 
-                if (1 < $equals->length) {
-                    if (static::isEqualOrPluralOf($parentName, $oname)) {
-                        $result[] = static::getPhpValue($child, null, $mergeAttributes);
+                $listKey = $this->getListKey();
+                $lKey = $prefix ? $this->prefixKey($listKey, $prefix) : $listKey;
+
+                if (1 < $equals->length || $lKey === $name) {
+                    if ($this->isEqualOrPluralOf($parentName, $oname) || $lKey === $name) {
+                        $result[] = static::getPhpValue($child, null, $this);
                     } else {
-                        $plural = static::pluralize($oname);
-                        $plural = null === $prefix ? $plural : static::prefixKey($plural, $prefix);
+                        $plural = $this->pluralize($oname);
+                        $plural = null === $prefix ? $plural : $this->prefixKey($plural, $prefix);
 
 
                         if (isset($result[$plural]) && is_array($result[$plural])) {
@@ -273,67 +377,54 @@ class Parser
     }
 
     /**
-     * parseChildNode
+     * parseElementAttributes
      *
-     * @param DOMElement $child
-     * @param array $result
+     * @param DOMelement $xml
+     * @param string $attrKey
      *
      * @access private
      * @return mixed
      */
-    private static function parseChildNode(DOMElement $child, \DOMNodelist $children, $parentName, array $result = [])
+    private function parseElementAttributes(DOMelement $xml)
     {
-        $prefix = $child->prefix ?: null;
-        $nsURL = $child->namespaceURI ?: null;
+        $elementAttrs = $xml->xpath('./@*');
 
-        $oname = $child->nodeName;
-        $name = null === $prefix ? $oname : static::prefixKey($oname, $prefix);
-
-        if ($children->length < 2) {
-            $result[$name] = static::parseDomElement($child, $nestedValues);
-            return;
+        if (0 === $elementAttrs->length) {
+            return [];
         }
 
-        if (isset($result[$name])) {
-            if (is_array($result[$name]) && arrayNumeric($result[$name])) {
-                $value = static::parseDomElement($child, $nsURL, $prefix);
-                if (is_array($value) && arrayNumeric($value)) {
-                    $result[$name] = array_merge($result[$name], $value);
-                } else {
-                    $result[$name][] = $value;
-                }
-            } else {
-                continue;
-            }
-        } else {
+        $attrs = [];
 
-            $equals = static::getEqualNodes($child, $prefix);
+        foreach ($elementAttrs as $key => $attribute) {
 
-            if (1 < $equals->length) {
-                if (static::isEqualOrPluralOf($parentName, $oname)) {
-                    $result[] = static::parseDomElement($child, $nestedValues);
-                } else {
-                    $plural = static::pluralize($oname);
-                    $plural = is_null($prefix) ? $plural : static::prefixKey($plural, $prefix);
-                    if (isset($result[$plural]) && is_array($result[$plural])) {
-                        $result[$plural][] = static::parseDomElement($child, $nestedValues);
-                    } elseif (count($children) !== count($equals)) {
-                        $result[$plural][] = static::parseDomElement($child, $nestedValues);
-                    } else {
-                        $result[$name][] = static::parseDomElement($child, $nestedValues);
-                    }
-                }
+            $namespace = $attribute->namespaceURI;
+
+            $value = static::getPhpValue($attribute->nodeValue, null, $this);
+
+            if ($prefix = $attribute->prefix) {
+                $attName = $this->prefixKey($attribute->nodeName, $prefix);
             } else {
-                $result[$name] = $foo = static::parseDomElement($child, $nsURL, $nestedValues);
+                $attName  = $attribute->nodeName;
             }
+
+            $attrs[$attName] = $value;
         }
 
-        return $result;
+        return [$this->getAttributesKey() => $attrs];
     }
 
-    private static function isEqualOrPluralOf($name, $singular)
+    /**
+     * isEqualOrPluralOf
+     *
+     * @param mixed $name
+     * @param mixed $singular
+     *
+     * @access private
+     * @return boolean
+     */
+    private function isEqualOrPluralOf($name, $singular)
     {
-        return $name === $singular || $name === static::pluralize($singular);
+        return $name === $singular || $name === $this->pluralize($singular);
     }
 
     /**
@@ -344,13 +435,13 @@ class Parser
      * @access private
      * @return mixed
      */
-    private static function pluralize($singular)
+    private function pluralize($singular)
     {
-        if (!isset(static::$pluralizer)) {
+        if (!isset($this->pluralizer)) {
             return $singular;
         }
 
-        return call_user_func(static::$pluralizer, $singular);
+        return call_user_func($this->pluralizer, $singular);
     }
 
     /**
@@ -361,7 +452,7 @@ class Parser
      * @access protected
      * @return DOMNodelist
      */
-    private static function getEqualNodes(DOMElement $node, $prefix = null)
+    private function getEqualNodes(DOMElement $node, $prefix = null)
     {
         $name = is_null($prefix) ? $node->nodeName : sprintf("%s:%s", $prefix, $node->nodeName);
         return $node->xpath(
@@ -378,7 +469,7 @@ class Parser
      * @access private
      * @return string
      */
-    private static function prefixKey($key, $prefix)
+    private function prefixKey($key, $prefix)
     {
         return sprintf('%s::%s', $prefix, $key);
     }
@@ -391,29 +482,9 @@ class Parser
      * @access private
      * @return mixed
      */
-    private static function convertDocument(\DOMDocument $xml)
+    private function convertDocument(\DOMDocument $xml)
     {
-        $xml = (new XmlLoader)->load($xml->saveXML());
+        $xml = $this->loader->load($xml->saveXML(), ['from_string' => true]);
         return $xml;
-    }
-
-    /**
-     * loadXml
-     *
-     * @param mixed $xml
-     * @param mixed $fromStrig
-     * @param string $domClass
-     *
-     * @access public
-     * @return mixed
-     */
-    public static function loadXml($xml, $fromStrig = false, $domClass = '\Selene\Components\Xml\Dom\DOMDocument')
-    {
-        $loader = new XmlLoader;
-
-        $loader->setOption('simplexml', false);
-        $loader->setOption('from_string', $fromStrig);
-
-        return $loader->load($xml);
     }
 }

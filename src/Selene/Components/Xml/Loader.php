@@ -26,7 +26,7 @@ use \Selene\Components\Config\Loaders\FileLoaderInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class XmlLoader
+class Loader implements LoaderInterface
 {
     use Getter;
 
@@ -35,21 +35,39 @@ class XmlLoader
      *
      * @var array
      */
-    protected $options = array();
+    protected $options;
+
+    /**
+     * defaultOptions
+     *
+     * @var array
+     */
+    protected $defaultOptions;
 
     /**
      * errors
      *
      * @var array
      */
-    protected $errors = array();
+    protected $errors;
 
     /**
      * xmlErrors
      *
      * @var array
      */
-    protected $xmlErrors = array();
+    protected $xmlErrors;
+
+    /**
+     * @access public
+     */
+    public function __construct()
+    {
+        $this->options = [];
+        $this->defaultOptions = [];
+        $this->errors = [];
+        $this->xmlErrors = [];
+    }
 
     /**
      * __clone
@@ -59,7 +77,10 @@ class XmlLoader
      */
     public function __clone()
     {
-        $this->options = clone $this->options;
+        $this->options = [];
+        $this->defaultOptions = [];
+        $this->errors = [];
+        $this->xmlErrors = [];
     }
 
     /**
@@ -94,15 +115,21 @@ class XmlLoader
      * @access public
      * @return DOMDocument or SimpleXMLElement
      */
-    public function load($file)
+    public function load($file, array $options = [])
     {
+        $this->loadOptions($options);
+
         $xml = $this->doLoad($file);
 
         if ($errors = $this->getErrors()) {
             throw new \Exception($this->formatErrors($errors, $file));
         }
+
+        $this->resotereOptions();
+
         return $xml;
     }
+
 
     /**
      * formatErrors
@@ -133,7 +160,9 @@ class XmlLoader
      */
     protected function doLoad($file)
     {
-        $dom = new DOMDocument('1.0', 'UTF-8');
+        $domClass = $this->getOption('dom_class', __NAMESPACE__.'\\Dom\DOMDocument');
+
+        $dom = new $domClass('1.0', 'UTF-8');
 
         $load = ($fromString = $this->getOption('from_string', false)) ? 'loadXML' : 'load';
 
@@ -141,8 +170,8 @@ class XmlLoader
             return false;
         }
 
-        if ((bool)$this->getOption('simplexml', false)) {
-            $xml = simplexml_import_dom($dom, __NAMESPACE__ . '\\SimpleXMLElement');
+        if ($simpleXml = $this->getOption('simplexml', false)) {
+            $xml = simplexml_import_dom($dom, $this->getOption('simplexml_class', __NAMESPACE__.'\\SimpleXmlElement'));
             return $xml;
         }
 
@@ -158,17 +187,6 @@ class XmlLoader
     public function getErrors()
     {
         return $this->getAllErrors();
-    }
-
-    /**
-     * create
-     *
-     * @access public
-     * @return static
-     */
-    public function create()
-    {
-        return new static();
     }
 
     /**
@@ -256,5 +274,38 @@ class XmlLoader
 
         $errors = array_merge($this->errors, $errors);
         return empty($errors) ? false : $errors;
+    }
+
+    /**
+     * loadOptions
+     *
+     * @param array $options
+     *
+     * @access private
+     * @return mixed
+     */
+    private function loadOptions(array $options)
+    {
+        $options = array_merge($this->options, $options);
+
+        foreach ($options as $option => $value) {
+            if ($default = $this->getOption($option)) {
+                $this->defaultOptions[$option] = $default;
+            }
+
+            $this->setOption($option, $value);
+        }
+    }
+
+    /**
+     * resotereOptions
+     *
+     * @access private
+     * @return void
+     */
+    private function resotereOptions()
+    {
+        $this->options = $this->defaultOptions;
+        $this->defaultOptions = [];
     }
 }
