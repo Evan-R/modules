@@ -14,6 +14,8 @@ namespace Selene\Components\Xml;
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
 use \Selene\Components\Common\Traits\Getter;
+use \Selene\Components\Xml\Loader\Loader;
+use \Selene\Components\Xml\Loader\LoaderInterface;
 
 /**
  * @class Parser
@@ -50,21 +52,6 @@ class Parser implements ParserInterface
     }
 
     /**
-     * getLoaderConfig
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function getLoaderConfig()
-    {
-        return [
-            'from_string' => false,
-            'simplexml' => false,
-            'dom_class' => __NAMESPACE__.'\\Dom\DOMDocument'
-        ];
-    }
-
-    /**
      * setMergeAttributes
      *
      * @param mixed $merge
@@ -85,7 +72,7 @@ class Parser implements ParserInterface
      * @access public
      * @return mixed
      */
-    public function setListKey($attribute)
+    public function setIndexKey($attribute)
     {
         return $this->options['list_key'] = $attribute;
     }
@@ -113,7 +100,7 @@ class Parser implements ParserInterface
      */
     public function getAttributesKey()
     {
-        return $this->getDefault($this->options, 'list_key', '@attributes');
+        return $this->getDefault($this->options, 'attribute_key', '@attributes');
     }
 
     /**
@@ -178,13 +165,13 @@ class Parser implements ParserInterface
             $xml = $this->convertDocument($xml);
         }
 
-        $root = $xml->documentElement;
+        if ($root = $xml->documentElement) {
+            $children = $this->parseDomElement($root);
+            $results = [$xml->documentElement->nodeName => $children];
+            return $results;
+        }
 
-        $children = $this->parseDomElement($root);
-
-        $results = [$xml->documentElement->nodeName => $children];
-
-        return $results;
+        throw new \InvalidArgumentException('DOM has no root element');
     }
 
     /**
@@ -198,11 +185,11 @@ class Parser implements ParserInterface
     public function parse($xml)
     {
         $opts = $this->getLoaderConfig();
-        $opts['from_sring'] = is_file($xml) && stream_is_local($xml) ? false : true;
+        $opts['from_string'] = !(is_file($xml) && stream_is_local($xml));
 
         $dom = $this->loader->load($xml, $opts);
 
-        return $this->parseDom($xml);
+        return $this->parseDom($dom);
     }
 
     /**
@@ -296,6 +283,21 @@ class Parser implements ParserInterface
             }
         }
         return $concat ? implode($textNodes) : $textNodes;
+    }
+
+    /**
+     * getLoaderConfig
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function getLoaderConfig()
+    {
+        return [
+            'from_string' => false,
+            'simplexml' => false,
+            'dom_class' => __NAMESPACE__.'\\Dom\DOMDocument'
+        ];
     }
 
     /**

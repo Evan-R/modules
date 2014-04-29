@@ -9,23 +9,21 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Tests;
+namespace Selene\Components\Xml\Tests\Loader;
 
-use \Selene\Components\Xml\XmlLoader;
+use \Selene\Components\Xml\Loader\Loader;
 
 /**
  * @class XmlLoaderTest
  * @package Selene\Components\Xml\Tests
  * @version $Id$
  */
-class XmlLoaderTest extends \PHPUnit_Framework_TestCase
+class LoaderTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * @test
-     */
+    /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\Xml', new XmlLoader);
+        $this->assertInstanceof('\Selene\Components\Xml\Loader\LoaderInterface', new Loader);
     }
 }

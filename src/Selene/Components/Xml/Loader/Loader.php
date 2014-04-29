@@ -9,12 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml;
+namespace Selene\Components\Xml\Loader;
 
 use \Selene\Components\Xml\Dom\DOMDocument;
 use \Selene\Components\Xml\SimpleXMLElement;
 use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\Config\Loaders\FileLoaderInterface;
 
 /**
  * Class: XmlLoader
@@ -160,7 +159,7 @@ class Loader implements LoaderInterface
      */
     protected function doLoad($file)
     {
-        $domClass = $this->getOption('dom_class', __NAMESPACE__.'\\Dom\DOMDocument');
+        $domClass = $this->getOption('dom_class', '\Selene\Components\Xml\Dom\DOMDocument');
 
         $dom = new $domClass('1.0', 'UTF-8');
 

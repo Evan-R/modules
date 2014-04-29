@@ -66,7 +66,7 @@ class DOMDocument extends BaseDom
      * @access public
      * @return DOMNodeList
      */
-    public function xPath($query, DOMNode $contextNode = null)
+    public function xpath($query, DOMNode $contextNode = null)
     {
         return $this->getXpath()->query($query, $contextNode);
     }

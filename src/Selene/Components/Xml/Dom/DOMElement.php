@@ -44,6 +44,10 @@ class DOMElement extends BaseDOMElement
      */
     public function appendDomElement(\DOMElement $import, $deep = true)
     {
-        return $this->ownerDocument->appendDomElement($import, $this, $deep);
+        if ($this->ownerDocument) {
+            return $this->ownerDocument->appendDomElement($import, $this, $deep);
+        }
+
+        throw new \BadMethodCallException('cannot add an element without a owner document');
     }
 }

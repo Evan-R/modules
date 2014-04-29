@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml;
+namespace Selene\Components\Xml\Loader;
 
 /**
  * @interface LoaderInterface
@@ -25,5 +25,4 @@ interface LoaderInterface
     public function getOption($option, $default = null);
 
     public function getErrors();
-
 }
