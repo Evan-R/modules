@@ -41,6 +41,23 @@ if (!function_exists('isXmlElement')) {
     }
 }
 
+if (!function_exists('arrayFlatten')) {
+    function arrayFlatten(array $array)
+    {
+        $out = [];
+        $iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($array));
+        foreach ($iterator as $key => $item) {
+            if (is_int($key)) {
+                $out[] = $item;
+            } else {
+                $out[$key] = $item;
+            }
+        }
+
+        return $out;
+    }
+}
+
 
 if (!function_exists('arrayGet')) {
     /**

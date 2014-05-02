@@ -13,7 +13,8 @@ use \Selene\Components\Routing\Exception\RouteNotFoundException;
 use \Selene\Components\Routing\Controller\ResolverInterface;
 
 /**
- * @class Router Router
+ * @class Router implements RouterInterface
+ * @see RouterInterface
  *
  * @package Selene\Components\Routing
  * @version $Id$

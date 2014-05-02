@@ -20,7 +20,7 @@ use \Selene\Components\Routing\Route;
  */
 interface MatcherInterface
 {
-    public function matchThen(callable $callback);
-
     public function matches(Route $route, $requirement);
+
+    public function onMatch(callable $callback);
 }

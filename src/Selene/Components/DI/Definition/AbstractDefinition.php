@@ -551,7 +551,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @access public
      * @return mixed
      */
-    public function setFactory($class, $method = null)
+    public function setFactory($class, $method = 'make')
     {
         return $this->setFactoryCallback(null !== $method ? [$class, $method] : $class);
     }

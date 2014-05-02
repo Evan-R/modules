@@ -54,8 +54,6 @@ interface ContainerInterface
 
     public function getAlias($alias);
 
-    public function addFileResource($file);
-
     public function define($service, $class = null, array $arguments = [], $scope = self::SCOPE_CONTAINER);
 
     public function get($id);
@@ -70,5 +68,5 @@ interface ContainerInterface
 
     public function isLocked();
 
-    public function compile(ResolveStrategyCollection $strategies = null);
+    public function compile();
 }

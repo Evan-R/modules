@@ -42,11 +42,24 @@ class StackBuilder
      *
      * @access public
      */
-    public function __construct(HttpKernelInterface $app)
+    public function __construct()
     {
-        $this->app   = $app;
         $this->queue = new \SplPriorityQueue;
     }
+
+    /**
+     * setKernel
+     *
+     * @param HttpKernelInterface $app
+     *
+     * @access public
+     * @return mixed
+     */
+    public function setKernel(HttpKernelInterface $app)
+    {
+        $this->app  = $app;
+    }
+
 
     /**
      * add

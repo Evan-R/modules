@@ -14,6 +14,7 @@ namespace Selene\Components\Config;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\Config\Validator\Builder;
 use \Selene\Components\Config\Validator\Validator;
+use \Selene\Components\DI\BuilderInterface;
 
 /**
  * @class Configuration
@@ -46,7 +47,7 @@ abstract class Configuration implements ConfigurationInterface
      * @abstract
      * @return mixed
      */
-    abstract public function load(ContainerInterface $container, array $values);
+    abstract public function load(BuilderInterface $builder, array $values);
 
     /**
      * validate

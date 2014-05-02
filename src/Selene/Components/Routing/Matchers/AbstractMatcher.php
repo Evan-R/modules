@@ -30,7 +30,7 @@ abstract class AbstractMatcher implements MatcherInterface
      * @access public
      * @return void
      */
-    public function matchThen(callable $callback)
+    public function onMatch(callable $callback)
     {
         $this->callback = $callback;
     }

@@ -11,16 +11,55 @@
 
 namespace Selene\Components\DI;
 
+use \Selene\Components\Common\Traits\Getter;
+use \Selene\Components\Common\Data\BaseList;
+use \Selene\Components\Common\Data\ListInterface;
 use \Selene\Components\DI\Dumper\ContainerDumper;
+use \Selene\Components\DI\Processor\Processor;
+use \Selene\Components\DI\Processor\ProcessorInterface;
+use \Selene\Components\Config\Resource\FileResource;
+use \Selene\Components\Config\Resource\ObjectResource;
 
 /**
- * @class Builder
+ * @class Builder implements BuilderInterface
+ * @see BuilderInterface
+ *
  * @package Selene\Components\DI
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
-class Builder
+class Builder implements BuilderInterface
 {
-    protected $containerClass;
+    use Getter;
+
+    /**
+     * processor
+     *
+     * @var mixed
+     */
+    protected $processor;
+
+    /**
+     * container
+     *
+     * @var mixed
+     */
+    protected $container;
+
+    /**
+     * extensions
+     *
+     * @var ListInterface
+     */
+    protected $resources;
+
+    /**
+     * container
+     *
+     * @var array
+     */
+    protected $extensions;
 
     /**
      * __construct
@@ -30,46 +69,198 @@ class Builder
      * @access public
      * @return mixed
      */
-    public function __construct(ContainerDumper $dumper)
-    {
-        $this->dumper = $dumper;
-    }
+    public function __construct(
+        ContainerInterface $container,
+        ProcessorInterface $processor = null,
+        ListInterface $resources = null
+    ) {
+        $this->container = $container;
+        $this->processor = $processor ?: new Processor;
+        $this->resources = $resources ?: new BaseList;
 
-    public function setContainerClass($class)
-    {
-        return $this->containerClass = $class;
+        $this->extensions = [];
     }
 
     /**
-     * getContainerClass
-     *
+     * getContainer
      *
      * @access public
      * @return mixed
      */
-    public function getContainerClass()
+    public function getContainer()
     {
-        return $this->containerClass ?: __NAMESPACE__.'\\BaseContainer';
+        return $this->container;
+    }
+
+    public function replaceContainer(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * merge
+     *
+     * @param BuilderInterface $builder
+     *
+     * @access public
+     * @return mixed
+     */
+    public function merge(BuilderInterface $builder)
+    {
+        $this->mergeExtensionConfigs($builder);
+        $this->mergeResources($builder);
+
+        $this->container->merge($builder->getContainer());
+    }
+
+    /**
+     * getProcessor
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getProcessor()
+    {
+        return $this->processor;
     }
 
     /**
      * build
      *
+     *
      * @access public
-     * @return ContainerInterface
+     * @return mixed
      */
-    public function build(callable $postSetup = null)
+    public function build()
     {
-        if (!class_exists($class = $this->getContainerClass())) {
-            throw new \InvalidArgumentException(sprintf('ContainerClass %s does not exist', $class));
+        $this->container->getParameters()->resolve()->all();
+        //Parameters->replaceParameters($parameters);
+        $this->processor->process($this->container);
+    }
+
+    /**
+     * addFileResource
+     *
+     * @param mixed $file
+     *
+     * @access public
+     * @return void
+     */
+    public function addFileResource($file)
+    {
+        $this->resources->add(new FileResource($file));
+    }
+
+    /**
+     * addObjectResource
+     *
+     * @param mixed $object
+     *
+     * @access public
+     * @return void
+     */
+    public function addObjectResource($object)
+    {
+        $this->resources->add(new ObjectResource($object));
+    }
+
+    /**
+     * getResources
+     *
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getResources()
+    {
+        return $this->resources;
+    }
+
+    /**
+     * addExtensionConfig
+     *
+     * @param mixed $extension
+     * @param array $config
+     *
+     * @access public
+     * @return mixed
+     */
+    public function addExtensionConfig($extension, array $config)
+    {
+        $this->extensions[$extension][] = $config;
+    }
+
+    /**
+     * getExtensionConfig
+     *
+     * @param mixed $extension
+     *
+     * @access public
+     * @return array
+     */
+    public function getExtensionConfig($extension)
+    {
+        return $this->getDefault($this->extensions, $extension, []);
+    }
+
+    /**
+     * getExtensionConfigs
+     *
+     * @param mixed $extension
+     *
+     * @access public
+     * @return array
+     */
+    public function getExtensionConfigs()
+    {
+        return $this->extensions;
+    }
+
+    /**
+     * __call
+     *
+     * @param mixed $method
+     * @param mixed $arguments
+     *
+     * @access public
+     * @return mixed
+     */
+    public function __call($method, $arguments)
+    {
+        if (method_exists($this->container, $method)) {
+            return call_user_func_array([$this->container, $method], $arguments);
         }
 
-        $container = new $class;
+        throw new \BadMethodCallException(sprintf('call to undefined method %s::%s()', get_class($this), $method));
+    }
 
-        if (null !== $postSetup) {
-            call_user_func($postSetup, $container);
+    /**
+     * mergeExtensionConfigs
+     *
+     * @param mixed $builder
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function mergeExtensionConfigs($builder)
+    {
+        foreach ($builder->getExtensionConfigs() as $extension => $config) {
+            $this->extensions[$extension] = array_merge($this->getExtensionConfig($extension), $config);
         }
+    }
 
-        return $container;
+    /**
+     * mergeResources
+     *
+     * @param mixed $builder
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function mergeResources($builder)
+    {
+        $this->resources = new BaseList(array_unique(
+            array_merge($this->resources->toArray(), $builder->getResources()->toArray())
+        ));
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Selene\Components\Package;
 
+use \Selene\Components\Console\Application as Console;
 use \Selene\Components\Kernel\Application;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
@@ -21,6 +22,7 @@ use \Selene\Components\DI\Traits\ContainerAwareTrait;
 use \Selene\Components\Config\Loader\DelegatingLoader;
 use \Selene\Components\Config\Loader\Resolver as LoaderResolver;
 use \Selene\Components\Config\Locator\FileLocator;
+use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
 
 /**
  * @abstract class Package implements PackageInterface, ContainerAwareInterface
@@ -148,7 +150,7 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
      * @access public
      * @return void
      */
-    public function build(ContainerInterface $container)
+    public function build(ContainerBuilderInterface $builder)
     {
     }
 
@@ -250,7 +252,7 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
      * @access public
      * @return mixed
      */
-    public function registerCommands()
+    public function registerCommands(Console $console)
     {
 
     }

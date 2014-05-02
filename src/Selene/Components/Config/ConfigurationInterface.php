@@ -11,6 +11,7 @@
 
 namespace Selene\Components\Config;
 
+use \Selene\Components\DI\BuilderInterface;
 use \Selene\Components\DI\ContainerInterface;
 
 /**
@@ -20,5 +21,5 @@ use \Selene\Components\DI\ContainerInterface;
  */
 interface ConfigurationInterface
 {
-    public function load(ContainerInterface $container, array $configs);
+    public function load(BuilderInterface $builder, array $values);
 }

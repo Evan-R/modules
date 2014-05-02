@@ -16,9 +16,11 @@ use \Selene\Components\Xml\Loader\Loader as XmlFileLoader;
 use \Selene\Components\DI\Reference;
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
+use \Selene\Components\DI\BuilderInterface;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\Config\Resource\Loader;
 use \Selene\Components\Config\Resource\LocatorInterface;
+use \Selene\Components\Config\Traits\XmlLoaderHelperTrait;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 
 /**
@@ -31,9 +33,7 @@ use \Selene\Components\DI\Definition\ServiceDefinition;
  */
 class XmlLoader extends Loader
 {
-    protected $parser;
-
-    protected $xmlLoader;
+    use XmlLoaderHelperTrait;
 
     /**
      *
@@ -41,10 +41,11 @@ class XmlLoader extends Loader
      *
      * @access public
      */
-    public function __construct(ContainerInterface $container, LocatorInterface $locator)
+    public function __construct(BuilderInterface $builder, LocatorInterface $locator)
     {
         parent::__construct($locator);
-        $this->container = $container;
+        $this->container = $builder->getContainer();
+        $this->builder = $builder;
     }
 
     /**
@@ -62,7 +63,7 @@ class XmlLoader extends Loader
 
         $this->checkPathIntegrity($file);
 
-        $this->container->addFileResource($file);
+        $this->builder->addFileResource($file);
 
         $xml = $this->loadXml($file);
 
@@ -98,73 +99,17 @@ class XmlLoader extends Loader
                 continue;
             }
 
-            $parameters = $this->container->getParameters();
-            $values = $parameters->has($name = 'package:'.$alias) ? $parameters->get($name) : [];
 
-            foreach ($package->xpath('*') as $item) {
+            $parameters = $this->container->getParameters();
+            $values = [];
+
+            foreach ($package->xpath("*[local-name() != 'import']") as $item) {
+                $this->builder->addExtensionConfig($alias, [$item->nodeName => $this->getParser()->parseDomElement($item)]);
                 $values[] = [$item->nodeName => $this->getParser()->parseDomElement($item)];
             }
 
-            $parameters->set($name, $values);
+            //$parameters->set($name, $values);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     * @param string $format
-     */
-    public function supports($resource)
-    {
-        return is_string($resource) && 'xml' ===  pathinfo(strtolower($resource), PATHINFO_EXTENSION);
-    }
-
-    /**
-     * loadXml
-     *
-     * @param mixed $xml
-     *
-     * @access public
-     * @return mixed
-     */
-    public function loadXml($xml)
-    {
-        return $this->getXmlLoader()->load($xml);
-    }
-
-    /**
-     * getXmlLoader
-     *
-     * @access protected
-     * @return XmlLoader
-     */
-    protected function getXmlLoader()
-    {
-        if (null === $this->xmlLoader) {
-            $this->xmlLoader = new XmlFileLoader;
-            $this->xmlLoader->setOption('simplexml', false);
-            $this->xmlLoader->setOption('from_string', false);
-        }
-
-        return $this->xmlLoader;
-    }
-
-    /**
-     * getParser
-     *
-     * @access protected
-     * @return Parser
-     */
-    protected function getParser()
-    {
-        if (null === $this->parser) {
-            $this->parser = new Parser($this->getXmlLoader());
-            $this->parser->setPluralizer(function ($singular) {
-                return $singular . 's';
-            });
-            $this->parser->setMergeAttributes(true);
-        }
-
-        return $this->parser;
     }
 
     /**
@@ -352,7 +297,8 @@ class XmlLoader extends Loader
         if ($class = $this->getAttributeValue($service, 'class', false)) {
             $def->setClass($class);
         } elseif ($factory = $this->getAttributeValue($service, 'factory', false)) {
-            $def->setFactory($factory);
+            $method = $this->getAttributeValue($service, 'factory-method', 'make');
+            $def->setFactory($factory, $method);
         } else {
             throw new \RuntimeException(
                 sprintf('either service class or factory is missing for service id %s', $id)
@@ -400,7 +346,6 @@ class XmlLoader extends Loader
     private function setServiceCallers(DOMElement $service, ServiceDefinition $def)
     {
         foreach ($service->xpath('setters/setter') as $setter) {
-
             $def->addSetter($this->getAttributeValue($setter, 'calls'), $this->getArguments($setter));
         }
     }

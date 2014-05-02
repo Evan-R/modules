@@ -17,6 +17,8 @@ use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\Config\ConfigurationInterface;
 use \Symfony\Component\HttpKernel\HttpKernelInterface;
 use \Selene\Components\Kernel\StackBuilder as KernelStackBuilder;
+use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
+use \Selene\Components\DI\Builder as ContainerBuilder;
 
 /**
  * @class PackageRepository
@@ -147,11 +149,11 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      * @access public
      * @return mixed
      */
-    public function build(ContainerInterface $container)
+    public function build(ContainerBuilderInterface $builder)
     {
         foreach ($this->packages as $package) {
-            $this->loadPackageConfig($container, $package);
-            $this->buildPackage($container, $package);
+            $this->loadPackageConfig($builder, $package);
+            $this->buildPackage($builder, $package);
         }
     }
 
@@ -164,27 +166,33 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      * @access protected
      * @return void
      */
-    protected function loadPackageConfig(ContainerInterface $container, PackageInterface $package)
+    protected function loadPackageConfig(ContainerBuilderInterface $builder, PackageInterface $package)
     {
+        $container = $builder->getContainer();
+
         if (!($config = $package->getConfiguration()) instanceof ConfigurationInterface) {
             return;
         }
 
-        $container->addObjectResource($config);
+        $builder->addObjectResource($config);
 
         $parameters = $container->getParameters();
         $containerClass = (new \ReflectionObject($container))->getName();
         $packageContainer = new $container(new Parameters($parameters->getRaw()));
 
-        if ($packageContainer->hasParameter($name = 'package:'.$package->getAlias())) {
-            $values = $packageContainer->getParameter($name);
-        } else {
-            $values = [];
-        }
+        //if ($packageContainer->hasParameter($name = 'package:'.$package->getAlias())) {
+        //    $values = $packageContainer->getParameter($name);
+        //} else {
+        //    $values = [];
+        //}
 
-        $config->load($packageContainer, $values);
+        $builder->replaceContainer($packageContainer);
+
+        $config->load($builder, $builder->getExtensionConfig($package->getAlias()));
 
         $container->merge($packageContainer);
+
+        $builder->replaceContainer($container);
     }
 
     /**
@@ -196,10 +204,10 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      * @access protected
      * @return mixed
      */
-    protected function buildPackage(ContainerInterface $container, PackageInterface $package)
+    protected function buildPackage(ContainerBuilderInterface $builder, PackageInterface $package)
     {
-        $container->addFileResource($package->getMeta());
-        return $package->build($container);
+        $builder->addFileResource($package->getMeta());
+        return $package->build($builder);
     }
 
     /**

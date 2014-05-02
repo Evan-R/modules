@@ -12,11 +12,19 @@
 namespace Selene\Components\DI;
 
 /**
- * @interface InspectableInterface
+ * @interface BuilderInterface
  * @package Selene\Components\DI
  * @version $Id$
  */
-interface InspectableInterface
+interface BuilderInterface
 {
-    public function inspect();
+    /**
+     * getContainer
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getContainer();
+
+    public function getProcessor();
 }

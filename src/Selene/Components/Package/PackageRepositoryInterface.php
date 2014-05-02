@@ -12,6 +12,7 @@
 namespace Selene\Components\Package;
 
 use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
 
 /**
  * @interface PackageRepositoryInterface
@@ -33,7 +34,7 @@ interface PackageRepositoryInterface
 
     public function all();
 
-    public function build(ContainerInterface $container);
+    public function build(ContainerBuilderInterface $builder);
 
     public function boot();
 

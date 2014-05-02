@@ -48,6 +48,27 @@ trait PathHelperTrait
     }
 
     /**
+     * substitutePaths
+     *
+     * @param mixed $root
+     * @param mixed $current
+     *
+     * @access private
+     * @return mixed
+     */
+    public function substitutePaths($root, $current)
+    {
+        $path = substr($current, 0, strlen($root));
+
+        if (strcasecmp($root, $path) !== 0) {
+            throw new \InvalidArgumentException('Root path does not contain current path');
+        }
+
+        $subPath = substr($current, strlen($root) + 1);
+        return false === $subPath ? '' : $subPath;
+    }
+
+    /**
      * expandPath
      *
      * @param mixed $path
@@ -57,15 +78,15 @@ trait PathHelperTrait
      */
     public function expandPath($path)
     {
-
         $bits = explode(DIRECTORY_SEPARATOR, str_replace('\\/', DIRECTORY_SEPARATOR, $path));
 
         $p = [];
+
         while (count($bits)) {
             $part = array_pop($bits);
             if ('..' === $part) {
                 array_pop($bits);
-            } elseif('' !== $part) {
+            } elseif ('' !== $part) {
                 $p[] = $part;
             }
         }

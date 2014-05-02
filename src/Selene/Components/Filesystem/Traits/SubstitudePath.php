@@ -32,7 +32,7 @@ trait SubstitudePath
     {
         $path = substr($current, 0, strlen($root));
 
-        if (strcasecmp($root, $path) !== 0)  {
+        if (strcasecmp($root, $path) !== 0) {
             throw new \InvalidArgumentException('Root path does not contain current path');
         }
 

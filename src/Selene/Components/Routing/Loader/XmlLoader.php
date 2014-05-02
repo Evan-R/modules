@@ -17,16 +17,27 @@ use \Selene\Components\DI\Loader\ConfigLoader;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\Xml\Builder;
 use \Selene\Components\Xml\Traits\XmlLoaderTrait;
-use \Selene\Components\Confgi\Loader\AbstractXmlLoader;
+use \Selene\Components\Confgi\Resource\Loader;
+use \Selene\Components\Confgi\Resource\Locator;
 
 /**
  * @class XmlLoader
  * @package Selene\Components\Routing\Loader
  * @version $Id$
  */
-class XmlLoader extends AbstractXmlLoader
+class XmlLoader extends Loader
 {
+    use XmlLoaderHelperTrait;
+
     protected $builder;
+
+    /**
+     * container
+     *
+     * @var mixed
+     */
+    protected $container;
+    protected $locator;
 
     /**
      * @param ContainerInterface $container
@@ -35,11 +46,12 @@ class XmlLoader extends AbstractXmlLoader
      * @access public
      * @return mixed
      */
-    public function __construct(ContainerInterface $container, $routeBuilder = null)
+    public function __construct(ContainerInterface $container, Locator $locator)
     {
-        $this->builder = $routeBuilder ?: new RouteBuilder;
+        $this->container = $container;
+        $this->builder = new RouteBuilder;
+        parent::__construct($locator);
 
-        parent::__construct($container);
     }
 
     /**
@@ -52,12 +64,13 @@ class XmlLoader extends AbstractXmlLoader
      */
     public function load($resource)
     {
-        $this->container->addFileResource($resource);
-        $xml = $this->loadXml($resource);
+        if (!($file = $this->locator->locate($resource))) {
+            return;
+        }
 
-        $this->parseImports($xml);
-        $this->parseRoutes($xml);
+        $xml = $this->loadXml($file);
 
+        $this->container->addFileResource($file);
     }
 
     /**

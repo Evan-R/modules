@@ -18,6 +18,8 @@ use \Symfony\Component\HttpKernel\TerminableInterface;
 use \Selene\Components\Events\DispatcherInterface;
 use \Selene\Components\Routing\RouterInterface;
 use \Selene\Components\DI\Builder;
+use \Selene\Components\DI\Processor\Processor;
+use \Selene\Components\DI\Dumper\PhpDumper;
 use \Selene\Components\DI\Dumper\ContainerDumper;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
@@ -41,7 +43,7 @@ use \Selene\Components\DI\Loader\XmlLoader;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-abstract class Application implements HttpKernelInterface, TerminableInterface, ContainerAwareInterface
+class Application implements ApplicationInterface, HttpKernelInterface, TerminableInterface, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
@@ -74,6 +76,14 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
     protected $packages;
 
     /**
+     * includePhpResources
+     *
+     * @var array
+     */
+    protected $packageResources;
+    protected $packageProviders;
+
+    /**
      * @param mixed $environment
      * @param mixed $debug
      *
@@ -88,6 +98,9 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
             $this->debugger = new Debugger;
             $this->debugger->start();
         }
+
+        $this->packageResources = [];
+        $this->packageProviders = [];
     }
 
     /**
@@ -141,7 +154,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
      */
     public function getContainerServiceId()
     {
-        return 'app.container';
+        return 'app_container';
     }
 
     /**
@@ -179,7 +192,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
      */
     public function getKernelStack()
     {
-        return $this->getContainer()->get('app_kernel.stack');
+        return $this->getContainer()->get('kernel_stack');
     }
 
     /**
@@ -223,7 +236,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
      */
     protected function getContainerClass()
     {
-        return 'Selene\Components\DI\BaseContainer';
+        return 'Selene\Components\DI\Container';
     }
 
     /**
@@ -234,18 +247,28 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
      */
     protected function initializeContainer()
     {
+        $ns = 'Selene\ClassCache';
+        $className = 'Container'.ucfirst($this->env);
+
         $cache = new ConfigCache(
-            $file = $this->getContainerCachePath() . '/Container'.ucfirst($this->env).'.php',
+            $file = $this->getContainerCachePath() . DIRECTORY_SEPARATOR . $className.'.php',
             $this->isDebugging()
         );
 
+
         if ($cache->isValid()) {
-            return $this->loadContainerCache($config);
+            //$className = $className . '_' . hash('md5', filemtime($file));
+            $class = $ns . '\\' . $className;
+            return $this->loadContainerCache($class, $file);
         }
 
-        $this->buildContainer($cache);
+        //$className = $className . '_' . hash('md5', $time = time());
 
-        $cache->write('some nonesense', $this->container->getResources()->toArray());
+        $builder = $this->buildContainer($cache);
+        $dumper = new PhpDumper($this->container, $ns, $className, $this->getContainerServiceId());
+
+        $cache->write($dumper->dump(), $builder->getResources()->toArray());
+        //touch($file, $time);
     }
 
     /**
@@ -258,33 +281,43 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
      */
     protected function buildContainer(ConfigCache $cache)
     {
-        $builder = new Builder(new ContainerDumper);
-        $builder->setContainerClass($this->getContainerClass());
 
-        $builder->build(function ($container) {
+        $class = $this->getContainerClass();
+        $container = new $class;
 
-            $this->setContainer($container);
-            $this->container->setParameter('app.root', $this->getApplicationRoot());
-            $this->container->inject($this->getContainerServiceId(), $container);
+        $this->setContainer($container);
+        $this->container->setParameter('app.root', $this->getApplicationRoot());
+        $this->container->inject($this->getContainerServiceId(), $container);
 
-            $configPaths = $this->getPackageConfig();
+        $builder = new Builder($container, new Processor);
 
-            $locator = new Locator($configPaths);
+        foreach ($this->packageResources as $file) {
+            $builder->addFileResource($file);
+        }
 
-            $locator->setRootPath(
-                $this->getApplicationRoot().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'packages'
-            );
-            $resolver = new LoaderResolver([
-                new XmlLoader($this->container, $locator)
-            ]);
-            $loader = new DelegatingLoader($resolver);
+        $configPaths = $this->getPackageConfig();
 
-            $loader->load('config.xml');
+        $locator = new Locator($configPaths);
 
-            $this->packages->build($container);
-        });
+        $locator->setRootPath(
+            $this->getApplicationRoot().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'packages'
+        );
+        $resolver = new LoaderResolver([
+            new XmlLoader($builder, $locator)
+        ]);
+        $loader = new DelegatingLoader($resolver);
 
-        $this->container->compile();
+        $loader->load('config.xml');
+
+        $this->packages->build($builder);
+
+        $builder->build();
+
+
+        return $builder;
+
+        //$this->container->compile();
+
     }
 
     /**
@@ -293,11 +326,12 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
      * @access protected
      * @return void
      */
-    protected function loadContainerCache(ConfigCache $cache)
+    protected function loadContainerCache($class, $file)
     {
-        $file = (string)$cache;
+        include $file;
 
-        $container = (basename($file));
+        $container = new $class;
+
         $this->setContainer($container);
     }
 
@@ -322,10 +356,8 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
      */
     protected function bootKernelStack()
     {
-        $builder = new KernelStackBuilder($this->getKernel());
-        $this->packages->registerMiddlewares($builder);
-
-        $this->container->inject('app_kernel.stack', $stack = $builder->make());
+        $builder = $this->getContainer()->get('kernel_stackbuilder');
+        $this->container->inject('kernel_stack', $stack = $builder->make());
     }
 
     /**
@@ -348,7 +380,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
     protected function initializePackages()
     {
         $this->packages = $this->packages ?:
-            new PackageRepository($this->initPackages($this->getPackages()));
+            new PackageRepository($this->initPackages($this->getPackageResources()));
     }
 
     protected function getPackageConfig()
@@ -374,6 +406,75 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
         return $initialized;
     }
 
+    /**
+     * setApplicationRoot
+     *
+     * @param mixed $path
+     *
+     * @access public
+     * @return mixed
+     */
+    public function setApplicationRoot($path)
+    {
+        $this->applicationRoot = $path;
+    }
+
+    /**
+     * getApplicationRoot
+     *
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getApplicationRoot()
+    {
+        return $this->applicationRoot;
+    }
+
+    /**
+     * setContainerCachePath
+     *
+     * @param mixed $path
+     *
+     * @access public
+     * @return void
+     */
+    public function setContainerCachePath($path)
+    {
+        $this->containerCachePath = $path;
+    }
+
+    /**
+     * getContainerCachePath
+     *
+     * @access public
+     * @return string
+     */
+    public function getContainerCachePath()
+    {
+        return $this->containerCachePath;
+    }
+
+    /**
+     * getLoadedPackages
+     *
+     * @access public
+     * @return PackageRepository
+     */
+    public function getLoadedPackages()
+    {
+        return $this->packages;
+    }
+
+    public function addPackageProvider($path, $extension = 'php', $default = [])
+    {
+        if (file_exists($file = $path . '.' . $extension)) {
+            $this->packageResources[] = $file;
+            $this->packageProviders[] = include $file;
+            return;
+        }
+
+    }
 
     /**
      * getPackages
@@ -383,15 +484,9 @@ abstract class Application implements HttpKernelInterface, TerminableInterface, 
      * @abstract
      * @return array
      */
-    abstract protected function getPackages();
-
-    /**
-     * getContainerCachePath
-     *
-     *
-     * @access protected
-     * @abstract
-     * @return string
-     */
-    abstract protected function getContainerCachePath();
+    protected function getPackageResources()
+    {
+        $paths = arrayFlatten($this->packageProviders);
+        return $paths;
+    }
 }

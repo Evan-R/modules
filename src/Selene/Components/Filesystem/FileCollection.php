@@ -11,15 +11,21 @@
 
 namespace Selene\Components\Filesystem;
 
-use ArrayIterator;
-use IteratorAggregate;
-use Selene\Components\Common\Interfaces\JsonableInterface;
-use Selene\Components\Common\Interfaces\ArrayableInterface;
+use \ArrayIterator;
+use \IteratorAggregate;
+use \Selene\Components\Common\Interfaces\JsonableInterface;
+use \Selene\Components\Common\Interfaces\ArrayableInterface;
 
 /**
- * @class FileCollection
- * @package
+ * @class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableInterface
+ * @see IteratorAggregate
+ * @see ArrayableInterface
+ * @see JsonableInterface
+ *
+ * @package Selene\Components\Filesystem
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableInterface
 {

@@ -71,11 +71,11 @@ class RouteMatcher implements RouteMatcherInterface
     public function prepareMatchers()
     {
         if (isset($this->callbacks['host'])) {
-            $this->getHostMatcher()->matchThen($this->callbacks['host']);
+            $this->getHostMatcher()->onMatch($this->callbacks['host']);
         }
 
         if (isset($this->callbacks['route'])) {
-            $this->getRegexpPathMatcher()->matchThen($this->callbacks['route']);
+            $this->getRegexpPathMatcher()->onMatch($this->callbacks['route']);
         }
     }
 

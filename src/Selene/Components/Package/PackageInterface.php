@@ -12,6 +12,8 @@
 namespace Selene\Components\Package;
 
 use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\Console\Application as Console;
+use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
 
 /**
  * @interface PackageInterface
@@ -38,7 +40,7 @@ interface PackageInterface
      * @access public
      * @return mixed
      */
-    public function build(ContainerInterface $container);
+    public function build(ContainerBuilderInterface $builder);
 
     /**
      * boot up the package
@@ -64,7 +66,7 @@ interface PackageInterface
      * @access public
      * @return mixed
      */
-    public function registerCommands();
+    public function registerCommands(Console $console);
 
     /**
      * getNamespace
