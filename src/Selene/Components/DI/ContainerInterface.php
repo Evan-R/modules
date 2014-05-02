@@ -15,8 +15,11 @@ use \Selene\Components\DI\Resolve\ResolveStrategyCollection;
 
 /**
  * @interface ContainerInterface
+ *
  * @package Selene\Components\DI
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 interface ContainerInterface
 {
@@ -26,47 +29,135 @@ interface ContainerInterface
 
     const SERVICE_REF_INDICATOR = '$';
 
-    const APP_CONTAINER_SERVICE = 'app.container';
+    /**
+     * setParameter
+     *
+     * @param mixed $param
+     * @param mixed $definition
+     *
+     * @access public
+     * @return void
+     */
+    public function setParameter($param, $definition);
 
-    ///**
-    // * Return the name of the serviceable container.
-    // *
-    // * The name defaults to `staic::APP_CONTAINER_SERVICE`
-    // *
-    // * @access public
-    // * @return string
-    // */
-    //public function getName();
+    /**
+     * getParameter
+     *
+     * @param mixed $parameter
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getParameter($parameter);
 
-    //public function setParameter($param, $definition);
-
-    //public function getParameter($parameter);
-
-    ///**
-    // * Get the parameter collection of the service.
-    // *
-    // * @access public
-    // * @return Parameters
-    // */
+    /**
+     * getParameters
+     *
+     *
+     * @access public
+     * @return ParameterInterface
+     */
     public function getParameters();
 
+    /**
+     * setAlias
+     *
+     * @param mixed $alias
+     * @param mixed $id
+     *
+     * @access public
+     * @return void
+     */
     public function setAlias($alias, $id);
 
+    /**
+     * getAlias
+     *
+     * @param mixed $alias
+     *
+     * @access public
+     * @return string
+     */
     public function getAlias($alias);
 
+    /**
+     * Define a service
+     *
+     * @param mixed $service
+     * @param mixed $class
+     * @param array $arguments
+     * @param mixed $scope
+     *
+     * @access public
+     * @return mixed
+     */
     public function define($service, $class = null, array $arguments = [], $scope = self::SCOPE_CONTAINER);
 
+    /**
+     * Resolve a service instance
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @return Object
+     */
     public function get($id);
 
+    /**
+     * inject a service instance
+     *
+     * @param mixed $id
+     * @param mixed $instance
+     * @param mixed $scope
+     *
+     * @access public
+     * @return void
+     */
     public function inject($id, $instance, $scope = self::SCOPE_CONTAINER);
 
+    /**
+     * getDefinition
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @return DefinitionInterface
+     */
+    public function getDefinition($id);
+
+    /**
+     * getDefinitions
+     *
+     * @access public
+     * @return array
+     */
     public function getDefinitions();
 
+    /**
+     * hasDefinition
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @return boolean
+     */
     public function hasDefinition($id);
 
+    /**
+     * Merge two containers.
+     *
+     * @param ContainerInterface $container
+     *
+     * @access public
+     * @return mixed
+     */
     public function merge(ContainerInterface $container);
 
+    /**
+     * isLocked
+     *
+     * @access public
+     * @return booelean
+     */
     public function isLocked();
-
-    public function compile();
 }

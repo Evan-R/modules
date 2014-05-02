@@ -195,66 +195,6 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Return the name of the serviceable container.
-     *
-     * The name defaults to `staic::APP_CONTAINER_SERVICE`
-     *
-     * @access public
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * addResolveStrategy
-     *
-     * @param mixed $strategy
-     *
-     * @access public
-     * @return void
-     */
-    public function addResolveStrategy($strategy)
-    {
-        $this->resolveStrategies->add($strategy);
-    }
-
-
-    /**
-     * loadPackageConfig
-     *
-     * @access public
-     * @return mixed
-     */
-    public function addPackageConfig($package, array $values = [])
-    {
-        $this->packageConfigs[$package][] = $values;
-    }
-
-    /**
-     * getPackageConfig
-     *
-     * @param mixed $package
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getPackageConfig($package)
-    {
-        return isset($this->packageConfigs[$package]) ? $this->packageConfigs[$package] : [];
-    }
-
-    /**
-     * @access public
-     * @return mixed
-     */
-    public function getPackageConfigs()
-    {
-        return $this->packageConfigs;
-    }
-
-    /**
      * getFlaggedDefinitions
      *
      * @access public
@@ -265,45 +205,6 @@ class Container implements ContainerInterface
         return array_filter($this->getDefinitions(), function ($def) {
             return (bool)$def->getFlags();
         });
-    }
-
-    /**
-     * setResolveStrategies
-     *
-     * @param StrategyCollection $strategies
-     *
-     * @access public
-     * @return void
-     */
-    public function setResolveStrategies(StrategyCollection $strategies = null)
-    {
-        $this->resolveStrategies = $strategies ?: new StrategyCollection;
-    }
-
-    /**
-     * addResolvePass
-     *
-     * @param mixed $strategy
-     *
-     * @access public
-     * @return void
-     */
-    public function addResolvePass($strategy)
-    {
-        $this->resolveStrategies[] = $strategy;
-    }
-
-    /**
-     * resolve
-     *
-     * @param ResolveStrategyCollection $strategies
-     *
-     * @access public
-     * @return void
-     */
-    public function compile()
-    {
-        $this->parameters = new Parameters($this->parameters->resolve()->all());
     }
 
     /**

@@ -93,4 +93,5 @@ trait PathHelperTrait
 
         return implode(DIRECTORY_SEPARATOR, array_reverse($p));
     }
+
 }
