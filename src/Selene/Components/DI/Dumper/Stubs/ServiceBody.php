@@ -143,27 +143,34 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      */
     protected function createSynCallcack(array $synced, $method, array $arguments)
     {
-        $content = [];
-        $content[] = '';
-        $content[] = '$synced = ' . $this->extractParams($synced) . ';';
-        $content[] = '$callback = function ($id = null) use (&$synced, $instance) {';
-        $content[] = '    unset($synced[$id]);';
-        $content[] = '';
-        $content[] = '    if (!empty($synced)) {';
-        $content[] = '        return;';
-        $content[] = '    }';
-        $content[] = '    '.$this->setServiceArgs($arguments, '$instance->'.$method, 4).';';
-        $content[] = '};';
-        $content[] = '';
-        $content[] = '$this->checkSynced($synced);';
-        $content[] = '';
-        $content[] = 'if (empty($synced)) {';
-        $content[] = '    call_user_func($callback);';
-        $content[] = '} else {';
-        $content[] = '    $this->pushSyncedCallers($synced, $callback);';
-        $content[] = '}';
+        $lines = (new Lines())
+            ->add('$synced = ' . $this->extractParams($synced) . ';')
+            ->add('$callback = function ($id = null) use (&$synced, $instance) {')
+                ->add('unset($synced[$id]);', 4)
+                ->emptyLine()
+                ->add('if (!empty($synced)) {')
+                    ->add('return;', 4)
+                    ->end()
+                ->add('}')
+                ->emptyLine()
+            ->add($this->setServiceArgs($arguments, '$instance->'.$method, 4).';')
+            ->end()
+            ->add('};')
+            ->emptyLine()
+            ->add('$this->checkSynced($synced);')
+            ->emptyLine()
+            ->add('if (empty($synced)) {')
+                ->add('call_user_func($callback);', 4)
+                ->end()
+            ->add('} else {')
+                ->add('$this->pushSyncedCallers($synced, $callback);', 4)
+            ->end()
+            ->add('}')
+            ->emptyLine();
 
-        return implode("\n".$this->indent(8), $content);
+        $lines->setOutputIndentation(8);
+
+        return (string)$lines;
     }
 
     /**
