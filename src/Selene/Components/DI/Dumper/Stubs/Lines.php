@@ -14,13 +14,19 @@ namespace Selene\Components\DI\Dumper\Stubs;
 use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
 
 /**
- * @class Lines
- * @package Selene\Components\DI\Dumper\Stubs
+ * @class Lines implements StubInterface
+ * @see StubInterface
+ *
+ * @package Selene\Components\DI
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
-class Lines
+class Lines implements StubInterface
 {
-    use FormatterTrait;
+    use FormatterTrait {
+        FormatterTrait::indent as protected doIndent;
+    }
 
     /**
      * lines
@@ -29,20 +35,19 @@ class Lines
      */
     protected $lines;
 
-    protected $indent;
     /**
-     * currentIndent
+     * indents
      *
-     * @var mixed
+     * @var \SplStack
      */
-    protected $currentIndent;
+    protected $indents;
 
     /**
-     * outPutIndentation
+     * outputIndentation
      *
      * @var int
      */
-    protected $outPutIndentation;
+    protected $outputIndentation;
 
     /**
      *
@@ -52,12 +57,29 @@ class Lines
     public function __construct()
     {
         $this->lines = [];
-        $this->indent = 0;
-        $this->currentIndent = 0;
-        $this->outPutIndentation = 0;
 
         $this->indents = new \SplStack;
         $this->indents->push(0);
+    }
+
+    /**
+     * @access public
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->dump();
+    }
+
+    /**
+     * dump
+     *
+     * @access public
+     * @return string
+     */
+    public function dump()
+    {
+        return implode($this->getImplodeSeparator(), $this->lines);
     }
 
     /**
@@ -71,11 +93,19 @@ class Lines
      */
     public function add($string, $indent = 0)
     {
-        if ($indent > 0) {
-            $this->indents->push($this->indents->top() + (int)$indent);
-        }
+        $this->lines[] = $l = sprintf('%s%s', $this->doIndent($i = $this->getCurrentIndent()), $string);
+        return $this;
+    }
 
-        $this->lines[] = $l = sprintf('%s%s', $this->indent($i = $this->indents->top()), $string);
+    /**
+     * indent
+     *
+     * @access public
+     * @return Lines
+     */
+    public function indent()
+    {
+        $this->indents->push($this->getCurrentIndent() + 4);
         return $this;
     }
 
@@ -116,30 +146,20 @@ class Lines
      */
     public function setOutputIndentation($indent = 0)
     {
-        $this->outPutIndentation = $indent;
+        $this->outputIndentation = $indent;
         return $this;
     }
 
     /**
-     * dump
+     * getCurrentIndent
      *
-     * @access public
-     * @return string
+     * @access protected
+     * @return int
      */
-    public function dump()
+    protected function getCurrentIndent()
     {
-        return implode($this->getImplodeSeparator(), $this->lines);
+        return $this->indents->count() ? $this->indents->top() : 0;
     }
-
-    /**
-     * @access public
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->dump();
-    }
-
     /**
      * getImplodeSeparator
      *
@@ -148,6 +168,6 @@ class Lines
      */
     protected function getImplodeSeparator()
     {
-        return sprintf('%s%s', PHP_EOL, $this->indent($this->outPutIndentation));
+        return sprintf('%s%s', PHP_EOL, $this->doIndent($this->outputIndentation));
     }
 }
