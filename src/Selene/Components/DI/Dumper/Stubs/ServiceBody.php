@@ -170,7 +170,7 @@ class ServiceBody extends Stub implements ContainerAwareInterface
 
         $lines->setOutputIndentation(8);
 
-        return (string)$lines;
+        return $lines->dump();
     }
 
     /**

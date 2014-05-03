@@ -58,7 +58,6 @@ class Lines
 
         $this->indents = new \SplStack;
         $this->indents->push(0);
-        $this->indents->push(0);
     }
 
     /**
@@ -73,26 +72,11 @@ class Lines
     public function add($string, $indent = 0)
     {
         if ($indent > 0) {
-            $this->indents->push((int)$indent);
+            $this->indents->push($this->indents->top() + (int)$indent);
         }
 
-        $this->lines[] = $l = sprintf('%s%s', $this->indent($i = $this->getCurrentIndent()), $string);
+        $this->lines[] = $l = sprintf('%s%s', $this->indent($i = $this->indents->top()), $string);
         return $this;
-    }
-
-    /**
-     * getCurrentIndent
-     *
-     * @access protected
-     * @return int
-     */
-    protected function getCurrentIndent()
-    {
-        $first =  $this->indents->pop();
-        $indent = $first + $this->indents->top();
-        $this->indents->push($first);
-
-        return $indent;
     }
 
     /**
