@@ -20,12 +20,21 @@ class SetterAwareService
 {
     public $foo;
 
+    public $bar;
+
     public $name;
 
     public function setFoo(FooService $foo)
     {
         $this->foo = $foo;
     }
+
+    public function setFooBar(FooService $foo, \StdClass $bar)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
+
 
     public function setName($name)
     {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests package
+ * This File is part of the Selene\Components\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -12,301 +12,418 @@
 namespace Selene\Components\DI\Tests;
 
 use \Mockery as m;
-//use \AspectMock\Test as test;
-use \Selene\Components\TestSuite\TestCase;
 use \Selene\Components\DI\Container;
-use \Selene\Components\DI\Reference;
 use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\DI\Definition;
+use \Selene\Components\DI\DefinitionInterface;
+use \Selene\Components\DI\Definition\ServiceDefinition;
 use \Selene\Components\DI\Tests\Stubs\FooService;
 use \Selene\Components\DI\Tests\Stubs\BarService;
-use \Selene\Components\DI\Tests\Stubs\ServiceFactory;
+use \Selene\Components\DI\Tests\Stubs\ChildService;
 use \Selene\Components\DI\Tests\Stubs\SetterAwareService;
-use \Selene\Components\DI\Tests\Stubs\LockedContainerStub;
+use \Selene\Components\DI\Tests\Stubs\ParentService;
+use \Selene\Components\DI\Exception\ContainerResolveException;
 
 /**
- * @class ContainerTest extends TestCase ContainerTest
- * @see TestCase
+ * @class ContainerTest extends \PHPUnit_Framework_TestCase
+ * @see \PHPUnit_Framework_TestCase
  *
  * @package Selene\Components\DI\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class ContainerTest extends TestCase
+class ContainerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ClassName
-     */
-    protected $object;
 
-    protected function setUp()
+    /** @test */
+    public function itShouldBeInstatiable()
     {
-        $this->container = new Container;
+        $container = $this->createContainer();
+        $this->assertInstanceOf('Selene\Components\DI\ContainerInterface', $container);
     }
 
-    /**
-     * @test
-     */
-    public function testContainerSetParams()
+    /** @test */
+    public function servicesShouldBeDefinableAndRecognized()
     {
-        //$p = test::double('Selene\Components\DI\Parameters', ['set' => null, 'get' => 'foo']);
+        $container = $this->createContainer();
 
-        $this->container->setParam('foo.service.class', 'foo');
-        //$p->verifyInvoked('set');
-        $this->assertSame('foo', $this->container->getParam('foo.service.class'));
-        //$p->verifyInvoked('get');
-
-        //$p = test::double('Selene\Components\DI\Parameters', ['set' => null, 'get' => ['opt1', 'opt2']]);
-
-        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
-        //$p->verifyInvoked('set');
-        $this->assertSame($opts, $this->container->getParam('foo.options'));
-        //$p->verifyInvoked('get');
+        $container->define('foo.service');
+        $this->assertTrue($container->hasDefinition('foo.service'));
     }
 
-    /**
-     * @test
-     */
-    public function testContainerScopeContainer()
+    /** @test */
+    public function definitinSetterShouldRegisterRecognizableServices()
     {
-        $this->container->setParam('foo.service.class', 'StdClass');
+        $container = $this->createContainer();
 
-        $this->container->setService('foo', '%foo.service.class%');
+        $def = m::mock('\Selene\Components\DI\Definition\ServiceDefinition');
 
-        $instanceA = $this->container->getService('foo');
-        $instanceB = $this->container->getService('foo');
-
-        $this->assertSame($instanceA, $instanceB);
+        $container->setDefinition('foo.service', $def);
+        $this->assertTrue($container->hasDefinition('foo.service'));
     }
 
-    /**
-     * @test
-     */
-    public function testContainerScopePrototype()
+    /** @test */
+    public function injectingAServiceWithWrongScopeShouldThrowAnException()
     {
-        $this->container->setParam('foo.service.class', 'StdClass');
+        $container = $this->createContainer();
 
-        $this->container
-            ->setService('foo', '%foo.service.class%')
-            ->setScope(ContainerInterface::SCOPE_PROTOTYPE);
-
-        $instanceA = $this->container->getService('foo');
-        $instanceB = $this->container->getService('foo');
-
-        $this->assertTrue($instanceA !== $instanceB);
-    }
-
-    /**
-     * @test
-     */
-    public function testCreateServiceDefaultArgs()
-    {
-        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
-        $this->container->setParam('foo.class', $fooclass = __NAMESPACE__.'\Stubs\FooService');
-
-        $this->container->setService('foo_service', '%foo.class%', ['%foo.options%']);
+        $service = m::mock('Container\Tests\ServiceStub');
 
         try {
-            $fooClass = $this->container->getService('foo_service');
+            $container->inject('foo.service', $service, ContainerInterface::SCOPE_PROTOTYPE);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals($e->getMessage(), 'An injected service must not have a prototype scope');
+            return;
         } catch (\Exception $e) {
-            $this->fail(sprintf('%s | [line]: %d | [FILE]: %s', $e->getMessage(), $e->getLine(), $e->getFile()));
+            $this->fail($e->getMessage());
+        }
+        $this->fail('->inject() injecting a service wirth prototype scope should throw an exception');
+    }
+
+    /** @test */
+    public function internalServicesShouldNotDirectlyRetrieveable()
+    {
+        $container = $this->createContainer();
+
+        $args = $this->getDefaultMockArgs('FooServiceClass', [], [
+            ['isInternal', null, true]
+            ]);
+        $def = $this->getDefinitionMock($args);
+
+        $container->setDefinition('foo.service', $def);
+
+        try {
+            $container->get('foo.service');
+        } catch (ContainerResolveException $e) {
+            $this->assertSame('A service with id foo.service was is not defined', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+            return;
+        }
+        $this->fail('you loose');
+    }
+
+    /** @test */
+    public function serviceGettersShouldBeRetreivingAInjectedService()
+    {
+        $service = m::mock('Container\Tests\ServiceStub');
+        $container = $this->createContainer();
+        $container->inject('foo.service', $service);
+
+        $this->assertEquals($service, $container->get('foo.service'));
+    }
+
+    /** @test */
+    public function serviceGettersShouldBeRetreiveDefinedServices()
+    {
+        $container = $this->createContainer();
+
+        $class = __NAMESPACE__.'\\Stubs\\FooService';
+
+        $margs = $this->getDefaultMockArgs($class, [$args = ['a' => 'b']]);
+        $definition = $this->getDefinitionMock($margs);
+
+        $container->setDefinition('foo.service', $definition);
+
+        $this->assertInstanceOf($class, $foo = $container->get('foo.service'));
+
+        try {
+            $this->assertInstanceOf($class, $bar = $container->get('foo.service'));
+        } catch (\Mockery\Exception\InvalidCountException $e) {
+            // definition is not touched again.
+            $this->assertTrue(true);
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
         }
 
-        $this->assertInstanceOf($fooclass, $fooClass);
-        $this->assertSame($opts, $fooClass->getOptions());
+        $this->assertEquals($args, $foo->getOptions());
+        $this->assertSame($foo, $bar);
+
+        $class = __NAMESPACE__.'\\Stubs\\BarService';
+
+        $reference = m::mock('Selene\Components\DI\Reference');
+        $reference->shouldReceive('__toString')->andReturn('foo.service');
+
+
+        $args = $this->getDefaultMockArgs($class, [$reference]);
+        $definition = $this->getDefinitionMock($args);
+
+        $container->setDefinition('bar.service', $definition);
+        $this->assertInstanceOf($class, $bar = $container->get('bar.service'));
+        $this->assertSame($foo, $bar->getFoo());
+    }
+
+    /** @test */
+    public function testSetterInjection()
+    {
+        $container = $this->createContainer();
+
+        $class = $fooClass = __NAMESPACE__.'\\Stubs\\FooService';
+
+        $margs = $this->getDefaultMockArgs($class);
+        $definition = $this->getDefinitionMock($margs);
+
+        $container->setDefinition('foo.service', $definition);
+
+        $class = __NAMESPACE__.'\\Stubs\\SetterAwareService';
+
+        $reference = $this->createReferenceMock('foo.service');
+
+        $args = $this->getDefaultMockArgs($class, [], [
+            ['isInjected', 'once', true],
+            ['hasSetters', 'once', true],
+            ['getSetters', 'once', [['setName' => ['stub']], ['setFoo' => [$reference]]]]
+        ]);
+
+        $definition = $this->getDefinitionMock($args);
+
+        $container->setDefinition('stub.service', $definition);
+
+        $this->assertInstanceOf($class, $stub = $container->get('stub.service'));
+        $this->assertSame('stub', $stub->name);
+
+        $this->assertInstanceOf(
+            $class,
+            $container->get('stub.service'),
+            '->get() should return an instance of ' .$class
+        );
+
+        $this->assertInstanceOf(
+            $fooClass,
+            $fooInstance = $stub->foo,
+            '->get() should auto setter inject an instance of '.$fooClass.' into '.$class
+        );
+
+        $this->assertSame(
+            $fooInstance,
+            $container->get('foo.service'),
+            '->get() once a container scoped service is resolved the container should always return the same instance'
+        );
+    }
+
+    /** @test */
+    public function testSetAlias()
+    {
+        $container = $this->createContainer();
+        $service = m::mock('Container\Tests\ServiceStub');
+        $container->inject('foo.service', $service);
+        $container->setAlias('foo', $this->createAliasMock('foo.service'));
+        $container->setAlias('bar', 'foo.service');
+
+        $this->assertSame($service, $container->get('foo.service'));
+        $this->assertSame($service, $container->get('foo'));
+        $this->assertSame($service, $container->get('bar'));
+    }
+
+    /** @test */
+    public function testDefinitionInheritance()
+    {
+        $container = $this->createContainer();
+
+        $container->define('parent.service', $parentClass = __NAMESPACE__.'\\Stubs\\ParentService', ['foo'])
+            ->addSetter('setBar', ['bar']);
+        $container->define('child.service', $childClass = __NAMESPACE__.'\\Stubs\\ChildService')
+            ->setParent('parent.service');
+
+        $this->assertInstanceOf($childClass, $child = $container->get('child.service'));
+        $this->assertEquals('foo', $child->getFoo());
+        $this->assertEquals('bar', $child->getBar());
+    }
+
+    /** @test */
+    public function testDeclareAbstract()
+    {
+        $container = $this->createContainer();
+        $def = m::mock('Selene\Components\DI\Definition\DefinitionInterface');
+        $def->shouldReceive('isInternal')->andReturn(false);
+        $def->shouldReceive('isAbstract')->andReturn(true);
+
+        $container->setDefinition($service = 'abstract.service', $def);
+
+        try {
+            $container->get($service);
+        } catch (\Selene\Components\DI\Exception\ContainerResolveException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                sprintf('Service %s is declared abstract. Instantiating abstract services is not allowed.', $service),
+                '->get() should throw an excetion on abstract services'
+            );
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+    }
+
+    /** @test */
+    public function testDeclareInternal()
+    {
+        $container = $this->createContainer();
+        $def = m::mock('Selene\Components\DI\Definition\DefinitionInterface');
+        $def->shouldReceive('isInternal')->andReturn(true);
+
+        $container->setDefinition($service = 'internal.service', $def);
+
+        try {
+            $container->get($service);
+        } catch (\Selene\Components\DI\Exception\ContainerResolveException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                sprintf('A service with id %s was is not defined', $service),
+                '->get() should throw an excetion on abstract services'
+            );
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+    }
+
+    /** @test */
+    public function injectedServicesShouldSynchronizeSetters()
+    {
+        $container = $this->createContainer();
+
+        $def = new ServiceDefinition('\Selene\Components\DI\Tests\Stubs\SetterAwareService');
+        $def->addSetter('setFoo', ['$injected']);
+        $injected = new ServiceDefinition('\Selene\Components\DI\Tests\Stubs\FooService');
+        $injected->setInjected(true);
+
+        $container->setDefinition('dependent', $def);
+        $container->setDefinition('injected', $injected);
+
+        $dependent = $container->get('dependent');
+
+        $this->assertTrue(null === $dependent->foo);
+
+        $container->inject('injected', $foo = new FooService);
+
+        $this->assertSame($foo, $dependent->foo);
+
+
+        // trigger by multiple injected
+
+        $container = $this->createContainer();
+
+        $def = new ServiceDefinition('\Selene\Components\DI\Tests\Stubs\SetterAwareService');
+        $def->addSetter('setFooBar', ['$injected', '$injectedb']);
+        $injected = new ServiceDefinition('\Selene\Components\DI\Tests\Stubs\FooService');
+        $injected->setInjected(true);
+
+        $injectedB = new ServiceDefinition('\StdClass');
+        $injectedB->setInjected(true);
+
+        $container->setDefinition('dependent', $def);
+        $container->setDefinition('injected', $injected);
+        $container->setDefinition('injectedb', $injectedB);
+
+        $dependent = $container->get('dependent');
+
+        $this->assertTrue(null === $dependent->foo);
+        $this->assertTrue(null === $dependent->bar);
+
+        $container->inject('injected', $foo = new FooService);
+
+        $this->assertTrue(null === $dependent->foo);
+        $this->assertTrue(null === $dependent->bar);
+
+        $container->inject('injectedb', $bar = new \StdClass);
+
+        $this->assertSame($foo, $dependent->foo);
+        $this->assertSame($bar, $dependent->bar);
+    }
+
+    protected function getDefaultMockArgs($class = null, array $arguments = [], array $custom = [])
+    {
+        $args = [
+            ['getClass', 'once', $class],
+            ['setClass', 'once', null],
+            ['isInternal', 'once', false],
+            ['isInjected', 'once', false],
+            ['isAbstract', 'once', false],
+            ['hasArguments', null, true],
+            ['getArguments', 'once', $arguments],
+            ['hasSetters', null, false],
+            ['requiresFile', null, false],
+            ['hasParent', null, false],
+            ['hasFactory', null, false],
+            ['scopeIsContainer', null, true],
+        ];
+
+        if (!empty($custom)) {
+            $filter = [];
+            return array_filter(array_merge($custom, $args), function ($def) use (&$filter) {
+                list($method, $times, $value) = $def;
+                if (!in_array($method, $filter)) {
+                    $filter[] = $method;
+                    return true;
+                }
+            });
+        }
+        return $args;
     }
 
     /**
-     * @test
+     * tearDown
+     *
+     * @access protected
+     * @return mixed
      */
-    public function testAddSetters()
+    protected function tearDown()
     {
-        $classname = __NAMESPACE__.'\Stubs\SetterAwareService';
-
-        $this->container->setParam('setter.class', $classname);
-        $this->container->setParam('setter.name', 'foo');
-        $this->container->setService('my_service', '%setter.class%')->addSetter('setName', ['%setter.name%']);
-
-        $service = $this->container->getService('my_service');
-
-        $this->assertSame('foo', $service->name);
+        m::close();
     }
 
     /**
-     * @test
+     * createContainer
+     *
+     * @param DefinitionInterface $definition
+     * @param string $name
+     *
+     * @access protected
+     * @return Container Container instance
      */
-    public function testAddSettersResolveArgs()
+    protected function createContainer(ParameterInterface $params = null, $list = null, $name = 'Container')
     {
-        $classname = __NAMESPACE__.'\Stubs\SetterAwareService';
-
-        $this->container->setParam('foo.class', $fooclass = __NAMESPACE__.'\Stubs\FooService');
-        $this->container->setParam('setter.class', $classname);
-        $this->container->setService('foo_service', '%foo.class%');
-
-        $this->container->setService('my_service', '%setter.class%')
-            ->addSetter('setFoo', [new Reference('foo_service')]);
-
-        $fooService = $this->container->getService('foo_service');
-        $service = $this->container->getService('my_service');
-
-        $this->assertInstanceOf($fooclass, $service->foo);
-        $this->assertSame($fooService, $service->foo);
+        return new Container($params, $list, $name);
     }
 
     /**
-     * @test
+     * getDefinitionMock
+     *
+     * @param array $arguments
+     * @param mixed $class
+     *
+     * @access protected
+     * @return Object
      */
-    public function testInjectServiceInstance()
+    protected function getDefinitionMock(array $arguments = null, $class = null)
     {
-        $service = m::mock('Acme\InjectedService');
-        $this->container->injectService('injected_service', $service);
-        $this->assertSame($service, $this->container->getService('injected_service'));
+        $class = $class ?: 'Selene\Components\DI\Definition\ServiceDefinition';
+
+        $def = m::mock($class);
+        foreach ($arguments as $argument) {
+
+            if ($arguments[1] === 'once') {
+                $def->shouldReceive($argument[0])->once()->andReturn($argument[2]);
+            } elseif (is_int($argument[1])) {
+                $def->shouldReceive($argument[0])->times($argument[1])->andReturn($argument[2]);
+            } else {
+                $def->shouldReceive($argument[0])->andReturn($argument[2]);
+            }
+        }
+        return $def;
     }
 
-    /**
-     * @test
-     */
-    public function testMergeContainers()
+    protected function createReferenceMock($id)
     {
-        $container = new Container(null, 'merge.container');
-        $container->setParam('foo', 'foo');
-        $container->setService('foo', 'FooClass');
-
-        $this->container->setParam('bar', 'bar');
-        $this->container->setService('bar', 'BarClass');
-
-        $this->container->merge($container);
-
-        $this->assertTrue($this->container->hasService('foo'));
-        $this->assertTrue($this->container->hasService('bar'));
-
-        $this->assertEquals('foo', $this->container->getParam('foo'));
-        $this->assertEquals('bar', $this->container->getParam('bar'));
+        $reference = m::mock('Selene\Components\DI\Reference');
+        $reference->shouldReceive('__toString')->andReturn($id);
+        return $reference;
     }
 
-    /**
-     * @test
-     * @expectedException Selene\Components\DI\Exception\ContainerLockedException
-     */
-    public function testMergeContainerSouldRaiseExceptionWhenContainerToBeMergedIsLocked()
+    protected function createAliasMock($id)
     {
-        $this->container->merge(new LockedContainerStub());
-    }
-
-    /**
-     * @test
-     * @expectedException Selene\Components\DI\Exception\ContainerLockedException
-     */
-    public function testMergeContainerSouldRaiseExceptionWhenMergingContainerIsLocked()
-    {
-        $container = new LockedContainerStub();
-        $container->merge($this->container);
-    }
-
-    /**
-     * @test
-     * @expectedException \LogicException
-     */
-    public function testMergeContainerSouldRaiseExceptionWhenMergingContainerWithTheSameName()
-    {
-        $container = new Container;
-        $container->merge($this->container);
-    }
-
-    /**
-     * @test
-     */
-    public function testContainerShouldBeServiceable()
-    {
-        $container = new Container();
-        $this->assertSame($this->container, $this->container->getService(ContainerInterface::APP_CONTAINER_SERVICE));
-
-        $container = new Container(null, 'foo.container');
-        $this->assertSame($container, $container->getService('foo.container'));
-    }
-
-    /**
-     * @test
-     */
-    public function testResolveAliasedService()
-    {
-        //$a = test::double('Selene\Components\DI\Aliases', ['add' => null, 'get' => 'my.service']);
-        $this->container->injectService('my.service', $service = new \StdClass);
-
-        $this->container->alias('my.service', 'alias.service');
-        //$a->verifyInvoked('add');
-        $s = $this->container->getService('alias.service');
-        //$a->verifyInvoked('get');
-        $this->assertSame($service, $s);
-    }
-
-    /**
-     * @test
-     */
-    public function testConstructClassWithFactoryDependOnOtherService()
-    {
-        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
-        $this->container->setParam('foo.class', __NAMESPACE__.'\Stubs\FooService');
-
-        $this->container->setService('foo_service', '%foo.class%', ['%foo.options%']);
-
-        $this->container->setService('bar_service', null)
-            ->addArgument('$foo_service')
-            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeBar');
-
-        $barService = $this->container->getService('bar_service');
-
-        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\BarService', $barService);
-        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $barService->getFoo());
-    }
-
-    /**
-     * @test
-     */
-    public function testParameterInheritance()
-    {
-        $abstract = __NAMESPACE__.'\Stubs\AbstractService';
-
-        $this->container->setParam('foo.service.class', $fooclass = __NAMESPACE__.'\Stubs\FooService');
-        $this->container->setParam('inh.service.class', __NAMESPACE__.'\Stubs\InheritedService');
-        $this->container->setParam($abstract, [new Reference('foo_service')]);
-
-        $this->container->setService('foo_service', '%foo.service.class%');
-        $this->container->setService('inh_service', '%inh.service.class%');
-
-        $service = $this->container->getService('inh_service');
-        $this->assertInstanceOf($fooclass, $service->foo);
-    }
-
-    /**
-     * @test
-     */
-    public function testConstructClassWithFactorySetArgs()
-    {
-        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
-
-        $this->container->setService('foo_service', null, ['%foo.options%'])
-            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeFoo');
-
-        $fooService = $this->container->getService('foo_service');
-
-        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $fooService, 'factory.with.args');
-        $this->assertSame($opts, $fooService->getOptions(), 'factory.with.args');
-    }
-
-    /**
-     * @test
-     */
-    public function testConstructClassWithFactoryAddArgs()
-    {
-        $this->container->setParam('foo.options', $opts = ['opt1', 'opt2']);
-        $this->container->setService('foo_service', null)
-            ->addArgument('%foo.options%')
-            ->setFactory(__NAMESPACE__.'\Stubs\ServiceFactory', 'makeFoo');
-
-        $fooService = $this->container->getService('foo_service');
-
-        $this->assertInstanceOf(__NAMESPACE__.'\Stubs\FooService', $fooService, 'factory.add.args');
-        $this->assertSame($opts, $fooService->getOptions(), 'factory.add.args');
+        $alias = m::mock('Selene\Components\DI\Alias');
+        $alias->shouldReceive('__toString')->andReturn($id);
+        return $alias;
     }
 }

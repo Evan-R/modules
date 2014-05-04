@@ -27,7 +27,7 @@ class AliasTest extends TestCase
     public function testSetAndGetAliases()
     {
         $alias = new Aliases();
-        $alias->add('bar', 'foo');
+        $alias->set('bar', 'foo');
         $this->assertEquals('foo', $alias->get('bar'));
     }
 

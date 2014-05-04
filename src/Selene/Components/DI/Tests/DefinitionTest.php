@@ -13,7 +13,7 @@ namespace Selene\Components\DI\Tests;
 
 use Selene\Components\TestSuite\TestCase;
 use Selene\Components\DI\Container;
-use Selene\Components\DI\Definition;
+use Selene\Components\DI\Definition\ServiceDefinition;
 use Selene\Components\DI\ContainerInterface;
 
 /**
@@ -32,7 +32,7 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionSetScope()
     {
-        $definition = new Definition('StdClass');
+        $definition = new ServiceDefinition('StdClass');
         $this->assertSame(ContainerInterface::SCOPE_CONTAINER, $definition->getScope());
 
         $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE);
@@ -44,7 +44,7 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionScopeIsContainer()
     {
-        $definition = new Definition('StdClass');
+        $definition = new ServiceDefinition('StdClass');
         $this->assertTrue($definition->scopeIsContainer());
     }
 
@@ -55,7 +55,7 @@ class DefinitionTest extends TestCase
     {
         $scope = 'controller';
 
-        $definition = new Definition('StdClass');
+        $definition = new ServiceDefinition('StdClass');
         $definition->addScope($scope);
 
         $this->assertSame('controller', $scope & $definition->getScope());
@@ -67,37 +67,7 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionAddScopeShouldThrowException()
     {
-        $definition = new Definition('StdClass');
+        $definition = new ServiceDefinition('StdClass');
         $definition->addScope(ContainerInterface::SCOPE_PROTOTYPE);
-    }
-
-    /**
-     * @test
-     */
-    public function testDefinitionGetResolvedScope()
-    {
-        $definition = new Definition('StdClass');
-        $class = new \StdClass;
-
-        $this->assertFalse($definition->isResolved());
-
-        $definition->setResolved($class);
-
-        $this->assertTrue($definition->isResolved());
-        $this->assertSame($class, $definition->getResolved());
-    }
-
-    /**
-     * @test
-     */
-    public function testDefinitionIsResolvedOnPrototypeScope()
-    {
-        $definition = new Definition('StdClass');
-        $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE);
-        $class = new \StdClass;
-
-        $definition->setResolved($class);
-        $this->assertFalse($definition->isResolved());
-        $this->assertNull($definition->getResolved());
     }
 }
