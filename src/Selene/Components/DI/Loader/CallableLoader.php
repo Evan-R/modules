@@ -11,10 +11,12 @@
 
 namespace Selene\Components\DI\Loader;
 
-use \Selene\Components\Config\Loader\ConfigLoader;
+use \Selene\Components\DI\BuilderInterface;
+use \Selene\Components\Config\Resource\Loader;
+use \Selene\Components\Config\Resource\LocatorInterface;
 
 /**
- * @class CallableLoader extends ConfigLoader
+ * @class CallableLoader extends Loader
  * @see ConfigLoader
  *
  * @package Selene\Components\DI
@@ -22,8 +24,22 @@ use \Selene\Components\Config\Loader\ConfigLoader;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class CallableLoader extends ConfigLoader
+class CallableLoader extends Loader
 {
+
+    /**
+     * @param BuilderInterface $builder
+     * @param LocatorInterface $locator
+     *
+     * @access public
+     */
+    public function __construct(BuilderInterface $builder, LocatorInterface $locator)
+    {
+        parent::__construct($locator);
+        $this->container = $builder->getContainer();
+        $this->builder = $builder;
+    }
+
     /**
      * Load a callable entity resuorce.
      *
@@ -58,9 +74,9 @@ class CallableLoader extends ConfigLoader
     {
         $resource = $this->findResourceOrigin($callable);
 
-        $this->container->addFileResource($resource);
+        $this->builder->addFileResource($resource);
 
-        call_user_func($callable, $this->container);
+        call_user_func($callable, $this->builder);
     }
 
     /**

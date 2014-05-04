@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container>
+  <services>
+    <service id="foo_service" class="StdClass">
+    </service>
+  </services>
+</container>

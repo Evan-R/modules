@@ -11,7 +11,9 @@
 
 namespace Selene\Components\DI\Loader;
 
-use \Selene\Components\Config\Loader\ConfigLoader;
+use \Selene\Components\DI\BuilderInterface;
+use \Selene\Components\Config\Resource\Loader;
+use \Selene\Components\Config\Resource\LocatorInterface;
 
 /**
  * @class PhpLoader extends ConfigLoader
@@ -22,8 +24,21 @@ use \Selene\Components\Config\Loader\ConfigLoader;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class PhpLoader extends ConfigLoader
+class PhpLoader extends Loader
 {
+    /**
+     * @param BuilderInterface $builder
+     * @param LocatorInterface $locator
+     *
+     * @access public
+     */
+    public function __construct(BuilderInterface $builder, LocatorInterface $locator)
+    {
+        parent::__construct($locator);
+        $this->container = $builder->getContainer();
+        $this->builder = $builder;
+    }
+
     /**
      * Load a php file resource.
      *
@@ -36,11 +51,12 @@ class PhpLoader extends ConfigLoader
     {
         $file = $this->locator->locate($resource, false);
 
+        $builder = $this->builder;
         $container = $this->container;
 
         include $file;
 
-        $container->addFileResource($file);
+        $builder->addFileResource($file);
     }
 
     /**

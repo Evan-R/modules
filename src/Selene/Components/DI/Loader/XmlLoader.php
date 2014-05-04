@@ -99,16 +99,16 @@ class XmlLoader extends Loader
                 continue;
             }
 
-
             $parameters = $this->container->getParameters();
             $values = [];
 
             foreach ($package->xpath("*[local-name() != 'import']") as $item) {
-                $this->builder->addExtensionConfig($alias, [$item->nodeName => $this->getParser()->parseDomElement($item)]);
+                $this->builder->addExtensionConfig(
+                    $alias,
+                    [$item->nodeName => $this->getParser()->parseDomElement($item)]
+                );
                 $values[] = [$item->nodeName => $this->getParser()->parseDomElement($item)];
             }
-
-            //$parameters->set($name, $values);
         }
     }
 

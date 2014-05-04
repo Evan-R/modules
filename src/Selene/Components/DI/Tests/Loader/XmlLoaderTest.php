@@ -13,8 +13,10 @@ namespace Selene\Components\DI\Tests\Loader;
 
 
 use \Mockery as m;
-use \Selene\Components\DI\BaseContainer;
+use \Selene\Components\DI\Builder;
+use \Selene\Components\DI\Container;
 use \Selene\Components\DI\Loader\XmlLoader;
+use \Selene\Components\Config\Resource\Locator;
 
 /**
  * @class XmlLoaderTest
@@ -33,40 +35,82 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldBeInstantiable()
     {
-        $loader = new XmlLoader(m::mock('\Selene\Components\DI\ContainerInterface'));
+        $container = m::mock('\Selene\Components\DI\ContainerInterface');
+        $builder = m::mock('\Selene\Components\DI\BuilderInterface');
+        $locator   = m::mock('\Selene\Components\Config\Resource\LocatorInterface');
+
+        $builder->shouldReceive('getContainer')->andReturn($container);
+
+        $loader = new XmlLoader($builder, $locator);
         $this->assertInstanceof('\Selene\Components\DI\Loader\XmlLoader', $loader);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function itShouldSupportXml()
     {
+        $loader = $this->getLoaderMock();
 
-        $container = m::mock('\Selene\Components\DI\ContainerInterface');
-        $loader = new XmlLoader($container);
-
-        $this->assertTrue($loader->supports('xml'));
-        $this->assertFalse($loader->supports('php'));
+        $this->assertTrue($loader->supports('some/file.xml'));
+        $this->assertFalse($loader->supports('some/file.php'));
     }
 
-    /**
-     * @test
-     */
-    public function itShouldLoadXmlFilesAndConfigureTheContainer()
+    /** @test */
+    public function itShouldParseParameters()
     {
-        $file = __DIR__.'/../config/config.xml';
+        $loader = new XmlLoader(new Builder($container = new Container), new Locator([__DIR__.'/Fixures']));
 
-        $container = new BaseContainer;
+        $loader->load('services.0.xml');
 
-        $loader = new XmlLoader($container);
-        $loader->load($file);
+        $this->assertTrue($container->hasParameter('foo'));
+        $this->assertSame('bar', $container->getParameter('foo'));
+    }
 
-        $this->assertTrue($container->hasFileResource($file));
-        $this->assertTrue($container->hasFileResource(dirname($file).'/import.xml'));
+    /** @test */
+    public function itShouldParseServices()
+    {
 
-        $this->assertTrue($container->hasParameter('imported_param'));
-        $this->assertTrue($container->hasParameter('foo_service.class'));
+        $loader = new XmlLoader(new Builder($container = new Container), new Locator([__DIR__.'/Fixures']));
+
+        $loader->load('services.1.xml');
+
         $this->assertTrue($container->hasDefinition('foo_service'));
+        $this->assertSame('StdClass', $container->getDefinition('foo_service')->getClass());
+    }
+
+    /** @test */
+    public function itShouldParseImportedFiles()
+    {
+
+        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([__DIR__.'/Fixures']));
+
+        $loader->load('services.2.xml');
+
+        $this->assertSame([['foo' => 'bar']], $builder->getExtensionConfig('acme'));
+    }
+
+    /** @test */
+    public function itShouldAddResourcesToTheBuilder()
+    {
+        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+
+        $loader->load('services.2.xml');
+
+        $resources = $builder->getResources();
+
+        $this->assertSame(2, count($resources));
+
+        $this->assertSame($dir.DIRECTORY_SEPARATOR.'services.2.xml', (string)$resources[0]);
+        $this->assertSame($dir.DIRECTORY_SEPARATOR.'imported.0.xml', (string)$resources[1]);
+    }
+
+    protected function getLoaderMock($builder = null, $container = null, $locator = null)
+    {
+        $builder =   $builder = $builder ?: m::mock('\Selene\Components\DI\BuilderInterface');
+        $container = m::mock('\Selene\Components\DI\ContainerInterface');
+        $locator   = $locator ?: m::mock('\Selene\Components\Config\Resource\LocatorInterface');
+
+        $builder->shouldReceive('getContainer')->andReturn($container);
+
+        return  new XmlLoader($builder, $locator);
     }
 }

@@ -13,7 +13,9 @@ namespace Selene\Components\DI\Tests\Loader;
 
 use \Mockery as m;
 use \Selene\Components\DI\Loader\PhpLoader;
-use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\DI\Builder;
+use \Selene\Components\DI\Container;
+use \Selene\Components\Config\Resource\Locator;
 
 /**
  * @class PhpLoaderInterface
@@ -32,40 +34,53 @@ class PhpLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldBeInstantiable()
     {
-        $container = m::mock('\Selene\Components\DI\ContainerInterface');
+        $loader = $this->getLoaderMock();
 
-        $loader = new PhpLoader($container);
-
-        $this->assertInstanceof('\Selene\Components\Config\Loader\ConfigLoader', $loader);
         $this->assertInstanceof('\Selene\Components\DI\Loader\PhpLoader', $loader);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function itShouldSupportPhpFiles()
     {
-
         $container = m::mock('\Selene\Components\DI\ContainerInterface');
-        $loader = new PhpLoader($container);
+        $loader = $this->getLoaderMock();
 
-        $this->assertTrue($loader->supports('php'));
-        $this->assertFalse($loader->supports('xml'));
+        $this->assertTrue($loader->supports('some/file.php'));
+        $this->assertFalse($loader->supports('some/file.xml'));
     }
 
-    /**
-     * @test
-     */
-    public function itShouldLoadPhpFiles()
+    /** @test */
+    public function itShouldLoadPhpFilesAndExposeBuilderVars()
     {
-        $file = dirname(__DIR__) . '/config/services.php';
+        $loader = new PhpLoader(new Builder($container = new Container), new Locator([__DIR__.'/Fixures']));
 
+        $loader->load('services.php');
+
+        $this->assertTrue($container->hasParameter('foo'));
+        $this->assertTrue($container->hasDefinition('foo_service'));
+    }
+
+    /** @test */
+    public function itShouldAddFileResources()
+    {
+        $loader = new PhpLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+
+        $loader->load('services.php');
+
+        $resources = $builder->getResources();
+
+        $this->assertSame(1, count($resources));
+        $this->assertSame($dir.DIRECTORY_SEPARATOR.'services.php', (string)$resources[0]);
+    }
+
+    protected function getLoaderMock($builder = null, $container = null, $locator = null)
+    {
+        $builder =   $builder = $builder ?: m::mock('\Selene\Components\DI\BuilderInterface');
         $container = m::mock('\Selene\Components\DI\ContainerInterface');
-        $container->shouldReceive('addFileResource')->with($file);
-        $container->shouldReceive('addParameter')->with('php', 'loaded');
+        $locator   = $locator ?: m::mock('\Selene\Components\Config\Resource\LocatorInterface');
 
-        $loader = new PhpLoader($container);
+        $builder->shouldReceive('getContainer')->andReturn($container);
 
-        $loader->load($file);
+        return  new PhpLoader($builder, $locator);
     }
 }
