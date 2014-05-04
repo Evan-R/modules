@@ -1,0 +1,12 @@
+    /**
+     * Service: foo
+     *
+     * @visibility protected
+     * @return \Foo
+     */
+    protected function getServiceFoo()
+    {
+        return $this->services['foo'] = new \Foo(
+            $this->getServiceBar()
+        );
+    }

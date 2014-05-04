@@ -86,14 +86,13 @@ class Lines implements StubInterface
      * add
      *
      * @param mixed $string
-     * @param int $indent
      *
      * @access public
      * @return Lines
      */
-    public function add($string, $indent = 0)
+    public function add($string)
     {
-        $this->lines[] = $l = sprintf('%s%s', $this->doIndent($i = $this->getCurrentIndent()), $string);
+        $this->lines[] = sprintf('%s%s', $this->doIndent($this->getCurrentIndent()), $string);
         return $this;
     }
 

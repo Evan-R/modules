@@ -401,6 +401,17 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     }
 
     /**
+     * hasFlags
+     *
+     * @access public
+     * @return boolean
+     */
+    public function hasFlags()
+    {
+        null !== $this->flags;
+    }
+
+    /**
      * getFlags
      *
      * @access public

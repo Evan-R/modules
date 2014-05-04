@@ -12,6 +12,7 @@
 namespace Selene\Components\Package\Tests;
 
 use \Mockery as m;
+use \Selene\Components\DI\Container;
 use \Selene\Components\DI\Parameters;
 use \Selene\Components\Package\PackageInterface;
 use \Selene\Components\Package\PackageRepository;
@@ -90,8 +91,11 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
     public function itShouldCallBuildOnPackages()
     {
         $pass = false;
-        $container = m::mock('\Selene\Components\DI\ContainerInterface');
-        $container->shouldReceive('addFileResource')->with('meta.xml');
+        $builder = m::mock('\Selene\Components\DI\BuilderInterface');
+        $builder->shouldReceive('addFileResource')->with('meta.xml');
+
+        $container = new Container;
+        $builder->shouldReceive('getContainer')->andReturn($container);
 
         $package = m::mock('\Selene\Components\Package\PackageInterface');
 
@@ -99,7 +103,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
         $package->shouldReceive('getName')->andReturn('AcmePackage');
         $package->shouldReceive('getAlias')->andReturn('acme');
         $package->shouldReceive('getConfiguration')->andReturn(null);
-        $package->shouldReceive('build')->with($container)->andReturnUsing(function () use (&$pass) {
+        $package->shouldReceive('build')->with($builder)->andReturnUsing(function () use (&$pass) {
             $pass = true;
             $this->assertTrue(true);
         });
@@ -107,7 +111,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
         $repo = new PackageRepository;
         $repo->add($package);
 
-        $repo->build($container);
+        $repo->build($builder);
 
         if (!$pass) {
             $this->fail();
@@ -121,14 +125,26 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $config =  $this->getConfigInterface();
 
+
         $params    = m::mock('\Selene\Components\DI\ParameterInterface');
         $params->shouldReceive('getRaw')->andReturn([]);
         $params->shouldReceive('merge');
 
-        $container = new \Selene\Components\DI\BaseContainer($params);
-        $config->shouldReceive('load')->andReturnUsing(function ($packageContainer) use ($container) {
-            $this->assertInstanceof('\Selene\Components\DI\ContainerInterface', $packageContainer);
-            $this->assertTrue($container !== $packageContainer);
+        $container = new Container($params);
+
+        $builder = m::mock('\Selene\Components\DI\BuilderInterface');
+        $builder->shouldReceive('getContainer')->andReturn($container);
+        $builder->shouldReceive('addObjectResource');
+        $builder->shouldReceive('addFileResource');
+        $builder->shouldReceive('replaceContainer')->andReturnUsing(function ($container) {
+            $this->assertInstanceof('\Selene\Components\DI\ContainerInterface', $container);
+        });
+
+        $builder->shouldReceive('getExtensionConfig')->andReturn([]);
+
+        $config->shouldReceive('load')->andReturnUsing(function ($cbuilder) use ($builder) {
+            $this->assertInstanceof('\Selene\Components\DI\BuilderInterface', $cbuilder);
+            $this->assertSame($builder, $cbuilder);
         });
 
         $package = m::mock('\Selene\Components\Package\PackageInterface');
@@ -137,7 +153,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
         $package->shouldReceive('getName')->andReturn('AcmePackage');
         $package->shouldReceive('getAlias')->andReturn('acme');
         $package->shouldReceive('getConfiguration')->andReturn($config);
-        $package->shouldReceive('build')->with($container)->andReturnUsing(function () use (&$pass) {
+        $package->shouldReceive('build')->with($builder)->andReturnUsing(function () use (&$pass) {
             $pass = true;
             $this->assertTrue(true);
         });
@@ -145,7 +161,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
         $repo = new PackageRepository;
         $repo->add($package);
 
-        $repo->build($container);
+        $repo->build($builder);
 
         if (!$pass) {
             $this->fail();
