@@ -182,7 +182,7 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
      */
     public function getMeta()
     {
-        return $this->getPath().DIRECTORY_SEPARATOR.'meta.xml';
+        return $this->getPath().DIRECTORY_SEPARATOR.'package.xml';
     }
 
     /**
