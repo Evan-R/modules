@@ -1,0 +1,143 @@
+<?php
+
+/**
+ * This File is part of the Selene\Components\Routing package
+ *
+ * (c) Thomas Appel <mail@thomas-appel.com>
+ *
+ * For full copyright and license information, please refer to the LICENSE file
+ * that was distributed with this package.
+ */
+
+namespace Selene\Components\Routing;
+
+/**
+ * @class Group
+ *
+ * @package Selene\Components\Routing
+ * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
+ */
+class GroupDefinition
+{
+    /**
+     * prefix
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
+     * parent
+     *
+     * @var parent
+     */
+    protected $parent;
+
+    /**
+     * requirements
+     *
+     * @var array
+     */
+    protected $requirements;
+
+    /**
+     * @param mixed $prefix
+     * @param array $requirements
+     * @param GroupDefinition $parent
+     *
+     * @access public
+     */
+    public function __construct($prefix, array $requirements, GroupDefinition $parent = null)
+    {
+        $this->parent = $parent;
+        $this->setPrefix($prefix);
+        $this->setRequirements($requirements);
+    }
+
+    /**
+     * hasParent
+     *
+     * @access public
+     * @return boolean
+     */
+    public function hasParent()
+    {
+        return null !== $this->parent;
+    }
+
+    /**
+     * getPrefix
+     *
+     * @access public
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * getRequirements
+     *
+     * @access public
+     * @return array
+     */
+    public function getRequirements()
+    {
+        return $this->requirements;
+    }
+
+    /**
+     * setPrefix
+     *
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function setPrefix($prefix)
+    {
+        $prefix = '/'.trim($prefix, '/');
+        $prefix = $this->hasParent() ? trim($this->parent->getPrefix(). '/') . '/' . ltrim($prefix, '/') : $prefix;
+
+        $this->prefix = '/' . ltrim($prefix, '/');
+    }
+
+    /**
+     * setRequirements
+     *
+     * @access protected
+     * @return void
+     */
+    protected function setRequirements(array $requirements)
+    {
+        $requirements = $this->filterRequirements($requirements);
+
+        $this->requirements = $this->hasParent() ?
+            array_merge_recursive($this->parent->getRequirements(), $requirements) :
+            $requirements;
+    }
+
+    /**
+     * filterRequirements
+     *
+     * @param array $requirements
+     *
+     * @access protected
+     * @return array
+     */
+    protected function filterRequirements(array $requirements)
+    {
+        $keys = ['after', 'before', 'host', 'schemes'];
+
+        $out = [];
+
+        foreach ($requirements as $key => $requirement) {
+            if (in_array($k = ltrim($key, '_'), $keys)) {
+                $out['_'.$k] = $requirement;
+            }
+        }
+        return $out;
+    }
+}

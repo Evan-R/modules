@@ -16,115 +16,107 @@ use \Selene\Components\Routing\RouteBuilder;
 
 class RouteBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ClassName
-     */
-    protected $subject;
 
-    protected function setUp()
+    /** @test */
+    public function itShouldBeInstantiable()
     {
-        $this->builder = new RouteBuilder;
+        $builder = new RouteBuilder;
+        $this->assertInstanceof('\Selene\Components\Routing\RouteBuilder', $builder);
     }
 
-    /**
-     * @test
-     */
-    public function itShouldAddANewRouteToTheCollection()
+    /** @test */
+    public function itShouldCreateRoutes()
     {
-        $this->builder->make('get', 'app', '/');
-        $this->builder->make('put', 'app.update', '/');
+        $builder = new RouteBuilder;
 
-        $this->assertEquals(['GET', 'HEAD'], $this->builder->getRoutes()->get('app')->getMethods());
-        $this->assertEquals(['PUT', 'PATCH'], $this->builder->getRoutes()->get('app.update')->getMethods());
+        $route = $builder->define('GET', 'foo', '/foo');
 
-        $this->assertEquals('app', $this->builder->getRoutes()->get('app')->getName());
-        $this->assertEquals('app.update', $this->builder->getRoutes()->get('app.update')->getName());
+        $this->assertInstanceof('\Selene\Components\Routing\Route', $route);
     }
 
-    /**
-     * @test
-     */
-    public function itShouldNestGroupsCorrectly()
+    /** @test */
+    public function itShouldBeAbleToGroupRoutes()
     {
-        $this->builder->group('app', '/', function ($builder) {
+        $builder = new RouteBuilder;
 
-        });
-       // $this->builder->group('app', '/', function ($builder) {
-       //     $builder->make('GET', 'index', '/', ['_action' => 'view.index:showIndex']);
-       //     $builder->make('GET', 'foo', '/foo', ['_action' => 'view.index:showFoo']);
+        $builder->group(
+            '/',
+            ['_host' => 'localhost', '_before' => 'auth'],
+            function ($builder) {
+                $builder->define('GET', 'foo', '/foo');
+                $builder->group('/bar', function ($builder) {
+                    $builder->define('GET', 'foo.foo', '/foo');
+                });
+            }
+        );
 
-       //     $builder->group('sub', '/sub', function ($builder) {
-       //         $builder->make('GET', 'bar', '/bar', ['_action' => 'view.sub:showBar']);
-       //         $builder->group('deep', '/deep', function ($builder) {
-       //             $builder->make('GET', 'bazoo', '/faaaz', ['_action' => 'view.deep:showBazoo']);
-       //         });
-       //     });
-       // });
-
-       // $routes = $this->builder->getRoutes();
-
-       // $this->assertTrue($routes->has('app.index'));
-
-       // $this->assertTrue($routes->has('app.foo'));
-
-       // $this->assertTrue($routes->has('app.sub.bar'));
-
-       // $this->assertTrue($routes->has('app.sub.deep.bazoo'));
     }
 
-    /**
-     * @test
-     */
-    public function routesShouldBeInsertable()
+    /** @test */
+    public function itShouldCreateResources()
     {
-        $this->builder->make('GET', 'index', '/app');
+        $builder = new RouteBuilder;
 
-        $this->builder->insert('index', 'GET', 'user', '/user');
+        $builder->resource('/user/photos', 'PhotoController');
 
-        $routes = $this->builder->getRoutes();
+        $routes = $builder->getRoutes();
 
-        $this->assertTrue($routes->has('index.user'));
-        $route = $routes->get('index.user');
+        $this->assertTrue($routes->has('user_photos.index'));
+        $this->assertEquals('/user/photos', $routes->get('user_photos.index')->getPath());
+        $this->assertEquals(['GET', 'HEAD'], $routes->get('user_photos.index')->getMethods());
 
-        $this->assertEquals('/app/user', $route->getPath());
+        $this->assertTrue($routes->has('user_photos.create'));
+        $this->assertEquals('/user/photos/create', $routes->get('user_photos.create')->getPath());
+        $this->assertEquals(['GET', 'HEAD'], $routes->get('user_photos.create')->getMethods());
+
+        $this->assertTrue($routes->has('user_photos.new'));
+        $this->assertEquals('/user/photos', $routes->get('user_photos.new')->getPath());
+        $this->assertEquals(['POST'], $routes->get('user_photos.new')->getMethods());
+
+        $this->assertTrue($routes->has('user_photos.show'));
+        $this->assertEquals('/user/photos/{resource}', $routes->get('user_photos.show')->getPath());
+        $this->assertEquals(['GET', 'HEAD'], $routes->get('user_photos.show')->getMethods());
+
+        $this->assertTrue($routes->has('user_photos.edit'));
+        $this->assertEquals('/user/photos/edit/{resource}', $routes->get('user_photos.edit')->getPath());
+        $this->assertEquals(['GET', 'HEAD'], $routes->get('user_photos.edit')->getMethods());
+
+        $this->assertTrue($routes->has('user_photos.update'));
+        $this->assertEquals('/user/photos/{resource}', $routes->get('user_photos.update')->getPath());
+        $this->assertEquals(['PUT', 'PATCH'], $routes->get('user_photos.update')->getMethods());
+
+        $this->assertTrue($routes->has('user_photos.delete'));
+        $this->assertEquals('/user/photos/{resource}', $routes->get('user_photos.delete')->getPath());
+        $this->assertEquals(['DELETE'], $routes->get('user_photos.delete')->getMethods());
     }
 
-    /**
-     * @test
-     * @expectedException \InvalidArgumentException
-     */
-    public function itShouldThrowExceptionWhenInsertingToUnknownParent()
+    /** @test */
+    public function itShouldOnlyCreateRoutesForGivenActions()
     {
-        $this->builder->insert('index', 'GET', 'user', '/user');
+        $builder = new RouteBuilder;
+
+        $builder->resource('/user/photos', 'PhotoController', ['index', 'new']);
+        $routes = $builder->getRoutes();
+
+        $this->assertTrue($routes->has('user_photos.index'));
+        $this->assertTrue($routes->has('user_photos.new'));
+
+        $this->assertFalse($routes->has('user_photos.create'));
+        $this->assertFalse($routes->has('user_photos.show'));
+        $this->assertFalse($routes->has('user_photos.edit'));
+        $this->assertFalse($routes->has('user_photos.delete'));
     }
 
-    /**
-     * @test
-     */
-    public function testShortCutMethods()
+    /** @test */
+    public function itShouldAddConstraitToTheResourceVariable()
     {
-        $this->builder->routeAny('any', '/');
-        $this->builder->routeGet('index', '/app');
-        $this->builder->routePost('index.create', '/app/create');
-        $this->builder->routePut('index.update', '/app/update');
-        $this->builder->routeDelete('index.delete', '/ap/delete');
+        $builder = new RouteBuilder;
 
-        $routes = $this->builder->getRoutes();
+        $builder->resource('/user/photos', 'PhotoController', [], $regexp = '(\d+)');
+        $routes = $builder->getRoutes();
 
-        $this->assertTrue($routes->has('any'));
-        $this->assertTrue($routes->has('index'));
-        $this->assertTrue($routes->has('index.create'));
-        $this->assertTrue($routes->has('index.update'));
-        $this->assertTrue($routes->has('index.delete'));
-
-        $this->assertTrue(in_array('GET', $routes->get('any')->getMethods()));
-        $this->assertTrue(in_array('POST', $routes->get('any')->getMethods()));
-        $this->assertTrue(in_array('PUT', $routes->get('any')->getMethods()));
-        $this->assertTrue(in_array('DELETE', $routes->get('any')->getMethods()));
-
-        $this->assertTrue(in_array('GET', $routes->get('index')->getMethods()));
-        $this->assertTrue(in_array('POST', $routes->get('index.create')->getMethods()));
-        $this->assertTrue(in_array('PUT', $routes->get('index.update')->getMethods()));
-        $this->assertTrue(in_array('DELETE', $routes->get('index.delete')->getMethods()));
+        $this->assertSame($regexp, $routes->get('user_photos.edit')->getConstraint('resource'));
+        $this->assertSame($regexp, $routes->get('user_photos.show')->getConstraint('resource'));
+        $this->assertSame($regexp, $routes->get('user_photos.delete')->getConstraint('resource'));
     }
 }

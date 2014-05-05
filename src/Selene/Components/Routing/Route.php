@@ -632,6 +632,12 @@ class Route implements Serializable
      */
     public function compile()
     {
+        if (null === $this->getAction()) {
+            throw new \BadMethodCallException(
+                sprintf('cannot compile route %s. A route action is not set.', $this->name)
+            );
+        }
+
         if (!$this->isCompiled()) {
             $this->setCompiledResults(call_user_func($this->getCompileMethod(), $this));
             $this->compiled = true;
