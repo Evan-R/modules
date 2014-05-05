@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Traits package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -15,19 +15,33 @@ use \Selene\Components\Xml\Parser;
 use \Selene\Components\Xml\Loader\Loader as XmlFileLoader;
 
 /**
- * @class XmlLoaderHelperTrait
- * @package Selene\Components\Config\Traits
+ * @trait XmlLoaderHelperTrait
+ *
+ * @package Selene\Components\Config
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 trait XmlLoaderHelperTrait
 {
+    /**
+     * parser
+     *
+     * @var \Selene\Components\Xml\Parser
+     */
     protected $parser;
 
+    /**
+     * xmlLoader
+     *
+     * @var \Selene\Components\Xml\Loader\LoaderInterface
+     */
     protected $xmlLoader;
 
     /**
      * {@inheritdoc}
      * @param string $format
+     * @return boolean
      */
     public function supports($resource)
     {
@@ -35,12 +49,12 @@ trait XmlLoaderHelperTrait
     }
 
     /**
-     * loadXml
+     * Loads an xml file into a DOMDocument.
      *
-     * @param mixed $xml
+     * @param string $xml filepath to an xml file
      *
      * @access public
-     * @return mixed
+     * @return \Selene\Components\Xml\Dom\DOMDocument
      */
     public function loadXml($xml)
     {
@@ -48,10 +62,10 @@ trait XmlLoaderHelperTrait
     }
 
     /**
-     * getXmlLoader
+     * Get the XmlLoader instance.
      *
      * @access protected
-     * @return XmlLoader
+     * @return \Selene\Components\Xml\Loader\LoaderInterface
      */
     protected function getXmlLoader()
     {
@@ -65,10 +79,10 @@ trait XmlLoaderHelperTrait
     }
 
     /**
-     * getParser
+     * Get the XmlParser instance.
      *
      * @access protected
-     * @return Parser
+     * @return \Selene\Components\Xml\Parser
      */
     protected function getParser()
     {

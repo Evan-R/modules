@@ -25,10 +25,16 @@ class Finder implements ResolverInterface, ContainerAwareInterface
     use ContainerAwareTrait;
 
     /**
+     * packages
+     *
+     * @var array
+     */
+    protected $namespaces;
+
+    /**
      * @param ContainerInterface $container
      *
      * @access public
-     * @return mixed
      */
     public function __construct(ContainerInterface $container = null)
     {
@@ -58,6 +64,46 @@ class Finder implements ResolverInterface, ContainerAwareInterface
     }
 
     /**
+     * registerPackages
+     *
+     * @param array $packages
+     *
+     * @access public
+     * @return void
+     */
+    public function registerNamespace($alias, $namespace)
+    {
+        $this->namespaces[$alias] = $namespace;
+    }
+
+    /**
+     * registerNamespaces
+     *
+     * @param array $namespaces
+     *
+     * @access public
+     * @return void
+     */
+    public function registerNamespaces(array $namespaces)
+    {
+        foreach ($namespaces as $alias => $namespaces) {
+            $this->registerNamesapce($alias, $namespace);
+        }
+    }
+
+    /**
+     * hasPackages
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function hasControllerNamespaces()
+    {
+        return null !== $this->namespaces;
+    }
+
+
+    /**
      * getControllerAction
      *
      * @param mixed $controller
@@ -69,10 +115,10 @@ class Finder implements ResolverInterface, ContainerAwareInterface
      */
     protected function findController($controller, $method)
     {
-        list ($controller, $action) = array_pad(explode(':', $controller), 2, null);
+        list ($controller, $action) = $this->extractControllerAction($controller);
 
         if (null === $action) {
-            $action = $this->getControllerAction($controller, $method, $path);
+            $action = $this->getControllerAction($controller, $method);
         }
 
         $instance = null;
@@ -92,6 +138,36 @@ class Finder implements ResolverInterface, ContainerAwareInterface
     }
 
     /**
+     * extractControllerAction
+     *
+     * @param mixed $controller
+     *
+     * @access protected
+     * @return array
+     */
+    protected function extractControllerAction($controller)
+    {
+        if ($this->hasControllerNamespaces() && false !== ($pos = strpos($controller, ':')) &&
+            false !== ($rpos = strrpos($controller, ':')) && $pos !== $rpos
+        ) {
+            $parts = explode(':', $controller);
+
+            if (!isset($this->namespaces[$parts[0]])) {
+                throw new \InvalidArgumentException(sprintf('no namespace set for alias %s', $parts[0]));
+            }
+
+            $ns = $this->namespaces[$parts[0]];
+
+            $controllerClass = $ns . '\\Controller\\' . ucfirst(strtr($parts[1], ['.' => '\\'])).'Controller';
+            $action = $parts[2] . 'Action';
+
+            return [$controllerClass, $action];
+        }
+
+        return array_pad(explode('@', $controller), 2, null);
+    }
+
+    /**
      * getControllerAction
      *
      * @param mixed $controller
@@ -100,7 +176,7 @@ class Finder implements ResolverInterface, ContainerAwareInterface
      * @access protected
      * @return mixed
      */
-    protected function getControllerAction($controller, $method, $path)
+    protected function getControllerAction($controller, $method)
     {
         return 'handleMissingMethod';
     }

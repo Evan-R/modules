@@ -1,3 +1,0 @@
-[submodule "bundle/vim-namespace"]
-	path = bundle/vim-namespace
-	url = https://github.com/arnaud-lb/vim-php-namespace

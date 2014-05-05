@@ -184,6 +184,7 @@ class Cache
 
         $timestamp = filemtime($this->file);
 
+
         foreach (unserialize(file_get_contents($manifest)) as $configFile) {
             if (!$configFile->isValid($timestamp)) {
                 return false;

@@ -27,32 +27,45 @@ use \ReflectionProperty;
 class Normalizer implements NormalizerInterface
 {
     /**
-     * objcache
+     * objectCache
      *
      * @var array
      */
-    protected $objectCache = [];
+    protected $objectCache;
 
     /**
      * ignoredAttributes
      *
      * @var array
      */
-    protected $ignoredAttributes = [];
+    protected $ignoredAttributes;
 
     /**
      * ignoredObjects
      *
      * @var array
      */
-    protected $ignoredObjects = [];
+    protected $ignoredObjects;
 
     /**
      * normalized
      *
      * @var array
      */
-    protected $normalized = [];
+    protected $normalized;
+
+    /**
+     * Creates a new Normalizer instance.
+     *
+     * @access public
+     */
+    public function __construct()
+    {
+        $this->normalized = [];
+        $this->objectCache = [];
+        $this->ignoredObjects = [];
+        $this->ignoredAttributes = [];
+    }
 
     /**
      * ensureArray

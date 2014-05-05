@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routing>
+
+  <routes>
+
+    <route name="index" path="/" action="some.controller:indexAction"></route>
+
+    <route name="index.user" path="/{userId}">
+      <requirements>
+        <methods>
+          <method>GET</method>
+        </methods>
+        <action>some.controller:indexAction</action>
+        <filters>
+          <before>auth</before>
+        </filters>
+      </requirements>
+    </route>
+
+  </routes>
+
+</routing>

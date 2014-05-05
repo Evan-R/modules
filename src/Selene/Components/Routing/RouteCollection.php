@@ -116,7 +116,7 @@ class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Se
     public function findByMethod($method)
     {
         $method = strtoupper($method);
-        $collection = new static;
+        $collection = $this->create();
 
         foreach ($this->routes as $route) {
             if (in_array($method, $route->getMethods())) {
@@ -125,6 +125,17 @@ class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Se
         }
 
         return $collection;
+    }
+
+    /**
+     * create
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function create()
+    {
+        return new static;
     }
 
     /**

@@ -14,10 +14,10 @@ namespace Selene\Components\Config\Resource;
 use \Selene\Components\FileSystem\Traits\PathHelperTrait;
 
 /**
- * @class FileLocator implements LocatorInterface
+ * @class Locator implements LocatorInterface
  * @see LocatorInterface
  *
- * @package Selene\Components\Config
+ * @package Selene\Components\Config\Resource
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

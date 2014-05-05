@@ -25,7 +25,6 @@
   "require-dev": {
     "mockery/mockery": "dev-master",
     "mikey179/vfsStream": "dev-master",
-    "phpspec/phpspec":"2.0.*@dev",
     "symfony/dependency-injection":"~2.4.0"
   },
   "config": {

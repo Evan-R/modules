@@ -98,8 +98,7 @@ class Route implements Serializable
 
         $this->initRequirements($requirements);
 
-        $this->defaults       = [];
-        $this->hostDefaults   = [];
+        $this->defaults       = ['route' => [], 'host' => []];
         $this->parameters     = [];
         $this->compiledArgs   = [];
 
@@ -312,7 +311,7 @@ class Route implements Serializable
      */
     public function setDefaults(array $defaults)
     {
-        $this->defaults = $defaults;
+        $this->defaults['route'] = $defaults;
         return $this;
     }
 
@@ -327,7 +326,7 @@ class Route implements Serializable
      */
     public function setDefault($var, $value)
     {
-        $this->defaults[$var] = $value;
+        $this->defaults['route'][$var] = $value;
         return $this;
     }
 
@@ -341,7 +340,7 @@ class Route implements Serializable
      */
     public function setHostDefaults(array $defaults)
     {
-        $this->defaults = $defaults;
+        $this->defaults['host'] = $defaults;
         return $this;
     }
 
@@ -356,7 +355,7 @@ class Route implements Serializable
      */
     public function setHostDefault($var, $value)
     {
-        $this->hostDefaults[$var] = $value;
+        $this->defaults['host'][$var] = $value;
         return $this;
     }
 
@@ -368,7 +367,7 @@ class Route implements Serializable
      */
     public function getDefaults()
     {
-        return $this->defaults;
+        return $this->defaults['route'];
     }
 
     /**
@@ -381,7 +380,7 @@ class Route implements Serializable
      */
     public function getDefault($var)
     {
-        return $this->getDefaultVar($this->defaults, $var);
+        return $this->getDefaultVar($this->defaults['route'], $var);
     }
 
     /**
@@ -810,8 +809,9 @@ class Route implements Serializable
         $data = [
             'name'          => $this->name,
             'path'          => $this->path,
+            'parent'        => $this->parent,
             'defaults'      => $this->defaults,
-            'host_defaults' => $this->hostDefaults,
+            'parameters'    => $this->parameters,
             'requirements'  => $this->requirements,
             'compiled_args' => $this->compiledArgs,
         ];
@@ -833,8 +833,9 @@ class Route implements Serializable
 
         $this->name         = $data['name'];
         $this->path         = $data['path'];
+        $this->parent       = $data['parent'];
         $this->defaults     = $data['defaults'];
-        $this->hostDefaults = $data['host_defaults'];
+        $this->parameters   = $data['parameters'];
         $this->requirements = $data['requirements'];
         $this->compiledArgs = $data['compiled_args'];
 

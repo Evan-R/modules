@@ -7,6 +7,6 @@
     protected function getServiceFoo()
     {
         return $this->services['foo'] = new \Foo(
-            $this->getServiceBar()
+            $this->get('bar')
         );
     }

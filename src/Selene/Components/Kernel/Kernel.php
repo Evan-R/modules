@@ -193,11 +193,35 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
      */
     protected function handleRequest(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        var_dump('kernel handle');
         $this->router->dispatch($request);
 
         return $this->filterResponse();
     }
+
+    /**
+     * getRouter
+     *
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
+
+    /**
+     * getEvents
+     *
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getEvents()
+    {
+        return $this->events;
+    }
+
 
 
     /**

@@ -81,14 +81,21 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      * @var array
      */
     protected $packageResources;
+
+    /**
+     * packageProviders
+     *
+     * @var array
+     */
     protected $packageProviders;
 
     /**
+     * Create a new Application instance.
+     *
      * @param mixed $environment
      * @param mixed $debug
      *
      * @access public
-     * @return mixed
      */
     public function __construct($environment, $debug = true)
     {
@@ -104,7 +111,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
-     * handle
+     * Handle a http request.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param int $type
@@ -127,7 +134,10 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
-     * boot
+     * Boots the application
+     *
+     * Initialize packages, initialize the service container, boot the kernel
+     * stack, and prepare the controller resolver.
      *
      * @access public
      * @return void
@@ -139,9 +149,12 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         }
 
         $this->initializePackages();
+
         $this->initializeContainer();
 
         $this->bootKernelStack();
+
+        $this->prepareControllers();
 
         $this->booted = true;
     }
@@ -155,6 +168,79 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     public function getContainerServiceId()
     {
         return 'app_container';
+    }
+
+    /**
+     * Set the Application directory
+     *
+     * @param mixed $path
+     *
+     * @access public
+     * @return voi
+     */
+    public function setApplicationRoot($path)
+    {
+        $this->applicationRoot = $path;
+    }
+
+    /**
+     * Get the application directory.
+     *
+     * @access public
+     * @return string
+     */
+    public function getApplicationRoot()
+    {
+        if (null === $this->applicationRoot) {
+            $reflection = new \ReflectionObject($this);
+            $this->applicationRoot = dirname($reflection->getFile());
+        }
+
+        return $this->applicationRoot;
+    }
+
+    /**
+     * setContainerCachePath
+     *
+     * @param mixed $path
+     *
+     * @access public
+     * @return void
+     */
+    public function setContainerCachePath($path)
+    {
+        $this->containerCachePath = $path;
+    }
+
+    /**
+     * getContainerCachePath
+     *
+     * @access public
+     * @return string
+     */
+    public function getContainerCachePath()
+    {
+        return $this->containerCachePath;
+    }
+
+    /**
+     * getLoadedPackages
+     *
+     * @access public
+     * @return PackageRepository
+     */
+    public function getLoadedPackages()
+    {
+        return $this->packages;
+    }
+
+    public function addPackageProvider($path, $extension = 'php', $default = [])
+    {
+        if (file_exists($file = $path . '.' . $extension)) {
+            $this->packageResources[] = $file;
+            $this->packageProviders[] = include $file;
+            return;
+        }
     }
 
     /**
@@ -240,6 +326,22 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
+     * prepareControllers
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function prepareControllers()
+    {
+        $router = $this->getKernel()->getRouter();
+        $resolver = $router->getControllerResolver();
+
+        foreach ($this->packages as $alias => $package) {
+            $resolver->registerNamespace($alias, $package->getNamespace());
+        }
+    }
+
+    /**
      * initializeContainer
      *
      * @access protected
@@ -257,18 +359,15 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
 
         if ($cache->isValid()) {
-            //$className = $className . '_' . hash('md5', filemtime($file));
+
             $class = $ns . '\\' . $className;
             return $this->loadContainerCache($class, $file);
         }
-
-        //$className = $className . '_' . hash('md5', $time = time());
 
         $builder = $this->buildContainer($cache);
         $dumper = new PhpDumper($this->container, $ns, $className, $this->getContainerServiceId());
 
         $cache->write($dumper->dump(), $builder->getResources()->toArray());
-        //touch($file, $time);
     }
 
     /**
@@ -302,9 +401,9 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         $locator->setRootPath(
             $this->getApplicationRoot().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'packages'
         );
-        $resolver = new LoaderResolver([
-            new XmlLoader($builder, $locator)
-        ]);
+
+        $resolver = new LoaderResolver([new XmlLoader($builder, $locator)]);
+
         $loader = new DelegatingLoader($resolver);
 
         $loader->load('config.xml');
@@ -315,9 +414,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
 
         return $builder;
-
-        //$this->container->compile();
-
     }
 
     /**
@@ -383,6 +479,12 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
             new PackageRepository($this->initPackages($this->getPackageResources()));
     }
 
+    /**
+     * getPackageConfig
+     *
+     * @access protected
+     * @return array
+     */
     protected function getPackageConfig()
     {
         $paths = [];
@@ -393,6 +495,14 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         return $paths;
     }
 
+    /**
+     * initPackages
+     *
+     * @param array $packages
+     *
+     * @access protected
+     * @return array
+     */
     protected function initPackages(array $packages)
     {
         $initialized = [];
@@ -400,80 +510,14 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         foreach ($packages as $packageClass) {
             if (class_exists($packageClass)) {
                 $initialized[] = new $packageClass;
+                continue;
             }
+            throw new \InvalidArgumentException(
+                sprintf('package class "%s" does not exist', $packageClass)
+            );
         }
 
         return $initialized;
-    }
-
-    /**
-     * setApplicationRoot
-     *
-     * @param mixed $path
-     *
-     * @access public
-     * @return mixed
-     */
-    public function setApplicationRoot($path)
-    {
-        $this->applicationRoot = $path;
-    }
-
-    /**
-     * getApplicationRoot
-     *
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getApplicationRoot()
-    {
-        return $this->applicationRoot;
-    }
-
-    /**
-     * setContainerCachePath
-     *
-     * @param mixed $path
-     *
-     * @access public
-     * @return void
-     */
-    public function setContainerCachePath($path)
-    {
-        $this->containerCachePath = $path;
-    }
-
-    /**
-     * getContainerCachePath
-     *
-     * @access public
-     * @return string
-     */
-    public function getContainerCachePath()
-    {
-        return $this->containerCachePath;
-    }
-
-    /**
-     * getLoadedPackages
-     *
-     * @access public
-     * @return PackageRepository
-     */
-    public function getLoadedPackages()
-    {
-        return $this->packages;
-    }
-
-    public function addPackageProvider($path, $extension = 'php', $default = [])
-    {
-        if (file_exists($file = $path . '.' . $extension)) {
-            $this->packageResources[] = $file;
-            $this->packageProviders[] = include $file;
-            return;
-        }
-
     }
 
     /**

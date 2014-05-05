@@ -77,6 +77,74 @@ class RouteBuilder
     }
 
     /**
+     * group
+     *
+     * @param mixed $prefix
+     * @param array $requirements
+     *
+     * @access public
+     * @return mixed
+     */
+    public function group($prefix, $requirements = [], $groupConstructor = null)
+    {
+        if (is_callable($requirements)) {
+            $groupConstructor = $requirements;
+            $requirements = [];
+        }
+
+        $this->enterGroup($prefix, $requirements);
+
+        if (is_callable($groupConstructor)) {
+            call_user_func($groupConstructor, $this);
+            $this->leaveGroup();
+        }
+    }
+
+    /**
+     * endGroup
+     *
+     * @access public
+     * @return RouteBuilder
+     */
+    public function endGroup()
+    {
+        if ($this->hasGroups()) {
+            $this->leaveGroup();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a route to the collection
+     *
+     * @param Route $route
+     *
+     * @access public
+     * @return RouteBuilder
+     */
+    public function add(Route $route)
+    {
+        $this->routes->add($route);
+
+        return $this;
+    }
+
+    /**
+     * addRoutes
+     *
+     * @param RouteCollectionInterface $routes
+     *
+     * @access public
+     * @return RoutBuilder
+     */
+    public function addRoutes(RouteCollectionInterface $routes)
+    {
+        $this->routes->merge($routes);
+        return $this;
+    }
+
+    /**
      * getRoutes
      *
      * @access public
@@ -86,6 +154,112 @@ class RouteBuilder
     {
         return $this->routes;
     }
+
+    /**
+     * get
+     *
+     * @param mixed $name
+     * @param mixed $pattern
+     * @param mixed $controller
+     * @param mixed $requirements
+     *
+     * @access public
+     * @return mixed
+     */
+    public function get($name, $pattern, $controller, $requirements = [])
+    {
+        return $this->define('GET', $name, $pattern, $this->extractShortcutArgs($controller, $requirements));
+    }
+
+    /**
+     * post
+     *
+     * @param mixed $name
+     * @param mixed $pattern
+     * @param mixed $controller
+     * @param mixed $requirements
+     *
+     * @access public
+     * @return mixed
+     */
+    public function post($name, $pattern, $controller, $requirements = [])
+    {
+        return $this->define('POST', $name, $pattern, $this->extractShortcutArgs($controller, $requirements));
+    }
+
+    /**
+     * put
+     *
+     * @param mixed $name
+     * @param mixed $pattern
+     * @param mixed $controller
+     * @param mixed $requirements
+     *
+     * @access public
+     * @return mixed
+     */
+    public function put($name, $pattern, $controller, $requirements = [])
+    {
+        return $this->define('PUT', $name, $pattern, $this->extractShortcutArgs($controller, $requirements));
+    }
+
+    /**
+     * delete
+     *
+     * @param mixed $name
+     * @param mixed $pattern
+     * @param mixed $controller
+     * @param mixed $requirements
+     *
+     * @access public
+     * @return mixed
+     */
+    public function delete($name, $pattern, $controller, $requirements = [])
+    {
+        return $this->define('DELETE', $name, $pattern, $this->extractShortcutArgs($controller, $requirements));
+    }
+
+    /**
+     * any
+     *
+     * @param mixed $name
+     * @param mixed $pattern
+     * @param mixed $controller
+     * @param mixed $requirements
+     *
+     * @access public
+     * @return mixed
+     */
+    public function any($name, $pattern, $controller, $requirements = [])
+    {
+        return $this->define(
+            'GET|POST|PUT|DELETE',
+            $name,
+            $pattern,
+            $this->extractShortcutArgs($controller, $requirements)
+        );
+    }
+
+    /**
+     * extractShortcutArgs
+     *
+     * @param mixed $controller
+     * @param mixed $requirements
+     *
+     * @access protected
+     * @return array
+     */
+    protected function extractShortcutArgs($controller, $requirements = [])
+    {
+        if (is_array($controller)) {
+            return $controller;
+        }
+
+        $requirements['_action'] = $controller;
+        return $requirements;
+    }
+
+
 
     /**
      * prefixPattern
@@ -224,44 +398,6 @@ class RouteBuilder
     protected function getResourceActionVerb($action)
     {
         return $this->getDefault($this->getResourceActionMap(), $action, 'GET');
-    }
-
-    /**
-     * group
-     *
-     * @param mixed $prefix
-     * @param array $requirements
-     *
-     * @access public
-     * @return mixed
-     */
-    public function group($prefix, $requirements = [], $groupConstructor = null)
-    {
-        if (is_callable($requirements)) {
-            $groupConstructor = $requirements;
-            $requirements = [];
-        }
-
-        $this->enterGroup($prefix, $requirements);
-
-        if (is_callable($groupConstructor)) {
-            call_user_func($groupConstructor, $this);
-        }
-    }
-
-    /**
-     * Add a route to the collection
-     *
-     * @param Route $route
-     *
-     * @access public
-     * @return RouteBuilder
-     */
-    public function add(Route $route)
-    {
-        $this->routes->add($route);
-
-        return $this;
     }
 
     /**

@@ -193,6 +193,7 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
         $container->merge($packageContainer);
 
         $builder->replaceContainer($container);
+        $builder->addObjectResource($config);
     }
 
     /**
@@ -233,45 +234,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
     {
         foreach ($this->packages as $package) {
             $package->shutDown();
-        }
-    }
-
-    /**
-     * registerMiddleWares
-     *
-     * @access public
-     * @return void
-     */
-    public function registerMiddleWares(KernelStackBuilder $builder)
-    {
-        //foreach ($this->packages as $package) {
-
-        //    if (!$package->provides(PackageInterface::PROV_MIDDLEWARE)) {
-        //        continue;
-        //    }
-
-        //    $app = $this->app->getKernel();
-        //    $this->registerMiddleware($builder, $package->getMiddlewares($app));
-        //}
-    }
-
-    /**
-     * registerMiddleWare
-     *
-     * @param KernelStackBuilder $builder
-     * @param mixed $middlewares
-     *
-     * @access protected
-     * @return void
-     */
-    protected function registerMiddleWare(KernelStackBuilder $builder, $middlewares)
-    {
-        if (!is_array($middlewares)) {
-            $middlewares = [$middlewares];
-        }
-
-        foreach ($middlewares as $middleware) {
-            $builder->add($middleware);
         }
     }
 

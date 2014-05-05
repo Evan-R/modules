@@ -476,7 +476,19 @@ class Container implements ContainerInterface
 
         $this->parameters->merge($container->getParameters());
         $this->definitions = array_merge((array)$this->definitions, (array)$container->getDefinitions());
-        //$this->packageConfigs = array_merge($this->packageConfigs, $container->getPackageConfigs());
+
+        $this->services = array_merge($container->getServices(), $this->services);
+    }
+
+    /**
+     * getServices
+     *
+     * @access public
+     * @return array
+     */
+    public function getServices()
+    {
+        return $this->services;
     }
 
     /**

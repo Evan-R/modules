@@ -165,6 +165,18 @@ class Router implements RouterInterface
     }
 
     /**
+     * getControllerResolver
+     *
+     *
+     * @access public
+     * @return \Selene\Components\Routing\Controller\ResolverInterface
+     */
+    public function getControllerResolver()
+    {
+        return $this->resolver;
+    }
+
+    /**
      * registerFilter
      *
      * @param callable $filter

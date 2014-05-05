@@ -37,4 +37,21 @@ class StaticRouteCollection extends RouteCollection
     {
         throw new \BadMethodCallException('cannot add route to a static collection');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findByMethod($method)
+    {
+        $collection = parent::findByMethod($method);
+        return new StaticRouteCollection($collection);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function create()
+    {
+        return new RouteCollection;
+    }
 }
