@@ -272,8 +272,7 @@ class ServiceBody extends Stub implements ContainerAwareInterface
 
         foreach ($arguments as $argument) {
             if ($argument instanceof Reference) {
-                $synced = $this->container->getDefinition($argument)->isInjected();
-                $args[] = '$this->'.ServiceMethod::getServiceGetterName($argument, $synced).'()';
+                $args[] = $this->extractRefenceInstantiator($argument);
             } elseif (!is_scalar($argument)) {
                 $args[] = $this->extractParams($argument, 16);
             } elseif ($this->container->hasParameter($argument)) {
@@ -289,6 +288,34 @@ class ServiceBody extends Stub implements ContainerAwareInterface
     protected function getServiceGetterName($id, $synced = false)
     {
         return ucfirst(Container::camelCaseStr($this->serviceId));
+    }
+
+    /**
+     * extractRefenceInstantiator
+     *
+     * @param mixed $reference
+     *
+     * @access protected
+     * @return string
+     */
+    protected function extractRefenceInstantiator($reference)
+    {
+        $definition = $this->container->getDefinition((string)$reference);
+
+        $arguments = $definition->hasArguments();
+        $setters = $definition->hasSetters();
+
+        if ($definition->hasParent()) {
+            $parent = $this->container->getDefinition($definition->getParent());
+            $arguments = $parent->hasArguments();
+            $setters = $parent->hasSetters();
+        }
+
+        if (!$arguments && !$setters && !$definition->scopeIsContainer()) {
+            return 'new '. $definition->getClass();
+        }
+
+        return '$this->get(\''. (string)$reference . '\')';
     }
 
     /**

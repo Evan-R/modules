@@ -202,7 +202,7 @@ EOL;
             return call_user_func([\$this, \$this->cmap[\$id]], \$id);
         }
 
-        return parent::getService(\$id);
+        return parent::get(\$id);
     }
 
     /**
@@ -216,14 +216,6 @@ EOL;
     protected function resolveId(\$id)
     {
         return \$this->getDefault(\$this->aliases, \$id, \$id);
-    }
-
-    /**
-     * {@iniheritdoc}
-     */
-    public function getService(\$id)
-    {
-        return \$this->get(\$id);
     }
 
     /**
