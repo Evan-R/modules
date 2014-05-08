@@ -12,7 +12,8 @@
     "php":">=5.4.0"
   },
   "require-dev": {
-    "selene/testsuite":"dev-development"
+    "selene/testsuite":"dev-development",
+    "selene/cryptography":"dev-development"
   },
   "autoload": {
     "psr-0": {"Selene\\Components\\Common\\": ""},
@@ -28,6 +29,10 @@
     {
       "type":"vcs", 
       "url":"git://github.com/seleneapp/common.git"
+    },
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/cryptography.git"
     }
   ],
   "target-dir": "Selene/Components/Common",
