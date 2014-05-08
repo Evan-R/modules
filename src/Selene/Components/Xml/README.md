@@ -8,6 +8,7 @@ to a php array.
 
 ### Parsing xml strings
 ```php
+<?php
 
 use \Selene\Components\Xml\Parser;
 
@@ -20,6 +21,7 @@ $parser->parse('<data><foo>bar</foo></data>');
 ### Parsing xml files
 
 ```php
+<?php
 
 use \Selene\Components\Xml\Parser;
 
@@ -32,6 +34,7 @@ $parser->parse('/path/to/data.xml');
 ### Parsing a `DOMDocument`
 
 ```php
+<?php
 
 use \Selene\Components\Xml\Parser;
 
@@ -44,6 +47,7 @@ $parser->parseDom($dom);
 ### Parsing a `DOMElement`
 
 ```php
+<?php
 
 use \Selene\Components\Xml\Parser;
 
@@ -59,6 +63,7 @@ $parser->parseDomElement($element);
 
 
 ```php
+<?php
 
 use \Selene\Components\Xml\Parser;
 
@@ -75,6 +80,7 @@ If attribute merging is disabled, use this to change the default attributes key
 
 
 ```php
+<?php
 
 use \Selene\Components\Xml\Parser;
 
@@ -91,6 +97,7 @@ handled as list.
 
 
 ```php
+<?php
 
 use \Selene\Components\Xml\Parser;
 
@@ -116,16 +123,20 @@ By default the parser will parse xml structures like
 To something like:
 
 ```php
+<?php
+
 ['entries' => ['entry' => [1, 2]]]
+
 ```
 
 Setting a pluralizer can fix this. 
 
-Note, that a pluralizer can be any callable that takes a string and returns
+Note, that a pluralizer can be any [callable](http://www.php.net/manual/en/language.types.callable.php) that takes a string and returns
 a string.
 
 
 ```php
+<?php
 
 $parser->setPluralizer(function ($string) {
 	if ('entry' === $string) {
@@ -136,5 +147,111 @@ $parser->setPluralizer(function ($string) {
 ```
 
 ```php
-	['entries' => [1, 2]]
+<?php
+['entries' => [1, 2]]
 ```
+
+## The Writer
+
+### Dumping php data to a xml string
+
+```php
+<?php
+
+use \Selene\Components\Xml\Writer;
+
+$writer = new Writer;
+
+$data = [
+	'foo' => 'bar'
+];
+
+$writer->dump($data); // <root><foo>bar</foo></root>
+
+// set the xml root node name:
+
+$writer->dump($data, 'data'); // <data><foo>bar</foo></data>
+
+```
+
+### Dumping php data to a DOMDocument
+
+Note: this will create an instance of `Selene\Components\Xml\Dom\DOMDocument`.
+
+```php
+
+<?php
+
+use \Selene\Components\Xml\Writer;
+
+$writer = new Writer;
+
+$data = [
+	'foo' => 'bar'
+];
+
+$dom = $writer->writeToDom($data);
+
+```
+
+##Writer options
+
+### Set the normalizer instance
+
+Normaly, the `NormalierInterface` implementation is set for you when instantiating a new `Writer`, however you can set your own normalizer instance.
+
+Note: the normalizer must implement the `Selene\Components\Xml\Normalizer\NormalierInterface` interface.
+
+```php
+<?php
+
+use \Selene\Components\Xml\Writer;
+use \Selene\Components\Xml\Normalizer\Normalizer;
+
+$writer = new Writer(new Normalizer);
+
+// or
+
+$writer->setNormalizer($myNormalizer);
+```
+
+### Set the inflector
+
+The inflector is the exact oppoite of the Parser's pluralizer. It singularizes
+strings.
+
+
+```php
+<?php
+
+$writer->setInflector(function ($string) {
+	if ('items' === $string) {
+		return 'item';
+	}
+});
+
+```
+
+### Set the document encoding
+
+Default encoding is `UTF-8`.
+
+```php
+<?php
+$writer->setEncoding($encoding); // string
+```
+
+### Set an attribute key map
+
+This is usefull if you want to output certain keys as xml attribute 
+
+```php
+<?php
+
+$writer->setKeyMap([
+	'nodeName' => ['id', 'entry'] // nested keys 'id' and 'entry' of the key
+	element 'nodeName' will be set as attributes instead of childnodes.
+]);
+
+```
+Note: you can also use use `addMappedAttribute($nodeName, $attributeName)` to add more mapped attributes.
