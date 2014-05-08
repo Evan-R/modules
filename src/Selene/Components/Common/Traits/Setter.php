@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Common\Traits;
 
+use \Selene\Components\Common\Helper\ListHelper;
+
 /**
  * @trait Setter
  *
@@ -32,8 +34,8 @@ trait Setter
         $resource[$attribute] = $value ?: $default;
     }
 
-    protected function setDefaultArray(array &$resource, $attribute, $default = null)
+    protected function setDefaultArray(array &$resource, $attribute, $value = null, $default = null)
     {
-        return arraySet($resource, $attribute ?: $default);
+        return ListHelper::arraySet($resource, $attribute, $value ?: $default);
     }
 }

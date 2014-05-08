@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Common\Traits;
 
+use \Selene\Components\Common\Helper\ListHelper;
+
 /**
  * @trait Getter
  *
@@ -94,7 +96,7 @@ trait Getter
      */
     protected function getDefaultArray(array $resource, $attribute, $default = null, $delimitter = '.')
     {
-        return arrayGet($resource, $attribute, $delimitter) ?: $default;
+        return ListHelper::arrayGet($resource, $attribute, $delimitter) ?: $default;
     }
 
     /**
