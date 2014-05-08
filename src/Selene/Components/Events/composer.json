@@ -29,8 +29,12 @@
       "url":"git://github.com/seleneapp/testsuite.git"
     },
     {
-      "type":"vcs",
-      "url":"git://github.com/seleneapp/.git"
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/di.git"
+    },
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/events.git"
     }
   ],
   "target-dir": "Selene/Components/Events",

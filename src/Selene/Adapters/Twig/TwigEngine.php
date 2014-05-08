@@ -33,11 +33,11 @@ class TwigEngine implements EngineInterface
     private $env;
 
     /**
-     * extensions
+     * templateResolver
      *
-     * @var array
+     * @var mixed
      */
-    private $extensions;
+    private $templateResolver;
 
     /**
      * @param TwigEnvironment $twig
@@ -45,10 +45,10 @@ class TwigEngine implements EngineInterface
      * @access public
      * @return mixed
      */
-    public function __construct(TwigEnvironment $twig)
+    public function __construct(TwigEnvironment $twig, ResolverInterface $templateResolver)
     {
         $this->env = $twig;
-        $this->extensions = ['twig'];
+        $this->templateResolver;
     }
 
     /**
@@ -60,11 +60,9 @@ class TwigEngine implements EngineInterface
      * @access public
      * @return string
      */
-    public function render($file, array $context = [])
+    public function render($template, array $context = [])
     {
-        $template = $this->env->loadTemplate($file);
-
-        return $template->render($context);
+        return $this->load($template)->render($context);
     }
 
     /**
@@ -77,6 +75,23 @@ class TwigEngine implements EngineInterface
      */
     public function supports($extension)
     {
-        return in_array($extension, $this->extensions);
+        return $name instanceof \Twig_Template ? true : 'twig' === $this->templateResolver->resolve($name)->getEngine();
+    }
+
+    /**
+     * load
+     *
+     * @param mixed $template
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function load($template)
+    {
+        if ($template instanceof \Twig_Template) {
+            return $template;
+        }
+
+        return $this->env->loadTemplate((string)$template);
     }
 }

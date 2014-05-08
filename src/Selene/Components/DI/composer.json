@@ -25,6 +25,10 @@
     {
       "type":"vcs", 
       "url":"git://github.com/seleneapp/common.git"
+    },
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/di.git"
     }
   ],
   "target-dir": "Selene/Components/DI",

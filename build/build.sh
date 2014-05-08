@@ -13,7 +13,7 @@ $GIT subsplit publish --no-tags src/Selene/Components/Kernel:git@github.com:sele
 $GIT subsplit publish --no-tags src/Selene/Components/Cryptography:git@github.com:seleneapp/cryptography.git
 $GIT subsplit publish --no-tags src/Selene/Components/Events:git@github.com:seleneapp/events.git
 $GIT subsplit publish --no-tags src/Selene/Components/Filesystem:git@github.com:seleneapp/filesystem.git
-$GIT subsplit publish --no-tags src/Selene/Components/DI:git@github.com:seleneapp/dependency-injection.git
+$GIT subsplit publish --no-tags src/Selene/Components/DI:git@github.com:seleneapp/di.git
 $GIT subsplit publish --no-tags src/Selene/Components/TestSuite:git@github.com:seleneapp/testsuite.git
 $GIT subsplit publish --no-tags src/Selene/Components/Routing:git@github.com:seleneapp/routing.git
 $GIT subsplit publish --no-tags src/Selene/Components/Package:git@github.com:seleneapp/package.git
