@@ -265,7 +265,7 @@ class Writer
             return;
         }
 
-        if (isTraversable($data) && !$this->isXmlElement($data)) {
+        if (ListHelper::isTraversable($data) && !$this->isXmlElement($data)) {
             $this->buildXmlFromTraversable($dom, $DOMNode, $normalizer->ensureBuildable($data));
         } else {
             $this->setElementValue($dom, $DOMNode, $data);
@@ -333,7 +333,7 @@ class Writer
                     }
                     continue;
                 }
-            } elseif (isXMLElement($value)) {
+            } elseif ($this->isXMLElement($value)) {
                 // if this is a non scalar value at this time, just set the
                 // value on the element
                 $node = $dom->createElement($normalizer->normalize($key));

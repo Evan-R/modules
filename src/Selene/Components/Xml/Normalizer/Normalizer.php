@@ -14,6 +14,8 @@ namespace Selene\Components\Xml\Normalizer;
 use \ReflectionObject;
 use \ReflectionMethod;
 use \ReflectionProperty;
+use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Components\Common\Helper\StringHelper;
 use \Selene\Components\Xml\Traits\XmlHelperTrait;
 
 /**
@@ -185,7 +187,7 @@ class Normalizer implements NormalizerInterface
      */
     public function isTraversable($data)
     {
-        return is_array($data) || $data instanceof \Traversable;
+        return ListHelper::isTraversable($data);
     }
 
     /**
@@ -363,7 +365,7 @@ class Normalizer implements NormalizerInterface
     {
         $value = $this->isAllUpperCase($string) ?
             strtolower(trim($string, '_-#$%')) :
-            strLowDash(trim($string, '_-#$%'));
+            StringHelper::strLowDash(trim($string, '_-#$%'));
 
         return strtolower(preg_replace('/[^a-zA-Z0-9(^@)]+/', '-', $value));
     }

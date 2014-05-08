@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the \Users\malcolm\www\selene_source\src\Selene\Components\Xml\Traits package
+ * This File is part of the Selene\Components\Xml package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace \Users\malcolm\www\selene_source\src\Selene\Components\Xml\Traits;
+namespace Selene\Components\Xml\Traits;
 
 /**
- * @class XmlHelperTrait
- * @package \Users\malcolm\www\selene_source\src\Selene\Components\Xml\Traits
+ * @trait XmlHelperTrait
+ *
+ * @package Selene\Components\Xml\Traits
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
-class XmlHelperTrait
+trait XmlHelperTrait
 {
     /**
      * isXmlElement
