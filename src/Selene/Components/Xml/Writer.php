@@ -186,7 +186,7 @@ class Writer
      */
     public function useKeyAsValue($key, $normalize = false)
     {
-        if (true !== $normalize and !$this->isValidNodeName($key)) {
+        if (true !== $normalize && !$this->isValidNodeName($key)) {
             throw new \InvalidArgumentException(sprintf('%s is an invalid node name', $key));
         } else {
             $key = $this->normalizer->normalize($key);
@@ -204,7 +204,7 @@ class Writer
      */
     public function useKeyAsIndex($key, $normalize = false)
     {
-        if (true !== $normalize and !$this->isValidNodeName($key)) {
+        if (true !== $normalize && !$this->isValidNodeName($key)) {
             throw new \InvalidArgumentException(sprintf('%s is an invalid node name', $key));
         } else {
             $key = $this->normalizer->normalize($key);
