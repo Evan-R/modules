@@ -1,6 +1,6 @@
 {
   "name": "selene/di",
-  "description": "selene di",
+  "description": "Selene Dependency Injection Component",
   "license": "MIT",
   "authors": [
     {
@@ -9,7 +9,8 @@
     }
   ],
   "require": {
-    "php":">=5.4.0"
+    "php":">=5.4.0",
+    "selene/common":"dev-development"
   },
   "require-dev": {
     "selene/testsuite":"dev-development"
