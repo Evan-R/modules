@@ -276,7 +276,7 @@ class RouteBuilder
         }
 
         $prefix = $this->getCurrentGroup()->getPrefix();
-        return ('/' === $prefix ? $prefix : (rtrim($prefix, '/').'/')) . trim($pattern, '/');
+        return rtrim(('/' === $prefix ? $prefix : (rtrim($prefix, '/').'/')) . trim($pattern, '/'), '/');
     }
 
     /**

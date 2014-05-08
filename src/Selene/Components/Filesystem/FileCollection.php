@@ -13,6 +13,7 @@ namespace Selene\Components\Filesystem;
 
 use \ArrayIterator;
 use \IteratorAggregate;
+use \Selene\Components\Common\Helper\ListHelper;
 use \Selene\Components\Common\Interfaces\JsonableInterface;
 use \Selene\Components\Common\Interfaces\ArrayableInterface;
 
@@ -161,7 +162,7 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
      */
     protected function expandPath($path, SplFileInfo $file, array &$data)
     {
-        arraySet($path, $file, $data, '/');
+        ListHelper::arraySet($data, $path, $file, '/');
     }
 
     /**

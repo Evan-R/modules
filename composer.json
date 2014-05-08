@@ -33,7 +33,7 @@
   "autoload": {
     "psr-4": {
       "Selene\\":"src/Selene/",
-      "App\\":"app"
+      "Application\\":"app"
     },
     "files": [
       "src/Selene/Components/Common/Helper/functions.php"

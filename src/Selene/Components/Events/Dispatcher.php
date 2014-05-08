@@ -14,6 +14,7 @@ namespace Selene\Components\Events;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
+use \Selene\Components\Common\Helper\ListHelper;
 
 /**
  * @class Dispatcher implements DispatcherInterface
@@ -168,7 +169,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     public function removeSubscriber(SubscriberInterface $subscriber)
     {
-        foreach ($subscriber::getSubscriptions() as $event => $handles) {
+        foreach ($subscriber->getSubscriptions() as $event => $handles) {
             foreach ($this->listSubscriptions($subscriber, $event, (array)$handles) as $subscription) {
                 array_pop($subscription);
                 call_user_func_array([$this, 'off'], $subscription);
@@ -248,7 +249,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
             $handlers = [];
 
             foreach ($this->handlers as $handler) {
-                $stack = ['stack' => &$handlers] + arrayPluck('eventHandler', $handler);
+                $stack = ['stack' => &$handlers] + ListHelper::arrayPluck('eventHandler', $handler);
                 call_user_func_array('array_push', $stack);
             }
 
@@ -258,7 +259,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         if (isset($this->handlers[$event])) {
             $this->sort($event);
 
-            return arrayPluck('eventHandler', $this->handlers[$event]);
+            return ListHelper::arrayPluck('eventHandler', $this->handlers[$event]);
         }
 
         return [];

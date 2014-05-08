@@ -21,6 +21,7 @@ use \Selene\Components\DI\Builder;
 use \Selene\Components\DI\Processor\Processor;
 use \Selene\Components\DI\Dumper\PhpDumper;
 use \Selene\Components\DI\Dumper\ContainerDumper;
+use \Selene\Components\DI\Parameters;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
 use \Selene\Components\Config\Cache as ConfigCache;
@@ -31,6 +32,9 @@ use \Selene\Components\Config\Resource\Locator;
 use \Selene\Components\Config\Resource\LoaderResolver;
 use \Selene\Components\Config\Resource\DelegatingLoader;
 use \Selene\Components\DI\Loader\XmlLoader;
+use \Selene\Components\DI\Loader\PhpLoader;
+use \Selene\Components\DI\Loader\CallableLoader;
+use \Selene\Components\Common\Helper\ListHelper;
 
 /**
  * @class Application implements HttpKernelInterface, TerminableInterface, ContainerAwareInterface
@@ -153,8 +157,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         $this->initializeContainer();
 
         $this->bootKernelStack();
-
-        $this->prepareControllers();
 
         $this->booted = true;
     }
@@ -326,22 +328,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
-     * prepareControllers
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function prepareControllers()
-    {
-        $router = $this->getKernel()->getRouter();
-        $resolver = $router->getControllerResolver();
-
-        foreach ($this->packages as $alias => $package) {
-            $resolver->registerNamespace($alias, $package->getNamespace());
-        }
-    }
-
-    /**
      * initializeContainer
      *
      * @access protected
@@ -382,7 +368,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     {
 
         $class = $this->getContainerClass();
-        $container = new $class;
+        $container = new $class(new Parameters($this->getDefaultParameters()));
 
         $this->setContainer($container);
         $this->container->setParameter('app.root', $this->getApplicationRoot());
@@ -402,7 +388,11 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
             $this->getApplicationRoot().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'packages'
         );
 
-        $resolver = new LoaderResolver([new XmlLoader($builder, $locator)]);
+        $resolver = new LoaderResolver([
+            new XmlLoader($builder, $locator),
+            new PhpLoader($builder, $locator),
+            new CallableLoader($builder, $locator)
+        ]);
 
         $loader = new DelegatingLoader($resolver);
 
@@ -440,8 +430,21 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     protected function getDefaultParameters()
     {
         return [
-            'app_kernel.root' => $this->getApplicationRoot()
+            'app_kernel.root' => $this->getApplicationRoot(),
+            'app.root' => $this->getApplicationRoot(),
+            'app.packages' => $this->getPackageInfo(),
         ];
+    }
+
+    protected function getPackageInfo()
+    {
+        $info = [];
+
+        foreach ($this->getLoadedPackages() as $alias => $package) {
+            $info[$alias] = $package->getNamespace();
+        }
+
+        return $info;
     }
 
     /**
@@ -530,7 +533,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      */
     protected function getPackageResources()
     {
-        $paths = arrayFlatten($this->packageProviders);
+        $paths = ListHelper::arrayFlatten($this->packageProviders);
         return $paths;
     }
 }

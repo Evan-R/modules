@@ -16,6 +16,7 @@ use \BadMethodCallException;
 use \InvalidArgumentException;
 use \Selene\Components\Common\Data\BaseList;
 use \Selene\Components\Common\Data\ListInterface;
+use \Selene\Components\Common\Helper\StringHelper;
 use \Selene\Components\DI\Definition\ClassDefinition;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 use \Selene\Components\DI\Definition\DefinitionInterface;
@@ -528,7 +529,7 @@ class Container implements ContainerInterface
      */
     public static function camelCaseStr($str)
     {
-        return strCamelCase($str, ['_' => ' ', '.' => 'Nss ', '\\' => 'Dbs ']);
+        return StringHelper::strCamelCase($str, ['_' => ' ', '.' => 'Nss ', '\\' => 'Dbs ']);
     }
 
     /**

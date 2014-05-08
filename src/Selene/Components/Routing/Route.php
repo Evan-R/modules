@@ -115,7 +115,11 @@ class Route implements Serializable
      */
     public function setBeforeFilters($filters)
     {
-        foreach (explode('|', $filters) as $filter) {
+        if (is_string($filters)) {
+            $filters = explode('|', $filters);
+        }
+
+        foreach ((array)$filters as $filter) {
             if (!in_array($filter, $this->requirements['_before'])) {
                 $this->requirements['_before'][] = trim((string)$filter);
             }
@@ -145,7 +149,12 @@ class Route implements Serializable
      */
     public function setAfterFilters($filters)
     {
-        foreach (explode('|', $filters) as $filter) {
+
+        if (is_string($filters)) {
+            $filters = explode('|', $filters);
+        }
+
+        foreach ((array)$filters as $filter) {
             if (!in_array($filter, $this->requirements['_after'])) {
                 $this->requirements['_after'][] = trim((string)$filter);
             }
@@ -398,6 +407,47 @@ class Route implements Serializable
 
         $this->requirements[$req] = $value;
 
+        return $this;
+    }
+
+    /**
+     * getRequirement
+     *
+     * @param mixed $requirement
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getRequirement($requirement)
+    {
+        $req = '_'.strtolower(trim($requirement, '_'));
+
+        return $this->getDefaultVar($this->requirements, $req);
+    }
+
+    /**
+     * getSchemes
+     *
+     *
+     * @access public
+     * @return array
+     */
+    public function getSchemes()
+    {
+        return $this->getDefaultVar($this->requirements, '_schemes', []);
+    }
+
+    /**
+     * setSchemes
+     *
+     * @param array $schemes
+     *
+     * @access public
+     * @return Route
+     */
+    public function setSchemes(array $schemes)
+    {
+        $this->requirements['_schemes'] = $schemes;
         return $this;
     }
 
@@ -666,7 +716,7 @@ class Route implements Serializable
      */
     public function getVars()
     {
-        return $this->getDefaultVar($this->compiledArgs, 'vars');
+        return $this->getDefaultVar($this->compiledArgs, 'vars', []);
     }
 
     /**
@@ -678,7 +728,7 @@ class Route implements Serializable
      */
     public function getHostVars()
     {
-        return $this->getDefaultArray($this->compiledArgs, 'host.vars');
+        return $this->getDefaultArray($this->compiledArgs, 'host.vars', []);
     }
 
     /**

@@ -13,8 +13,10 @@ namespace Selene\Components\Xml;
 
 use \Selene\Components\Xml\DOM\DOMElement;
 use \Selene\Components\Xml\DOM\DOMDocument;
+use \Selene\Components\Xml\Traits\XmlHelperTrait;
 use \Selene\Components\Xml\Normalizer\Normalizer;
 use \Selene\Components\Xml\Normalizer\NormalizerInterface;
+use \Selene\Components\Common\Helper\ListHelper;
 
 /**
  * @class Writer
@@ -26,6 +28,8 @@ use \Selene\Components\Xml\Normalizer\NormalizerInterface;
  */
 class Writer
 {
+    use XmlHelperTrait;
+
     /**
      * dom
      *
@@ -261,7 +265,7 @@ class Writer
             return;
         }
 
-        if (isTraversable($data) && !isXmlElement($data)) {
+        if (isTraversable($data) && !$this->isXmlElement($data)) {
             $this->buildXmlFromTraversable($dom, $DOMNode, $normalizer->ensureBuildable($data));
         } else {
             $this->setElementValue($dom, $DOMNode, $data);
@@ -281,7 +285,7 @@ class Writer
     protected function buildXmlFromTraversable(\DOMDocument $dom, \DOMNode $DOMNode, $data)
     {
         $normalizer = $this->getNormalizer();
-        $isIndexedArray = arrayIsList($data);
+        $isIndexedArray = ListHelper::arrayIsList($data);
         $hasAttributes = false;
 
         foreach ($data as $key => $value) {
@@ -306,7 +310,7 @@ class Writer
             if (is_array($value) && !is_int($key)) {
 
 
-                if (arrayIsList($value)) {
+                if (ListHelper::arrayIsList($value)) {
                     if (($skey = $this->inflect($key)) && ($key !== $skey)) {
                         $parentNode = $dom->createElement($key);
                         foreach ($value as $arrayValue) {

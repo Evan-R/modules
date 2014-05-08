@@ -23,6 +23,7 @@ use \Selene\Components\Config\Loader\DelegatingLoader;
 use \Selene\Components\Config\Loader\Resolver as LoaderResolver;
 use \Selene\Components\Config\Locator\FileLocator;
 use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
+use \Selene\Components\Common\Helper\StringHelper;
 
 /**
  * @abstract class Package implements PackageInterface, ContainerAwareInterface
@@ -110,7 +111,7 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
     public function getConfiguration()
     {
         $class = $this->getNamespace() . '\\Config\\Config';
-        return new $class;
+        return new $class($this->getPath());
     }
 
     /**
@@ -136,7 +137,7 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
             $name = $this->getName();
             $base = 0 !== strrpos($name, 'Package') ? substr($name, 0, -strlen('Package')) : $name;
 
-            $this->alias = strLowDash($base);
+            $this->alias = StringHelper::strLowDash($base);
         }
 
         return $this->alias;

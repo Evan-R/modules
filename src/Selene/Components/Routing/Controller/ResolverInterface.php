@@ -19,4 +19,8 @@ namespace Selene\Components\Routing\Controller;
 interface ResolverInterface
 {
     public function find($action, $method);
+
+    public function registerNamespace($alias, $namespace);
+
+    public function registerNamespaces(array $namespace);
 }

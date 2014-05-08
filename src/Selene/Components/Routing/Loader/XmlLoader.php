@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Loader package
+ * This File is part of the Selene\Components\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -11,56 +11,22 @@
 
 namespace Selene\Components\Routing\Loader;
 
-use \Selene\Components\Routing\RouteBuilder;
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
-use \Selene\Components\DI\Loader\ConfigLoader;
 use \Selene\Components\Config\Traits\XmlLoaderHelperTrait;
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\Xml\Builder;
-use \Selene\Components\Xml\Traits\XmlLoaderTrait;
-use \Selene\Components\Config\Resource\Loader;
-use \Selene\Components\Config\Resource\Locator;
 
 /**
- * @class XmlLoader
- * @package Selene\Components\Routing\Loader
+ * @class XmlLoader extends RoutingLoader XmlLoader
+ * @see RoutingLoader
+ *
+ * @package Selene\Components\Routing
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
-class XmlLoader extends Loader
+class XmlLoader extends RoutingLoader
 {
     use XmlLoaderHelperTrait;
-
-    protected $builder;
-
-    /**
-     * container
-     *
-     * @var mixed
-     */
-    protected $container;
-    protected $locator;
-
-    /**
-     * @param ContainerInterface $container
-     * @param mixed $routerService
-     *
-     * @access public
-     * @return mixed
-     */
-    public function __construct(BuilderInterface $builder, Locator $locator)
-    {
-        $this->builder = $builder;
-        $this->container = $builder->getContainer();
-        $this->routes = new RouteBuilder;
-
-        //if ($this->container->hasDefinition('routes')) {
-            //$this->container->get('routes')->merge($this->;
-        //}
-
-        parent::__construct($locator);
-    }
 
     /**
      * load
@@ -70,36 +36,19 @@ class XmlLoader extends Loader
      * @access public
      * @return mixed
      */
-    public function load($resource)
+    protected function doLoad($file)
     {
-        if (!($file = $this->locator->locate($resource))) {
+        $xml = $this->loadXml($file);
+        $this->parseRoutes($xml);
+    }
+
+    protected function setRequirement($route, array $data, $attribute)
+    {
+        if (!isset($data[$attribute])) {
             return;
         }
 
-        $xml = $this->loadXml($file);
-
-        $this->builder->addFileResource($file);
-
-        $this->parseRoutes($xml);
-
-        if (!$this->container->hasDefinition('routes')) {
-            $this->container->define('routes', '\Selene\Components\Routing\RouteCollection');
-        }
-
-        $routes = $this->container->get('routes');
-
-        $this->container->get('routes')->merge($this->routes->getRoutes());
-    }
-
-    /**
-     * getRouteCollectionClass
-     *
-     * @access protected
-     * @return string
-     */
-    protected function getRouteCollectionClass()
-    {
-        return '\Selene\Components\Routing\RouteCollection';
+        $route->setRequirement('_'.$attribute, $data[$attribute]);
     }
 
     /**
@@ -128,13 +77,41 @@ class XmlLoader extends Loader
         $values = $this->getParser()->parseDomElement($node);
         $route = $this->routes->define($values['method'], $values['name'], $values['pattern']);
 
+        $this->setRequirement($route, $values, 'host');
+
         $route->setAction($values['action']);
 
+        $filterNodes = $node->getElementsByTagName('filters');
+
+        if (isset($values['filters'])) {
+            $this->setRouteFilters($route, $values['filters']);
+        }
+
+    }
+
+    /**
+     * setRouteFilters
+     *
+     * @param mixed $route
+     * @param mixed $filters
+     *
+     * @access protected
+     * @return void
+     */
+    protected function setRouteFilters($route, $filters)
+    {
+        foreach ($filters as $key => $filter) {
+            if ('before' === $key) {
+                $route->setBeforeFilters($filter);
+            } elseif ('after' === $key) {
+                $route->setAfterFilters($filter);
+            }
+        }
     }
 
     protected function parseGroups(DOMElement $routes)
     {
-        return null;
+        //var_dump($routes);
     }
 
     protected function parseResources(DOMElement $routes)

@@ -304,7 +304,8 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
             throw new \InvalidArgumentException('cannot add prototype scope to a container scope');
         }
 
-        $this->scope = !$this->scope ? $scope : $this->scope | $scope;
+        $this->scope |= $scope;
+        //$this->scope = !$this->scope ? $scope : $this->scope | $scope;
         return $this;
     }
 

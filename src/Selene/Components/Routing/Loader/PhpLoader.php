@@ -33,15 +33,11 @@ class PhpLoader extends RoutingLoader
      * @access public
      * @return mixed
      */
-    public function load($resource)
+    protected function doLoad($file)
     {
-        $routes = new RouteBuilder;
+        $routes = $this->routes;
 
-        include $resource;
-
-        $this->routes->merge($routes->getRoutes());
-
-        $this->container->addFileResource($resource);
+        include $file;
     }
 
     /**
@@ -52,8 +48,8 @@ class PhpLoader extends RoutingLoader
      * @access public
      * @return boolean
      */
-    public function supports($format)
+    public function supports($resource)
     {
-        return 'php' === $format;
+        return is_string($resource) && 'php' ===  pathinfo(strtolower($resource), PATHINFO_EXTENSION);
     }
 }

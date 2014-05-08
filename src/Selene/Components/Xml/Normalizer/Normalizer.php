@@ -14,6 +14,7 @@ namespace Selene\Components\Xml\Normalizer;
 use \ReflectionObject;
 use \ReflectionMethod;
 use \ReflectionProperty;
+use \Selene\Components\Xml\Traits\XmlHelperTrait;
 
 /**
  * @class Normalizer implements NormalizerInterface
@@ -26,6 +27,8 @@ use \ReflectionProperty;
  */
 class Normalizer implements NormalizerInterface
 {
+    use XmlHelperTrait;
+
     /**
      * objectCache
      *
@@ -434,18 +437,6 @@ class Normalizer implements NormalizerInterface
     public function addIgnoredObject($classname)
     {
         $this->ignoredObjects[] = preg_replace('~^\\\~', '', strtolower($classname));
-    }
-
-    /**
-     * isXMLElement
-     *
-     * @param mixed $data
-     * @access public
-     * @return boolean
-     */
-    public function isXMLElement($data)
-    {
-        return $data instanceof \SimpleXMLElement || $data instanceof \DOMNode;
     }
 
     /**

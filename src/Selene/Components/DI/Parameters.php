@@ -11,6 +11,7 @@
 
 namespace Selene\Components\DI;
 
+use \Selene\Components\Common\Helper\StringHelper;
 use \Selene\Components\DI\Exception\ParameterNotFoundException;
 use \Selene\Components\DI\Exception\ParameterResolvingException;
 
@@ -295,7 +296,7 @@ class Parameters implements ParameterInterface
             return $string;
         }
 
-        $keys = explode(',', strWrapStr(implode('%,%', array_keys($this->parameters)), '%'));
+        $keys = explode(',', StringHelper::strWrap(implode('%,%', array_keys($this->parameters)), '%'));
         $this->checkReferenceViolation($string, $this->resolving);
 
         if (in_array($string, $keys)) {
@@ -326,7 +327,7 @@ class Parameters implements ParameterInterface
     public function escape($value)
     {
         if (is_string($value)) {
-            return strEscapeStr($value, '%');
+            return StringHelper::strEscape($value, '%');
         }
 
         if (is_array($value)) {
@@ -352,7 +353,7 @@ class Parameters implements ParameterInterface
     public function unescape($value)
     {
         if (is_string($value)) {
-            return strUnescapeStr($value, '%');
+            return StringHelper::strUnescape($value, '%');
         }
 
         if (is_array($value)) {

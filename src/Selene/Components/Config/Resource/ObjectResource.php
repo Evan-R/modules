@@ -26,7 +26,7 @@ class ObjectResource extends FileResource implements ObjectResourceInterface
 
     public function __construct($resource)
     {
-        if (!is_object($resource)) {
+        if (!is_object($resource) || $resource instanceof \Closure) {
             throw \InvalidArgumentException('resource must be an object');
         }
 

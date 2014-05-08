@@ -23,9 +23,9 @@ use \Selene\Components\DI\Resolve\ResolveStrategyCollection;
  */
 interface ContainerInterface
 {
-    const SCOPE_CONTAINER = 'container';
+    const SCOPE_CONTAINER = 99;
 
-    const SCOPE_PROTOTYPE = 'prototype';
+    const SCOPE_PROTOTYPE = 112;
 
     const SERVICE_REF_INDICATOR = '$';
 

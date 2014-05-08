@@ -22,7 +22,7 @@ class EventSubscriberStub implements SubscriberInterface
 {
     public static $event;
 
-    public static function getSubscriptions()
+    public function getSubscriptions()
     {
         return [
             'foo.event' => [

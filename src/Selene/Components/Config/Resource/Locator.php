@@ -46,12 +46,12 @@ class Locator implements LocatorInterface
 
         foreach ($this->paths as $path) {
 
-            if (!($file = $this->locateResource($path, $file, $collection, $files))) {
+            if (!($resource = $this->locateResource($path, $file, $collection, $files))) {
                 continue;
             }
 
             if (true !== $collection) {
-                return $file;
+                return $resource;
             }
         }
 
@@ -110,13 +110,15 @@ class Locator implements LocatorInterface
     {
         $dir = $this->getFullPath($path);
 
+        var_dump($file);
+
         if (!is_dir($dir)) {
             return false;
         }
 
         if (file_exists($resource = $dir . DIRECTORY_SEPARATOR . $file)) {
 
-            if (true !== $collect) {
+            if (!$collect) {
                 return $resource;
             }
 

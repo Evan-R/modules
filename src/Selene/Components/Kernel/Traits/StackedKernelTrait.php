@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Kernel\Traits;
 
+use \Symfony\Component\HttpKernel\HttpKernelInterface;
+
 /**
  * @trait StackedKernelTrait
  *
@@ -22,6 +24,13 @@ namespace Selene\Components\Kernel\Traits;
 trait StackedKernelTrait
 {
     private $kernel;
+
+    /**
+     * priority
+     *
+     * @var int
+     */
+    protected $priority;
 
     /**
      * setKernel
@@ -56,6 +65,6 @@ trait StackedKernelTrait
      */
     public function getPriority()
     {
-        return $this->priority;
+        return $this->priority ?: 1000;
     }
 }

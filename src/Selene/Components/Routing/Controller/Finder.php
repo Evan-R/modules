@@ -86,8 +86,8 @@ class Finder implements ResolverInterface, ContainerAwareInterface
      */
     public function registerNamespaces(array $namespaces)
     {
-        foreach ($namespaces as $alias => $namespaces) {
-            $this->registerNamesapce($alias, $namespace);
+        foreach ($namespaces as $alias => $namespace) {
+            $this->registerNamespace($alias, $namespace);
         }
     }
 
