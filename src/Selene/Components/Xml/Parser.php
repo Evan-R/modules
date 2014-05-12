@@ -13,6 +13,7 @@ namespace Selene\Components\Xml;
 
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
+use \Selene\Components\Common\Helper\StringHelper;
 use \Selene\Components\Common\Traits\Getter;
 use \Selene\Components\Xml\Loader\Loader;
 use \Selene\Components\Xml\Loader\LoaderInterface;
@@ -32,6 +33,13 @@ class Parser implements ParserInterface
      * @var mixed
      */
     private $pluralizer;
+
+    /**
+     * keyNormalizer
+     *
+     * @var callable
+     */
+    private $keyNormalizer;
 
     /**
      * options
@@ -101,6 +109,19 @@ class Parser implements ParserInterface
     public function getAttributesKey()
     {
         return $this->getDefault($this->options, 'attribute_key', '@attributes');
+    }
+
+    /**
+     * setKeyNormalizer
+     *
+     * @param callable $normalizer
+     *
+     * @access public
+     * @return void
+     */
+    public function setKeyNormalizer(callable $normalizer)
+    {
+        $this->keyNormalizer = $normalizer;
     }
 
     /**
@@ -301,6 +322,23 @@ class Parser implements ParserInterface
     }
 
     /**
+     * normalizeKey
+     *
+     * @param mixed $key
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function normalizeKey($key)
+    {
+        if (null !== $this->keyNormalizer) {
+            return call_user_func($this->keyNormalizer, $key);
+        }
+
+        return strtr(StringHelper::strLowDash($key), ['-' => '_']);
+    }
+
+    /**
      * convert boolish and numeric values
      *
      * @param mixed $text
@@ -330,7 +368,7 @@ class Parser implements ParserInterface
             $prefix = $child->prefix ?: null;
             $nsURL = $child->namespaceURI ?: null;
 
-            $oname = $child->nodeName;
+            $oname = $this->normalizeKey($child->nodeName);
             $name = null === $prefix ? $oname : $this->prefixKey($oname, $prefix);
 
             if (isset($result[$name])) {
@@ -403,10 +441,12 @@ class Parser implements ParserInterface
 
             $value = static::getPhpValue($attribute->nodeValue, null, $this);
 
+            $name = $this->normalizeKey($attribute->nodeName);
+
             if ($prefix = $attribute->prefix) {
-                $attName = $this->prefixKey($attribute->nodeName, $prefix);
+                $attName = $this->prefixKey($name, $prefix);
             } else {
-                $attName  = $attribute->nodeName;
+                $attName  = $name;
             }
 
             $attrs[$attName] = $value;

@@ -73,6 +73,28 @@ $parser->setMergeAttributes(true);
 
 ```
 
+### Normalizing keys
+
+You my specifay how keys are transformed by setting a key normalizer callback.
+
+The default normalizer transforms dashes to underscores and camelcase to snakecase notation.
+
+```php
+<?php
+
+use \Selene\Components\Xml\Parser;
+
+$parser = new Parser;
+
+$parser->setKeyNormalizer(function ($key) {
+	// do string transfomations
+	return $key;
+});
+
+$parser->parseDomElement($element);
+
+```
+
 ### Set the attributes key
 
 If attribute merging is disabled, use this to change the default attributes key
