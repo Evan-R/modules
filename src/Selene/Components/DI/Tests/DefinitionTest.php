@@ -53,12 +53,12 @@ class DefinitionTest extends TestCase
      */
     public function testDefinitionAddScope()
     {
-        $scope = 'controller';
+        $scope = ContainerInterface::SCOPE_CONTAINER;
 
         $definition = new ServiceDefinition('StdClass');
         $definition->addScope($scope);
 
-        $this->assertSame('controller', $scope & $definition->getScope());
+        $this->assertSame(ContainerInterface::SCOPE_CONTAINER, $scope & $definition->getScope());
     }
 
     /**

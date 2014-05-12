@@ -51,7 +51,7 @@ class CallableLoader extends Loader
      * @access public
      * @return void
      */
-    public function load($resource)
+    public function load($callable)
     {
         $resource = $this->findResourceOrigin($callable);
 

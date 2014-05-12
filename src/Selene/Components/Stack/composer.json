@@ -1,0 +1,24 @@
+{
+  "name": "selene/stack",
+  "description": "Selene Kernel Stack Component",
+  "require": {
+    "php":">=5.4.0",
+    "selene/common":"dev-development"
+  },
+  "require-dev": {
+    "symfony/http-kernel": "~2.4.0",
+    "symfony/http-foundation": "~2.4.0",
+    "mockery/mockery": "dev-master"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+    "name": "Thomas Appel",
+    "email": "mail@thomas-appel.com"
+  }
+  ],
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-0": {"Selene\\Components\\Stack\\": ""}
+  }
+}

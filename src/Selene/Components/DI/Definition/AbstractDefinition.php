@@ -353,39 +353,25 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @access public
      * @return DefinitionInterace this instance.
      */
-    public function addFlag($flag)
+    public function addFlag($name, array $arguments = [])
     {
-        $this->flags[] = new Flag($flag, $this);
-        return $this;
-    }
-
-    /**
-     * @param array $flags
-     *
-     * @access public
-     * @return mixed
-     */
-    public function addFlags(array $flags)
-    {
-        foreach ($flags as $flag) {
-            $this->addFlag($flag);
-        }
+        $flag = new Flag($name, $arguments);
+        $this->flags[$flag->getName()] = $flag;
 
         return $this;
     }
 
     /**
-     * setFlags
+     * getFlag
      *
-     * @param array $flags
+     * @param mixed $name
      *
      * @access public
      * @return mixed
      */
-    public function setFlags(array $flags)
+    public function getFlag($name)
     {
-        $this->flags = [];
-        return $this->addFlags($flags);
+        return $this->hasFlag($name) ? $this->flags[$name] : null;
     }
 
     /**
@@ -398,7 +384,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      */
     public function hasFlag($flag)
     {
-        return in_array($flag, $this->flags);
+        return isset($this->flags[$flag]);
     }
 
     /**

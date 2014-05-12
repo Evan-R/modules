@@ -11,6 +11,8 @@
 
 namespace Selene\Components\DI\Definition;
 
+use \Selene\Components\Common\Traits\Getter;
+
 /**
  * @class Flag
  * @package Selene\Components\DI\Definition
@@ -18,14 +20,48 @@ namespace Selene\Components\DI\Definition;
  */
 class Flag implements FlagInterface
 {
-    protected $name;
+    use Getter;
 
-    protected $definition;
+    /**
+     * arguments
+     *
+     * @var array
+     */
+    protected $arguments;
 
-    public function __construct($name, DefinitionInterface $definition)
+    /**
+     * @param mixed $name
+     * @param array $arguments
+     *
+     * @access public
+     */
+    public function __construct($name, array $arguments = [])
     {
-        $this->name = $name;
-        $this->definition = $definition;
+        if (is_array($name)) {
+            $arguments = array_merge($arguments, $name);
+        } else {
+            $arguments['name'] = $name;
+        }
+
+        if (!isset($arguments['name'])) {
+            throw new \InvalidArgumentException('no name given');
+        }
+
+        $this->arguments = $arguments;
+    }
+
+    /**
+     * get
+     *
+     * @param mixed $argument
+     * @param mixed $default
+     *
+     * @access public
+     * @return mixed
+     */
+    public function get($argument, $default = null)
+    {
+        return $this->getDefault($this->arguments, $argument, $default);
     }
 
     /**
@@ -36,18 +72,7 @@ class Flag implements FlagInterface
      */
     public function getName()
     {
-        return $this->name;
-    }
-
-    /**
-     * getDefinition
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getDefinition()
-    {
-        return $this->definition;
+        return $this->getDefault($this->arguments, 'name');
     }
 
     /**
@@ -56,6 +81,6 @@ class Flag implements FlagInterface
      */
     public function __toString()
     {
-        return $this->name;
+        return $this->getName();
     }
 }

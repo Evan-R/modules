@@ -13,18 +13,31 @@ namespace Selene\Components\DI;
 
 /**
  * @interface BuilderInterface
+ *
  * @package Selene\Components\DI
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 interface BuilderInterface
 {
-    /**
-     * getContainer
-     *
-     * @access public
-     * @return mixed
-     */
+    public function build();
+
+    public function merge(BuilderInterface $builder);
+
+    public function addFileResource($file);
+
+    public function addObjectResource($object);
+
+    public function addExtensionConfig($extension, array $config);
+
+    public function replaceContainer(ContainerInterface $container);
+
     public function getContainer();
 
     public function getProcessor();
+
+    public function getExtensionConfig($extension);
+
+    public function getExtensionConfigs();
 }

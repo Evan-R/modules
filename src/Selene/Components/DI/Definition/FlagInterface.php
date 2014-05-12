@@ -18,4 +18,7 @@ namespace Selene\Components\DI\Definition;
  */
 interface FlagInterface
 {
+    public function get($argument, $default = null);
+
+    public function getName();
 }

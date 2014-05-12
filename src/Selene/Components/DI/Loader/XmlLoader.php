@@ -59,9 +59,9 @@ class XmlLoader extends Loader
      */
     public function load($resource)
     {
-        $file = $this->locator->locate($resource, false);
-
-        $this->checkPathIntegrity($file);
+        if (!$this->checkPathIntegrity($file = $this->locator->locate($resource, false))) {
+            return;
+        }
 
         $this->builder->addFileResource($file);
 
@@ -140,11 +140,7 @@ class XmlLoader extends Loader
      */
     protected function checkPathIntegrity($path)
     {
-        if (stream_is_local($path) && is_file($path)) {
-            return true;
-        }
-
-        throw new \RuntimeException(sprintf('resource "%s" is not a local file', $path));
+        return stream_is_local($path) && is_file($path);
     }
 
     /**
@@ -291,7 +287,8 @@ class XmlLoader extends Loader
         }
 
         foreach ($service->xpath('flags/flag') as $flagNode) {
-            $def->addFlag($flag = $flagNode->nodeValue);
+            $attrs = $this->getParser()->parseDomElement($flagNode);
+            $def->addFlag($attrs);
         }
 
         if ($class = $this->getAttributeValue($service, 'class', false)) {

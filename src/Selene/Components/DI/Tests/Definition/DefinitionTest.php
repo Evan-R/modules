@@ -121,8 +121,17 @@ abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($def->hasSetters());
         $this->assertEquals([['setFoo' =>  ['foo']], ['setBar' => ['bar']]], $def->getSetters());
 
-        var_dump(json_encode($def));
-        //var_dump($def->toJson());
+    }
+
+    /** @test */
+    public function itShouldBeFlagable()
+    {
+        $def = $this->createDefinition('bar');
+
+        $def->addFlag('foo');
+
+        $this->assertTrue($def->hasFlag('foo'));
+        $this->assertInstanceof('\Selene\Components\DI\Definition\FlagInterface', $flag = $def->getFlag('foo'));
     }
 
     abstract protected function createDefinition($class = null, $arguments = [], $scope = null);

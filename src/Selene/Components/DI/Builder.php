@@ -12,8 +12,6 @@
 namespace Selene\Components\DI;
 
 use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\Common\Data\BaseList;
-use \Selene\Components\Common\Data\ListInterface;
 use \Selene\Components\DI\Dumper\ContainerDumper;
 use \Selene\Components\DI\Processor\Processor;
 use \Selene\Components\DI\Processor\ProcessorInterface;
@@ -36,38 +34,37 @@ class Builder implements BuilderInterface
     /**
      * processor
      *
-     * @var mixed
+     * @var \Selene\Components\DI\Processor\ProcessorInterface
      */
     protected $processor;
 
     /**
      * container
      *
-     * @var mixed
+     * @var \Selene\Components\DI\ContainerInterface
      */
     protected $container;
 
     /**
-     * extensions
+     * resources
      *
-     * @var ListInterface
+     * @var array
      */
     protected $resources;
 
     /**
-     * container
+     * extensions
      *
      * @var array
      */
     protected $extensions;
 
     /**
-     * __construct
+     * Create a new Builder instance.
      *
      * @param Dumper $dumper
      *
      * @access public
-     * @return mixed
      */
     public function __construct(
         ContainerInterface $container,
@@ -76,34 +73,45 @@ class Builder implements BuilderInterface
     ) {
         $this->container = $container;
         $this->processor = $processor ?: new Processor;
-        $this->resources = $resources ?: new BaseList;
+        $this->resources = $resources ?: [];
 
         $this->extensions = [];
     }
 
     /**
-     * getContainer
+     * Get the current DI Container
      *
      * @access public
-     * @return mixed
+     * @return \Selene\Components\DI\ContainerInterface
      */
     public function getContainer()
     {
         return $this->container;
     }
 
+    /**
+     * Replaces the current DI Container.
+     *
+     * @param \Selene\Components\DI\ContainerInterface $container a new
+     * container.
+     *
+     * @access public
+     * @return void
+     */
     public function replaceContainer(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
     /**
-     * merge
+     * Merges two builder instances, including resources.
      *
-     * @param BuilderInterface $builder
+     * This will merge the containers, resources, configs and parameters.
+     *
+     * @param \Selene\Components\DI\BuilderInterface $builder
      *
      * @access public
-     * @return mixed
+     * @return voi
      */
     public function merge(BuilderInterface $builder)
     {
@@ -114,10 +122,10 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * getProcessor
+     * Get the current Container Processor.
      *
      * @access public
-     * @return mixed
+     * @return \Selene\Components\DI\Processor\ProcessorInterface
      */
     public function getProcessor()
     {
@@ -125,11 +133,10 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * build
-     *
+     * Starts Building the DI Container.
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function build()
     {
@@ -139,37 +146,36 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * addFileResource
+     * Add a file resource to track.
      *
-     * @param mixed $file
+     * @param string $file Path to a file
      *
      * @access public
      * @return void
      */
     public function addFileResource($file)
     {
-        $this->resources->add(new FileResource($file));
+        $this->resources[] = new FileResource($file);
     }
 
     /**
-     * addObjectResource
+     * Add an object resource to track.
      *
-     * @param mixed $object
+     * @param object $object any serilizable objet.
      *
      * @access public
      * @return void
      */
     public function addObjectResource($object)
     {
-        $this->resources->add(new ObjectResource($object));
+        $this->resources[] = new ObjectResource($object);
     }
 
     /**
-     * getResources
-     *
+     * Dump all tracked resources.
      *
      * @access public
-     * @return mixed
+     * @return array
      */
     public function getResources()
     {
@@ -177,13 +183,13 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * addExtensionConfig
+     * Add a extension configuration array.
      *
-     * @param mixed $extension
-     * @param array $config
+     * @param string $extension the extension id
+     * @param array $config the config array
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function addExtensionConfig($extension, array $config)
     {
@@ -191,9 +197,9 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * getExtensionConfig
+     * Get all config arrays for a given extension id.
      *
-     * @param mixed $extension
+     * @param string $extension the extension id.
      *
      * @access public
      * @return array
@@ -204,9 +210,7 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * getExtensionConfigs
-     *
-     * @param mixed $extension
+     * Get all extension config arrays.
      *
      * @access public
      * @return array
@@ -217,10 +221,12 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * __call
+     * Forward member calls to the container.
      *
-     * @param mixed $method
-     * @param mixed $arguments
+     * @param string $method
+     * @param array $arguments
+     *
+     * @throws \BadMethodCallException if the method does not exist.
      *
      * @access public
      * @return mixed
@@ -235,14 +241,14 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * mergeExtensionConfigs
+     * Merge extension configs.
      *
-     * @param mixed $builder
+     * @param \Selene\Components\DI\BuilderInterface $builder
      *
      * @access protected
-     * @return mixed
+     * @return void
      */
-    protected function mergeExtensionConfigs($builder)
+    protected function mergeExtensionConfigs(BuilderInterface $builder)
     {
         foreach ($builder->getExtensionConfigs() as $extension => $config) {
             $this->extensions[$extension] = array_merge($this->getExtensionConfig($extension), $config);
@@ -250,17 +256,17 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * mergeResources
+     * Merge resources.
      *
-     * @param mixed $builder
+     * @param \Selene\Components\DI\BuilderInterface $builder
      *
      * @access protected
-     * @return mixed
+     * @return void
      */
-    protected function mergeResources($builder)
+    protected function mergeResources(BuilderInterface $builder)
     {
-        $this->resources = new BaseList(array_unique(
-            array_merge($this->resources->toArray(), $builder->getResources()->toArray())
-        ));
+        $this->resources = array_unique(
+            array_merge($this->resources, $builder->getResources())
+        );
     }
 }
