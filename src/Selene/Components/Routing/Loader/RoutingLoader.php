@@ -95,9 +95,6 @@ abstract class RoutingLoader extends Loader
         $routes = $this->container->get('routes');
 
         $this->container->get('routes')->merge($this->routes->getRoutes());
-
-
-        var_dump($this->container->get('routes'));
     }
 
     /**

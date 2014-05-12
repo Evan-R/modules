@@ -12,7 +12,8 @@
 namespace Selene\Adapters\Twig;
 
 use \Twig_Environment as TwigEnvironment;
-use \Selene\Components\View\EngineInterface;
+use \Selene\Components\View\Template\EngineInterface;
+use \Selene\Components\View\Template\ResolverInterface;
 
 /**
  * @class TwigEngine implements EngineInterface
@@ -48,7 +49,7 @@ class TwigEngine implements EngineInterface
     public function __construct(TwigEnvironment $twig, ResolverInterface $templateResolver)
     {
         $this->env = $twig;
-        $this->templateResolver;
+        $this->templateResolver = $templateResolver;
     }
 
     /**
@@ -73,7 +74,7 @@ class TwigEngine implements EngineInterface
      * @access public
      * @return boolean
      */
-    public function supports($extension)
+    public function supports($name)
     {
         return $name instanceof \Twig_Template ? true : 'twig' === $this->templateResolver->resolve($name)->getEngine();
     }

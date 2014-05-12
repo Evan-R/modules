@@ -11,9 +11,16 @@
 
 namespace Selene\Components\View;
 
-interface EngineResolverInterface
-{
-    public function resolve($template);
+use \Selene\Components\View\Template\EngineInterface;
 
-    public function addEngine(EngineInterface $engine);
+/**
+ * @interface ManagerInterface
+ * @package Selene\Components\View
+ * @version $Id$
+ */
+interface ManagerInterface
+{
+    public function registerEngine(EngineInterface $engine);
+
+    public function findEngine($template);
 }

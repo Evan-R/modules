@@ -112,6 +112,26 @@ class ListHelper
         return $input;
     }
 
+    public static function arrayUnset(array &$array, $namespace, $separator = '.')
+    {
+        if (!is_string($namespace)) {
+            return $array;
+        }
+
+        $keys = explode($separator, $namespace);
+
+        while (($count = count($keys)) > 0 and !is_null($array)) {
+            $key = array_shift($keys);
+            if (isset($array[$key])) {
+                if ($count < 2) {
+                    unset($array[$key]);
+                } else {
+                    $array =& $array[$key];
+                }
+            }
+        }
+    }
+
     /**
      * @see http://www.php.net/manual/en/function.array-walk.php
      * @return array

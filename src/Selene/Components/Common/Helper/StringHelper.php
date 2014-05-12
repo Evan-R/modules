@@ -170,11 +170,11 @@ class StringHelper
      * @access public
      * @return array
      */
-    public function strrposSplit($string, $char)
+    public static function strrposSplit($string, $char)
     {
         $pos = strrpos($string, $char);
 
-        return [substr($string, 0, $pos - 1), substr($string, $pos)];
+        return [substr($string, 0, $pos), substr($string, $pos + 1)];
     }
 
     /**
@@ -186,13 +186,12 @@ class StringHelper
      * @access public
      * @return array
      */
-    public function strposSplit($string, $char)
+    public static function strposSplit($string, $char)
     {
         $pos = strpos($string, $char);
 
-        return [substr($string, 0, $pos - 1), substr($string, $pos)];
+        return [substr($string, 0, $pos), substr($string, $pos + 1)];
     }
-
 
     /**
      * strPad
@@ -339,7 +338,7 @@ class StringHelper
      */
     public static function strEndsWith($string, $sequence)
     {
-        return (strlen($string) - strlen($sequence)) === strpos($string, $sequence);
+        return 0 === strcmp($sequence, (substr($string, - strlen($sequence))));
     }
 
     /**
@@ -352,7 +351,7 @@ class StringHelper
      */
     public static function striEndsWith($string, $sequence)
     {
-        return (strlen($string) - strlen($sequence)) === stripos($string, $sequence);
+        return 0 === strcasecmp($sequence, (substr($string, - strlen($sequence))));
     }
 
     /**

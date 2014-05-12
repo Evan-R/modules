@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Controller package
+ * This File is part of the Selene\Components\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -13,32 +13,41 @@ namespace Selene\Components\Routing\Controller;
 
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
+use \Selene\Components\DI\Exception\ContainerResolveException;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
+use \Selene\Components\Common\SeparatorParserInterface;
 
 /**
- * @class Finder
- * @package Selene\Components\Routing\Controller
+ * @class Resolver implements ResolverInterface, ContainerAwareInterface
+ * @see ResolverInterface
+ * @see ContainerAwareInterface
+ *
+ * @package Selene\Components\Routing
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
-class Finder implements ResolverInterface, ContainerAwareInterface
+class Resolver implements ResolverInterface, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
     /**
-     * packages
+     * parser
      *
-     * @var array
+     * @var ResolverParser
      */
-    protected $namespaces;
+    protected $parser;
 
     /**
      * @param ContainerInterface $container
+     * @param SeparatorParserInterface $parser
      *
      * @access public
      */
-    public function __construct(ContainerInterface $container = null)
+    public function __construct(ContainerInterface $container = null, SeparatorParserInterface $parser = null)
     {
         $this->container = $container;
+        $this->parser    = $parser ?: new ResolverParser;
     }
 
     /**
@@ -71,9 +80,9 @@ class Finder implements ResolverInterface, ContainerAwareInterface
      * @access public
      * @return void
      */
-    public function registerNamespace($alias, $namespace)
+    public function setNamespaceAlias($alias, $namespace)
     {
-        $this->namespaces[$alias] = $namespace;
+        $this->parser->setNamespaceAlias($alias, $namespace);
     }
 
     /**
@@ -84,24 +93,12 @@ class Finder implements ResolverInterface, ContainerAwareInterface
      * @access public
      * @return void
      */
-    public function registerNamespaces(array $namespaces)
+    public function setNamespaceAliases(array $namespaces)
     {
         foreach ($namespaces as $alias => $namespace) {
-            $this->registerNamespace($alias, $namespace);
+            $this->setNamespaceAlias($alias, $namespace);
         }
     }
-
-    /**
-     * hasPackages
-     *
-     * @access protected
-     * @return boolean
-     */
-    protected function hasControllerNamespaces()
-    {
-        return null !== $this->namespaces;
-    }
-
 
     /**
      * getControllerAction
@@ -123,10 +120,18 @@ class Finder implements ResolverInterface, ContainerAwareInterface
 
         $instance = null;
 
-        if ($this->container && $this->container->hasDefinition($controller)) {
-            $instance = $this->container->get($controller);
-        } elseif (class_exists($controller)) {
+        if (class_exists($controller)) {
             $instance = new $controller;
+        } elseif ($this->container) {
+
+            try {
+                $instance = $this->container->get($controller);
+            } catch (\ContainerResolveException $e) {
+                throw new \RuntimeException(sprintf('controller for id %s could not be resolved', $controller));
+            } catch (\Exception $e) {
+                throw $e;
+            }
+
         } else {
             throw new \RuntimeException('no controller found');
         }
@@ -134,6 +139,7 @@ class Finder implements ResolverInterface, ContainerAwareInterface
         if ($this->container && $instance instanceof ContainerAwareInterface) {
             $instance->setContainer($this->container);
         }
+
         return [$instance, $action];
     }
 
@@ -147,24 +153,30 @@ class Finder implements ResolverInterface, ContainerAwareInterface
      */
     protected function extractControllerAction($controller)
     {
-        if ($this->hasControllerNamespaces() && false !== ($pos = strpos($controller, ':')) &&
-            false !== ($rpos = strrpos($controller, ':')) && $pos !== $rpos
-        ) {
-            $parts = explode(':', $controller);
-
-            if (!isset($this->namespaces[$parts[0]])) {
-                throw new \InvalidArgumentException(sprintf('no namespace set for alias %s', $parts[0]));
-            }
-
-            $ns = $this->namespaces[$parts[0]];
-
-            $controllerClass = $ns . '\\Controller\\' . ucfirst(strtr($parts[1], ['.' => '\\'])).'Controller';
-            $action = $parts[2] . 'Action';
+        if ($this->parser->supports($controller)) {
+            list ($controllerClass, $action) = $this->parser->parse($controller);
 
             return [$controllerClass, $action];
         }
 
+        if ($this->controllerIsService($controller)) {
+            return explode(':', $controller);
+        }
+
         return array_pad(explode('@', $controller), 2, null);
+    }
+
+    /**
+     * controllerIsService
+     *
+     * @param mixed $controller
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function controllerIsService($controller)
+    {
+        return 1 === substr_count($controller, ':');
     }
 
     /**

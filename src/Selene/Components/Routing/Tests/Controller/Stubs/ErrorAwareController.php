@@ -24,12 +24,12 @@ use \Selene\Components\Routing\Controller\BaseController;
  */
 class ErrorAwareController extends BaseController
 {
-    public function actionIndex()
+    public function indexAction()
     {
         throw new \Exception('exception thrown in ' . __METHOD__);
     }
 
-    public function onActionIndexError(\Exception $e)
+    public function onIndexActionError(\Exception $e)
     {
         return 'Caught Exception';
     }

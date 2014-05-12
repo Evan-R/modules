@@ -213,14 +213,6 @@ class Crypter
 
         if (!$this->cryptModule) {
             $cm = mcrypt_module_open($this->cypher, null, MCRYPT_MODE_CBC, null);
-            //try {
-            //    $cm = mcrypt_module_open($this->cypher, null, MCRYPT_MODE_CBC, null);
-            //} catch (\Exception $e) {
-            //    $throws = true;
-            //}
-            //if ($throws) {
-            //    $cm = mcrypt_module_open($this->cypher, null, MCRYPT_MODE_STREAM, null);
-            //}
             $this->cryptModule = $cm;
         }
 

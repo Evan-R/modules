@@ -11,7 +11,7 @@
 
 namespace Selene\Components\View\Traits;
 
-use \Selene\Components\View\EnvironmentInterface;
+use \Selene\Components\View\ManagerInterface;
 
 /**
  * @trait ViewAwareTrait
@@ -26,19 +26,19 @@ trait ViewAwareTrait
     /**
      * view
      *
-     * @var \Selene\Components\View\EnvironmentInterface
+     * @var \Selene\Components\View\ManagerInterface
      */
     protected $view;
 
     /**
      * setView
      *
-     * @param \Selene\Components\View\EnvironmentInterface $view
+     * @param \Selene\Components\ViewManagerInterface $view
      *
      * @access public
      * @return mixed
      */
-    public function setView(EnvironmentInterface $view)
+    public function setView(ManagerInterface $view)
     {
         $this->view = $view;
     }

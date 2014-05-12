@@ -20,10 +20,11 @@ use \Selene\Components\Routing\RouterInterface;
 use \Selene\Components\Http\RequestStack;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
-use \Selene\Components\Kernel\Stack\KernelStack;
 use \Selene\Components\Events\SubscriberInterface;
 use \Selene\Components\Routing\Events\RouteDispatchEvent;
 use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
+use \Selene\Components\Kernel\Events\HandleRequestEvent;
+use \Selene\Components\Kernel\Events\KernelExceptionEvent;
 
 /**
  * @class Kernel implements HttpKernelInterface
@@ -97,12 +98,13 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         $this->requestStack->push($request);
+        $this->getEvents()->dispatch('kernel.handle_request', new HandleRequestEvent($request));
 
         try {
             $response = $this->handleRequest($request, $type, $catch);
         } catch (\Exception $e) {
             if ($catch) {
-                return $this->handleRequestException($e);
+                return $this->handleRequestException($request, $e);
             }
             throw $e;
         }
@@ -194,7 +196,6 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
     protected function handleRequest(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         $this->router->dispatch($request);
-
         return $this->filterResponse();
     }
 
@@ -257,9 +258,8 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
         return new Response($response);
     }
 
-    protected function handleRequestException(\Exception $e)
+    protected function handleRequestException(Request $request, \Exception $e)
     {
-        throw $e;
-        die;
+        $this->getEvents()->dispatch('kernel.handle_exception', new KernelExceptionEvent($request, $e));
     }
 }

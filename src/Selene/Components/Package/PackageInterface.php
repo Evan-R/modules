@@ -93,6 +93,14 @@ interface PackageInterface
     public function getAlias();
 
     /**
+     * getRequirement
+     *
+     * @access public
+     * @return string|boolean
+     */
+    public function getRequirement();
+
+    /**
      * getNamespace
      *
      * @access public

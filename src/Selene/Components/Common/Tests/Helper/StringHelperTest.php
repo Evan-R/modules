@@ -104,6 +104,8 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue(StringHelper::strEndsWith('string', 'ing'));
         $this->assertFalse(StringHelper::strEndsWith('string', 'ink'));
+
+        $this->assertTrue(StringHelper::strEndsWith('Foo\\Controller', 'Controller'));
     }
 
     /**
@@ -113,6 +115,8 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue(StringHelper::striEndsWith('string', 'ING'));
         $this->assertTrue(StringHelper::striEndsWith('STRING', 'ing'));
+
+        $this->assertTrue(StringHelper::striEndsWith('Controller\\Foo\\Controller', 'controller'));
     }
 
     /**

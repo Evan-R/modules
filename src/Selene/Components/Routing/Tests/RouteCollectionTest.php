@@ -32,9 +32,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function routesSouldBeAddable()
     {
         $route = m::mock('\Selene\Components\Routing\Route');
@@ -45,9 +43,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($route, $this->collection->get('app.index'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function routesSouldBeRetrieveableByMethod()
     {
         $routeA = m::mock('\Selene\Components\Routing\Route');
@@ -74,9 +70,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function itShouldBeIteratable()
     {
         $route = m::mock('\Selene\Components\Routing\Route');
@@ -89,20 +83,19 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->fail('failure');
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function itShouldReturnRawArray()
     {
 
         $this->assertTrue(is_array($this->collection->raw()));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function itShouldBeSerilizeable()
     {
-        $this->assertInstanceOf('\Selene\Components\Routing\RouteCollection', unserialize(serialize($this->collection)));
+        $this->assertInstanceOf(
+            '\Selene\Components\Routing\RouteCollection',
+            unserialize(serialize($this->collection))
+        );
     }
 }

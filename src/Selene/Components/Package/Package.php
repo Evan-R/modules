@@ -89,16 +89,15 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
     protected $alias;
 
     /**
-     * setApplication
      *
-     * @param Application $app
+     * Returns a required package alias, otherwhise false.
      *
      * @access public
-     * @return mixed
+     * @return string|boolean
      */
-    public function setApplication(Application $app)
+    public function getRequirement()
     {
-        $this->app = $app;
+        return false;
     }
 
     /**
@@ -251,49 +250,9 @@ abstract class Package implements PackageInterface, ContainerAwareInterface
      * registerCommands
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function registerCommands(Console $console)
     {
-
-    }
-
-    /**
-     * registerMiddleWares
-     *
-     * @access public
-     * @return array|HttpKernelInterface
-     */
-    public function getMiddlewares($app)
-    {
-
-    }
-
-    /**
-     * supports
-     *
-     * @param mixed $type
-     *
-     * @access public
-     * @return mixed
-     */
-    public function provides($type = null)
-    {
-        if (null !== $type) {
-            return in_array($type, $this->getProviderTypes());
-        }
-
-        return $this->getProviderTypes();
-    }
-
-    /**
-     * getSupportedTypes
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function getProviderTypes()
-    {
-        return [];
     }
 }

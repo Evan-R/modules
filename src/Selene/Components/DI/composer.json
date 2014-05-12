@@ -13,6 +13,7 @@
     "selene/common":"dev-development"
   },
   "require-dev": {
+    "selene/config":"dev-development",
     "selene/testsuite":"dev-development"
   },
   "autoload": {
@@ -26,6 +27,10 @@
     {
       "type":"vcs", 
       "url":"git://github.com/seleneapp/common.git"
+    },
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/config.git"
     },
     {
       "type":"vcs", 

@@ -20,7 +20,7 @@ interface ResolverInterface
 {
     public function find($action, $method);
 
-    public function registerNamespace($alias, $namespace);
+    public function setNamespaceAlias($alias, $namespace);
 
-    public function registerNamespaces(array $namespace);
+    public function setNamespaceAliases(array $aliases);
 }

@@ -16,6 +16,7 @@ $GIT subsplit publish --no-tags src/Selene/Components/Filesystem:git@github.com:
 $GIT subsplit publish --no-tags src/Selene/Components/DI:git@github.com:seleneapp/di.git
 $GIT subsplit publish --no-tags src/Selene/Components/TestSuite:git@github.com:seleneapp/testsuite.git
 $GIT subsplit publish --no-tags src/Selene/Components/Routing:git@github.com:seleneapp/routing.git
+$GIT subsplit publish --no-tags src/Selene/Components/Stack:git@github.com:seleneapp/stack.git
 $GIT subsplit publish --no-tags src/Selene/Components/Package:git@github.com:seleneapp/package.git
 $GIT subsplit publish --no-tags src/Selene/Components/Xml:git@github.com:seleneapp/xml.git
 

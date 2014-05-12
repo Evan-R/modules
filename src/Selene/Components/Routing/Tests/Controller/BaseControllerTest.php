@@ -27,6 +27,6 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase
     {
         $controller = new ErrorAwareController;
 
-        $this->assertSame('Caught Exception', $controller->callAction('actionIndex', []));
+        $this->assertSame('Caught Exception', $controller->callAction('indexAction', []));
     }
 }

@@ -48,6 +48,25 @@ class ListHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itArrayUnset()
+    {
+        $data = ['foo' => ['bar' => 'baz']];
+
+        $this->assertTrue(isset($data['foo']['bar']));
+
+        ListHelper::arrayUnset($data, 'foo.bar');
+
+        $this->assertTrue(isset($data['foo']));
+        $this->assertFalse(isset($data['foo']['bar']));
+
+        $data = ['foo' => ['bar' => ['baz' => 'boom']]];
+
+        ListHelper::arrayUnset($data, 'foo.bar.bame');
+        $this->assertTrue(isset($data['foo']['bar']));
+        $this->assertFalse(isset($data['foo']['bar']['bame']));
+    }
+
+    /** @test */
     public function testArraySet()
     {
         $array = [];

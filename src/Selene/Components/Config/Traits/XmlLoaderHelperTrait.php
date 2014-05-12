@@ -12,6 +12,7 @@
 namespace Selene\Components\Config\Traits;
 
 use \Selene\Components\Xml\Parser;
+use \Selene\Components\Xml\Normalizer\PhpVarNormalizer;
 use \Selene\Components\Xml\Loader\Loader as XmlFileLoader;
 
 /**

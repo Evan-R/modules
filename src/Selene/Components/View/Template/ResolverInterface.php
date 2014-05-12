@@ -9,20 +9,25 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View;
+namespace Selene\Components\View\Template;
 
 /**
- * @interface TemplateResolverInterface
+ * @interface ResolverInterface
+ *
  * @package Selene\Components\View
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
-interface TemplateResolverInterface
+interface ResolverInterface
 {
+    /**
+     * resolver
+     *
+     * @param mixed $template
+     *
+     * @access public
+     * @return string
+     */
     public function resolve($template);
-
-    public function setPackagePaths(array $paths);
-
-    public function getPackagePaths();
-
-    public function getPackagePath($package = null);
 }

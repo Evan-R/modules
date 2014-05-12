@@ -29,12 +29,11 @@ class CacheTest extends TestCase
 {
     protected $root;
     protected $path;
+
     protected function setUp()
     {
         $this->root = vfsStream::setUp('testdrive/cache');
         $this->path = vfsStream::url('testdrive/cache');
-
-        var_dump($this->path);
     }
 
     /** @test */

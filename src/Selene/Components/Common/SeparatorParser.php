@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * This File is part of the Selene\Components\Common package
+ *
+ * (c) Thomas Appel <mail@thomas-appel.com>
+ *
+ * For full copyright and license information, please refer to the LICENSE file
+ * that was distributed with this package.
+ */
+
+namespace Selene\Components\Common;
+
+/**
+ * @class SeqenceParser
+ * @package Selene\Components\Common
+ * @version $Id$
+ */
+class SeparatorParser implements SeparatorParserInterface
+{
+    /**
+     * separator
+     *
+     * @var string
+     */
+    protected static $separator = ':';
+
+    /**
+     * supports
+     *
+     * @param mixed $string
+     *
+     * @access public
+     * @return boolean
+     */
+    public function supports($string)
+    {
+        return 2 === substr_count($string, static::$separator);
+    }
+
+    /**
+     * parse
+     *
+     * @param mixed $string
+     *
+     * @access public
+     * @return array
+     */
+    public function parse($string)
+    {
+        list($first, $mid, $last) = explode(static::$separator, $string);
+
+        return [$first, $mid, $last];
+    }
+}

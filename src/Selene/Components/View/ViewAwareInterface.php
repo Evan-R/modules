@@ -21,7 +21,7 @@ namespace Selene\Components\View;
  */
 interface ViewAwareInterface
 {
-    public function setView(EnvironmentInterface $view);
+    public function setView(ManagerInterface $view);
 
     public function getView();
 }

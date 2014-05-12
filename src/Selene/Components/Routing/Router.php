@@ -73,6 +73,11 @@ class Router implements RouterInterface
      */
     protected $filters;
 
+    /**
+     * actionSet
+     *
+     * @var boolean
+     */
     protected $actionSet;
 
     /**
@@ -85,9 +90,9 @@ class Router implements RouterInterface
     /**
      * @param ResolverInterface $resolver
      * @param RouteMatcherInterface $matcher
+     * @param DispatcherInterface $events
      *
      * @access public
-     * @return mixed
      */
     public function __construct(
         ResolverInterface $resolver,

@@ -56,7 +56,7 @@ class RouteCompiler
             ];
         }
 
-        $results = static::compilePattern($route, $route->getPath(), false);
+        $results = static::compilePattern($route, $route->getPattern(), false);
 
         $compiled['vars']        = $results['parameters'];
         $compiled['regexp']      = $results['expression'];

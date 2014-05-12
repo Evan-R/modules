@@ -4,14 +4,14 @@
 
   <routes>
 
-    <route name="index" path="/" action="some.controller:indexAction"></route>
+    <route name="index" path="/" action="some:funny:index"></route>
 
     <route name="index.user" path="/{userId}">
       <requirements>
         <methods>
           <method>GET</method>
         </methods>
-        <action>some.controller:indexAction</action>
+        <action>some:funny:user</action>
         <filters>
           <before>auth</before>
         </filters>

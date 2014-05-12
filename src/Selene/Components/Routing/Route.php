@@ -15,9 +15,13 @@ use \Serializable;
 use \Selene\Components\Common\Traits\Getter;
 
 /**
- * @class Route
+ * @class Route implements Serializable
+ * @see Serializable
+ *
  * @package Selene\Components\Routing
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 class Route implements Serializable
 {
@@ -26,18 +30,18 @@ class Route implements Serializable
     }
 
     /**
-     * name
+     * Route name
      *
      * @var string
      */
     protected $name;
 
     /**
-     * path
+     * Route pattern
      *
      * @var string
      */
-    protected $path;
+    protected $pattern;
 
     /**
      * parent
@@ -83,7 +87,7 @@ class Route implements Serializable
     /**
      *
      * @param string       $name
-     * @param string       $path
+     * @param string       $pattern
      * @param string|array $methods
      * @param string       $host
      * @param array        $requirements
@@ -91,10 +95,10 @@ class Route implements Serializable
      *
      * @access public
      */
-    public function __construct($name, $path, $methods = 'GET', array $requirements = [])
+    public function __construct($name, $pattern, $methods = 'GET', array $requirements = [])
     {
         $this->name = $name;
-        $this->path = $path;
+        $this->pattern = $pattern;
 
         $this->initRequirements($requirements);
 
@@ -149,7 +153,6 @@ class Route implements Serializable
      */
     public function setAfterFilters($filters)
     {
-
         if (is_string($filters)) {
             $filters = explode('|', $filters);
         }
@@ -565,14 +568,14 @@ class Route implements Serializable
     }
 
     /**
-     * getPath
+     * getPattern
      *
      * @access public
      * @return mixed
      */
-    public function getPath()
+    public function getPattern()
     {
-        return $this->path;
+        return $this->pattern;
     }
 
     /**
@@ -858,7 +861,7 @@ class Route implements Serializable
 
         $data = [
             'name'          => $this->name,
-            'path'          => $this->path,
+            'pattern'       => $this->pattern,
             'parent'        => $this->parent,
             'defaults'      => $this->defaults,
             'parameters'    => $this->parameters,
@@ -882,7 +885,7 @@ class Route implements Serializable
         $data = unserialize($data);
 
         $this->name         = $data['name'];
-        $this->path         = $data['path'];
+        $this->pattern      = $data['pattern'];
         $this->parent       = $data['parent'];
         $this->defaults     = $data['defaults'];
         $this->parameters   = $data['parameters'];
@@ -904,7 +907,14 @@ class Route implements Serializable
      */
     protected static function methodDict($method)
     {
-        return;
+        return [
+            'GET'    => ['GET', 'HEAD'],
+            'HEAD'   => ['GET', 'HEAD'],
+            'POST'   => ['POST'],
+            'PUT'    => ['PUT', 'PATCH'],
+            'PATCH'  => ['PUT', 'PATCH'],
+            'DELETE' => ['DELETE']
+        ];
     }
 
     /**

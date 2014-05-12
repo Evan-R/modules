@@ -110,8 +110,6 @@ class Locator implements LocatorInterface
     {
         $dir = $this->getFullPath($path);
 
-        var_dump($file);
-
         if (!is_dir($dir)) {
             return false;
         }

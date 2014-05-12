@@ -25,8 +25,7 @@ use \Selene\Components\DI\Parameters;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
 use \Selene\Components\Config\Cache as ConfigCache;
-use \Selene\Components\Kernel\KernelStack;
-use \Selene\Components\Kernel\StackBuilder as KernelStackBuilder;
+use \Selene\Components\Stack\StackBuilder as KernelStackBuilder;
 use \Selene\Components\Package\PackageRepository;
 use \Selene\Components\Config\Resource\Locator;
 use \Selene\Components\Config\Resource\LoaderResolver;
@@ -92,6 +91,13 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      * @var array
      */
     protected $packageProviders;
+
+    /**
+     * testEnv
+     *
+     * @var string
+     */
+    protected static $testEnv = 'testing';
 
     /**
      * Create a new Application instance.
@@ -306,6 +312,41 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
+     * runsInConsole
+     *
+     * @access public
+     * @return mixed
+     */
+    public function runsInConsole()
+    {
+        return 'cli' === php_sapi_name();
+    }
+
+    /**
+     * runsInTest
+     *
+     * @access public
+     * @return mixed
+     */
+    public function runsInTest()
+    {
+        return static::$testEnv === $this->getEnv();
+    }
+
+    /**
+     * setTestEnvironmentName
+     *
+     * @param mixed $name
+     *
+     * @access public
+     * @return mixed
+     */
+    public static function setTestEnvironmentName($name)
+    {
+        static::$testEnv = strtolower($name);
+    }
+
+    /**
      * loadConfig
      *
      * @access protected
@@ -336,7 +377,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     protected function initializeContainer()
     {
         $ns = 'Selene\ClassCache';
-        $className = 'Container'.ucfirst($this->env);
+        $className = 'Container'.ucfirst($this->getEnvironment());
 
         $cache = new ConfigCache(
             $file = $this->getContainerCachePath() . DIRECTORY_SEPARATOR . $className.'.php',
@@ -353,7 +394,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         $builder = $this->buildContainer($cache);
         $dumper = new PhpDumper($this->container, $ns, $className, $this->getContainerServiceId());
 
-        $cache->write($dumper->dump(), $builder->getResources()->toArray());
+        $cache->write($dumper->dump(), $builder->getResources());
     }
 
     /**
@@ -398,6 +439,8 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $loader->load('config.xml');
 
+        $loader->load('config_'.strtolower($this->getEnvironment()).'.xml');
+
         $this->packages->build($builder);
 
         $builder->build();
@@ -429,22 +472,33 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      */
     protected function getDefaultParameters()
     {
+        list($packages, $packagePaths) = $this->getPackageInfo();
+
         return [
-            'app_kernel.root' => $this->getApplicationRoot(),
-            'app.root' => $this->getApplicationRoot(),
-            'app.packages' => $this->getPackageInfo(),
+            'app_kernel.root'   => $this->getApplicationRoot(),
+            'app.root'          => $this->getApplicationRoot(),
+            'app.packages'      => $packages,
+            'app.package_paths' => $packagePaths,
+            'app.env'           => $this->getEnvironment()
         ];
+    }
+
+    public function getEnvironment()
+    {
+        return $this->env;
     }
 
     protected function getPackageInfo()
     {
         $info = [];
+        $path = [];
 
         foreach ($this->getLoadedPackages() as $alias => $package) {
             $info[$alias] = $package->getNamespace();
+            $path[$alias] = $package->getPath();
         }
 
-        return $info;
+        return [$info, $path];
     }
 
     /**
