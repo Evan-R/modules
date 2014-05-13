@@ -11,7 +11,7 @@
 
 namespace Selene\Components\Config\Resource;
 
-use \Selene\Components\FileSystem\Traits\PathHelperTrait;
+use \Selene\Components\Filesystem\Traits\PathHelperTrait;
 
 /**
  * @class Locator implements LocatorInterface

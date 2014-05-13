@@ -30,10 +30,6 @@
     },
     {
       "type":"vcs", 
-      "url":"git://github.com/seleneapp/config.git"
-    },
-    {
-      "type":"vcs", 
       "url":"git://github.com/seleneapp/filesystem.git"
     }
   ],
