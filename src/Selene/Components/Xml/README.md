@@ -1,5 +1,12 @@
 # Selene Component for loading, parsing and, writing xml
 
+[![Build Status](https://travis-ci.org/seleneapp/xml.png?branch=development)](https://travis-ci.org/seleneapp/xml)
+[![Latest Stable Version](https://poser.pugx.org/selene/xml/v/stable.png)](https://packagist.org/packages/selene/xml) 
+[![Latest Unstable Version](https://poser.pugx.org/selene/xml/v/unstable.png)](https://packagist.org/packages/selene/xml) 
+[![License](https://poser.pugx.org/selene/xml/license.png)](https://packagist.org/packages/selene/xml)
+
+
+
 ## The Parser
 
 The `Parser` class can parse xml string, files, DOMDocuments, and DOMElements

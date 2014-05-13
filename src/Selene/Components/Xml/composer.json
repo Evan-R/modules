@@ -1,6 +1,7 @@
 {
   "name": "selene/xml",
   "description": "selene xml utils",
+  "keywords": ["selene", "xml"],
   "license": "MIT",
   "authors": [
     {
