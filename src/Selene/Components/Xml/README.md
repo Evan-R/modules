@@ -5,7 +5,16 @@
 [![Latest Unstable Version](https://poser.pugx.org/selene/xml/v/unstable.png)](https://packagist.org/packages/selene/xml) 
 [![License](https://poser.pugx.org/selene/xml/license.png)](https://packagist.org/packages/selene/xml)
 
+## Install
 
+In your `composer.json`: 
+
+```sh
+"require": {
+	"php": ">=5.4.0",
+	"selene/xml": "dev-development"
+}
+```
 
 ## The Parser
 

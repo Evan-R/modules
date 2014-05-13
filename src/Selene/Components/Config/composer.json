@@ -19,20 +19,6 @@
   "autoload": {
     "psr-0": {"Selene\\Components\\Config\\": ""}
   },
-  "repositories": [
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/xml.git"
-    },
-    {
-      "type":"vcs",
-      "url":"git://github.com/seleneapp/common.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/filesystem.git"
-    }
-  ],
   "target-dir": "Selene/Components/Config",
   "minimum-stability": "dev"
 }

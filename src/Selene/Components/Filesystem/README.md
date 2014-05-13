@@ -1,4 +1,9 @@
+# Selene Filesystem Component
+
 [![Build Status](https://api.travis-ci.org/seleneapp/filesystem.png?branch=development)](https://travis-ci.org/seleneapp/filesystem)
+[![Latest Stable Version](https://poser.pugx.org/selene/filesystem/v/stable.png)](https://packagist.org/packages/selene/filesystem) 
+[![Latest Unstable Version](https://poser.pugx.org/selene/filesystem/v/unstable.png)](https://packagist.org/packages/selene/filesystem) 
+[![License](https://poser.pugx.org/selene/filesystem/license.png)](https://packagist.org/packages/selene/filesystem)
 
 ## Setup
 

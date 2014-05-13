@@ -13,6 +13,7 @@ namespace Selene\Components\Xml;
 
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
+use \Selene\Components\Common\Helper\clearValue;
 use \Selene\Components\Common\Helper\StringHelper;
 use \Selene\Components\Common\Traits\Getter;
 use \Selene\Components\Xml\Loader\Loader;
@@ -299,7 +300,8 @@ class Parser implements ParserInterface
         $textNodes = [];
 
         foreach ($element->xpath('./text()') as $text) {
-            if ($value = clearValue($text->nodeValue)) {
+
+            if ($value = \clearValue($text->nodeValue)) {
                 $textNodes[] = $value;
             }
         }

@@ -18,20 +18,6 @@
   "autoload": {
     "psr-0": {"Selene\\Components\\Filesystem\\": ""}
   },
-  "repositories": [
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/testsuite.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/filesystem.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/common.git"
-    }
-  ],
   "target-dir": "Selene/Components/Filesystem",
   "minimum-stability": "dev"
 }

@@ -18,20 +18,6 @@
     "psr-0": {"Selene\\Components\\Cryptography":""},
     "classmap":["tests/"]
   },
-  "repositories": [
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/testsuite.git"
-    }, 
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/common.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/cryptography.git"
-    }
-  ],
   "target-dir": "Selene/Components/Cryptography",
   "minimum-stability": "dev"
 }

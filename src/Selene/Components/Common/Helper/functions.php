@@ -29,18 +29,19 @@ namespace {
             return $out;
         };
     }
+}
 
-    if (!function_exists('clearValue')) {
-        /**
-         * null a given value in case it's an empty string
-         *
-         * @param mixed $value
-         *
-         * @return mixed
-         */
-        function clearValue($value)
-        {
-            return is_string($value) && 0 === strlen(trim($value)) ? null : $value;
-        }
+namespace Selene\Components\Common\Helper {
+
+    /**
+     * nulls a given value in case it's an empty string
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    function clearValue($value)
+    {
+        return is_string($value) && 0 === strlen(trim($value)) ? null : $value;
     }
 }

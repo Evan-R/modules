@@ -19,20 +19,6 @@
   "autoload": {
     "psr-0": {"Selene\\Components\\Cache\\": ""}
   },
-  "repositories": [
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/testsuite.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/common.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/filesystem.git"
-    }
-  ],
   "target-dir": "Selene/Components/Cache",
   "minimum-stability": "dev"
 }

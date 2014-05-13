@@ -21,20 +21,6 @@
       "Helper/functions.php"
     ]
   },
-  "repositories": [
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/testsuite.git"
-    }, 
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/common.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/cryptography.git"
-    }
-  ],
   "target-dir": "Selene/Components/Common",
   "minimum-stability": "dev"
 }

@@ -19,32 +19,6 @@
   "autoload": {
     "psr-0": {"Selene\\Components\\DI\\": ""}
   },
-  "repositories": [
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/testsuite.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/common.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/config.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/filesystem.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/xml.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/di.git"
-    }
-  ],
   "target-dir": "Selene/Components/DI",
   "minimum-stability": "dev"
 }

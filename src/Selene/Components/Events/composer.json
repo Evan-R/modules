@@ -19,24 +19,6 @@
   "autoload": {
     "psr-0": {"Selene\\Components\\Events\\": ""}
   },
-  "repositories": [
-    {
-      "type":"vcs",
-      "url":"git://github.com/seleneapp/common.git"
-    },
-    {
-      "type":"vcs",
-      "url":"git://github.com/seleneapp/testsuite.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/di.git"
-    },
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/events.git"
-    }
-  ],
   "target-dir": "Selene/Components/Events",
   "minimum-stability": "dev"
 }

@@ -20,12 +20,6 @@
   "autoload": {
     "psr-0": {"Selene\\Components\\Stack\\": ""}
   },
-  "repositories": [
-    {
-      "type":"vcs", 
-      "url":"git://github.com/seleneapp/common.git"
-    }
-  ],
   "target-dir": "Selene/Components/Stack",
   "minimum-stability": "dev"
 }

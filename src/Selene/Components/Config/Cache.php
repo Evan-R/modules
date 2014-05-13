@@ -24,7 +24,7 @@ use \Selene\Components\Filesystem\Exception\IOException;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Cache
+class Cache implements CacheInterface
 {
     use FsHelperTrait, PathHelperTrait {
         FsHelperTrait::mask as private getMask;

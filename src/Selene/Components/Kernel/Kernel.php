@@ -223,8 +223,6 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
         return $this->events;
     }
 
-
-
     /**
      * setUpRouterEvents
      *
