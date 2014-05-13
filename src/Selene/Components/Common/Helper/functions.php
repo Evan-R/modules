@@ -29,9 +29,6 @@ namespace {
             return $out;
         };
     }
-}
-
-namespace Selene\Components\Common\Helper {
 
     /**
      * nulls a given value in case it's an empty string

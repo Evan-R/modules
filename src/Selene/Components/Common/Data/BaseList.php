@@ -27,7 +27,7 @@ use \Selene\Components\Common\Interfaces\ArrayableInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class BaseList implements \ArrayAccess, \Countable, \Serializable, \IteratorAggregate, ArrayableInterface
+class BaseList implements ListInterface, \ArrayAccess, \Countable, \Serializable, \IteratorAggregate, ArrayableInterface
 {
     /**
      * data
@@ -168,12 +168,12 @@ class BaseList implements \ArrayAccess, \Countable, \Serializable, \IteratorAggr
     /**
      * extend
      *
-     * @param ListStruct $list
+     * @param ListInterface $list
      *
      * @access public
      * @return mixed
      */
-    public function extend(AbstractList $list)
+    public function extend(ListInterface $list)
     {
         $args = $list->toArray();
         array_unshift($args, null);

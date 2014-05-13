@@ -88,5 +88,5 @@ interface ListInterface
      * @access public
      * @return mixed
      */
-    public function extend(AbstractList $list);
+    public function extend(ListInterface $list);
 }
