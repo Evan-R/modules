@@ -16,6 +16,9 @@
   "require-dev": {
     "mockery/mockery": "dev-master"
   },
+  "autoload": {
+    "psr-0": {"Selene\\Components\\Config\\": ""}
+  },
   "repositories": [
     {
       "type":"vcs", 
