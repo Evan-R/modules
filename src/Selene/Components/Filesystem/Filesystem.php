@@ -208,13 +208,11 @@ class Filesystem
      */
     public function touch($file, $time = null, $atime = null)
     {
-        $touched = $time ? @touch($file, $time, $atime) : @touch($file);
-
-        if (true !== $touched) {
+        if (true !== ($time ? @touch($file, $time, $atime) : @touch($file))) {
             throw new IOException(sprintf('could not touch file %s', $file));
         }
 
-        return $touched;
+        return true;
     }
 
     /**

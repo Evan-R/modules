@@ -1,6 +1,6 @@
 {
   "name": "selene/config",
-  "description": "Configration component",
+  "description": "Selene configration component",
   "license": "MIT",
   "authors": [
     {
@@ -9,7 +9,27 @@
   }
   ],
   "require": {
-    "selene/filesystem":"dev-master"
+    "php":">=5.4.0",
+    "selene/filesystem":"dev-development",
+    "selene/xml":"dev-development"
   },
+  "require-dev": {
+    "mockery/mockery": "dev-master"
+  },
+  "repositories": [
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/xml.git"
+    },
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/common.git"
+    },
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/config.git"
+    }
+  ],
+  "target-dir": "Selene/Components/Config",
   "minimum-stability": "dev"
 }

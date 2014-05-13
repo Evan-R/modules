@@ -89,7 +89,6 @@ class FilesystemTest extends FilesystemTestCase
 
     /**
      * @test
-     * @TODO hhvm fails
      */
     public function testShouldCreateDirectoryShouldThrowIOException()
     {
@@ -109,9 +108,6 @@ class FilesystemTest extends FilesystemTestCase
         } catch (\Exception $e) {
             $this->fail('test sould throw \Selene\Components\Filesystem\Exception\IOException');
         }
-
-        // make this pass untill resolved
-        // throw new \Selene\Components\Filesystem\Exception\IOException('test failed');
     }
 
     /** @test */
