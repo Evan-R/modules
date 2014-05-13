@@ -14,6 +14,7 @@ namespace Selene\Components\Common\Data;
 use \Selene\Components\Common\Traits\Getter;
 use \Selene\Components\Common\Traits\Setter;
 use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Components\Common\Interfaces\ArrayableInterface;
 
 /**
  * @class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregate
@@ -26,7 +27,7 @@ use \Selene\Components\Common\Helper\ListHelper;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregate
+class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregate, ArrayableInterface
 {
     use Getter, Setter;
 
@@ -99,6 +100,14 @@ class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregat
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function toArray()
+    {
+        return $this->all();
+    }
+
+    /**
      * has
      *
      * @param mixed $attribute
@@ -108,7 +117,7 @@ class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregat
      */
     public function has($attribute)
     {
-        return (bool)$this->getDefault($this->attributes, $attribute, false);
+        return isset($this->attributes[$attribute]);
     }
 
     /**

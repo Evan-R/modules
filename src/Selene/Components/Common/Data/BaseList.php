@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Yam\Utils\Data package
+ * This File is part of the Selene\Components\Common package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -10,6 +10,8 @@
  */
 
 namespace Selene\Components\Common\Data;
+
+use \Selene\Components\Common\Interfaces\ArrayableInterface;
 
 /**
  * Inspired by python lists.
@@ -20,12 +22,12 @@ namespace Selene\Components\Common\Data;
  * @see \Serializable
  * @see \IteratorAggregate
  *
- * @package Yam\Utils
+ * @package Selene\Components\Common
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class BaseList implements \ArrayAccess, \Countable, \Serializable, \IteratorAggregate
+class BaseList implements \ArrayAccess, \Countable, \Serializable, \IteratorAggregate, ArrayableInterface
 {
     /**
      * data
