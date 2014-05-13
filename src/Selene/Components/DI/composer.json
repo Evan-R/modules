@@ -34,6 +34,14 @@
     },
     {
       "type":"vcs", 
+      "url":"git://github.com/seleneapp/filesystem.git"
+    },
+    {
+      "type":"vcs", 
+      "url":"git://github.com/seleneapp/xml.git"
+    },
+    {
+      "type":"vcs", 
       "url":"git://github.com/seleneapp/di.git"
     }
   ],

@@ -22,7 +22,7 @@
       "url":"git://github.com/seleneapp/xml.git"
     },
     {
-      "type":"vcs", 
+      "type":"vcs",
       "url":"git://github.com/seleneapp/common.git"
     },
     {
