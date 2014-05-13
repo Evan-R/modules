@@ -25,6 +25,10 @@
     },
     {
       "type":"vcs", 
+      "url":"git://github.com/seleneapp/filesystem.git"
+    },
+    {
+      "type":"vcs", 
       "url":"git://github.com/seleneapp/common.git"
     }
   ],
