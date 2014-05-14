@@ -11,7 +11,7 @@
 
 namespace Selene\Components\Filesystem;
 
-use Selene\Components\Filesystem\Traits\SubstitudePath;
+use \Selene\Components\Filesystem\Traits\SubstitudePath;
 
 /**
  * @class FilesystemIterator

@@ -11,7 +11,10 @@
 
 namespace Selene\Components\Filesystem;
 
+use \RecursiveIteratorIterator;
 use \Selene\Components\Filesystem\FilesystemIterator;
+use \Selene\Components\Filesystem\RecursiveDirectoryIterator;
+use \Selene\Components\Filesystem\R;
 use \Selene\Components\Filesystem\Filter\FileFilter;
 use \Selene\Components\Filesystem\Filter\DirectoryFilter;
 use \Selene\Components\Common\Interfaces\JsonableInterface;
@@ -134,7 +137,7 @@ class Directory extends AbstractFileObject
      */
     protected static $vcsPattern = [
         '\.git.*', '\.svn.*'
-    ];
+        ];
 
     /**
      * __construct
@@ -480,34 +483,41 @@ class Directory extends AbstractFileObject
     private function doList(FileCollection $collection, $location, $recursive = true, $ignorefiles = false)
     {
 
-        $count = true;
+        $depth = $this->depthsFilter;
 
-        foreach ($iterator = $this->getIterator($location) as $fileInfo) {
+        $iterator = $this->getIterator($location);
+
+        if (is_int($this->depthsFilter)) {
+            $iterator->setMaxDepth($this->depthsFilter);
+        }
+
+        foreach ($iterator as $fileInfo) {
 
             // continue loop if file is link
             if ($fileInfo->isLink()) {
                 continue;
+            }
+
+            if ($fileInfo->isDir()) {
+
+                // only add directory to collection only if onlyfiles is false
+                // and is included directory
+                if ($this->isIncludedDir($fileInfo->getRealPath()) && true !== $this->onlyFilesFilter) {
+                    $collection->add($fileInfo);
+                } else {
+                    $iterator->next();
+                    continue;
+                }
             }
             // add file to collection:
             if ($fileInfo->isFile() && true !== $ignorefiles && $this->isIncludedFile($fileInfo->getBaseName())) {
                 $collection->add($fileInfo);
                 continue;
             }
+
             // operate on all included directories
-            if ($fileInfo->isDir()) {
-                // only add directory to collection only if onlyfiles is false
-                // and is included directory
-                if ($this->isIncludedDir($fileInfo->getRealPath())) {
-                    if (true !== $this->onlyFilesFilter) {
-                        $collection->add($fileInfo);
-                    }
-                    // just list this directory if max depths is not already
-                    // reached
-                    if (!$this->isRecursionStoppend()) {
-                        $this->countRecursion($count);
-                        $this->doList($collection, $fileInfo->getRealPath(), $recursive, $ignorefiles);
-                    }
-                }
+            if (!$fileInfo->isDir()) {
+                continue;
             }
         }
     }
@@ -617,6 +627,7 @@ class Directory extends AbstractFileObject
         if ($this->isIgnoredFile($file)) {
             return false;
         }
+
         return isset($this->fileFilter) ? $this->fileFilter->match($file) : true;
     }
 
@@ -630,7 +641,14 @@ class Directory extends AbstractFileObject
      */
     protected function isIgnoredFile($file)
     {
-        return $this->ignoreFilter->match($file);
+        return $ignored = $this->ignoreFilter->match($file);
+
+        if (preg_match('#.*\.git#', $file)) {
+            var_dump($file);
+            var_dump($ignored);
+            var_dump($this->ignoreFilter);
+        }
+        return $ignored;
     }
 
     /**
@@ -643,8 +661,9 @@ class Directory extends AbstractFileObject
      */
     protected function isIncludedDir($dir)
     {
-        // need to check agains vcs ignore pattern
+        // need to check against vcs ignore pattern
         if ($this->isIgnoredFile($dir)) {
+            //var_dump($dir);
             return false;
         }
         return $this->isExcludedDir($dir) ?
@@ -662,6 +681,13 @@ class Directory extends AbstractFileObject
      */
     protected function isExcludedDir($path)
     {
+        $p = basename($path);
+        //var_dump($p);
+        //var_dump($path);
+        if ($this->ignoreFilter->match($p)) {
+            return true;
+        }
+
         return $this->isIgnoredFile(basename($path)) ? true : (
             (!isset($this->notInFilter) ? false : $this->notInFilter->match($path))
         );
@@ -695,12 +721,15 @@ class Directory extends AbstractFileObject
      */
     protected function getIterator($directory, $flags = FilesystemIterator::SKIP_DOTS)
     {
-        $iterator = new FilesystemIterator(
-            $directory,
-            FilesystemIterator::CURRENT_AS_FILEINFO|$flags,
-            (string)$this
+        $iterator = new \RecursiveIteratorIterator(
+            $ditr = new RecursiveDirectoryIterator(
+                $directory,
+                FilesystemIterator::CURRENT_AS_FILEINFO|$flags,
+                (string)$this
+            ),
+            \RecursiveIteratorIterator::SELF_FIRST
         );
-        $iterator->setInfoClass(__NAMESPACE__.'\\SplFileInfo');
+        $ditr->setInfoClass(__NAMESPACE__.'\\SplFileInfo');
 
         return $iterator;
     }
@@ -746,5 +775,19 @@ class Directory extends AbstractFileObject
     public static function addVcsPattern($pattern)
     {
         static::$vcsPattern = array_merge(static::$vcsPattern, (array)$pattern);
+    }
+
+    public static function setVcsPattern(array $pattern)
+    {
+        static::$vcsPattern = [];
+
+        foreach ($pattern as $p) {
+            static::addVcsPattern($p);
+        }
+    }
+
+    public static function getVcsPattern()
+    {
+        return static::$vcsPattern;
     }
 }

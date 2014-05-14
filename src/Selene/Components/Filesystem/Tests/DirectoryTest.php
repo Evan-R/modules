@@ -22,6 +22,25 @@ use \Selene\Components\Filesystem\Directory;
 class DirectoryTest extends FilesystemTestCase
 {
 
+    private $vcs;
+
+    protected function setUp()
+    {
+        if (!$this->vcs) {
+            $this->vcs = Directory::getVcsPattern();
+        }
+        parent::setUp();
+    }
+
+    protected function tearDown()
+    {
+        if ($this->vcs) {
+            Directory::setVcsPattern($this->vcs);
+        }
+
+        parent::tearDown();
+    }
+
     /**
      * @test
      */
@@ -134,7 +153,7 @@ class DirectoryTest extends FilesystemTestCase
         $this->assertTrue(empty($array));
 
         $this->fs->mkdir(
-            $this->testDrive.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'.git'
+            $path = $this->testDrive.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'.git'
             .DIRECTORY_SEPARATOR.'0983912380921830809sa89d89a0s8d',
             0775,
             true
@@ -142,6 +161,7 @@ class DirectoryTest extends FilesystemTestCase
 
         $dir = $this->fs->directory($this->testDrive);
         $array = $dir->toArray();
+
 
         $this->assertTrue(isset($array['%directories%']['foo']));
         $this->assertFalse(isset($array['%directories%']['foo']['.git']));
@@ -179,6 +199,7 @@ class DirectoryTest extends FilesystemTestCase
         $collection->setOutputTree(true);
 
         $files = $collection->toArray();
+
 
         $this->assertTrue(is_array($f = ListHelper::arrayGet($files, '%files%.fileA')) && $f['name'] === 'fileA');
         $this->assertTrue(is_array($f = ListHelper::arrayGet($files, '%directories%.testB')) && $f['name'] === 'testB');
@@ -245,7 +266,7 @@ class DirectoryTest extends FilesystemTestCase
         $collection = $dir->files()->get();
         $collection->setOutputTree(false);
 
-        $this->assertEquals(6, count($collection->toArray()));
+        $this->assertEquals(5, count($collection->toArray()));
     }
 
     //public function testListDirectoryStructure()
@@ -276,11 +297,13 @@ class DirectoryTest extends FilesystemTestCase
     public function itShouldIgnoreVCSPattern()
     {
         $this->buildTree();
-        $dir = $this->fs->directory($this->testDrive.DIRECTORY_SEPARATOR, Directory::IGNORE_VCS);
+        $dir = $this->fs->directory($this->testDrive.DIRECTORY_SEPARATOR);
         $collection = $dir->get();
         $collection->setOutputTree(false);
 
         $ignored = ['.git', '.svn'];
+
+        //var_dump($collection->toArray());
 
         foreach ($collection->toArray() as $file) {
             if (in_array($f = basename($file), $ignored)) {
@@ -303,14 +326,18 @@ class DirectoryTest extends FilesystemTestCase
     {
         $this->buildTree();
 
-        Directory::addVCSPattern('^\.sass.*?');
+        Directory::addVCSPattern('\.sass.*');
 
         $dir = $this->fs->directory($this->testDrive, Directory::IGNORE_VCS);
+
         $collection = $dir->get();
         $collection->setOutputTree(false);
-        $ignored = ['.git', '.svn', '.sass-cache'];
+        $ignored = ['.git', '.svn', '.sass'];
 
-        foreach ($collection->toArray() as $file) {
+        $failures = [];
+
+
+        foreach ($files = $collection->toArray() as $file) {
 
             if (in_array($f = basename($file), $ignored)) {
                 $this->fail(
