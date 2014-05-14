@@ -17,8 +17,7 @@
     "selene/testsuite":"dev-development"
   },
   "autoload": {
-    "psr-0": {"Selene\\Components\\DI\\": ""}
+    "psr-4": {"Selene\\Components\\DI\\": ""}
   },
-  "target-dir": "Selene/Components/DI",
   "minimum-stability": "dev"
 }

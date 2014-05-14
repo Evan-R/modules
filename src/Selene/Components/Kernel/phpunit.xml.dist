@@ -10,7 +10,7 @@
 		stopOnFailure="false"
 		syntaxCheck="false">
 	<testsuites>
-		<testsuite name="Package">
+		<testsuite name="Kernel">
 			<directory>./Tests/</directory>
 		</testsuite>
 	</testsuites>

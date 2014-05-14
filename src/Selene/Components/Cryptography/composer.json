@@ -15,8 +15,7 @@
     "selene/testsuite": "dev-development"
   },
   "autoload": {
-    "psr-0": {"Selene\\Components\\Cryptography":""},
-    "classmap":["tests/"]
+    "psr-4": {"Selene\\Components\\Cryptography":""}
   },
   "target-dir": "Selene/Components/Cryptography",
   "minimum-stability": "dev"
