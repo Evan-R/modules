@@ -1,4 +1,9 @@
+# Selene PubSub Component 
+
 [![Build Status](https://api.travis-ci.org/seleneapp/events.png?branch=development)](https://travis-ci.org/seleneapp/events)
+[![Latest Stable Version](https://poser.pugx.org/selene/events/v/stable.png)](https://packagist.org/packages/selene/events) 
+[![Latest Unstable Version](https://poser.pugx.org/selene/events/v/unstable.png)](https://packagist.org/packages/selene/events) 
+[![License](https://poser.pugx.org/selene/events/license.png)](https://packagist.org/packages/selene/events)
 
 ## Setup
 
