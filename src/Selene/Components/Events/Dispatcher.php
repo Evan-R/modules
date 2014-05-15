@@ -15,6 +15,7 @@ use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
 use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Components\Common\Traits\Getter;
 
 /**
  * @class Dispatcher implements DispatcherInterface
@@ -27,7 +28,7 @@ use \Selene\Components\Common\Helper\ListHelper;
  */
 class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 {
-    use ContainerAwareTrait;
+    use Getter, ContainerAwareTrait;
 
     /**
      * events
@@ -83,13 +84,20 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 
         if (null !== $eventHandler && !is_callable($eventHandler)) {
             if ($this->isCallableService($eventHandler)) {
-                extract($this->getEventHandlerFromServiceString($event, $eventHandler));
+
+                $handler = $this->getEventHandlerFromServiceString($event, $eventHandler);
+
+                $eventHandler = $handler['eventHandler'];
+                $service = $handler['service'];
+                $method = $handler['method'];
+
             } else {
                 throw new \InvalidArgumentException(
                     sprintf('%s::on() expects argument 2 to be valid callback', __CLASS__)
                 );
             }
         }
+
         $this->bindEvent($event, $eventHandler, $priority, $service, $method);
     }
 
@@ -111,7 +119,12 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         $method = null;
 
         if (!is_callable($eventHandler)) {
-            extract($this->getEventHandlerFromServiceString($event, $eventHandler));
+
+            $handler = $this->getEventHandlerFromServiceString($event, $eventHandler);
+
+            $eventHandler = $handler['eventHandler'];
+            $service = $handler['service'];
+            $method = $handler['method'];
         }
 
         $handler = $eventHandler;
@@ -135,7 +148,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     public function off($event, $eventHandler = null)
     {
-        if (!is_null($eventHandler) && $this->detachEventByHandler($event, $eventHandler)) {
+        if (null !== $eventHandler && $this->detachEventByHandler($event, $eventHandler)) {
             return;
         }
 
@@ -203,7 +216,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 
         foreach ($this->handlers[$event] as $i => $handler) {
 
-            extract($handler);
+            $eventHandler = $handler['eventHandler'];
 
             if ($isEvent && $parameters->isPropagationStopped()) {
                 break;
@@ -214,7 +227,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
             $results[] = $res;
 
             // stop on first result;
-            if (!is_null($res) && $stopOnFirstResult) {
+            if (null !== $res && $stopOnFirstResult) {
                 break;
             }
         }
@@ -245,7 +258,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     public function getEventHandlers($event = null)
     {
-        if (is_null($event)) {
+        if (null === $event) {
             $handlers = [];
 
             foreach ($this->handlers as $handler) {
@@ -325,7 +338,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
             $priority = $this->findPriority($event);
         }
 
-        if (!is_null($service)) {
+        if (null !== $service) {
             $handler['uses'] = implode(static::EVTHANDLER_SEPARATOR, [$service, $method]);
         }
 
@@ -417,7 +430,10 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     private function getEventHandlerFromServiceString($event, $eventHandler)
     {
         if (is_string($eventHandler)) {
-            extract($this->extractService($eventHandler));
+            $definition = $this->extractService($eventHandler);
+
+            $service = $definition['service'];
+            $method  = $definition['method'];
 
             if (!$this->container) {
                 throw new \InvalidArgumentException(
