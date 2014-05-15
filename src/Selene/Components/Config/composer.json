@@ -17,8 +17,7 @@
     "mockery/mockery": "dev-master"
   },
   "autoload": {
-    "psr-0": {"Selene\\Components\\Config\\": ""}
+    "psr-4": {"Selene\\Components\\Config\\": ""}
   },
-  "target-dir": "Selene/Components/Config",
   "minimum-stability": "dev"
 }

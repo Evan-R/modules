@@ -16,8 +16,7 @@
     "selene/testsuite":"dev-development"
   },
   "autoload": {
-    "psr-0": {"Selene\\Components\\Filesystem\\": ""}
+    "psr-4": {"Selene\\Components\\Filesystem\\": ""}
   },
-  "target-dir": "Selene/Components/Filesystem",
   "minimum-stability": "dev"
 }

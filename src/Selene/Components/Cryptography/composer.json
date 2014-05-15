@@ -19,6 +19,5 @@
       "Selene\\Components\\Cryptography\\":""
     }
   },
-  "target-dir": "Selene/Components/Cryptography",
   "minimum-stability": "dev"
 }

@@ -22,6 +22,5 @@
       "Helper/functions.php"
     ]
   },
-  "target-dir": "Selene/Components/Common",
   "minimum-stability": "dev"
 }

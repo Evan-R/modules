@@ -132,7 +132,7 @@ $events->dispatch('event_name', $parameters); // returns an array containing the
 // will stop broadcasting the event as  soon as the first result is being returned:
 $events->dispatch('event_name', $parameters, true); 
 // or
-$events->untill('event_name', $parameters); 
+$events->until('event_name', $parameters); 
 ```
 ---------
 
@@ -168,7 +168,7 @@ class EventSubscriber implements SubscriberInterface
 {
     public static $event;
 
-    public static function getSubscriptions()
+    public function getSubscriptions()
     {
         return [
             'foo_event' => [

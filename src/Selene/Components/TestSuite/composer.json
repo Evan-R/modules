@@ -16,6 +16,5 @@
   "autoload": {
     "psr-4": {"Selene\\Components\\TestSuite\\": ""}
   },
-  "target-dir": "Selene/Components/TestSuite",
   "minimum-stability": "dev"
 }

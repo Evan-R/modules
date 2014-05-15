@@ -19,6 +19,5 @@
   "autoload": {
     "psr-4": {"Selene\\Components\\Package\\": ""}
   },
-  "target-dir": "Selene/Components/Package",
   "minimum-stability": "dev"
 }

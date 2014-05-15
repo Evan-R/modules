@@ -20,6 +20,5 @@
   "autoload": {
     "psr-4": {"Selene\\Components\\Routing\\": ""}
   },
-  "target-dir": "Selene/Components/Routing",
   "minimum-stability": "dev"
 }

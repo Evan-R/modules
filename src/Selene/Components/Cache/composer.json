@@ -17,8 +17,7 @@
     "selene/testsuite":"dev-development"
   },
   "autoload": {
-    "psr-0": {"Selene\\Components\\Cache\\": ""}
+    "psr-4": {"Selene\\Components\\Cache\\": ""}
   },
-  "target-dir": "Selene/Components/Cache",
   "minimum-stability": "dev"
 }
