@@ -133,6 +133,7 @@ class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableI
         if ($file->isFile()) {
             $this->pool[$this->getFilePath($file)] = $file;
         }
+
         if ($file->isDir()) {
             $this->pool[$this->getDirPath($file)] = $file;
         }

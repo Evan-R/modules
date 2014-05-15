@@ -14,18 +14,27 @@ namespace Selene\Components\Filesystem;
 use Selene\Components\Filesystem\Traits\IteratorTrait;
 
 /**
- * @class RecursiveDirectoryIterator
+ * @class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
+ * @see \RecursiveDirectoryIterator
+ *
  * @package Selene\Components\Filesystem
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 {
-    //use IteratorTrait {
-        //IteratorTrait::getSubPath as private _getSubPath;
-        //IteratorTrait::getSubPathname as private _getSubPathname;
-    //}
-
-    public function __construct($path, $flags, $rootpath = null)
+    /**
+     * Creates a new Recursive Directory Iterator.
+     *
+     * @param string  $path
+     * @param integer $flags
+     * @throws \InvalidArgumentException if $flags contain an
+     * CURRENT_AS_* flag other then CURRENT_AS_FILEINFO.
+     *
+     * @access public
+     */
+    public function __construct($path, $flags)
     {
         if ($flags & (\FilesystemIterator::CURRENT_AS_SELF|\FilesystemIterator::CURRENT_AS_PATHNAME)) {
             throw new \InvalidArgumentException(
@@ -34,15 +43,13 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
         }
 
         parent::__construct($path, $flags);
-
     }
-    //public function getSubPath()
-    //{
-        //return parent::getSubPath();
-    //}
 
-    //public function getSubPathname()
-    //{
-        //return parent::getSubPathname();
-    //}
+    /**
+     * {@inheritdoc}
+     */
+    public function current()
+    {
+        return new SplFileInfo(parent::current()->getPathname(), $this->getSubPath(), $this->getSubPathname());
+    }
 }

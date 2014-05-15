@@ -480,8 +480,23 @@ class FilesystemTest extends FilesystemTestCase
     {
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_dir'.DIRECTORY_SEPARATOR.'sub_dir';
         mkdir($target, 0755, true);
+
         $this->fs->chown(dirname($target), $this->getFileOwner($target), true);
-        $this->fs->chown(dirname($target), get_current_user(), true);
+
+        // get_current_user() still sometimes returns an empty string
+        // try to insert vagrant as user instead, otherwhise skip the test.
+        if ($phpbug = (0 === strlen($user = get_current_user()))) {
+            $user = 'vagrant';
+        }
+        try {
+            $this->fs->chown(dirname($target), $user, true);
+        } catch (\Exception $e) {
+            if ($phpbug) {
+                $this->markTestIncomplete();
+            } else {
+                $this->fail($e->getMessage());
+            }
+        }
     }
 
     /**

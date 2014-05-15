@@ -40,7 +40,7 @@ class FileFilter extends AbstractFilter
      * @access public
      * @return mixed
      */
-    public function __construct($filter)
+    public function __construct($filter = [])
     {
         $this->filter = (array)$filter;
     }
