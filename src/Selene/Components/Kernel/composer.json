@@ -1,6 +1,6 @@
 {
-  "name": "selene/stack",
-  "description": "Selene Kernel Stack Component",
+  "name": "selene/kernel",
+  "description": "Selene Kernel Component",
   "authors": [
     {
     "name": "Thomas Appel",
@@ -10,16 +10,17 @@
   "license": "MIT",
   "require": {
     "php":">=5.4.0",
+    "selene/di":"dev-development",
+    "symfony/http-kernel": "~2.4.0",
+    "symfony/http-foundation": "~2.4.0",
     "selene/common":"dev-development"
   },
   "require-dev": {
-    "symfony/http-kernel": "~2.4.0",
-    "symfony/http-foundation": "~2.4.0",
     "mockery/mockery": "dev-master"
   },
   "autoload": {
-    "psr-4": {"Selene\\Components\\Stack\\": ""}
+    "psr-4": {"Selene\\Components\\Package\\": ""}
   },
-  "target-dir": "Selene/Components/Stack",
+  "target-dir": "Selene/Components/Package",
   "minimum-stability": "dev"
 }

@@ -1,6 +1,6 @@
 {
-  "name": "selene/stack",
-  "description": "Selene Kernel Stack Component",
+  "name": "selene/routing",
+  "description": "Selene Routing Component",
   "authors": [
     {
     "name": "Thomas Appel",
@@ -10,16 +10,16 @@
   "license": "MIT",
   "require": {
     "php":">=5.4.0",
-    "selene/common":"dev-development"
+    "selene/common":"dev-development",
+    "symfony/http-foundation": "~2.4.0"
   },
   "require-dev": {
     "symfony/http-kernel": "~2.4.0",
-    "symfony/http-foundation": "~2.4.0",
     "mockery/mockery": "dev-master"
   },
   "autoload": {
-    "psr-4": {"Selene\\Components\\Stack\\": ""}
+    "psr-4": {"Selene\\Components\\Routing\\": ""}
   },
-  "target-dir": "Selene/Components/Stack",
+  "target-dir": "Selene/Components/Routing",
   "minimum-stability": "dev"
 }

@@ -42,6 +42,16 @@ class XmlLoader extends RoutingLoader
         $this->parseRoutes($xml);
     }
 
+    /**
+     * setRequirement
+     *
+     * @param mixed $route
+     * @param array $data
+     * @param mixed $attribute
+     *
+     * @access protected
+     * @return mixed
+     */
     protected function setRequirement($route, array $data, $attribute)
     {
         if (!isset($data[$attribute])) {

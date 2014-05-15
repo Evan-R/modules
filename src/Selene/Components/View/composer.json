@@ -1,7 +1,7 @@
 {
-  "name": "selene/xml",
-  "description": "selene xml utils",
-  "keywords": ["selene", "xml"],
+  "name": "selene/view",
+  "description": "selene templating",
+  "keywords": ["selene", "view", "templating"],
   "license": "MIT",
   "authors": [
     {
@@ -17,8 +17,8 @@
     "mockery/mockery": "dev-master"
   },
   "autoload": {
-    "psr-4": {"Selene\\Components\\Xml\\": ""}
+    "psr-4": {"Selene\\Components\\View\\": ""}
   },
-  "target-dir": "Selene/Components/Xml",
+  "target-dir": "Selene/Components/View",
   "minimum-stability": "dev"
 }

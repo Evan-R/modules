@@ -48,6 +48,8 @@ trait FormatterTrait
 
             if (is_array($value)) {
                 $value = $this->extractParams($value, $indent + 4);
+            } elseif (is_string($value) && 0 === strpos($value, '$this')) {
+                $value = $value;
             } else {
                 $value = $this->exportVar($value);
             }

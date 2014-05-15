@@ -356,7 +356,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     public function addFlag($name, array $arguments = [])
     {
         $flag = new Flag($name, $arguments);
-        $this->flags[$flag->getName()] = $flag;
+        $this->flags[$flag->getName()][] = $flag;
 
         return $this;
     }
@@ -513,7 +513,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      */
     public function addSetter($method, array $arguments)
     {
-        $this->setters[] = [$method => $arguments];
+        $this->setters[$method][] = $arguments;
         return $this;
     }
 

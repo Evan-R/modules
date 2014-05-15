@@ -330,7 +330,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      */
     public function runsInTest()
     {
-        return static::$testEnv === $this->getEnv();
+        return static::$testEnv === $this->getEnvironment();
     }
 
     /**

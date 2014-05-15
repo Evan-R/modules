@@ -664,17 +664,20 @@ class Container implements ContainerInterface
      */
     protected function callSetters($instance, array $callers)
     {
-        foreach ($callers as $caller) {
+        foreach ($callers as $method => $argsList) {
 
-            $method  = key($caller);
-            $args    = $caller[$method];
-            $synced  = $this->getSyncedArguments($args);
+            //$method  = key($caller);
+            foreach ($argsList as $args) {
+                $synced  = $this->getSyncedArguments($args);
 
-            if (!empty($synced)) {
-                return $this->createSyncCallback($instance, $method, $args, $synced);
+                if (!empty($synced)) {
+                    return $this->createSyncCallback($instance, $method, $args, $synced);
+                }
+
+                $this->applySetter($instance, $method, $args);
             }
+            //$args    = $caller[$method];
 
-            $this->applySetter($instance, $method, $args);
         }
     }
 

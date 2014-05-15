@@ -14,7 +14,7 @@
     "mikey179/vfsStream": "dev-master"
   },
   "autoload": {
-    "psr-0": {"Selene\\Components\\TestSuite\\": ""}
+    "psr-4": {"Selene\\Components\\TestSuite\\": ""}
   },
   "target-dir": "Selene/Components/TestSuite",
   "minimum-stability": "dev"

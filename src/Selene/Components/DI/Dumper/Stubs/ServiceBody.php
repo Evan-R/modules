@@ -111,23 +111,26 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      */
     protected function getCallers($instance, $definition, &$content)
     {
-        foreach ($definition->getSetters() as $setter) {
-            $synced    = [];
-            $method    = key($setter);
-            $arguments = $setter[$method];
+        foreach ($definition->getSetters() as $setter => $argsList) {
+            $method    = $setter;
+            //$arguments = $setter[$method];
 
-            foreach ($arguments as $argument) {
-                if ($argument instanceof Reference && $this->container->getDefinition($argument)->isInjected()) {
-                    $synced[(string)$argument] = true;
+            foreach ($argsList as $arguments) {
+
+                $synced    = [];
+                foreach ($arguments as $argument) {
+                    if ($argument instanceof Reference && $this->container->getDefinition($argument)->isInjected()) {
+                        $synced[(string)$argument] = true;
+                    }
                 }
-            }
 
-            $args = $this->getArguments($arguments);
+                $args = $this->getArguments($arguments);
 
-            if ((bool)$synced) {
-                $content[] = $this->createSynCallcack($synced, $method, $args);
-            } else {
-                $content[] = $this->setServiceArgs($args, $instance.'->'.$method).';';
+                if ((bool)$synced) {
+                    $content[] = $this->createSynCallcack($synced, $method, $args);
+                } else {
+                    $content[] = $this->setServiceArgs($args, $instance.'->'.$method).';';
+                }
             }
         }
     }
@@ -270,15 +273,35 @@ class ServiceBody extends Stub implements ContainerAwareInterface
     {
         $args = [];
 
-        foreach ($arguments as $argument) {
+        foreach ($arguments as $key => $argument) {
+            if (is_array($argument)) {
+                $argument = $this->replaceReferenceInArgsArray($argument);
+            }
             if ($argument instanceof Reference) {
-                $args[] = $this->extractRefenceInstantiator($argument);
+                $args[$key] = $this->extractRefenceInstantiator($argument);
             } elseif (!is_scalar($argument)) {
-                $args[] = $this->extractParams($argument, 16);
+                $args[$key] = $this->extractParams($argument, 16);
             } elseif ($this->container->hasParameter($argument)) {
-                $args[] = '$this->getParameter('.$argument.')';
+                $args[$key] = '$this->getParameter('.$argument.')';
             } else {
-                $args[] = $this->exportVar($argument);
+                $args[$key] = $this->exportVar($argument);
+            }
+        }
+
+        return $args;
+    }
+
+    protected function replaceReferenceInArgsArray(array $arguments)
+    {
+        $args = [];
+
+        foreach ($arguments as $key => $argument) {
+            if (is_array($argument)) {
+                $args[$key] = $this->replaceReferenceInArgsArray($argument);
+            } elseif ($argument instanceof Reference) {
+                $args[$key] = $this->extractRefenceInstantiator($argument);
+            } else {
+                $args[$key] = $argument;
             }
         }
 

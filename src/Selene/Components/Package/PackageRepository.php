@@ -174,17 +174,10 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
             return;
         }
 
-        $builder->addObjectResource($config);
-
         $parameters = $container->getParameters();
         $containerClass = (new \ReflectionObject($container))->getName();
-        $packageContainer = new $container(new Parameters($parameters->getRaw()));
-
-        //if ($packageContainer->hasParameter($name = 'package:'.$package->getAlias())) {
-        //    $values = $packageContainer->getParameter($name);
-        //} else {
-        //    $values = [];
-        //}
+        $packageContainer = new $container;
+        $packageContainer->getParameters()->merge(new Parameters($parameters->getRaw()));
 
         $builder->replaceContainer($packageContainer);
 

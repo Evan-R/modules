@@ -65,21 +65,26 @@ class ProcessArgumentReference implements ProcessInterface
 
         $setters = [];
 
-        foreach ($definition->getSetters() as $setter) {
+        foreach ($definition->getSetters() as $method => $argsList) {
 
-            $args = [];
-            $method = key($setter);
-            $arguments = $setter[$method];
+            foreach ($argsList as $arguments) {
 
-            foreach ($arguments as $argument) {
-                if ($this->isDefinitionString($argument)) {
-                    $args[] = new Reference(substr($argument, 1));
-                } else {
-                    $args[] = $argument;
+                $args = [];
+
+                foreach ($arguments as $argument) {
+                    if ($this->isDefinitionString($argument)) {
+                        $args[] = new Reference(substr($argument, 1));
+                    } else {
+                        $args[] = $argument;
+                    }
                 }
+                var_dump($args);
+                $setters[$method][] = $args;
             }
 
-            $setters[] = [$method => $args];
+            //$method = key($setter);
+            //$arguments = $setter[$method];
+
         }
 
         $definition->setSetters($setters);

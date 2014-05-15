@@ -13,10 +13,11 @@
   },
   "require-dev": {
     "selene/testsuite":"dev-development",
-    "selene/cryptography":"dev-development"
+    "selene/cryptography":"dev-development",
+    "phpunit/phpunit": "dev-master"
   },
   "autoload": {
-    "psr-0": {"Selene\\Components\\Common\\": ""},
+    "psr-4": {"Selene\\Components\\Common\\": ""},
     "files": [
       "Helper/functions.php"
     ]
