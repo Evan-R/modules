@@ -18,13 +18,25 @@ use Selene\Components\Events\Tests\Stubs\EventStub;
 use Selene\Components\Events\Tests\Stubs\EventSubscriberStub;
 use Selene\Components\DI\ContainerInterface;
 
+/**
+ * @class EventDispatcherTest extends TestCase
+ * @see TestCase
+ *
+ * @package Selene\Components\Events\Tests
+ * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
+ */
 class EventDispatcherTest extends TestCase
 {
     /**
-     * @var ClassName
+     * createDispatcher
+     *
+     * @param ContainerInterface $container
+     *
+     * @access protected
+     * @return Dispatcher
      */
-    protected $object;
-
     protected function createDispatcher(ContainerInterface $container = null)
     {
         if (null === $container) {

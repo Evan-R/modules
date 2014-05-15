@@ -17,7 +17,7 @@
     "selene/di":"dev-development"
   },
   "autoload": {
-    "psr-0": {"Selene\\Components\\Events\\": ""}
+    "psr-4": {"Selene\\Components\\Events\\": ""}
   },
   "target-dir": "Selene/Components/Events",
   "minimum-stability": "dev"
