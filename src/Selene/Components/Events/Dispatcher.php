@@ -84,20 +84,13 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 
         if (null !== $eventHandler && !is_callable($eventHandler)) {
             if ($this->isCallableService($eventHandler)) {
-
-                $handler = $this->getEventHandlerFromServiceString($event, $eventHandler);
-
-                $eventHandler = $handler['eventHandler'];
-                $service = $handler['service'];
-                $method = $handler['method'];
-
+                extract($this->getEventHandlerFromServiceString($event, $eventHandler));
             } else {
                 throw new \InvalidArgumentException(
                     sprintf('%s::on() expects argument 2 to be valid callback', __CLASS__)
                 );
             }
         }
-
         $this->bindEvent($event, $eventHandler, $priority, $service, $method);
     }
 
@@ -119,12 +112,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         $method = null;
 
         if (!is_callable($eventHandler)) {
-
-            $handler = $this->getEventHandlerFromServiceString($event, $eventHandler);
-
-            $eventHandler = $handler['eventHandler'];
-            $service = $handler['service'];
-            $method = $handler['method'];
+            extract($this->getEventHandlerFromServiceString($event, $eventHandler));
         }
 
         $handler = $eventHandler;
@@ -222,16 +210,17 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
                 break;
             }
 
-            $res = call_user_func_array($eventHandler, !is_array($parameters) ? [$parameters] : $parameters);
+            if (null !== (
+                $res = call_user_func_array($eventHandler, !is_array($parameters) ? [$parameters] : $parameters))
+            ) {
+                $results[] = $res;
 
-            $results[] = $res;
-
-            // stop on first result;
-            if (null !== $res && $stopOnFirstResult) {
-                break;
+                // stop on first result;
+                if ($stopOnFirstResult) {
+                    return $results;
+                }
             }
         }
-
         return $results;
     }
 
@@ -430,10 +419,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     private function getEventHandlerFromServiceString($event, $eventHandler)
     {
         if (is_string($eventHandler)) {
-            $definition = $this->extractService($eventHandler);
-
-            $service = $definition['service'];
-            $method  = $definition['method'];
+            extract($this->extractService($eventHandler));
 
             if (!$this->container) {
                 throw new \InvalidArgumentException(
