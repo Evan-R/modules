@@ -11,6 +11,7 @@
 
 namespace Selene\Components\Xml\Dom;
 
+use \DOMNode;
 use \DOMXpath;
 use \DOMDocument as BaseDOM;
 
@@ -43,7 +44,7 @@ class DOMDocument extends BaseDom
     public function __construct($version = null, $encoding = null)
     {
         parent::__construct($version, $encoding);
-        $this->registerNodeClass('DOMElement', __NAMESPACE__ . '\\DOMElement');
+        $this->registerNodeClass('DOMElement', '\Selene\Components\Xml\Dom\DOMElement');
     }
 
     /**

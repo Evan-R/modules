@@ -30,9 +30,13 @@ class DOMElement extends BaseDOMElement
      * @access public
      * @return mixed
      */
-    public function xPath($query)
+    public function xpath($query)
     {
-        return $this->ownerDocument->getXpath()->query($query, $this);
+        if ($this->ownerDocument) {
+            return $this->ownerDocument->getXpath()->query($query, $this);
+        }
+
+        throw new \BadMethodCallException('cannot xpath on element without an owner document');
     }
 
     /**
@@ -48,6 +52,6 @@ class DOMElement extends BaseDOMElement
             return $this->ownerDocument->appendDomElement($import, $this, $deep);
         }
 
-        throw new \BadMethodCallException('cannot add an element without a owner document');
+        throw new \BadMethodCallException('cannot add an element without an owner document');
     }
 }

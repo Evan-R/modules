@@ -51,6 +51,25 @@ class StackTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('success', $response->getContent());
     }
 
+    /** @test */
+    public function itShouldCallTerminateOnItsParentKenel()
+    {
+        $stack = new Stack($kernel = $this->getTerminableKernelMock());
+
+        $request = Request::create('/');
+
+        $response = new Response('error');
+
+        $kernel->shouldReceive('terminate')
+            ->with($request, $resp = m::mock('Symfony\Component\HttpFoundation\Response'))
+            ->andReturnUsing(function ($req, $res) use ($response) {
+                $response->setContent('success');
+            });
+
+        $stack->terminate($request, $resp);
+        $this->assertSame('success', $response->getContent());
+    }
+
     protected function getKernelMock()
     {
         $kernel = m::mock('Symfony\Component\HttpKernel\HttpKernelInterface');
@@ -60,6 +79,12 @@ class StackTest extends \PHPUnit_Framework_TestCase
     protected function getStackedKernelMock()
     {
         $kernel = m::mock('Selene\Components\Stack\StackedKernelInterface');
+        return $kernel;
+    }
+
+    protected function getTerminableKernelMock()
+    {
+        $kernel = m::mock('Selene\Components\Stack\StackedKernelInterface, Symfony\Component\HttpKernel\TerminableInterface');
         return $kernel;
     }
 }

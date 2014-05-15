@@ -15,7 +15,8 @@
   "require-dev": {
     "symfony/http-kernel": "~2.4.0",
     "symfony/http-foundation": "~2.4.0",
-    "mockery/mockery": "dev-master"
+    "mockery/mockery": "dev-master",
+    "phpunit/phpunit": "dev-master"
   },
   "autoload": {
     "psr-4": {"Selene\\Components\\Stack\\": ""}
