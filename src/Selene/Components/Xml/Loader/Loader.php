@@ -16,12 +16,11 @@ use \Selene\Components\Xml\SimpleXMLElement;
 use \Selene\Components\Common\Traits\Getter;
 
 /**
- * Class: XmlLoader
+ * @class Loader implements LoaderInterface
+ * @see LoaderInterface
  *
- * @implements LoaderInterface
- *
- * @package
- * @version
+ * @package Selene\Components\Xml\Loader
+ * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
@@ -129,7 +128,6 @@ class Loader implements LoaderInterface
         return $xml;
     }
 
-
     /**
      * formatErrors
      *
@@ -205,13 +203,13 @@ class Loader implements LoaderInterface
         $externalEntitiesDisabled = libxml_disable_entity_loader(false);
         libxml_clear_errors();
 
-        set_error_handler(array($this, 'handleXMLErrors'));
+        set_error_handler([$this, 'handleXMLErrors']);
 
         // set LIBXML_NONET to prevent local and remote file inclusion attacks.
         try {
             call_user_func_array(
-                array($dom, $load),
-                array($file, LIBXML_NONET | LIBXML_DTDATTR | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)
+                [$dom, $load],
+                [$file, LIBXML_NONET | LIBXML_DTDATTR | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0]
             );
         } catch (\Exception $e) {
             $this->errors[] = trim($e->getMessage(), "\n");
@@ -265,7 +263,7 @@ class Loader implements LoaderInterface
      */
     private function getAllErrors()
     {
-        $errors = array();
+        $errors = [];
 
         foreach ($this->xmlErrors as $error) {
             $errors[] = trim($error->message, "\n");

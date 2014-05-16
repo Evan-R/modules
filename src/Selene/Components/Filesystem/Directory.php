@@ -139,8 +139,6 @@ class Directory extends AbstractFileObject implements \IteratorAggregate
         ];
 
     /**
-     * __construct
-     *
      * @param Filesystem $files
      * @param mixed $path
      * @param mixed $flags

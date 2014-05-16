@@ -11,7 +11,6 @@
 
 namespace Selene\Components\Package;
 
-
 use \Selene\Components\DI\Parameters;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\Config\ConfigurationInterface;

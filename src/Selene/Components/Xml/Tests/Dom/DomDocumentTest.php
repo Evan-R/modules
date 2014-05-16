@@ -32,6 +32,7 @@ class DomDocumentTest extends \PHPUnit_Framework_TestCase
     public function itShouldCreateDOMElementsWithRightClass()
     {
         $dom = new DOMDocument;
+
         $element = $dom->createElement('foo', 'bar');
 
         $this->assertInstanceof('\Selene\Components\Xml\Dom\DOMElement', $element);
@@ -42,6 +43,7 @@ class DomDocumentTest extends \PHPUnit_Framework_TestCase
     {
         $xml = '<data><foo>foo</foo><bar>bar</bar></data>';
         $dom = new DOMDocument;
+
         $dom->loadXML($xml, LIBXML_NONET);
 
         foreach ($dom->xpath('//foo|//bar') as $node) {

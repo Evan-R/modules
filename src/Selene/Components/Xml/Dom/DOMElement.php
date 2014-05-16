@@ -11,8 +11,6 @@
 
 namespace Selene\Components\Xml\Dom;
 
-use \DOMElement as BaseDOMElement;
-
 /**
  * @class DOMElement extends BaseDOMElement
  * @see BaseDOMElement
@@ -22,7 +20,7 @@ use \DOMElement as BaseDOMElement;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class DOMElement extends BaseDOMElement
+class DOMElement extends \DOMElement
 {
     /**
      * xPath

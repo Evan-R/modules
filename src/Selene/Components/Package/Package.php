@@ -33,10 +33,8 @@ use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-abstract class Package implements PackageInterface, ContainerAwareInterface
+abstract class Package implements PackageInterface
 {
-    use ContainerAwareTrait;
-
     /**
      * path
      *

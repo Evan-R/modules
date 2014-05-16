@@ -44,7 +44,7 @@ class DOMDocument extends BaseDom
     public function __construct($version = null, $encoding = null)
     {
         parent::__construct($version, $encoding);
-        $this->registerNodeClass('DOMElement', '\Selene\Components\Xml\Dom\DOMElement');
+        $this->registerNodeClass('DOMElement', 'Selene\Components\Xml\Dom\DomElement');
     }
 
     /**
@@ -69,7 +69,9 @@ class DOMDocument extends BaseDom
      */
     public function xpath($query, DOMNode $contextNode = null)
     {
-        return $this->getXpath()->query($query, $contextNode);
+        $xpath = $this->getXpath();
+        return $xpath->query($query);
+        //return $this->getXpath()->query($query, $contextNode);
     }
 
     /**
