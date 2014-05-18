@@ -1,5 +1,11 @@
 #The common component
 
+[![Build Status](https://api.travis-ci.org/seleneapp/common.png?branch=development)](https://travis-ci.org/seleneapp/common)
+[![Latest Stable Version](https://poser.pugx.org/selene/common/v/stable.png)](https://packagist.org/packages/selene/common) 
+[![Latest Unstable Version](https://poser.pugx.org/selene/common/v/unstable.png)](https://packagist.org/packages/selene/common) 
+[![License](https://poser.pugx.org/selene/common/license.png)](https://packagist.org/packages/selene/common)
+[![HHVM Status](http://hhvm.h4cc.de/badge/selene/common.png)](http://hhvm.h4cc.de/package/selene/common)
+
 The Common component is shared across almost ever other selene component.
 
 ## Data Structures

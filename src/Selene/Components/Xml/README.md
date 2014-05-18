@@ -4,6 +4,7 @@
 [![Latest Stable Version](https://poser.pugx.org/selene/xml/v/stable.png)](https://packagist.org/packages/selene/xml) 
 [![Latest Unstable Version](https://poser.pugx.org/selene/xml/v/unstable.png)](https://packagist.org/packages/selene/xml) 
 [![License](https://poser.pugx.org/selene/xml/license.png)](https://packagist.org/packages/selene/xml)
+[![HHVM Status](http://hhvm.h4cc.de/badge/selene/xml.png)](http://hhvm.h4cc.de/package/selene/xml)
 
 ## Install
 

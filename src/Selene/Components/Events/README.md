@@ -4,6 +4,7 @@
 [![Latest Stable Version](https://poser.pugx.org/selene/events/v/stable.png)](https://packagist.org/packages/selene/events) 
 [![Latest Unstable Version](https://poser.pugx.org/selene/events/v/unstable.png)](https://packagist.org/packages/selene/events) 
 [![License](https://poser.pugx.org/selene/events/license.png)](https://packagist.org/packages/selene/events)
+[![HHVM Status](http://hhvm.h4cc.de/badge/selene/events.png)](http://hhvm.h4cc.de/package/selene/events)
 
 ## Setup
 

@@ -4,6 +4,7 @@
 [![Latest Stable Version](https://poser.pugx.org/selene/filesystem/v/stable.png)](https://packagist.org/packages/selene/filesystem) 
 [![Latest Unstable Version](https://poser.pugx.org/selene/filesystem/v/unstable.png)](https://packagist.org/packages/selene/filesystem) 
 [![License](https://poser.pugx.org/selene/filesystem/license.png)](https://packagist.org/packages/selene/filesystem)
+[![HHVM Status](http://hhvm.h4cc.de/badge/selene/filesystem.png)](http://hhvm.h4cc.de/package/selene/filesystem)
 
 ## Setup
 
