@@ -17,7 +17,9 @@
     "mockery/mockery": "dev-master"
   },
   "autoload": {
-    "psr-4": {"Selene\\Components\\Package\\": ""}
+    "psr-4": {
+      "Selene\\Components\\Package\\": ""
+    }
   },
   "minimum-stability": "dev"
 }
