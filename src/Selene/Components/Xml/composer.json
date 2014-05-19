@@ -11,10 +11,12 @@
   ],
   "require": {
     "php":">=5.4.0",
+    "phpunit/phpunit": "~4.0",
     "selene/common":"dev-development"
   },
   "require-dev": {
-    "mockery/mockery": "dev-master"
+    "mockery/mockery": "dev-master",
+    "league/phpunit-coverage-listener":"dev-master"
   },
   "autoload": {
     "psr-4": {"Selene\\Components\\Xml\\": ""}
