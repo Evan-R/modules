@@ -268,7 +268,7 @@ class Normalizer implements NormalizerInterface
         $nkey = $this->normalize($attributeName);
 
         if (is_callable($attributeValue) || in_array($nkey, $this->ignoredAttributes)) {
-            continue;
+            return;
         }
 
         if (null !== $attributeValue && !is_scalar($attributeValue)) {

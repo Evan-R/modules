@@ -148,6 +148,17 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['bar' => 'bar'], $normalizer->ensureArray($object));
     }
 
+    /** @test */
+    public function itShouldConvertObjectsAndIgnoreCallableProperties()
+    {
+        $obj = new ConvertToArrayStub;
+
+        $this->assertTrue(is_callable($obj->getBaz(), 'stub getter should return callable'));
+
+        $normalizer = new Normalizer;
+        $this->assertEquals(['foo' => 'foo', 'bar' => 'bar'], $normalizer->ensureArray($obj));
+    }
+
     /**
      * tearDown
      *

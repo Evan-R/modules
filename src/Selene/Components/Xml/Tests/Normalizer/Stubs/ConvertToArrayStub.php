@@ -30,6 +30,14 @@ class ConvertToArrayStub
      */
     protected $bar = 'bar';
 
+    protected $baz;
+
+    public function __construct()
+    {
+        $this->baz = function () {
+        };
+    }
+
     /**
      * getFoo
      *
@@ -52,6 +60,11 @@ class ConvertToArrayStub
     public function getFoo()
     {
         return $this->foo;
+    }
+
+    public function getBaz()
+    {
+        return $this->baz;
     }
 
     public function getAttributes($param)
