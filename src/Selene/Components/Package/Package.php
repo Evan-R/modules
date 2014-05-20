@@ -25,6 +25,9 @@ use \Selene\Components\Console\Application as Console;
 use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
 
 /**
+ * The package class is an entry point for extending functionality of the
+ * selene components in a framework context.
+ *
  * @abstract class Package implements PackageInterface
  * @see PackageInterface
  * @abstract
