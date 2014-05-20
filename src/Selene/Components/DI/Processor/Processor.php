@@ -58,6 +58,22 @@ class Processor implements ProcessorInterface
     }
 
     /**
+     * add
+     *
+     * @param ProcessInterface $process
+     * @param mixed $priority
+     *
+     * @access public
+     * @return \Selene\Components\DI\Processor\ProcessorInterface
+     */
+    public function add(ProcessInterface $process, $priority = ProcessInterface::BEFORE_RESOLVE)
+    {
+        $this->processes[$priority][] = $process;
+
+        return $this;
+    }
+
+    /**
      * processGroup
      *
      * @param array $group
@@ -70,19 +86,5 @@ class Processor implements ProcessorInterface
         foreach ($group as $process) {
             $process->process($this->container);
         }
-    }
-
-    /**
-     * add
-     *
-     * @param ProcessInterface $process
-     * @param mixed $priority
-     *
-     * @access public
-     * @return mixed
-     */
-    public function add(ProcessInterface $process, $priority = ProcessInterface::BEFORE_RESOLVE)
-    {
-        $this->processes[$priority][] = $process;
     }
 }

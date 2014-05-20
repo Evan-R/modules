@@ -239,7 +239,7 @@ class Parser implements ParserInterface
             }
 
             if ($this->mergeAttributes()) {
-                $attributes = $attributes['@attributes'];
+                $attributes = $attributes[$this->getAttributesKey()];
             }
 
             $result = array_merge($attributes, $result);
