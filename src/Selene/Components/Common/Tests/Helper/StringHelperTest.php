@@ -136,6 +136,19 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('doodle=foo', StringHelper::substrAfter('--env=doodle=foo', '='));
     }
 
+    /** @test */
+    public function strNull()
+    {
+        $nullStr = '';
+        $this->assertNull(StringHelper::strNull($nullStr));
+
+        $str = 'foo';
+        $this->assertSame($str, StringHelper::strNull($str));
+
+        $inp = new \StdClass;
+        $this->assertSame($inp, StringHelper::strNull($inp));
+    }
+
     /**
      * @test
      */

@@ -77,6 +77,21 @@ class StringHelper
     }
 
     /**
+     * Nulls an empty string if input is a string.
+     *
+     * Only vaiables can be passed as argument.
+     *
+     * @param mixed $input
+     *
+     * @access public
+     * @return mixed|null
+     */
+    public static function strNull(&$input)
+    {
+        return is_string($input) ? (0 === strlen($input) ? null : $input) : $input;
+    }
+
+    /**
      * strRand
      *
      * @param mixed $length
