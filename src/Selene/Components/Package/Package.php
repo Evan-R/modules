@@ -11,6 +11,7 @@
 
 namespace Selene\Components\Package;
 
+use \Selene\Components\Kernel\ApplicationInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Loader\XmlLoader;
 use \Selene\Components\DI\Loader\PhpLoader;
@@ -24,7 +25,7 @@ use \Selene\Components\Console\Application as Console;
 use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
 
 /**
- * @abstract class Package implements PackageInterface, ContainerAwareInterface
+ * @abstract class Package implements PackageInterface
  * @see PackageInterface
  * @abstract
  *
@@ -78,11 +79,11 @@ abstract class Package implements PackageInterface
     protected $alias;
 
     /**
-     *
-     * Returns a required package alias, otherwhise false.
+     * Return a package alias that is required by this package.
      *
      * @access public
-     * @return string|boolean
+     * @return string|boolean the parent package alias as string,
+     *  otherwise boolean `false`
      */
     public function getRequirement()
     {
@@ -90,11 +91,13 @@ abstract class Package implements PackageInterface
     }
 
     /**
-     * getExtension
+     * Provides a PackageConfiguration instance.
      *
+     * If no additional Configuration is required for a package, this method
+     * should return `null` or `false`.
      *
      * @access public
-     * @return mixed
+     * @return null|PackageConfiguration
      */
     public function getConfiguration()
     {
@@ -103,7 +106,10 @@ abstract class Package implements PackageInterface
     }
 
     /**
-     * getResourcePath
+     * Return the path to the resources of the package.
+     *
+     * Resources are flat files meant to scaffold configuration, routing, or
+     * static assets.
      *
      * @access public
      * @return mixed
@@ -114,7 +120,10 @@ abstract class Package implements PackageInterface
     }
 
     /**
-     * getAlias
+     * Get the package alias.
+     *
+     * The Alias is the snake cased version of your package name ommiting the
+     * `Package` suffix
      *
      * @access public
      * @return string
@@ -123,7 +132,7 @@ abstract class Package implements PackageInterface
     {
         if (null === $this->alias) {
             $name = $this->getName();
-            $base = 0 !== strrpos($name, 'Package') ? substr($name, 0, -strlen('Package')) : $name;
+            $base = 0 !== strripos($name, 'package') ? substr($name, 0, -7) : $name;
 
             $this->alias = StringHelper::strLowDash($base);
         }
@@ -132,7 +141,9 @@ abstract class Package implements PackageInterface
     }
 
     /**
-     * build
+     * Build package dependencies.
+     *
+     * This method is called only once before the service container is built.
      *
      * @param ContainerBuilderInterface $container
      *
@@ -146,15 +157,17 @@ abstract class Package implements PackageInterface
     /**
      * Boot the package.
      *
+     * Provice additional bootstrapping for a package.
+     *
      * @access public
      * @return void
      */
-    public function boot()
+    public function boot(ApplicationInterface $app)
     {
     }
 
     /**
-     * shutdown
+     * Shutdown ops on this package.
      *
      * @access public
      * @return void
@@ -175,9 +188,10 @@ abstract class Package implements PackageInterface
     }
 
     /**
-     * getNamespace
+     * Get the namespace of this package.
      *
      * @access public
+     * @final
      * @return string
      */
     final public function getNamespace()
@@ -190,7 +204,10 @@ abstract class Package implements PackageInterface
 
 
     /**
-     * getName
+     * Get the package name.
+     *
+     * The default package name is the short name of the package class,
+     * e.g. `Acme\Special\FooPackage` will result in `FooPackage`.
      *
      * @access public
      * @return string
@@ -205,10 +222,10 @@ abstract class Package implements PackageInterface
     }
 
     /**
-     * getPath
+     * Get the actual filesystem path of this package.
      *
      * @access public
-     * @return mixed
+     * @return string
      */
     final public function getPath()
     {
@@ -220,7 +237,7 @@ abstract class Package implements PackageInterface
     }
 
     /**
-     * getPackageReflection
+     * Get the reflection object of this package.
      *
      * @access protected
      * @final
@@ -236,7 +253,9 @@ abstract class Package implements PackageInterface
     }
 
     /**
-     * registerCommands
+     * Register Console commands for this package.
+     *
+     * This method is only invoked when booting the application in cli mode.
      *
      * @access public
      * @return void
