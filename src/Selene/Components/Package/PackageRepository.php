@@ -199,7 +199,7 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      */
     protected function buildPackage(ContainerBuilderInterface $builder, PackageInterface $package)
     {
-        $builder->addFileResource($package->getMeta());
+        //$builder->addFileResource($package->getMeta());
         return $package->build($builder);
     }
 

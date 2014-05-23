@@ -11,9 +11,9 @@
 
 namespace Selene\Components\Package;
 
-use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\DI\BuilderInterface;
+use \Selene\Components\Kernel\ApplicationInterface;
 use \Selene\Components\Console\Application as Console;
-use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
 
 /**
  * @interface PackageInterface
@@ -35,20 +35,22 @@ interface PackageInterface
     /**
      * build
      *
-     * @param ContainerInterface $container
+     * @param \Selene\Components\DI\BuilderInterface $builder
+     * @internal param \Selene\Components\Package\ContainerInterface $container
      *
      * @access public
      * @return mixed
      */
-    public function build(ContainerBuilderInterface $builder);
+    public function build(BuilderInterface $builder);
 
     /**
      * boot up the package
      *
      * @access public
+     * @param \Selene\Components\Kernel\ApplicationInterface $app
      * @return void
      */
-    public function boot();
+    public function boot(ApplicationInterface $app);
 
     /**
      * bundle shutdown.
@@ -64,6 +66,7 @@ interface PackageInterface
      * registerCommands
      *
      * @access public
+     * @param \Selene\Components\Console\Application $console
      * @return mixed
      */
     public function registerCommands(Console $console);

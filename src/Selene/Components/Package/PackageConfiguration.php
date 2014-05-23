@@ -11,6 +11,7 @@
 
 namespace Selene\Components\Package;
 
+use \Selene\Components\Common\Traits\Getter;
 use \Selene\Components\DI\BuilderInterface;
 use \Selene\Components\DI\Loader\PhpLoader;
 use \Selene\Components\DI\Loader\XmlLoader;
@@ -36,6 +37,8 @@ use \Selene\Components\Routing\Loader\CallableLoader as CallableRoutingLoader;
  */
 abstract class PackageConfiguration extends Configuration
 {
+    use Getter;
+
     /**
      * package
      *

@@ -11,18 +11,10 @@
 
 namespace Selene\Components\Package;
 
+use \Selene\Components\DI\BuilderInterface;
 use \Selene\Components\Kernel\ApplicationInterface;
-use \Selene\Components\DI\ContainerAwareInterface;
-use \Selene\Components\DI\Loader\XmlLoader;
-use \Selene\Components\DI\Loader\PhpLoader;
-use \Selene\Components\DI\Loader\CallableLoader;
-use \Selene\Components\DI\Traits\ContainerAwareTrait;
-use \Selene\Components\Config\Loader\DelegatingLoader;
-use \Selene\Components\Config\Loader\Resolver as LoaderResolver;
-use \Selene\Components\Config\Locator\FileLocator;
 use \Selene\Components\Common\Helper\StringHelper;
 use \Selene\Components\Console\Application as Console;
-use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
 
 /**
  * The package class is an entry point for extending functionality of the
@@ -125,7 +117,7 @@ abstract class Package implements PackageInterface
     /**
      * Get the package alias.
      *
-     * The Alias is the snake cased version of your package name ommiting the
+     * The Alias is the snake cased version of your package name omitting the
      * `Package` suffix
      *
      * @access public
@@ -148,12 +140,13 @@ abstract class Package implements PackageInterface
      *
      * This method is called only once before the service container is built.
      *
-     * @param ContainerBuilderInterface $container
+     * @param \Selene\Components\DI\BuilderInterface $builder
+     * @internal param \Selene\Components\DI\BuilderInterface $container
      *
      * @access public
      * @return void
      */
-    public function build(ContainerBuilderInterface $builder)
+    public function build(BuilderInterface $builder)
     {
     }
 
@@ -163,6 +156,7 @@ abstract class Package implements PackageInterface
      * Provice additional bootstrapping for a package.
      *
      * @access public
+     * @param \Selene\Components\Kernel\ApplicationInterface $app
      * @return void
      */
     public function boot(ApplicationInterface $app)
@@ -259,6 +253,8 @@ abstract class Package implements PackageInterface
      * Register Console commands for this package.
      *
      * This method is only invoked when booting the application in cli mode.
+     *
+     * @param \Selene\Components\Console\Application $console
      *
      * @access public
      * @return void
