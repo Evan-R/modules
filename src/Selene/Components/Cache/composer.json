@@ -14,7 +14,11 @@
     "selene/common":"dev-development"
   },
   "require-dev": {
+    "selene/cache":"dev-development",
     "selene/testsuite":"dev-development"
+  },
+  "suggests": {
+    "selene/cache":"Utilize memcached route caching"
   },
   "autoload": {
     "psr-4": {"Selene\\Components\\Cache\\": ""}
