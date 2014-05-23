@@ -22,7 +22,7 @@ use \Selene\Components\DI\Definition\ClassDefinition;
  */
 class ClassDefinitionTest extends DefinitionTest
 {
-    protected function setUpt()
+    protected function setUp()
     {
         $this->defaultScope = ContainerInterface::SCOPE_PROTOTYPE;
     }

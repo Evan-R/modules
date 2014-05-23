@@ -30,7 +30,7 @@ class Processor implements ProcessorInterface
     /**
      * container
      *
-     * @var ContainerInterace
+     * @var ContainerInterface
      */
     protected $container;
 
@@ -45,6 +45,7 @@ class Processor implements ProcessorInterface
     /**
      * process
      *
+     * @param ContainerInterface $container
      * @access public
      * @return void
      */
@@ -66,7 +67,7 @@ class Processor implements ProcessorInterface
      * @access public
      * @return \Selene\Components\DI\Processor\ProcessorInterface
      */
-    public function add(ProcessInterface $process, $priority = ProcessInterface::BEFORE_RESOLVE)
+    public function add(ProcessInterface $process, $priority = ProcessorInterface::BEFORE_OPTIMIZE)
     {
         $this->processes[$priority][] = $process;
 

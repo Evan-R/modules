@@ -13,12 +13,21 @@ namespace Selene\Components\DI\Tests\Definition;
 use \Mockery as m;
 use \Selene\Components\DI\ContainerInterface;
 
+/**
+ * @abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
+ * @see \PHPUnit_Framework_TestCase
+ * @abstract
+ *
+ * @package Selene\Components\DI\Tests\Definition
+ * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
+ */
 abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
 {
-
     protected $defaultScope;
 
-    protected function setUpt()
+    protected function setUp()
     {
         $this->defaultScope = ContainerInterface::SCOPE_CONTAINER;
     }
@@ -101,9 +110,7 @@ abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([], $def->getArguments());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testGetSetters()
     {
 
@@ -124,14 +131,14 @@ abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itShouldBeFlagable()
+    public function itShouldBeTaggable()
     {
         $def = $this->createDefinition('bar');
 
-        $def->addFlag('foo');
+        $def->addMetaData('foo');
 
-        $this->assertTrue($def->hasFlag('foo'));
-        $this->assertInstanceof('\Selene\Components\DI\Definition\FlagInterface', $flag = $def->getFlag('foo'));
+        $this->assertTrue($def->hasMetaData('foo'));
+        $this->assertInstanceof('\Selene\Components\DI\Meta\MetaDataInterface', $data = $def->getMetaData('foo'));
     }
 
     abstract protected function createDefinition($class = null, $arguments = [], $scope = null);

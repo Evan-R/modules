@@ -31,7 +31,7 @@ interface DefinitionInterface
     public function hasScope($scope);
     public function getScope();
 
-    public function addSetter($method, array $arguments);
+    public function addSetter($method, array $arguments = []);
     public function setSetters(array $setters);
     public function getSetters();
     public function hasSetters();
@@ -41,8 +41,6 @@ interface DefinitionInterface
     public function getFactory();
 
     public function scopeIsContainer();
-    public function setResolved($resolved);
-    public function isResolved();
 
     public function setInjected($injected);
     public function isInjected();
@@ -52,4 +50,12 @@ interface DefinitionInterface
 
     public function setAbstract($abstract);
     public function isAbstract();
+
+    public function addMetadata($tagname, array $parameters = []);
+    public function getMetaData($tagname = null);
+    public function hasMetaData($tagname);
+
+    public function setFile($file);
+    public function getFile();
+    public function requiresFile();
 }

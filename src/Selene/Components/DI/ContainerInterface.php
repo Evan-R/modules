@@ -11,7 +11,7 @@
 
 namespace Selene\Components\DI;
 
-use \Selene\Components\DI\Resolve\ResolveStrategyCollection;
+use \Selene\Components\DI\Definition\DefinitionInterface;
 
 /**
  * @interface ContainerInterface
@@ -115,6 +115,8 @@ interface ContainerInterface
      */
     public function inject($id, $instance, $scope = self::SCOPE_CONTAINER);
 
+    public function setDefinition($id, DefinitionInterface $definition);
+
     /**
      * getDefinition
      *
@@ -142,6 +144,16 @@ interface ContainerInterface
      * @return boolean
      */
     public function hasDefinition($id);
+
+    /**
+     * removeDefinition
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @return void
+     */
+    public function removeDefinition($id);
 
     /**
      * Merge two containers.

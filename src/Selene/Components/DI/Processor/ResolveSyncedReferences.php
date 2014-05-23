@@ -26,13 +26,5 @@ class ResolveSyncedReferences implements ProcessInterface
 {
     public function process(ContainerInterface $container)
     {
-        foreach ($container->getDefinitions() as $definition) {
-            if ($definition->hasFactory()) {
-                $args = $definition->getArguments();
-                $class = $definition->getClass();
-                array_unshift($args, $class);
-                $definition->setArguments($args);
-            }
-        }
     }
 }

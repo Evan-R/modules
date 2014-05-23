@@ -18,7 +18,7 @@ use \Selene\Components\DI\ContainerInterface;
  * @package Selene\Components\DI\Resolver\Pass
  * @version $Id$
  */
-class ResolveDefinition implements ProcessInterface
+class ResolveDefinitionDependencies implements ProcessInterface
 {
 
     /**
@@ -31,26 +31,9 @@ class ResolveDefinition implements ProcessInterface
      */
     public function process(ContainerInterface $container)
     {
-        $this->resolveDefinitions($container);
-    }
-
-    /**
-     * resolveDefinitions
-     *
-     * @param mixed $container
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function resolveDefinitions($container)
-    {
         $parameters = $container->getParameters();
 
         foreach ($container->getDefinitions() as $id => $definition) {
-
-            if ($definition->requiresFile()) {
-
-            }
 
             $class = $parameters->resolveParam($definition->getClass());
 
@@ -60,18 +43,13 @@ class ResolveDefinition implements ProcessInterface
 
             $definition->setClass($class);
 
-            if ($definition->hasArguments()) {
-                $definition->setArguments($parameters->resolveParam($definition->getArguments()));
-            }
+            if ($definition->requiresFile()) {
 
-            if ($definition->hasFactory()) {
-                $args = $definition->getArguments();
-                array_unshift($args, $definition->getClass());
-                $definition->setArguments($args);
-            }
+                if (!is_file($file = $parameters->resolveParam($definition->getFile()))) {
+                    throw new \InvalidArgumentException(sprintf('file "%s" does not exist', $file));
+                }
 
-            if ($definition->hasSetters()) {
-                $definition->setSetters($parameters->resolveParam($definition->getSetters()));
+                $definition->setFile($file);
             }
         }
     }

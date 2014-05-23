@@ -26,7 +26,7 @@ use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
 
 /**
  * @class Dumper
- * @package Selene\Components\DI\Dumper
+ * @package Selene\Components\DI
  * @version $Id$
  */
 class PhpDumper implements ContainerAwareInterface
@@ -35,6 +35,9 @@ class PhpDumper implements ContainerAwareInterface
 
     /**
      * @param ContainerInterface $container
+     * @param string $namespace
+     * @param string $className
+     * @param string $containerServiceName
      *
      * @access public
      */
@@ -83,6 +86,8 @@ class PhpDumper implements ContainerAwareInterface
         $this->add($header);
 
         $this->add(new Property('cmap', 'protected', null, 'array'));
+        $this->add(new Property('icmap', 'protected', null, 'array'));
+        $this->add(new Property('internals', 'protected', null, 'array'));
         $this->add(new Property('locked', 'protected', null, 'boolean'));
 
         $this->add(new Constructor);
@@ -102,9 +107,10 @@ class PhpDumper implements ContainerAwareInterface
             $this->add(new ServiceMethod($this->getContainer(), $id));
         }
 
-        $this->add($this->mapConstructorNames());
-
         $this->add($this->getDefaultClassMethods());
+
+        $this->add($this->mapConstructorNames());
+        $this->add($this->getDefaultParameters());
 
         $this->add(new ClassFooter);
     }
@@ -150,19 +156,44 @@ class PhpDumper implements ContainerAwareInterface
         $this->content[] = $string;
     }
 
+    /**
+     * getDefaultParameters
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getDefaultParameters()
+    {
+        $params = $this->extractParams($this->container->getParameters()->all());
+
+        return <<<EOL
+
+    /**
+     * Return the default parameter array;
+     * @return array
+     */
+    private function getDefaultParams()
+    {
+        return $params;
+    }
+EOL;
+    }
+
     protected function mapConstructorNames()
     {
         $names = [];
+        $internal = [];
 
         foreach ($this->container->getDefinitions() as $id => $definition) {
-            if ($definition->isInjected()) {
-                $names[$id] = ServiceMethod::getServiceGetterName($id, true);
+            if ($definition->isInternal()) {
+                $internal[$id] = ServiceMethod::getServiceGetterName($id, $definition->isInjected(), true);
             } else {
-                $names[$id] = ServiceMethod::getServiceGetterName($id);
+                $names[$id] = ServiceMethod::getServiceGetterName($id, $definition->isInjected(), false);
             }
         }
 
         $map = $this->extractParams($names);
+        $imap = $this->extractParams($internal);
         return <<<EOL
 
     /**
@@ -172,17 +203,23 @@ class PhpDumper implements ContainerAwareInterface
     {
         return $map;
     }
+
+    /**
+     * get service names and methods for internal services
+     */
+    protected function getInternalContructorsMap()
+    {
+        return $imap;
+    }
 EOL;
     }
 
     protected function getDefaultClassMethods()
     {
-        $parameters = $this->extractParams($this->container->getParameters()->all());
-
         return <<<EOL
 
     /**
-     * {@iniheritdoc}
+     * {@inheritdoc}
      */
     public function getAlias(\$id)
     {
@@ -190,7 +227,7 @@ EOL;
     }
 
     /**
-     * {@iniheritdoc}
+     * {@inheritdoc}
      */
     public function get(\$id)
     {
@@ -203,6 +240,20 @@ EOL;
         }
 
         return parent::get(\$id);
+    }
+
+    /**
+     * Get an internal service
+     */
+    protected function getInternal(\$id)
+    {
+        if (isset(\$this->internals[\$id = \$this->getAlias(\$id)])) {
+            return \$this->internals[\$id];
+        }
+
+        if (isset(\$this->icmap[\$id])) {
+            return call_user_func([\$this, \$this->icmap[\$id]], \$id);
+        }
     }
 
     /**
@@ -219,19 +270,11 @@ EOL;
     }
 
     /**
-     * {@iniheritdoc}
+     * {@inheritdoc}
      */
     public function hasService(\$id)
     {
         return array_key_exists(\$id, \$this->cmap);
-    }
-
-    /**
-     * {@iniheritdoc}
-     */
-    protected function getDefaultParameters()
-    {
-        return $parameters;
     }
 
     /**

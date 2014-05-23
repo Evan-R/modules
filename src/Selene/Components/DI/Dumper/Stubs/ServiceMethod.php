@@ -43,14 +43,16 @@ class ServiceMethod extends Stub implements ContainerAwareInterface
     /**
      * getServiceGetterName
      *
-     * @param mixed $id
+     * @param string $id
+     * @param boolean $synced
+     * @param boolean $internal
      *
      * @access public
      * @return string
      */
-    public static function getServiceGetterName($id, $synced = false)
+    public static function getServiceGetterName($id, $synced = false, $internal = false)
     {
-        $prefix  = $synced ? 'getSyncedService' : 'getService';
+        $prefix  = sprintf($synced ? 'getSynced%sService' : 'get%sService', $internal ? 'Internal' : '');
 
         return $prefix.ucfirst(Container::camelCaseStr($id));
     }
@@ -68,7 +70,7 @@ class ServiceMethod extends Stub implements ContainerAwareInterface
         $id = $this->serviceId;
         $def = $this->container->getDefinition($id);
         $class = ltrim($def->getClass(), '\\');
-        $name = static::getServiceGetterName($id, $def->isInjected());
+        $name = static::getServiceGetterName($id, $def->isInjected(), $def->isInternal());
 
         return <<<EOL
     /**

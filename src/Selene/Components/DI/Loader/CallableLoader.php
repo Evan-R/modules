@@ -51,11 +51,15 @@ class CallableLoader extends Loader
      * @access public
      * @return void
      */
-    public function load($callable)
+    public function load($callable, $any = false)
     {
         $resource = $this->findResourceOrigin($callable);
 
         call_user_func($callable, $this->builder);
         $this->builder->addFileResource($resource);
+    }
+
+    protected function doLoad($file)
+    {
     }
 }

@@ -111,26 +111,27 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      */
     protected function getCallers($instance, $definition, &$content)
     {
-        foreach ($definition->getSetters() as $setter => $argsList) {
-            $method    = $setter;
-            //$arguments = $setter[$method];
 
-            foreach ($argsList as $arguments) {
+        foreach ($definition->getSetters() as $setters) {
 
-                $synced    = [];
-                foreach ($arguments as $argument) {
-                    if ($argument instanceof Reference && $this->container->getDefinition($argument)->isInjected()) {
-                        $synced[(string)$argument] = true;
-                    }
+            $method    = key($setters);
+            $argsList  = $setters[$method];
+
+            $synced  = [];
+
+            foreach ($argsList as $argument) {
+
+                if ($argument instanceof Reference && $this->container->getDefinition($argument)->isInjected()) {
+                    $synced[(string)$argument] = true;
                 }
+            }
 
-                $args = $this->getArguments($arguments);
+            $args = $this->getArguments($argsList);
 
-                if ((bool)$synced) {
-                    $content[] = $this->createSynCallcack($synced, $method, $args);
-                } else {
-                    $content[] = $this->setServiceArgs($args, $instance.'->'.$method).';';
-                }
+            if ((bool)$synced) {
+                $content[] = $this->createSynCallcack($synced, $method, $args);
+            } else {
+                $content[] = $this->setServiceArgs($args, $instance.'->'.$method).';';
             }
         }
     }
@@ -338,7 +339,9 @@ class ServiceBody extends Stub implements ContainerAwareInterface
             return 'new '. $definition->getClass();
         }
 
-        return '$this->get(\''. (string)$reference . '\')';
+        $getter = $definition->isInternal() ? 'getInternal' : 'get';
+
+        return '$this->' . $getter .'(\''. (string)$reference . '\')';
     }
 
     /**
@@ -353,7 +356,9 @@ class ServiceBody extends Stub implements ContainerAwareInterface
     {
         $definition = $this->container->getDefinition($this->serviceId);
 
-        if ($definition->isInjected()) {
+        if ($definition->isInternal()) {
+            $value = sprintf('$this->internals[\'%s\'] = %s', $this->serviceId, $content);
+        } elseif ($definition->isInjected()) {
             $value = sprintf('$this->getDefault($this->services, \'%s\')', $this->serviceId);
         } elseif ($definition->scopeIsContainer()) {
             $value = sprintf('$this->services[\'%s\'] = %s', $this->serviceId, $content);

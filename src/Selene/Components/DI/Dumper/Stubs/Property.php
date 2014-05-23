@@ -41,15 +41,17 @@ class Property extends Stub
     public function dump()
     {
         $indent = $this->indent(4);
-        $static = $this->static ? ' static' : null;
+        $static = $this->static ? ' static' : '';
         $comment = $this->dumpComment();
 
-        return sprintf('%s%s%s%s%s $%s;%s', $comment, PHP_EOL, $indent, $this->visibility, $static, $this->name, PHP_EOL);
+        $value = $this->value ? ' = '. $this->value : '';
+
+        return sprintf('%s%s%s%s%s $%s%s;%s', $comment, PHP_EOL, $indent, $this->visibility, $static, $this->name, $value, PHP_EOL);
     }
 
     protected function dumpComment()
     {
-        $comment = new DocComment($this->name, null, ['return' => $this->type]);
+        $comment = new DocComment($this->name, null, ['var' => $this->type]);
 
         return $comment->dump();
     }

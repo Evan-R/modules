@@ -39,18 +39,8 @@ class PhpLoader extends Loader
         $this->builder = $builder;
     }
 
-    /**
-     * Load a php file resource.
-     *
-     * @param mixed $resource
-     *
-     * @access public
-     * @return void
-     */
-    public function load($resource)
+    protected function doLoad($file)
     {
-        $file = $this->locator->locate($resource, false);
-
         $builder = $this->builder;
         $container = $this->container;
 

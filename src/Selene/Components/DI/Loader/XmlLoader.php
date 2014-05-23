@@ -12,16 +12,17 @@
 namespace Selene\Components\DI\Loader;
 
 use \Selene\Components\Xml\Parser;
-use \Selene\Components\Xml\Loader\Loader as XmlFileLoader;
-use \Selene\Components\DI\Reference;
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
+use \Selene\Components\DI\Reference;
 use \Selene\Components\DI\BuilderInterface;
 use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\DI\Definition\ParentDefinition;
+use \Selene\Components\DI\Definition\ServiceDefinition;
+use \Selene\Components\DI\Definition\DefinitionInterface;
 use \Selene\Components\Config\Resource\Loader;
 use \Selene\Components\Config\Resource\LocatorInterface;
 use \Selene\Components\Config\Traits\XmlLoaderHelperTrait;
-use \Selene\Components\DI\Definition\ServiceDefinition;
 
 /**
  * @class XmlLoader XmlLoader
@@ -48,18 +49,9 @@ class XmlLoader extends Loader
         $this->builder = $builder;
     }
 
-    /**
-     * Loads the resource file into the container.
-     *
-     * @TODO add DTD schema check.
-     * @param string $resource the xml file resource.
-     *
-     * @access public
-     * @return void
-     */
-    public function load($resource)
+    protected function doLoad($file)
     {
-        if (!$this->checkPathIntegrity($file = $this->locator->locate($resource, false))) {
+        if (!$this->checkPathIntegrity($file)) {
             return;
         }
 
@@ -99,15 +91,15 @@ class XmlLoader extends Loader
                 continue;
             }
 
-            $parameters = $this->container->getParameters();
             $values = [];
 
             foreach ($package->xpath("*[local-name() != 'import']") as $item) {
+                $key = Parser::fixNodeName($item->nodeName);
                 $this->builder->addExtensionConfig(
                     $alias,
-                    [$item->nodeName => $this->getParser()->parseDomElement($item)]
+                    [$key => $this->getParser()->parseDomElement($item)]
                 );
-                $values[] = [$item->nodeName => $this->getParser()->parseDomElement($item)];
+                $values[] = [$key => $this->getParser()->parseDomElement($item)];
             }
         }
     }
@@ -146,7 +138,7 @@ class XmlLoader extends Loader
     /**
      * Parse parameter nodes of the resource file.
      *
-     * @param DOMDocument $xml the reource Document.
+     * @param DOMDocument $xml the resource Document.
      *
      * @access private
      * @return void
@@ -171,14 +163,14 @@ class XmlLoader extends Loader
         $params = [];
 
         foreach ($xml->xpath('/parameters') as $parameter) {
-            $params[] = Parser::parseDomElement($parameter);
+            $params[] = $this->getParser()->parseDomElement($parameter);
         }
 
         return $params;
     }
 
     /**
-     * paser service nodes of the resource file.
+     * Parse service nodes of the resource file.
      *
      * @access private
      * @return void
@@ -268,6 +260,7 @@ class XmlLoader extends Loader
      */
     private function setServiceDefinition(DOMElement $service)
     {
+
         $def = new ServiceDefinition;
         $id  = $this->getAttributeValue($service, 'id');
 
@@ -283,12 +276,15 @@ class XmlLoader extends Loader
                 $method = 'set'.ucfirst($attribute);
                 call_user_func([$def, $method], $value);
             }
-
         }
 
-        foreach ($service->xpath('flags/flag') as $flagNode) {
-            $attrs = $this->getParser()->parseDomElement($flagNode);
-            $def->addFlag($attrs);
+        if ($def->hasParent()) {
+            $def = new ParentDefinition($def->getParent());
+        }
+
+        foreach ($service->xpath('meta/data') as $tagNode) {
+            $attrs = $this->getParser()->parseDomElement($tagNode);
+            $def->addMetaData($attrs);
         }
 
         if ($class = $this->getAttributeValue($service, 'class', false)) {
@@ -296,17 +292,28 @@ class XmlLoader extends Loader
         } elseif ($factory = $this->getAttributeValue($service, 'factory', false)) {
             $method = $this->getAttributeValue($service, 'factory-method', 'make');
             $def->setFactory($factory, $method);
-        } else {
+        } elseif (!$def instanceof ParentDefinition) {
             throw new \RuntimeException(
                 sprintf('either service class or factory is missing for service id %s', $id)
             );
         }
 
-        $def->setArguments($this->getArguments($service));
+        $this->setDefinitionArguments($service, $def);
 
         $this->setServiceCallers($service, $def);
 
         $this->container->setDefinition($id, $def);
+    }
+
+    private function setDefinitionArguments(DOMElement $service, DefinitionInterface $definition)
+    {
+        if (!$definition instanceof ParentDefinition) {
+            $definition->setArguments($this->getArguments($service));
+        }
+
+        foreach ($this->getReplacementArguments($service) as $index => $argument) {
+            $definition->replaceArgument($argument, $index);
+        }
     }
 
     /**
@@ -321,9 +328,29 @@ class XmlLoader extends Loader
     {
         $arguments = [];
 
-        foreach ($node->xpath('arguments/argument') as $argument) {
+        foreach ($node->xpath('arguments/argument[not(index)]') as $argument) {
 
-            $arguments[] = $this->getPhpValue($argument);
+            $arguments[] = $val = $this->getPhpValue($argument);
+        }
+
+        return $arguments;
+    }
+
+    /**
+     * Get all arguments contained on a <arguments> node.
+     *
+     * @param DOMElement $node the <arguments> node.
+     *
+     * @access private
+     * @return array
+     */
+    private function getReplacementArguments(DOMElement $node)
+    {
+        $arguments = [];
+
+        foreach ($node->xpath('arguments/argument[@index]') as $argument) {
+            $index = $this->getAttributeValue($argument, 'index');
+            $arguments[$index] = $this->getPhpValue($argument);
         }
 
         return $arguments;
@@ -340,7 +367,7 @@ class XmlLoader extends Loader
      * @access private
      * @return void
      */
-    private function setServiceCallers(DOMElement $service, ServiceDefinition $def)
+    private function setServiceCallers(DOMElement $service, DefinitionInterface $def)
     {
         foreach ($service->xpath('setters/setter') as $setter) {
             $def->addSetter($this->getAttributeValue($setter, 'calls'), $this->getArguments($setter));

@@ -14,23 +14,11 @@ namespace Selene\Components\DI;
 use \DomainException;
 use \BadMethodCallException;
 use \InvalidArgumentException;
-use \Selene\Components\Common\Data\BaseList;
-use \Selene\Components\Common\Data\ListInterface;
 use \Selene\Components\Common\Helper\StringHelper;
-use \Selene\Components\DI\Definition\ClassDefinition;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 use \Selene\Components\DI\Definition\DefinitionInterface;
 use \Selene\Components\DI\Exception\ContainerResolveException;
 use \Selene\Components\DI\Exception\CircularReferenceException;
-use \Selene\Components\DI\Resolve\ResolveStrategyCollection;
-use \Selene\Components\DI\Processor\Processor;
-use \Selene\Components\DI\Processor\ProcessArgumentReference;
-use \Selene\Components\DI\Processor\ResolveDefinition;
-use \Selene\Components\DI\Processor\ResolveFactoryClosures;
-use \Selene\Components\DI\Processor\ResolveCircularReference;
-use \Selene\Components\DI\Processor\ResolveDefinitionFactoryArgs;
-use \Selene\Components\Config\Resource\FileResource;
-use \Selene\Components\Config\Resource\ObjectResource;
 
 /**
  * @class BaseContainer implements ContainerInterface
@@ -43,6 +31,7 @@ use \Selene\Components\Config\Resource\ObjectResource;
  */
 class Container implements ContainerInterface
 {
+    const FOO = 0;
     /**
      * parameters
      *
@@ -116,14 +105,12 @@ class Container implements ContainerInterface
      */
     public function __construct(ParameterInterface $parameters = null)
     {
-        //$this->resources = $resources ?: new BaseList;
         $this->parameters = $parameters ?: new Parameters;
         $this->synced = [];
         $this->services = [];
         $this->definitions = [];
         $this->injected = [];
         $this->building = [];
-        //$this->packageConfigs = [];
         $this->setAliases();
 
     }
@@ -201,11 +188,24 @@ class Container implements ContainerInterface
      * @access public
      * @return mixed
      */
-    public function getFlaggedDefinitions()
+    public function getDefinitionMetaData()
     {
         return array_filter($this->getDefinitions(), function ($def) {
-            return (bool)$def->getFlags();
+            return (bool)$def->getMetaData();
         });
+    }
+
+    /**
+     * removeDefinition
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @return void
+     */
+    public function removeDefinition($id)
+    {
+        unset($this->definitions[$id]);
     }
 
     /**
@@ -352,7 +352,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Like `Container::hasDefinition()` but also checks for `$this->serivces`.
+     * Like `Container::hasDefinition()` but also checks for `$this->services`.
      *
      * @param string $id the service id.
      *
@@ -372,7 +372,7 @@ class Container implements ContainerInterface
      * @param string $id the service id
      *
      * @access public
-     * @throws InvalidArgumentException if a service with given alias alread
+     * @throws InvalidArgumentException if a service with given alias already
      * exists.
      * @throws InvalidArgumentException if the alias is the same as the id.
      * @return void
@@ -653,31 +653,29 @@ class Container implements ContainerInterface
     }
 
     /**
-     * callSetters
+     * Call the setters on a service instace.
      *
-     * @param mixed $instance
-     * @param array $callers
+     * @param object $instance the service instance
+     * @param array  $setters  the service setters as array.
      *
      * @throws BadMethodCallException
      * @access protected
      * @return void
      */
-    protected function callSetters($instance, array $callers)
+    protected function callSetters($instance, array $setters)
     {
-        foreach ($callers as $method => $argsList) {
+        foreach ($setters as $setter) {
 
-            //$method  = key($caller);
-            foreach ($argsList as $args) {
-                $synced  = $this->getSyncedArguments($args);
+            $method = key($setter);
+            $arguments = $setter[$method];
 
-                if (!empty($synced)) {
-                    return $this->createSyncCallback($instance, $method, $args, $synced);
-                }
+            $synced = $this->getSyncedArguments($arguments);
 
-                $this->applySetter($instance, $method, $args);
+            if (!empty($synced)) {
+                $this->createSyncCallback($instance, $method, $arguments, $synced);
+            } else {
+                $this->applySetter($instance, $method, $arguments);
             }
-            //$args    = $caller[$method];
-
         }
     }
 
@@ -703,6 +701,7 @@ class Container implements ContainerInterface
 
         call_user_func_array([$instance, $method], $arguments);
     }
+
 
     /**
      * callFactory

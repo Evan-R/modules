@@ -35,9 +35,13 @@ class Constructor extends Stub
      */
     public function __construct()
     {
-        parent::__construct(new StaticParameters(\$this->getDefaultParameters()));
+        parent::__construct(new StaticParameters(\$this->getDefaultParams()));
+
         \$this->aliases = [];
+        \$this->internals = [];
+
         \$this->cmap = \$this->getContructorsMap();
+        \$this->icmap = \$this->getInternalContructorsMap();
         \$this->locked = true;
     }
 

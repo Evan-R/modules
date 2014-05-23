@@ -11,6 +11,8 @@
 
 namespace Selene\Components\DI\Processor;
 
+use \Selene\Components\DI\ContainerInterface;
+
 /**
  * @interface ProcessorInterface
  * @package Selene\Components\DI\Processor
@@ -18,4 +20,13 @@ namespace Selene\Components\DI\Processor;
  */
 interface ProcessorInterface
 {
+    const BEFORE_OPTIMIZE = 0;
+    const OPTIMIZE = 1;
+    const BEFORE_REMOVE = 2;
+    const REMOVE = 3;
+    const AFTER_REMOVE = 4;
+
+    public function process(ContainerInterface $container);
+
+    public function add(ProcessInterface $process, $priority = ProcessorInterface::BEFORE_OPTIMIZE);
 }

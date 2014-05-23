@@ -103,6 +103,31 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($dir.DIRECTORY_SEPARATOR.'imported.0.xml', (string)$resources[1]);
     }
 
+    /** @test */
+    public function itShouldLoadAllFilesWhenRequested()
+    {
+        $loader = new XmlLoader(
+            $builder = new Builder(
+                $container = new Container
+            ),
+            new Locator(
+                [
+                    $dirA = __DIR__.DIRECTORY_SEPARATOR.'Fixures',
+                    $dirB = __DIR__.DIRECTORY_SEPARATOR.'Fixures' . DIRECTORY_SEPARATOR . 'sub'
+                ]
+            )
+        );
+
+        $loader->load('services.0.xml', true);
+
+        $resources = $builder->getResources();
+
+        $this->assertSame(2, count($resources));
+
+        $this->assertSame($dirA.DIRECTORY_SEPARATOR.'services.0.xml', (string)$resources[0]);
+        $this->assertSame($dirB.DIRECTORY_SEPARATOR.'services.0.xml', (string)$resources[1]);
+    }
+
     protected function getLoaderMock($builder = null, $container = null, $locator = null)
     {
         $builder =   $builder = $builder ?: m::mock('\Selene\Components\DI\BuilderInterface');

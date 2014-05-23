@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Resolver\Pass package
+ * This File is part of the Selene\Components\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -14,7 +14,7 @@ namespace Selene\Components\DI\Processor;
 use \Selene\Components\DI\ContainerInterface;
 
 /**
- * @class ResolveDefinitionFactoryArgs implements ProcessInterface
+ * @class RemoveAbstractDefinition implements ProcessInterface
  * @see ProcessInterface
  *
  * @package Selene\Components\DI\Processor
@@ -22,16 +22,13 @@ use \Selene\Components\DI\ContainerInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class ResolveDefinitionFactoryArgs implements ProcessInterface
+class RemoveAbstractDefinition implements ProcessInterface
 {
     public function process(ContainerInterface $container)
     {
-        foreach ($container->getDefinitions() as $definition) {
-            if ($definition->hasFactory()) {
-                $args = $definition->getArguments();
-                $class = $definition->getClass();
-                array_unshift($args, $class);
-                $definition->setArguments($args);
+        foreach ($container->getDefinitions() as $id => $definition) {
+            if ($definition->isAbstract()) {
+                $container->removeDefinition($id);
             }
         }
     }

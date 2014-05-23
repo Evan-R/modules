@@ -15,6 +15,11 @@ use \Selene\Components\Common\Traits\Getter;
 use \Selene\Components\DI\Dumper\ContainerDumper;
 use \Selene\Components\DI\Processor\Processor;
 use \Selene\Components\DI\Processor\ProcessorInterface;
+use \Selene\Components\DI\Processor\ResolveDefinitionFactoryArgsPass;
+use \Selene\Components\DI\Processor\ResolveDefinitionArguments;
+use \Selene\Components\DI\Processor\ResolveDefinitionDependencies;
+use \Selene\Components\DI\Processor\ResolveParentDefinition;
+use \Selene\Components\DI\Processor\RemoveAbstractDefinition;
 use \Selene\Components\Config\Resource\FileResource;
 use \Selene\Components\Config\Resource\ObjectResource;
 
@@ -59,6 +64,8 @@ class Builder implements BuilderInterface
      */
     protected $extensions;
 
+    protected $configured;
+
     /**
      * Create a new Builder instance.
      *
@@ -69,11 +76,11 @@ class Builder implements BuilderInterface
     public function __construct(
         ContainerInterface $container,
         ProcessorInterface $processor = null,
-        ListInterface $resources = null
+        array $resources = []
     ) {
         $this->container = $container;
         $this->processor = $processor ?: new Processor;
-        $this->resources = $resources ?: [];
+        $this->resources = $resources;
 
         $this->extensions = [];
     }
@@ -140,9 +147,43 @@ class Builder implements BuilderInterface
      */
     public function build()
     {
+        $this->configure();
+
         $this->container->getParameters()->resolve()->all();
-        //Parameters->replaceParameters($parameters);
         $this->processor->process($this->container);
+    }
+
+    /**
+     * configure
+     *
+     * @access public
+     * @return void
+     */
+    public function configure()
+    {
+        if ($this->configured) {
+            return;
+        }
+
+        return $this->configureProcessor($this->processor);
+    }
+
+    /**
+     * configureProcessor
+     *
+     * @param ProcessorInterface $processor
+     *
+     * @access protected
+     * @return void
+     */
+    protected function configureProcessor(ProcessorInterface $processor)
+    {
+        $processor->add(new ResolveParentDefinition, ProcessorInterface::OPTIMIZE);
+        $processor->add(new ResolveDefinitionDependencies, ProcessorInterface::OPTIMIZE);
+        $processor->add(new ResolveDefinitionArguments, ProcessorInterface::OPTIMIZE);
+        $processor->add(new RemoveAbstractDefinition, ProcessorInterface::REMOVE);
+
+        $this->configured = true;
     }
 
     /**

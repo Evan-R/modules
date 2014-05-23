@@ -14,7 +14,7 @@ namespace Selene\Components\DI\Tests;
 use \Mockery as m;
 use \Selene\Components\DI\Container;
 use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Definition;
+use \Selene\Components\DI\Reference;
 use \Selene\Components\DI\DefinitionInterface;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 use \Selene\Components\DI\Tests\Stubs\FooService;
@@ -172,9 +172,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $reference = $this->createReferenceMock('foo.service');
 
         $args = $this->getDefaultMockArgs($class, [], [
-            ['isInjected', 'once', true],
+            ['isInjected', 'once', false],
             ['hasSetters', 'once', true],
-            ['getSetters', 'once', [['setName' => ['stub']], ['setFoo' => [$reference]]]]
+            ['getSetters', 'once', [[ 'setName' => ['stub']], ['setFoo' => [$reference]]]]
         ]);
 
         $definition = $this->getDefinitionMock($args);

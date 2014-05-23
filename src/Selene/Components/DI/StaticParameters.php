@@ -159,6 +159,7 @@ class StaticParameters extends Parameters
      *
      * @param mixed $method
      *
+     * @throws \Exception
      * @access private
      * @return mixed
      */

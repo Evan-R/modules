@@ -13,6 +13,8 @@ namespace Selene\Components\DI\Definition;
 
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\Common\Interfaces\JsonableInterface;
+use \Selene\Components\DI\Meta\Data as MetaData;
+use \Selene\Components\DI\Meta\MetaDataInterface;
 
 /**
  * @class AbstractDefinition implements DefinitionInterface
@@ -100,11 +102,11 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      *
      * @var array
      */
-    protected $flags;
+    protected $meta;
 
     /**
      * @param mixed $class
-     * @param mixed $params
+     * @param mixed $arguments
      * @param mixed $scope
      *
      * @access public
@@ -123,7 +125,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param mixed $class
      *
      * @access protected
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function setClass($class)
     {
@@ -145,10 +147,10 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     /**
      * setParams
      *
-     * @param mixed $class
+     * @param array $arguments
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function setArguments(array $arguments)
     {
@@ -162,7 +164,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param mixed $argument
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function addArgument($argument)
     {
@@ -188,7 +190,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param mixed $index
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function replaceArgument($argument, $index)
     {
@@ -199,6 +201,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
         }
 
         $this->arguments[$index] = $argument;
+
         return $this;
     }
 
@@ -219,7 +222,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param mixed $parent
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function setParent($parent)
     {
@@ -294,7 +297,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      *
      * @throws \InvalidArgumentException
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function addScope($scope)
     {
@@ -326,7 +329,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param mixed $injected
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function setInjected($injected)
     {
@@ -346,17 +349,18 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     }
 
     /**
-     * addFlag
+     * addMetaData
      *
-     * @param mixed $flag
+     * @param mixed $tagName
+     * @param array $parameters
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return mixed
      */
-    public function addFlag($name, array $arguments = [])
+    public function addMetaData($tagName, array $parameters = [])
     {
-        $flag = new Flag($name, $arguments);
-        $this->flags[$flag->getName()][] = $flag;
+        $data = new MetaData($tagName, $parameters);
+        $this->meta[$data->getName()] = $data;
 
         return $this;
     }
@@ -364,49 +368,44 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     /**
      * getFlag
      *
-     * @param mixed $name
+     * @param mixed $name string or null
      *
      * @access public
-     * @return mixed
+     * @return MetaDataInterface|array|null
      */
-    public function getFlag($name)
+    public function getMetaData($name = null)
     {
-        return $this->hasFlag($name) ? $this->flags[$name] : null;
+        return null !== $name ? ($this->hasMetaData($name) ? $this->meta[$name] : []) : (array)$this->meta;
     }
 
     /**
      * hasFlag
      *
-     * @param mixed $flag
+     * @param mixed $name string or null
      *
      * @access public
      * @return boolean
      */
-    public function hasFlag($flag)
+    public function hasMetaData($name = null)
     {
-        return isset($this->flags[$flag]);
+        return null !== $name ? isset($this->meta[$name]) : (bool) $this->meta;
     }
 
     /**
-     * hasFlags
+     * replaceMetaData
+     *
+     * @param mixed $name
+     * @param array $parameters
      *
      * @access public
-     * @return boolean
+     * @return mixed
      */
-    public function hasFlags()
+    public function replaceMetaData($name, array $parameters = [])
     {
-        null !== $this->flags;
-    }
+        $data = new MetaData($name, $parameters);
 
-    /**
-     * getFlags
-     *
-     * @access public
-     * @return array
-     */
-    public function getFlags()
-    {
-        return $this->flags;
+        $this->meta[$data->getName()] = [];
+        $this->meta[$data->getName()][] = $data;
     }
 
     /**
@@ -415,11 +414,12 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param boolean $abstract
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function setAbstract($abstract)
     {
         $this->abstract = (bool)$abstract;
+
         return $this;
     }
 
@@ -427,7 +427,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * isAbstract
      *
      * @access public
-     * @return mixed
+     * @return boolean
      */
     public function isAbstract()
     {
@@ -440,52 +440,24 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param mixed $internal
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function setInternal($internal)
     {
         $this->internal = (bool)$internal;
-    }
-
-    /**
-     * isInternal
-     *
-     * @param mixed $internal
-     *
-     * @access public
-     * @return mixed
-     */
-    public function isInternal()
-    {
-        return (bool)$this->internal;
-    }
-
-    /**
-     * setResolved
-     *
-     * @param mixed $resolved
-     *
-     * @access public
-     * @return DefinitionInterace this instance.
-     */
-    public function setResolved($resolved)
-    {
-        if ($this->scopeIsContainer()) {
-            $this->resolved = (boolean)$resolved;
-        }
 
         return $this;
     }
 
     /**
-     * isResolved
+     * isInternal
      *
      * @access public
-     * @return bool
+     * @return boolean
      */
-    public function isResolved()
+    public function isInternal()
     {
-        return (bool)$this->getResolved();
+        return (bool)$this->internal;
     }
 
     /**
@@ -494,11 +466,17 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param array $setters
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function setSetters(array $setters)
     {
-        $this->setters = $setters;
+        $this->setters = [];
+
+        foreach ($setters as $setter) {
+            $method = key($setter);
+            $this->addSetter($method, $setter[$method]);
+        }
+
         return $this;
     }
 
@@ -509,11 +487,11 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param array $arguments
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
-    public function addSetter($method, array $arguments)
+    public function addSetter($method, array $arguments = [])
     {
-        $this->setters[$method][] = $arguments;
+        $this->setters[] = [$method => $arguments];
         return $this;
     }
 
@@ -540,18 +518,38 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     }
 
     /**
+     * hasSetter
+     *
+     * @param mixed $method
+     *
+     * @access public
+     * @return boolean
+     */
+    public function hasSetter($method)
+    {
+        foreach ($this->setters as $setter) {
+            if ($method === key($setter)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * setFactory
      *
      * @param mixed $class
      * @param mixed $method
-     * @param array $arguments
      *
      * @access public
-     * @return mixed
+     * @return DefinitionInterface this instance.
      */
     public function setFactory($class, $method = 'make')
     {
-        return $this->setFactoryCallback(null !== $method ? [$class, $method] : $class);
+        $this->setFactoryCallback(null !== $method ? [$class, $method] : $class);
+
+        return $this;
     }
 
     /**
@@ -600,12 +598,23 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param string $file
      *
      * @access public
-     * @return DefinitionInterace this instance.
+     * @return DefinitionInterface this instance.
      */
     public function setFile($file)
     {
         $this->file = $file;
         return $this;
+    }
+
+    /**
+     * getFile
+     *
+     * @access public
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->file;
     }
 
     /**
@@ -617,6 +626,49 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     public function requiresFile()
     {
         return (boolean)$this->file;
+    }
+
+    /**
+     * merge
+     *
+     * @param DefinitionInterface $definition
+     *
+     * @access public
+     * @return DefinitionInterface this instance.
+     */
+    public function merge(DefinitionInterface $definition)
+    {
+        $this->parent     = $definition->getParent() ?: $this->parent;
+        $this->class      = $definition->getClass() ?: $this->class;
+        $this->file       = $definition->getFile() ?: $this->file;
+        $this->factory    = $definition->getFactory() ?: $this->factory;
+        $this->injected   = $definition->isInjected() ? true : $this->injected;
+        $this->internal   = $definition->isInternal() ? true : $this->internal;
+        $this->abstract   = $definition->isAbstract() ? true : $this->abstract;
+
+        $this->setScope($definition->getScope());
+
+        foreach ($definition->getSetters() as $setter) {
+            $method = key($setter);
+            $this->addSetter($method, $setter[$method]);
+        }
+
+        $count = count($this->getArguments());
+
+        foreach ($definition->getArguments() as $index => $argument) {
+            if ($index < $count) {
+                $this->replaceArgument($argument, $index);
+            } else {
+                $this->addArgument($argument);
+            }
+        }
+
+        foreach ($definition->getMetaData() as $key => $data) {
+            $this->meta[$key] = [];
+            $this->meta[$key][] = $data;
+        }
+
+        return $this;
     }
 
     /**
@@ -688,7 +740,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      */
     private function stripClassName($classname)
     {
-        // comoposer autoload will fail if a class is requested multiple times, but with mixed NS separators
+        // composer autoload will fail if a class is requested multiple times, but with mixed NS separators
         return strtr($classname, ['\\\\' => '\\']);
     }
 }
