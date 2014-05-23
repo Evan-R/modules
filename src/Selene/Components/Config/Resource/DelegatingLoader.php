@@ -34,10 +34,10 @@ class DelegatingLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function load($resource)
+    public function load($resource, $any = false)
     {
         if ($loader = $this->getResolver()->resolve($resource)) {
-            return $loader->load($resource);
+            return $loader->load($resource, $any);
         }
     }
 
@@ -69,5 +69,10 @@ class DelegatingLoader extends Loader
         }
 
         return false;
+    }
+
+    protected function doLoad($file)
+    {
+        return null;
     }
 }

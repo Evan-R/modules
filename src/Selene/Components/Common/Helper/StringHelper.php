@@ -110,14 +110,15 @@ class StringHelper
             );
         }
 
-        if (function_exists('openssl_random_pseudo_bytes')) {
-            if (null === ($bytes = openssl_random_pseudo_bytes($length * 2))) {
-                throw new \RuntimeException('Cannot generate random string');
-            }
-            return substr(str_replace(['/', '=', '+'], '', base64_encode($bytes)), 0, $length);
-        } else {
+        if (!function_exists('openssl_random_pseudo_bytes')) {
             return self::strQuickRand($length);
         }
+
+        if (null === ($bytes = openssl_random_pseudo_bytes($length * 2))) {
+            throw new \RuntimeException('Cannot generate random string');
+        }
+
+        return substr(str_replace(['/', '=', '+'], '', base64_encode($bytes)), 0, $length);
     }
 
     /**

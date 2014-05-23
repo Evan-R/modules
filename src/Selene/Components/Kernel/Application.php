@@ -384,17 +384,22 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
             $this->isDebugging()
         );
 
+        $class = $ns . '\\' . $className;
 
-        if ($cache->isValid()) {
 
-            $class = $ns . '\\' . $className;
-            return $this->loadContainerCache($class, $file);
+
+        if (true) {
+        //if (!$cache->isValid()) {
+
+            $builder = $this->buildContainer($cache, $class, $file);
+            $dumper = new PhpDumper($this->container, $ns, $className, $this->getContainerServiceId());
+
+            $cache->write($dumper->dump(), $builder->getResources());
+
         }
 
-        $builder = $this->buildContainer($cache);
-        $dumper = new PhpDumper($this->container, $ns, $className, $this->getContainerServiceId());
 
-        $cache->write($dumper->dump(), $builder->getResources());
+        return $this->loadContainerCache($class, $file);
     }
 
     /**
@@ -405,13 +410,17 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      * @access protected
      * @return void
      */
-    protected function buildContainer(ConfigCache $cache)
+    protected function buildContainer(ConfigCache $cache, $containerClass, $containerFile)
     {
 
         $class = $this->getContainerClass();
         $container = new $class(new Parameters($this->getDefaultParameters()));
 
+
         $this->setContainer($container);
+
+        $this->container->setParameter('app_container.class', $containerClass);
+        $this->container->setParameter('app_container.file', $containerFile);
         $this->container->setParameter('app.root', $this->getApplicationRoot());
         $this->container->inject($this->getContainerServiceId(), $container);
 
@@ -437,14 +446,15 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $loader = new DelegatingLoader($resolver);
 
-        $loader->load('config.xml');
+        $loader->load('config.xml', true);
 
-        $loader->load('config_'.strtolower($this->getEnvironment()).'.xml');
+        $loader->load('config_'.strtolower($this->getEnvironment()).'.xml', true);
+
+        $builder->configure();
 
         $this->packages->build($builder);
 
         $builder->build();
-
 
         return $builder;
     }

@@ -122,7 +122,18 @@ abstract class Loader implements LoaderInterface
         }
     }
 
-    abstract public function load($resource);
+    public function load($resource, $any = false)
+    {
+        if ($any) {
+            foreach ($this->locator->locate($resource, true) as $file) {
+                $this->doLoad($file);
+            }
+        } else {
+            $this->doLoad($this->locator->locate($resource));
+        }
+    }
 
     abstract public function supports($resource);
+
+    abstract protected function doLoad($file);
 }

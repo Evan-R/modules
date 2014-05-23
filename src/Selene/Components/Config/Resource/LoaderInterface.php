@@ -29,7 +29,7 @@ interface LoaderInterface
      * @access public
      * @return mixed
      */
-    public function load($resource);
+    public function load($resource, $any = false);
 
     /**
      * import
