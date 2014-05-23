@@ -18,7 +18,7 @@ use \Selene\Components\Common\Traits\Getter;
  * @package Selene\Components\DI\Meta
  * @version $Id$
  */
-class Data implements MetadataInterface
+class Data implements MetaDataInterface
 {
     use Getter;
 
