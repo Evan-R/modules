@@ -15,13 +15,16 @@ use \Symfony\Component\HttpFoundation\Request;
 use \Selene\Components\Events\DispatcherInterface;
 
 /**
- * @class RouterInterface
+ * @interface RouterInterface
+ *
  * @package Selene\Components\Routing
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 interface RouterInterface
 {
-    public function setEventDispatcher(DispatcherInterface $events);
+    public function setRoutes(RouteCollectionInterface $routes);
 
     public function getRoutes();
 
@@ -33,5 +36,5 @@ interface RouterInterface
 
     public function registerFilter($name, $filter);
 
-    public function boot(DispatcherInterface $events = null);
+    public function boot();
 }

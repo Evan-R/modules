@@ -62,13 +62,13 @@ class RouteBuilder
      * @access public
      * @return Route
      */
-    public function define($method, $name, $pattern, array $requirements = [])
+    public function define($method, $name, $pattern, $controller, array $requirements = [])
     {
         $route = new Route(
             $name,
             $this->prefixPattern($pattern),
             $this->getMethods($method),
-            $this->extendRequirements($requirements)
+            $this->extendRequirements($this->extractShortcutArgs($controller, $requirements))
         );
 
         $this->add($route);
@@ -168,7 +168,7 @@ class RouteBuilder
      */
     public function get($name, $pattern, $controller, $requirements = [])
     {
-        return $this->define('GET', $name, $pattern, $this->extractShortcutArgs($controller, $requirements));
+        return $this->define('GET', $name, $pattern, $controller, $requirements);
     }
 
     /**
@@ -184,7 +184,7 @@ class RouteBuilder
      */
     public function post($name, $pattern, $controller, $requirements = [])
     {
-        return $this->define('POST', $name, $pattern, $this->extractShortcutArgs($controller, $requirements));
+        return $this->define('POST', $name, $pattern, $controller, $requirements);
     }
 
     /**
@@ -200,7 +200,7 @@ class RouteBuilder
      */
     public function put($name, $pattern, $controller, $requirements = [])
     {
-        return $this->define('PUT', $name, $pattern, $this->extractShortcutArgs($controller, $requirements));
+        return $this->define('PUT', $name, $pattern, $controller, $requirements);
     }
 
     /**
@@ -216,7 +216,7 @@ class RouteBuilder
      */
     public function delete($name, $pattern, $controller, $requirements = [])
     {
-        return $this->define('DELETE', $name, $pattern, $this->extractShortcutArgs($controller, $requirements));
+        return $this->define('DELETE', $name, $pattern, $controller, $requirements);
     }
 
     /**
@@ -236,7 +236,8 @@ class RouteBuilder
             'GET|POST|PUT|DELETE',
             $name,
             $pattern,
-            $this->extractShortcutArgs($controller, $requirements)
+            $controller,
+            $requirements
         );
     }
 

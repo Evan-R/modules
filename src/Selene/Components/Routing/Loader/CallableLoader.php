@@ -29,7 +29,7 @@ class CallableLoader extends RoutingLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource)
+    public function load($resource, $any = false)
     {
         call_user_func($resource, $this->routes);
 

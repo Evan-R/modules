@@ -67,7 +67,7 @@ abstract class RoutingLoader extends Loader
      * @access public
      * @return mixed
      */
-    public function load($resource)
+    public function load($resource, $any = false)
     {
         foreach ($this->locator->locate($resource, true) as $file) {
             $this->doLoad($file);
@@ -76,8 +76,6 @@ abstract class RoutingLoader extends Loader
 
         $this->prepareContainer();
     }
-
-    abstract protected function doLoad($file);
 
     /**
      * prepareContainer

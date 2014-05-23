@@ -14,7 +14,6 @@ namespace Selene\Components\Routing\Cache;
 use \Selene\Components\Routing\RouteCollection;
 use \Selene\Components\Routing\StaticRouteCollection;
 use \Selene\Components\Routing\RouteCollectionInterface;
-use \Selene\Components\Filesystem\Traits\FsHelperTrait;
 
 /**
  * @class Storage Storage
@@ -24,13 +23,28 @@ use \Selene\Components\Filesystem\Traits\FsHelperTrait;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Storage
+class Storage implements StorageInterface
 {
-    use FsHelperTrait;
 
-    public function __construct($path)
+    /**
+     * @var DriverInterface
+     */
+    private $driver;
+
+    /**
+     * @var string
+     */
+    private $storeId;
+
+
+    /**
+     * @param DriverInterface $driver
+     * @param string $storeId
+     */
+    public function __construct(DriverInterface $driver, $storeId = 'selene_routes')
     {
-        $this->path = $path;
+        $this->driver  = $driver;
+        $this->storeId = $storeId;
     }
 
     /**
@@ -43,7 +57,11 @@ class Storage
      */
     public function write(RouteCollectionInterface $routes)
     {
-        file_put_contents($this->path, serialize($routes));
+        if ($this->driver->has($this->storeId)) {
+            $this->driver->replace($this->storeId, $routes);
+        } else {
+            $this->driver->put($this->storeId, $routes);
+        }
     }
 
     /**
@@ -56,11 +74,10 @@ class Storage
      */
     public function read()
     {
-        if (!is_file($this->path)) {
+        if (!$this->driver->has($this->storeId)) {
             return new RouteCollection;
         }
 
-        $routes = unserialize(file_get_contents($this->path));
-        return new StaticRouteCollection($routes);
+        return new StaticRouteCollection($this->driver->get($this->storeId));
     }
 }
