@@ -14,6 +14,7 @@ namespace Selene\Components\Xml;
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
 use \Selene\Components\Common\Helper\clearValue;
+use \Selene\Components\Common\Helper\ListHelper;
 use \Selene\Components\Common\Helper\StringHelper;
 use \Selene\Components\Common\Traits\Getter;
 use \Selene\Components\Xml\Loader\Loader;
@@ -102,8 +103,6 @@ class Parser implements ParserInterface
     /**
      * getAttributesKey
      *
-     * @param mixed $key
-     *
      * @access public
      * @return string
      */
@@ -176,7 +175,7 @@ class Parser implements ParserInterface
     /**
      * parse
      *
-     * @param DOMDocument $xml
+     * @param \DOMDocument $xml
      *
      * @access public
      * @return array
@@ -217,18 +216,18 @@ class Parser implements ParserInterface
     /**
      * parseDomElement
      *
-     * @param DOMelement $xml
+     * @param DOMElement $xml
      *
      * @access public
      * @return null|array
      */
-    public function parseDomElement(DOMelement $xml)
+    public function parseDomElement(DOMElement $xml)
     {
         $attributes = $this->parseElementAttributes($xml);
 
         $hasAttributes = (bool)$attributes;
 
-        $text = $this->prepareTextValue($xml, current($attributes));
+        $text = $this->prepareTextValue($xml, current($attributes) ?: null);
 
         $result = $this->parseElementNodes($xml->xpath('./child::*'), $xml->nodeName);
 
@@ -261,7 +260,9 @@ class Parser implements ParserInterface
     /**
      * getPhpValue
      *
-     * @param mixed $value
+     * @param mixed $val
+     * @param mixed $default
+     * @param ParserInterface $parser
      *
      * @access public
      * @return mixed
@@ -290,12 +291,12 @@ class Parser implements ParserInterface
      * getElementText
      *
      * @param DOMElement $element
-     * @param mixed $concat
+     * @param boolean $concat
      *
      * @access private
      * @return mixed
      */
-    public static function getElementText(\DOMElement $element, $concat = true)
+    public static function getElementText(DOMElement $element, $concat = true)
     {
         $textNodes = [];
 
@@ -306,6 +307,21 @@ class Parser implements ParserInterface
             }
         }
         return $concat ? implode($textNodes) : $textNodes;
+    }
+
+
+    /**
+     * fix node names
+     *
+     * @param string $name
+     *
+     * @static
+     * @access public
+     * @return string
+     */
+    public static function fixNodeName($name)
+    {
+        return strtr(StringHelper::strLowDash($name), ['-' => '_']);
     }
 
     /**
@@ -337,16 +353,17 @@ class Parser implements ParserInterface
             return call_user_func($this->keyNormalizer, $key);
         }
 
-        return strtr(StringHelper::strLowDash($key), ['-' => '_']);
+        return static::fixNodeName($key);
     }
 
     /**
-     * convert boolish and numeric values
+     * Convert boolish and numeric values
      *
-     * @param mixed $text
+     * @param DOMElement $xml
      * @param array $attributes
+     * @return mixed
      */
-    private function prepareTextValue(DOMElement $xml, $attributes = null)
+    private function prepareTextValue(DOMElement $xml, array $attributes = null)
     {
         $text = static::getElementText($xml, true);
         return (isset($attributes['type']) && 'text' === $attributes['type']) ?
@@ -357,7 +374,8 @@ class Parser implements ParserInterface
     /**
      * parseElementNodes
      *
-     * @param DOMElement $child
+     * @param mixed $children
+     * @param string $parentName
      *
      * @access private
      * @return array
@@ -374,10 +392,10 @@ class Parser implements ParserInterface
             $name = null === $prefix ? $oname : $this->prefixKey($oname, $prefix);
 
             if (isset($result[$name])) {
-                if (is_array($result[$name]) && arrayNumeric($result[$name])) {
+                if (is_array($result[$name]) && ListHelper::arrayIsList($result[$name])) {
                     $value = static::getPhpValue($child, null, $this);
 
-                    if (is_array($value) && arrayNumeric($value)) {
+                    if (is_array($value) && ListHelper::arrayIsList($value)) {
                         $result[$name] = array_merge($result[$name], $value);
                     } else {
                         $result[$name][] = $value;
@@ -387,20 +405,19 @@ class Parser implements ParserInterface
                     continue;
                 }
             } else {
-
                 $equals = $this->getEqualNodes($child, $prefix);
                 $value = static::getPhpValue($child, null, $this);
 
                 $listKey = $this->getListKey();
                 $lKey = $prefix ? $this->prefixKey($listKey, $prefix) : $listKey;
 
-                if (1 < $equals->length || $lKey === $name) {
+                if (1 < $equals->length || $lKey === $name || $this->isEqualOrPluralOf($parentName, $oname)) {
+
                     if ($this->isEqualOrPluralOf($parentName, $oname) || $lKey === $name) {
                         $result[] = static::getPhpValue($child, null, $this);
                     } else {
                         $plural = $this->pluralize($oname);
                         $plural = null === $prefix ? $plural : $this->prefixKey($plural, $prefix);
-
 
                         if (isset($result[$plural]) && is_array($result[$plural])) {
                             $result[$plural][] = $value;
@@ -415,6 +432,7 @@ class Parser implements ParserInterface
                 }
             }
         }
+
         return $result;
     }
 
