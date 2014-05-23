@@ -4,14 +4,18 @@ php:
   - 5.5
   - 5.6
   - hhvm
-before_script:
-  - composer self-update
-  - composer install --prefer-source --no-interaction --dev
-script: phpunit --configuration phpunit.xml.dist
+  - hhvm-nightly
 matrix: 
   allow_failures: 
     - php: hhvm
+    - php: hhvm-nightly
   fast_finish: true
+before_script:
+  - composer self-update
+  - composer install --prefer-source --no-interaction --dev
+script: 
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "hhvm" || "$TRAVIS_PHP_VERSION" == "hhvm-nightly"]; then vendor/bin/phpunit --verbose; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" && "$TRAVIS_PHP_VERSION" != "hhvm-nightly"]; then vendor/bin/phpunit --verbose --coverage-text --coverage-clover /tmp/di/coverage.xml; fi;'
 notififation:   
   on_success: never
   on_failure: always
