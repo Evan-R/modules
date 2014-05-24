@@ -181,7 +181,7 @@ class Parser implements ParserInterface
     public function parse($xml)
     {
         $opts = $this->getLoaderConfig();
-        $opts['from_string'] = !(is_file($xml) && stream_is_local($xml));
+        $opts[LoaderInterface::FROM_STRING] = !(is_file($xml) && stream_is_local($xml));
 
         $dom = $this->loader->load($xml, $opts);
 
@@ -346,9 +346,10 @@ class Parser implements ParserInterface
     protected function getLoaderConfig()
     {
         return [
-            'from_string' => false,
-            'simplexml' => false,
-            'dom_class' => __NAMESPACE__.'\\Dom\DOMDocument'
+            LoaderInterface::FROM_STRING => false,
+            LoaderInterface::SIMPLEXML => false,
+            LoaderInterface::DOM_CLASS => __NAMESPACE__.'\\Dom\DOMDocument',
+            LoaderInterface::SIMPLEXML_CLASS => __NAMESPACE__.'\\SimpleXMLElement'
         ];
     }
 
@@ -572,7 +573,7 @@ class Parser implements ParserInterface
      */
     private function convertDocument(\DOMDocument $xml)
     {
-        $xml = $this->loader->load($xml->saveXML(), ['from_string' => true]);
+        $xml = $this->loader->load($xml->saveXML(), [LoaderInterface::FROM_STRING => true]);
         return $xml;
     }
 }
