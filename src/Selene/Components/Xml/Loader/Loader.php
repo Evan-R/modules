@@ -142,12 +142,9 @@ class Loader implements LoaderInterface
      */
     private function loadXmlInDom(\DOMDocument $dom, $xml, $method)
     {
-        $errored = false;
-
         $usedInternalErrors = libxml_use_internal_errors(true);
         $externalEntitiesDisabled = libxml_disable_entity_loader(false);
         libxml_clear_errors();
-
 
         if (!$this->loadDom($dom, $xml, $method)) {
             libxml_disable_entity_loader($externalEntitiesDisabled);

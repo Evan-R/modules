@@ -249,6 +249,82 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /** @test */
+    public function itShouldNotParseInvalidKeyNames()
+    {
+        $writer = new Writer($this->getNormalizerMock());
+
+        try {
+            $writer->useKeyAsIndex($str = '%%adssad');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame($str . ' is an invalid node name', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('failed');
+
+    }
+
+    /** @test */
+    public function itShouldChangeThisTestName()
+    {
+        $writer = new Writer($this->getNormalizerMock());
+
+        try {
+            $writer->useKeyAsValue($str = '%%adssad');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame($str . ' is an invalid node name', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('failed');
+
+    }
+
+    /** @test */
+    public function itIsExpectedThat()
+    {
+        $writer = new Writer($this->getNormalizerMock());
+        $xml = $writer->dump(null);
+
+        $this->assertXmlStringEqualsXmlString('<root></root>', $xml);
+
+        $xml = $writer->dump('foo');
+
+        $this->assertXmlStringEqualsXmlString('<root>foo</root>', $xml);
+    }
+
+    /** @test */
+    public function itShouldParseSimpleXmlObjects()
+    {
+        $writer = new Writer($this->getNormalizerMock());
+        $xml = simplexml_load_string('<foo>bar</foo>');
+
+        $data = ['data' => $xml];
+
+        $xml = $writer->dump($data);
+        $this->assertXmlStringEqualsXmlString('<root><data><foo>bar</foo></data></root>', $xml);
+    }
+
+    /** @test */
+    public function itShouldDoWiredStuff()
+    {
+        $dom = new \DOMDocument;
+        $el = $dom->createElement('foo', 'bar');
+        $dom->appendChild($el);
+
+        $writer = new Writer($this->getNormalizerMock());
+
+        $data = ['slam' => $dom];
+
+        $xml = $writer->dump($data);
+        $this->assertXmlStringEqualsXmlString('<root><slam><foo>bar</foo></slam></root>', $xml);
+    }
+
     protected function getNormalizerMock()
     {
         $n = m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface');
@@ -263,7 +339,6 @@ class WriterTest extends \PHPUnit_Framework_TestCase
 
         return $n;
     }
-
 
     /**
      * tearDown
