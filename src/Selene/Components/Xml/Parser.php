@@ -398,43 +398,73 @@ class Parser implements ParserInterface
         $result = [];
 
         foreach ($children as $child) {
+
             $prefix = $child->prefix ?: null;
             $oname  = $this->normalizeKey($child->nodeName);
             $name   = $this->prefixKey($oname, $prefix);
 
             if (isset($result[$name])) {
-                if (is_array($result[$name]) && ListHelper::arrayIsList($result[$name])) {
-                    $value = static::getPhpValue($child, null, $this);
-
-                    if (is_array($value) && ListHelper::arrayIsList($value)) {
-                        $result[$name] = array_merge($result[$name], $value);
-                    } else {
-                        $result[$name][] = $value;
-                    }
-
-                } else {
-                    continue;
-                }
-            } else {
-                $list = false;
-                $equals = $this->getEqualNodes($child, $prefix);
-                $value = static::getPhpValue($child, null, $this);
-
-                if (($list = $this->isListKey($name, $prefix) || $this->isEqualOrPluralOf($parentName, $oname))
-                    || 1 < $equals->length
-                ) {
-                    if ($list) {
-                        $result[] = $value;
-                    } else {
-                        $result[$name][] = $value;
-                    }
-                } else {
-                    $result[$name] = $value;
-                }
+                $this->parseSetResultNodes($child, $name, $result);
+                continue;
             }
+
+            $this->parseUnsetResultNodes($child, $name, $oname, $parentName, $result, $prefix);
         }
 
         return $result;
+    }
+
+    /**
+     * Parse a `DOMElement` if a result key is set.
+     *
+     * @param DOMElement $child
+     * @param string $name
+     * @param array $result
+     *
+     * @access private
+     * @return mixed|boolean the result, else `false` if no result.
+     */
+    private function parseSetResultNodes(DOMElement $child, $name, array &$result = null)
+    {
+        if (!(is_array($result[$name]) && ListHelper::arrayIsList($result[$name]))) {
+            return false;
+        }
+
+        $value = static::getPhpValue($child, null, $this);
+
+        if (is_array($value) && ListHelper::arrayIsList($value)) {
+            return $result[$name] = array_merge($result[$name], $value);
+        }
+
+        return $result[$name][] = $value;
+    }
+
+    /**
+     * Parse a `DOMElement` if a result key is unset.
+     *
+     * @param DOMElement $child
+     * @param string $name
+     * @param string $oname
+     * @param string $pName
+     * @param array $result
+     * @param string $prefix
+     *
+     * @access private
+     * @return mixed the result
+     */
+    private function parseUnsetResultNodes(DOMElement $child, $name, $oname, $pName, array &$result, $prefix = null)
+    {
+        $value = static::getPhpValue($child, null, $this);
+
+        if ($this->isListKey($name, $prefix) || $this->isEqualOrPluralOf($pName, $oname)) {
+            return $result[] = $value;
+        }
+
+        if (1 < $this->getEqualNodes($child, $prefix)->length) {
+            return $result[$name][] = $value;
+        }
+
+        return $result[$name] = $value;
     }
 
     /**
