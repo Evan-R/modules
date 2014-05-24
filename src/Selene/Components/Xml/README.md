@@ -6,6 +6,8 @@
 [![License](https://poser.pugx.org/selene/xml/license.png)](https://packagist.org/packages/selene/xml)
 [![HHVM Status](http://hhvm.h4cc.de/badge/selene/xml.png)](http://hhvm.h4cc.de/package/selene/xml)
 
+[![Coverage Status](https://coveralls.io/repos/seleneapp/xml/badge.png?branch=development)](https://coveralls.io/r/seleneapp/xml?branch=development)
+
 ## Install
 
 In your `composer.json`: 
