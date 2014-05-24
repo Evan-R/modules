@@ -100,6 +100,180 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->fail('you lose');
     }
 
+    /** @test */
+    public function itShouldRespectPluralizedParentKeys()
+    {
+        $parser = new Parser;
+
+        $parser->setPluralizer(function ($string) {
+            return $string . 's';
+        });
+
+
+        $xmlString = '<data><aas><aa>1</aa></aas></data>';
+
+        $data = $parser->parse($xmlString);
+
+        $this->assertEquals(['data' => ['aas' => [1]]], $data);
+
+        $parser->setIndexKey('item');
+
+        $xmlString = '<data><aas><item>1</item></aas></data>';
+
+        $data = $parser->parse($xmlString);
+
+        $this->assertEquals(['data' => ['aas' => [1]]], $data);
+    }
+
+    /** @test */
+    public function itShouldParseAttributesAsKeys()
+    {
+        $parser = new Parser;
+        $parser->setMergeAttributes(true);
+
+        $xmlString = '<data><foo id="1">bar</foo></data>';
+        $data = $parser->parse($xmlString);
+        $this->assertEquals(['data' => ['foo' => ['id' => 1, 'value' => 'bar']]], $data);
+    }
+
+    /** @test */
+    public function itShouldParseAttributesAsArray()
+    {
+        $parser = new Parser;
+        $parser->setMergeAttributes(false);
+
+        $xmlString = '<data><foo id="1">bar</foo></data>';
+        $data = $parser->parse($xmlString);
+        $this->assertEquals(['data' => ['foo' => ['@attributes' => ['id' => 1], 'value' => 'bar']]], $data);
+    }
+
+    /** @test */
+    public function attributeKeyNameShouldBeSettable()
+    {
+        $parser = new Parser;
+        $parser->setMergeAttributes(false);
+        $parser->setAttributesKey('attrs');
+
+        $xmlString = '<data><foo id="1">bar</foo></data>';
+        $data = $parser->parse($xmlString);
+        $this->assertEquals(['data' => ['foo' => ['attrs' => ['id' => 1], 'value' => 'bar']]], $data);
+    }
+
+    /** @test */
+    public function itIsSetInnerTextAsValueKey()
+    {
+        $parser = new Parser;
+
+        $xmlString = '<data><foo>bar<inner>foo</inner></foo></data>';
+        $data = $parser->parse($xmlString);
+
+        $this->assertEquals(['data' => ['foo' => ['inner' => 'foo', 'value' => 'bar']]], $data);
+    }
+
+    /** @test */
+    public function itShouldNormalizeKeys()
+    {
+        $parser = new Parser;
+        $parser->setKeyNormalizer(function ($key) {
+            return strtr($key, ['-' => '_']);
+        });
+
+        $xmlString = '<data><test-name>foo</test-name></data>';
+        $data = $parser->parse($xmlString);
+        $this->assertEquals(['data' => ['test_name' => 'foo']], $data);
+    }
+
+    /** @test */
+    public function itShouldHandleRegularDomDocuments()
+    {
+        $parser = new Parser;
+
+        $dom = new \DOMDocument;
+        $dataNode = $dom->createElement('data');
+        $dom->appendChild($dataNode);
+
+        $data = $parser->parseDom($dom);
+
+        $this->assertEquals(['data' => null], $data);
+    }
+
+    /** @test */
+    public function itShouldParseItemsAndRespectArrayNotaion()
+    {
+
+        $xmlString =
+        '<data>
+            <items>
+                <item>a</item>
+                <item>b</item>
+                <item>c</item>
+            </items>
+        </data>';
+
+        $parser = new Parser;
+        $parser->setIndexKey('item');
+
+        $data = $parser->parse($xmlString);
+
+        $this->assertEquals(['data' => ['items' => ['a', 'b', 'c']]], $data);
+
+        $parser = new Parser;
+        $parser->setPluralizer(function ($string) {
+            return $string . 's';
+        });
+
+        $data = $parser->parse($xmlString);
+
+        $this->assertEquals(['data' => ['items' => ['a', 'b', 'c']]], $data);
+    }
+
+    /** @test */
+    public function itShouldContinueIndexOnParsingMixedListStructure()
+    {
+        $xmlString =
+        '<data>
+            <items>
+                <item>a</item>
+                <item>b</item>
+                <item>c</item>
+                <bla>d</bla>
+                <item>e</item>
+            </items>
+        </data>';
+
+        $parser = new Parser;
+        $parser->setPluralizer(function ($string) {
+            return $string . 's';
+        });
+
+        $data = $parser->parse($xmlString);
+
+        $this->assertEquals(['data' => ['items' => ['a', 'b', 'c', 'bla' => 'd', 'e']]], $data);
+
+        $parser = new Parser;
+
+        $data = $parser->parse($xmlString);
+
+        $this->assertEquals(['data' => ['items' => ['item' => ['a', 'b', 'c', 'e'], 'bla' => 'd']]], $data);
+    }
+
+    /** @test */
+    public function staticHelperTest()
+    {
+        $dom = new DOMDocument;
+
+        $elementParent = $dom->createElement('data');
+        $elementChild = $dom->createElement('foo', 'bar');
+        $elementParent->appendChild($elementChild);
+
+        $this->assertEquals(['foo' => 'bar'], Parser::getPhpValue($elementParent));
+        $this->assertNull(Parser::getPhpValue(''));
+        $this->assertSame(10, Parser::getPhpValue('10'));
+        $this->assertSame(1.2, Parser::getPhpValue('1.2'));
+        $this->assertTrue(Parser::getPhpValue('true'));
+        $this->assertFalse(Parser::getPhpValue('false'));
+    }
+
     /**
      * tearDown
      *

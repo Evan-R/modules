@@ -143,9 +143,9 @@ class Parser implements ParserInterface
      * @access protected
      * @return boolean
      */
-    protected function isListKey($name)
+    protected function isListKey($name, $prefix = null)
     {
-        return $this->getDefault($this->options, 'list_key', null) === $name;
+        return $this->prefixKey($this->getListKey(), $prefix) === $name;
     }
 
     /**
@@ -389,7 +389,7 @@ class Parser implements ParserInterface
             $nsURL = $child->namespaceURI ?: null;
 
             $oname = $this->normalizeKey($child->nodeName);
-            $name = null === $prefix ? $oname : $this->prefixKey($oname, $prefix);
+            $name  = $this->prefixKey($oname, $prefix);
 
             if (isset($result[$name])) {
                 if (is_array($result[$name]) && ListHelper::arrayIsList($result[$name])) {
@@ -405,27 +405,17 @@ class Parser implements ParserInterface
                     continue;
                 }
             } else {
+
                 $equals = $this->getEqualNodes($child, $prefix);
                 $value = static::getPhpValue($child, null, $this);
 
-                $listKey = $this->getListKey();
-                $lKey = $prefix ? $this->prefixKey($listKey, $prefix) : $listKey;
-
-                if (1 < $equals->length || $lKey === $name || $this->isEqualOrPluralOf($parentName, $oname)) {
-
-                    if ($this->isEqualOrPluralOf($parentName, $oname) || $lKey === $name) {
-                        $result[] = static::getPhpValue($child, null, $this);
+                if (($list = $this->isListKey($name, $prefix) || $this->isEqualOrPluralOf($parentName, $oname))
+                    || 1 < $equals->length
+                ) {
+                    if ($list) {
+                        $result[] = $value;
                     } else {
-                        $plural = $this->pluralize($oname);
-                        $plural = null === $prefix ? $plural : $this->prefixKey($plural, $prefix);
-
-                        if (isset($result[$plural]) && is_array($result[$plural])) {
-                            $result[$plural][] = $value;
-                        } elseif (count($children) !== count($equals)) {
-                            $result[$plural][] = $value;
-                        } else {
-                            $result[$name][] = $value;
-                        }
+                        $result[$name][] = $value;
                     }
                 } else {
                     $result[$name] = $value;
@@ -463,13 +453,7 @@ class Parser implements ParserInterface
 
             $name = $this->normalizeKey($attribute->nodeName);
 
-            if ($prefix = $attribute->prefix) {
-                $attName = $this->prefixKey($name, $prefix);
-            } else {
-                $attName  = $name;
-            }
-
-            $attrs[$attName] = $value;
+            $attrs[$this->prefixKey($name, $attribute->prefix ?: null)] = $value;
         }
 
         return [$this->getAttributesKey() => $attrs];
@@ -499,7 +483,7 @@ class Parser implements ParserInterface
      */
     private function pluralize($singular)
     {
-        if (!isset($this->pluralizer)) {
+        if (null === $this->pluralizer) {
             return $singular;
         }
 
@@ -525,15 +509,15 @@ class Parser implements ParserInterface
     /**
      * prefixKey
      *
-     * @param mixed $key
-     * @param mixed $prefix
+     * @param string $key
+     * @param string $prefix
      *
      * @access private
      * @return string
      */
-    private function prefixKey($key, $prefix)
+    private function prefixKey($key, $prefix = null)
     {
-        return sprintf('%s::%s', $prefix, $key);
+        return $prefix ? sprintf('%s::%s', $prefix, $key) : $key;
     }
 
     /**

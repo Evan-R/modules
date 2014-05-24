@@ -11,7 +11,6 @@
 
 namespace Selene\Components\Xml;
 
-use \InvalidArgumentException;
 use \SimpleXMLElement as SimpleXML;
 
 /**
@@ -31,7 +30,7 @@ class SimpleXMLElement extends SimpleXML
      *
      * @var array
      */
-    public static $boolish = array('yes', 'no', 'true', 'false');
+    public static $boolish = ['yes', 'no', 'true', 'false'];
 
     /**
      * argumentsAsArray
@@ -41,7 +40,7 @@ class SimpleXMLElement extends SimpleXML
      */
     public function attributesAsArray($namespace = null)
     {
-        $attributes = array();
+        $attributes = [];
         $attr = $this->xpath('./@*');
 
         foreach ($attr as $key => $value) {
@@ -81,12 +80,12 @@ class SimpleXMLElement extends SimpleXML
                 $content = $content->saveXML($content->childNodes->item(0));
                 break;
             case ($content instanceof \DOMNode):
-                $dom = new DOMDocument();
+                $dom = new \DOMDocument();
                 $dom->appendChild($content);
                 $content = $dom->saveXML($dom->childNodes->item(0));
                 break;
             default:
-                throw new InvalidArgumentException(
+                throw new \InvalidArgumentException(
                     'expected arguement 1 to be String, SimpleXMLElement, DOMNode, or DOMDocument, instead saw ' . gettype($content)
                 );
         }
