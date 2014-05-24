@@ -32,7 +32,7 @@ class Parser implements ParserInterface
     /**
      * pluralizer
      *
-     * @var mixed
+     * @var callable
      */
     private $pluralizer;
 
@@ -51,9 +51,9 @@ class Parser implements ParserInterface
     private $options;
 
     /**
-     * @param LoaderInterface $loader
+     * Creates a new `Parser` instance.
      *
-     * @access public
+     * @param LoaderInterface $loader
      */
     public function __construct(LoaderInterface $loader = null)
     {
@@ -62,35 +62,25 @@ class Parser implements ParserInterface
     }
 
     /**
-     * setMergeAttributes
+     * Toggle on/off merging attributes to array keys.
      *
-     * @param mixed $merge
+     * @param boolean $merge
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function setMergeAttributes($merge)
     {
-        return $this->options['merge_attributes'] = (bool)$merge;
+        $this->options['merge_attributes'] = (bool)$merge;
     }
 
     /**
-     * setListAttribute
+     * Set the attributes key name.
      *
-     * @param mixed $attribute
+     * The default key will be `@attributes`.
+     * This will be ignored if merging attributes is active.
      *
-     * @access public
-     * @return mixed
-     */
-    public function setIndexKey($attribute)
-    {
-        return $this->options['list_key'] = $attribute;
-    }
-
-    /**
-     * setAttributesKey
-     *
-     * @param mixed $key
+     * @param string $key
      *
      * @access public
      * @return void
@@ -101,7 +91,9 @@ class Parser implements ParserInterface
     }
 
     /**
-     * getAttributesKey
+     * Get the attributes key.
+     *
+     * Defaults to `@attributes`.
      *
      * @access public
      * @return string
@@ -112,7 +104,25 @@ class Parser implements ParserInterface
     }
 
     /**
-     * setKeyNormalizer
+     * Set the list identifier key.
+     *
+     * Elements that match with that key will always be considered a list,
+     * as long as thy have any parent element.
+     *
+     * @param string $key
+     *
+     * @access public
+     * @return void
+     */
+    public function setIndexKey($key)
+    {
+        $this->options['list_key'] = $key;
+    }
+
+    /**
+     * Set a custom function to normalize an xml node name to a php array key name.
+     *
+     * By default, hyphens are converted to underscores.
      *
      * @param callable $normalizer
      *
@@ -125,42 +135,7 @@ class Parser implements ParserInterface
     }
 
     /**
-     * getListKey
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function getListKey()
-    {
-        return $this->getDefault($this->options, 'list_key', null);
-    }
-
-    /**
-     * isListKey
-     *
-     * @param mixed $name
-     *
-     * @access protected
-     * @return boolean
-     */
-    protected function isListKey($name, $prefix = null)
-    {
-        return $this->prefixKey($this->getListKey(), $prefix) === $name;
-    }
-
-    /**
-     * mergeAttributes
-     *
-     * @access protected
-     * @return boolean
-     */
-    protected function mergeAttributes()
-    {
-        return $this->getDefault($this->options, 'merge_attributes', false);
-    }
-
-    /**
-     * setPluralizer
+     * Set the pluralizer.
      *
      * @param callable $pluralizer
      *
@@ -173,7 +148,7 @@ class Parser implements ParserInterface
     }
 
     /**
-     * parse
+     * Parses a `\DOMDocument` into an array.
      *
      * @param \DOMDocument $xml
      *
@@ -196,9 +171,9 @@ class Parser implements ParserInterface
     }
 
     /**
-     * parse
+     * Parses an xml string or file into an array.
      *
-     * @param mixed $xml
+     * @param string $xml
      *
      * @access public
      * @return array
@@ -214,7 +189,7 @@ class Parser implements ParserInterface
     }
 
     /**
-     * parseDomElement
+     * Parse the contents of a `DOMElement` to an array.
      *
      * @param DOMElement $xml
      *
@@ -258,7 +233,7 @@ class Parser implements ParserInterface
     }
 
     /**
-     * getPhpValue
+     * Get the php equivalent of an input value derived from any king of xml.
      *
      * @param mixed $val
      * @param mixed $default
@@ -288,13 +263,14 @@ class Parser implements ParserInterface
     }
 
     /**
-     * getElementText
+     * Get the text of a `DOMElement` excluding the contents
+     * of its child elements.
      *
      * @param DOMElement $element
      * @param boolean $concat
      *
      * @access private
-     * @return mixed
+     * @return string|array returns an array of strings if `$concat` is `false`
      */
     public static function getElementText(DOMElement $element, $concat = true)
     {
@@ -311,7 +287,7 @@ class Parser implements ParserInterface
 
 
     /**
-     * fix node names
+     * Convert hyphens to underscores.
      *
      * @param string $name
      *
@@ -323,6 +299,43 @@ class Parser implements ParserInterface
     {
         return strtr(StringHelper::strLowDash($name), ['-' => '_']);
     }
+
+    /**
+     * Get the list identifier key.
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getListKey()
+    {
+        return $this->getDefault($this->options, 'list_key', null);
+    }
+
+    /**
+     * Check if a given string is the list identifier.
+     *
+     * @param string $name
+     * @param string $prefix
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function isListKey($name, $prefix = null)
+    {
+        return $this->prefixKey($this->getListKey(), $prefix) === $name;
+    }
+
+    /**
+     * Determine weather to merge attributes or not.
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function mergeAttributes()
+    {
+        return $this->getDefault($this->options, 'merge_attributes', false);
+    }
+
 
     /**
      * getLoaderConfig
@@ -340,7 +353,7 @@ class Parser implements ParserInterface
     }
 
     /**
-     * normalizeKey
+     * Normalize a node key
      *
      * @param mixed $key
      *
@@ -357,9 +370,9 @@ class Parser implements ParserInterface
     }
 
     /**
-     * Convert boolish and numeric values
+     * Convert boolean like and numeric values to their php equivalent values.
      *
-     * @param DOMElement $xml
+     * @param DOMElement $xml the element to get the value from
      * @param array $attributes
      * @return mixed
      */
@@ -372,10 +385,10 @@ class Parser implements ParserInterface
     }
 
     /**
-     * parseElementNodes
+     * Parse a nodelist into a array
      *
-     * @param mixed $children
-     * @param string $parentName
+     * @param \DOMNodeList|array $children elements to parse
+     * @param string $parentName           node name of the parent element
      *
      * @access private
      * @return array
@@ -386,10 +399,8 @@ class Parser implements ParserInterface
 
         foreach ($children as $child) {
             $prefix = $child->prefix ?: null;
-            $nsURL = $child->namespaceURI ?: null;
-
-            $oname = $this->normalizeKey($child->nodeName);
-            $name  = $this->prefixKey($oname, $prefix);
+            $oname  = $this->normalizeKey($child->nodeName);
+            $name   = $this->prefixKey($oname, $prefix);
 
             if (isset($result[$name])) {
                 if (is_array($result[$name]) && ListHelper::arrayIsList($result[$name])) {
@@ -405,7 +416,7 @@ class Parser implements ParserInterface
                     continue;
                 }
             } else {
-
+                $list = false;
                 $equals = $this->getEqualNodes($child, $prefix);
                 $value = static::getPhpValue($child, null, $this);
 
@@ -427,15 +438,14 @@ class Parser implements ParserInterface
     }
 
     /**
-     * parseElementAttributes
+     * Parse element attributes into an array.
      *
-     * @param DOMelement $xml
-     * @param string $attrKey
+     * @param DOMElement $xml
      *
      * @access private
-     * @return mixed
+     * @return array
      */
-    private function parseElementAttributes(DOMelement $xml)
+    private function parseElementAttributes(DOMElement $xml)
     {
         $elementAttrs = $xml->xpath('./@*');
 
@@ -446,8 +456,6 @@ class Parser implements ParserInterface
         $attrs = [];
 
         foreach ($elementAttrs as $key => $attribute) {
-
-            $namespace = $attribute->namespaceURI;
 
             $value = static::getPhpValue($attribute->nodeValue, null, $this);
 
@@ -460,10 +468,10 @@ class Parser implements ParserInterface
     }
 
     /**
-     * isEqualOrPluralOf
+     * Check if the input string is a plural or equal to a given comparative string.
      *
-     * @param mixed $name
-     * @param mixed $singular
+     * @param string $name the input string
+     * @param string $singular the string to compare with
      *
      * @access private
      * @return boolean
@@ -474,12 +482,12 @@ class Parser implements ParserInterface
     }
 
     /**
-     * pluralize
+     * Attempt to pluralize a string.
      *
-     * @param mixed $singular
+     * @param string $singular
      *
      * @access private
-     * @return mixed
+     * @return string
      */
     private function pluralize($singular)
     {
@@ -491,12 +499,13 @@ class Parser implements ParserInterface
     }
 
     /**
-     * getEqualNodes
+     * A lookahead to find sibling elements with similar names.
      *
-     * @param DOMElement $node
-     * @param mixed $prefix
+     * @param DOMElement $node the node in charge.
+     * @param string     $prefix the element prefix
+     *
      * @access protected
-     * @return DOMNodelist
+     * @return \DOMNodeList
      */
     private function getEqualNodes(DOMElement $node, $prefix = null)
     {
@@ -507,10 +516,12 @@ class Parser implements ParserInterface
     }
 
     /**
-     * prefixKey
+     * Prepend a string.
      *
-     * @param string $key
-     * @param string $prefix
+     * Will pass-through the original string if `$prefix` is `null`.
+     *
+     * @param string $key the key to prefix
+     * @param string $prefix the prefix
      *
      * @access private
      * @return string
@@ -521,12 +532,13 @@ class Parser implements ParserInterface
     }
 
     /**
-     * convertDocument
+     * Converts a `\DOMDocument`that is not an instance of
+     * `Selene\Components\Dom\DOMDocument`.
      *
-     * @param \DOMDocument $xml
+     * @param \DOMDocument $xml the document to convert
      *
      * @access private
-     * @return mixed
+     * @return DOMDocument
      */
     private function convertDocument(\DOMDocument $xml)
     {
