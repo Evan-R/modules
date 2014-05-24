@@ -35,36 +35,16 @@ class Loader implements LoaderInterface
      */
     protected $options;
 
-    /**
-     * defaultOptions
-     *
-     * @var array
-     */
     protected $defaultOptions;
-
-    /**
-     * errors
-     *
-     * @var array
-     */
-    protected $errors;
-
-    /**
-     * xmlErrors
-     *
-     * @var array
-     */
-    protected $xmlErrors;
 
     /**
      * @access public
      */
-    public function __construct()
+    public function __construct(array $options = [])
     {
-        $this->options = [];
-        $this->defaultOptions = [];
-        $this->errors = [];
-        $this->xmlErrors = [];
+        $this->resetOptions();
+
+        $this->loadOptions($options);
     }
 
     /**
@@ -75,10 +55,7 @@ class Loader implements LoaderInterface
      */
     public function __clone()
     {
-        $this->options = [];
-        $this->defaultOptions = [];
-        $this->errors = [];
-        $this->xmlErrors = [];
+        $this->resetOptions();
     }
 
     /**
@@ -119,33 +96,9 @@ class Loader implements LoaderInterface
 
         $xml = $this->doLoad($file);
 
-        if ($errors = $this->getErrors()) {
-            throw new \Exception($this->formatErrors($errors, $file));
-        }
-
         $this->resotereOptions();
 
         return $xml;
-    }
-
-    /**
-     * formatErrors
-     *
-     * @param array $errors
-     * @param mixed $file
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function formatErrors(array $errors, $file)
-    {
-        $output = "[file] $file \n";
-
-        foreach ($errors as $errnum => $error) {
-            $output .= "[$errnum] $error \n";
-        }
-
-        return $output;
     }
 
     /**
@@ -157,18 +110,22 @@ class Loader implements LoaderInterface
      */
     protected function doLoad($file)
     {
-        $domClass = $this->getOption('dom_class', '\Selene\Components\Xml\Dom\DOMDocument');
+        $domClass = $this->getOption(static::DOM_CLASS, '\Selene\Components\Xml\Dom\DOMDocument');
 
-        $dom = new $domClass('1.0', 'UTF-8');
+        $dom = new $domClass('1.0', $this->getOption(static::ENCODING, 'UTF-8'));
 
-        $load = ($fromString = $this->getOption('from_string', false)) ? 'loadXML' : 'load';
+        $method = $this->getOption(static::FROM_STRING, false) ? 'loadXML' : 'load';
 
-        if (!$this->loadXmlInDom($dom, $file, $load)) {
-            return false;
-        }
+        $this->loadXmlInDom($dom, $file, $method);
 
-        if ($simpleXml = $this->getOption('simplexml', false)) {
-            $xml = simplexml_import_dom($dom, $this->getOption('simplexml_class', __NAMESPACE__.'\\SimpleXmlElement'));
+        if ($simpleXml = $this->getOption(self::SIMPLEXML, false)) {
+            $xml = simplexml_import_dom(
+                $dom,
+                $this->getOption(
+                    static::SIMPLEXML_CLASS,
+                    'Selene\Components\Xml\SimpleXmlElement'
+                )
+            );
             return $xml;
         }
 
@@ -176,26 +133,14 @@ class Loader implements LoaderInterface
     }
 
     /**
-     * getErrors
-     *
-     * @access public
-     * @return mixed|bool|array
-     */
-    public function getErrors()
-    {
-        return $this->getAllErrors();
-    }
-
-    /**
      * loadXmlInDom
      *
      * @param \DOMDocument $dom
      * @param mixed $file
-     * @param string $load
      * @access protected
      * @return DOMDocument;
      */
-    protected function loadXmlInDom(\DOMDocument $dom, $file, $load = 'load')
+    private function loadXmlInDom(\DOMDocument $dom, $xml, $method)
     {
         $errored = false;
 
@@ -203,56 +148,37 @@ class Loader implements LoaderInterface
         $externalEntitiesDisabled = libxml_disable_entity_loader(false);
         libxml_clear_errors();
 
-        set_error_handler([$this, 'handleXMLErrors']);
 
-        // set LIBXML_NONET to prevent local and remote file inclusion attacks.
-        try {
-            call_user_func_array(
-                [$dom, $load],
-                [$file, LIBXML_NONET | LIBXML_DTDATTR | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0]
-            );
-        } catch (\Exception $e) {
-            $this->errors[] = trim($e->getMessage(), "\n");
-            return false;
-        }
+        if (!$this->loadDom($dom, $xml, $method)) {
+            libxml_disable_entity_loader($externalEntitiesDisabled);
 
-        restore_error_handler();
-
-        if ($errors = libxml_get_errors()) {
-            $this->xmlErrors = $errors;
-            $errored = true;
+            throw new \InvalidArgumentException($this->formatLibXmlErrors($usedInternalErrors));
         }
 
         // restore previous libxml setting:
         libxml_use_internal_errors($usedInternalErrors);
         libxml_disable_entity_loader($externalEntitiesDisabled);
 
-        if ($errored) {
-            return false;
-        }
-
-        $dom->normalizeDocument();
-
         return $dom;
     }
 
     /**
-     * handleXMLErrors
+     * loadDom
      *
-     * @param mixed $errorno
-     * @param mixed $errstr
-     * @access public
-     * @return mixed
+     * @param \DOMDocument $dom
+     * @param mixed $method
+     * @param mixed $content
+     *
+     * @access private
+     * @return boolean
      */
-    public function handleXMLErrors($errorno, $errstr)
+    private function loadDom(\DOMDocument $dom, $xml, $method)
     {
-        $this->xmlErrors = libxml_get_errors();
-
-        if (0 === error_reporting()) {
-            return false;
-        }
-
-        $this->errors[] = trim($errstr, "\n");
+        return call_user_func_array(
+            [$dom, $method],
+            // set LIBXML_NONET to prevent local and remote file inclusion attacks.
+            [$xml, LIBXML_NONET | LIBXML_DTDATTR | defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0]
+        );
     }
 
     /**
@@ -261,16 +187,26 @@ class Loader implements LoaderInterface
      * @access private
      * @return mixed
      */
-    private function getAllErrors()
+    private function formatLibXmlErrors($usedInternalErrors)
     {
         $errors = [];
 
-        foreach ($this->xmlErrors as $error) {
-            $errors[] = trim($error->message, "\n");
+        foreach (libxml_get_errors() as $error) {
+            $errors[] = sprintf(
+                '[%s %s] %s (in file %s in column %s on line %s)',
+                LIBXML_ERR_ERROR === $error->level ? 'ERROR' : 'WARNING',
+                $error->code,
+                $error->message,
+                $error->file ?: 'n/a',
+                $error->column,
+                $error->line
+            );
         }
 
-        $errors = array_merge($this->errors, $errors);
-        return empty($errors) ? false : $errors;
+        libxml_clear_errors();
+        libxml_use_internal_errors($usedInternalErrors);
+
+        return implode("\n", $errors);
     }
 
     /**
@@ -303,6 +239,19 @@ class Loader implements LoaderInterface
     private function resotereOptions()
     {
         $this->options = $this->defaultOptions;
+        $this->defaultOptions = [];
+    }
+
+    /**
+     * resetOptions
+     *
+     *
+     * @access private
+     * @return void
+     */
+    private function resetOptions()
+    {
+        $this->options = [];
         $this->defaultOptions = [];
     }
 }

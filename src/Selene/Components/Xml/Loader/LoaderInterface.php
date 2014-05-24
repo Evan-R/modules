@@ -18,11 +18,19 @@ namespace Selene\Components\Xml\Loader;
  */
 interface LoaderInterface
 {
+    const ENCODING        = 'encoding';
+
+    const FROM_STRING     = 'from_string';
+
+    const DOM_CLASS       = 'dom_class';
+
+    const SIMPLEXML       = 'simplexml';
+
+    const SIMPLEXML_CLASS = 'simplexml_class';
+
     public function load($xml);
 
     public function setOption($option, $value);
 
     public function getOption($option, $default = null);
-
-    public function getErrors();
 }
