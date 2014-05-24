@@ -349,12 +349,13 @@ class Writer
     }
 
     /**
-     * appendDOMNode
+     * Appends a dom node to the DOM.
      *
      * @param DOMNode $DOMNode
      * @param string  $name
      * @param mixed   $value
      * @param boolean $hasAttributes
+     *
      * @access protected
      * @return void
      */
@@ -394,37 +395,42 @@ class Writer
      */
     protected function mapAttributes(\DOMNode &$DOMNode, $key, $value)
     {
-        if ($attrName = $this->isAttribute($DOMNode, $key)) {
+        if ($attrName = $this->getAttributeName($DOMNode, $key)) {
 
             if (is_array($value)) {
                 foreach ($value as $attrKey => $attrValue) {
-                    $DOMNode->setAttribute($attrKey, $this->getValue($attrValue));
+                    $DOMNode->setAttribute($attrKey, $this->getAttributeValue($attrValue, $attrKey));
                 }
             } else {
-                $DOMNode->setAttribute($attrName, $this->getValue($value));
+                $DOMNode->setAttribute($attrName, $this->getAttributeValue($value, $attrName));
             }
+
+            return true;
+
+        } elseif ($this->isMappedAttribute($DOMNode->nodeName, $key) && $this->isValidNodeName($key)) {
+
+            $DOMNode->setAttribute($key, $this->getAttributeValue($value, $key));
+
             return true;
         }
+
         return false;
     }
 
     /**
-     * isAttribute
+     * getAttributeName
      *
      * @param DOMNode $parent
      * @param mixed $key
      * @access protected
      * @return string|boolean
      */
-    protected function isAttribute(\DOMNode $parent, $key)
+    protected function getAttributeName(\DOMNode $parent, $key)
     {
         if (0 === strpos($key, '@') && $this->isValidNodeName($attrName = substr($key, 1))) {
             return $attrName;
         }
 
-        if ($this->isMappedAttribute($parent->nodeName, $key) && $this->isValidNodeName($key)) {
-            return $key;
-        }
         return false;
     }
 
@@ -470,14 +476,15 @@ class Writer
             case is_array($value) || $value instanceof \Traversable:
                 $this->buildXML($dom, $DOMNode, $value);
                 return true;
-            case is_numeric($value):
-                if (is_string($value)) {
-                    return $this->createTextNodeWithTypeAttribute($dom, $DOMNode, (string)$value, 'string');
-                }
+            case is_int($value):
+            case is_float($value):
                 return $this->createText($dom, $DOMNode, (string)$value);
             case is_bool($value):
-                return $this->createText($dom, $DOMNode, $value ? 'yes' : 'no');
+                return $this->createText($dom, $DOMNode, $value ? 'true' : 'false');
             case is_string($value):
+                if (in_array(strtolower($value), ['true', 'false']) || is_numeric($value)) {
+                    return $this->createTextNodeWithTypeAttribute($dom, $DOMNode, (string)$value, 'string');
+                }
                 if (preg_match('/(<|>|&)/i', $value)) {
                     return $this->createCDATASection($dom, $DOMNode, $value);
                 }
@@ -546,18 +553,17 @@ class Writer
      * @access protected
      * @return mixed
      */
-    protected function getValue($value)
+    protected function getAttributeValue($value, $attrKey = null)
     {
-        switch (true) {
-            case is_bool($value):
-                return $value ? 'true' : 'false';
-            case is_numeric($value):
-                return ctype_digit($value) ? intval($value) : floatval($value);
-            case in_array($value, ['true', 'false']):
-                return ('false' === $value || 'no' === $value) ? false : true;
-            default:
-                return clear_value(trim($value));
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        } elseif (!is_scalar($value)) {
+            throw new \InvalidArgumentException(
+                sprintf('Cannot use none scalar value as value for attribute %s', $attrKey)
+            );
         }
+
+        return $value;
     }
 
     /**

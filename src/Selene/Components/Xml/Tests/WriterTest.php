@@ -68,15 +68,8 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $args = [
             'tags' => ['mysql', 'postgres']
         ];
-        $writer = new Writer($n = m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface'));
 
-        $n->shouldReceive('ensureBuildable')->andReturnUsing(function ($arg) {
-            return $arg;
-        });
-
-        $n->shouldReceive('normalize')->andReturnUsing(function ($arg) {
-            return $arg;
-        });
+        $writer = new Writer($this->getNormalizerMock());
 
         $writer->setInflector(function ($value) {
             return strrpos($value, 's') === (strlen($value) - 1) ? substr($value, 0, -1) : $value;
@@ -97,15 +90,7 @@ class WriterTest extends \PHPUnit_Framework_TestCase
             'foo' => ['id' => 10, 'val' => 'value']
         ];
 
-        $writer = new Writer($n = m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface'));
-
-        $n->shouldReceive('ensureBuildable')->andReturnUsing(function ($arg) {
-            return $arg;
-        });
-
-        $n->shouldReceive('normalize')->andReturnUsing(function ($arg) {
-            return $arg;
-        });
+        $writer = new Writer($this->getNormalizerMock());
 
         $writer->addMappedAttribute('foo', 'id');
 
@@ -118,21 +103,99 @@ class WriterTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldMappAttributesFromAttributesMap()
+    {
+        $args = [
+            'foo' => ['soma' => true, 'val' => 'value']
+        ];
+
+        $writer = new Writer($this->getNormalizerMock());
+
+        $writer->setAttributeMap([
+            'foo' => ['soma']
+        ]);
+
+        $xml = $writer->dump($args);
+        $this->assertXmlStringEqualsXmlString(
+            '<root><foo soma="true"><val>value</val>
+            </foo></root>',
+            $xml
+        );
+    }
+
+    /** @test */
+    public function itShouldThrowExceptionOnInvalidAttributeValue()
+    {
+        $args = [
+            'foo' => ['id' => [1, 2], 'zz' => 'bar']
+        ];
+
+        $writer = new Writer($this->getNormalizerMock());
+
+        $writer->setAttributeMap([
+          'foo' => ['id']
+        ]);
+
+        try {
+            $xml = $writer->dump($args);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Cannot use none scalar value as value for attribute id', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+            return;
+        }
+
+        $this->fail('test failed');
+    }
+
+    /** @test */
+    public function itShouldAddTypeToStringTypes()
+    {
+        $args = [
+            'foo' => ['value' => '2']
+        ];
+
+        $writer = new Writer($this->getNormalizerMock());
+
+        $xml = $writer->dump($args);
+
+        $this->assertXmlStringEqualsXmlString(
+            '<root><foo><value type="string">2</value></foo></root>',
+            $xml
+        );
+
+        $args = [
+            'foo' => ['value' => 'true']
+        ];
+
+        $xml = $writer->dump($args);
+
+        $this->assertXmlStringEqualsXmlString(
+            '<root><foo><value type="string">true</value></foo></root>',
+            $xml
+        );
+
+        $args = [
+            'foo' => ['value' => '<a>link</a>']
+        ];
+
+        $xml = $writer->dump($args);
+
+        $this->assertXmlStringEqualsXmlString(
+            '<root><foo><value><![CDATA[<a>link</a>]]></value></foo></root>',
+            $xml
+        );
+    }
+
+    /** @test */
     public function itShouldUseValueKeys()
     {
         $args = [
             'foo' => ['@attributes' => ['id' => 10], 'value' => 'value']
         ];
 
-        $writer = new Writer($n = m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface'));
-
-        $n->shouldReceive('ensureBuildable')->andReturnUsing(function ($arg) {
-            return $arg;
-        });
-
-        $n->shouldReceive('normalize')->andReturnUsing(function ($arg) {
-            return $arg;
-        });
+        $writer = new Writer($this->getNormalizerMock());
 
         $writer->useKeyAsValue('value');
 
@@ -150,15 +213,7 @@ class WriterTest extends \PHPUnit_Framework_TestCase
             'foo' => [0, 1]
         ];
 
-        $writer = new Writer($n = m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface'));
-
-        $n->shouldReceive('ensureBuildable')->andReturnUsing(function ($arg) {
-            return $arg;
-        });
-
-        $n->shouldReceive('normalize')->andReturnUsing(function ($arg) {
-            return $arg;
-        });
+        $writer = new Writer($this->getNormalizerMock());
 
         $xml = $writer->dump($args);
 
@@ -180,12 +235,23 @@ class WriterTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldConvertXmlElements()
     {
-
         $args = [
             'foo' => new \DOMElement('bar', 'baz')
         ];
 
-        $writer = new Writer($n = m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface'));
+        $writer = new Writer($this->getNormalizerMock());
+
+        $xml = $writer->dump($args);
+
+        $this->assertXmlStringEqualsXmlString(
+            '<root><foo><bar>baz</bar></foo></root>',
+            $xml
+        );
+    }
+
+    protected function getNormalizerMock()
+    {
+        $n = m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface');
 
         $n->shouldReceive('ensureBuildable')->andReturnUsing(function ($arg) {
             return $arg;
@@ -195,13 +261,9 @@ class WriterTest extends \PHPUnit_Framework_TestCase
             return $arg;
         });
 
-        $xml = $writer->dump($args);
-
-        $this->assertXmlStringEqualsXmlString(
-            '<root><foo><bar>baz</bar></foo></root>',
-            $xml
-        );
+        return $n;
     }
+
 
     /**
      * tearDown
