@@ -123,7 +123,7 @@ class Loader implements LoaderInterface
                 $dom,
                 $this->getOption(
                     static::SIMPLEXML_CLASS,
-                    'Selene\Components\Xml\SimpleXmlElement'
+                    'Selene\Components\Xml\SimpleXMLElement'
                 )
             );
             return $xml;
