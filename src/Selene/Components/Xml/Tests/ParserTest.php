@@ -272,6 +272,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1.2, Parser::getPhpValue('1.2'));
         $this->assertTrue(Parser::getPhpValue('true'));
         $this->assertFalse(Parser::getPhpValue('false'));
+        $this->assertSame(3840, Parser::getPhpValue('0xF00'));
     }
 
     /**

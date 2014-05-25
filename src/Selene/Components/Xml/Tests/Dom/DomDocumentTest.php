@@ -50,4 +50,41 @@ class DomDocumentTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceof('\Selene\Components\Xml\Dom\DOMElement', $node);
         }
     }
+
+    /** @test */
+    public function itShouldAppendElementToAGivenReference()
+    {
+        $dom = new DOMDocument;
+
+        $root = $dom->createElement('root');
+
+        $firstChild = $dom->createElement('data');
+        $nextChild = $dom->createElement('foo', 'bar');
+
+        $dom->appendChild($root);
+        $root->appendChild($firstChild);
+
+        $dom->appendDomElement($nextChild, $firstChild);
+
+        $list = $dom->xpath('data/foo');
+
+        $this->assertSame($list->item(0), $nextChild);
+    }
+
+    /** @test */
+    public function itShouldAppendElementToItsFirstChildIfNoReferenceIsGiven()
+    {
+        $dom = new DOMDocument;
+
+        $firstChild = $dom->createElement('data');
+        $nextChild = $dom->createElement('foo', 'bar');
+
+        $dom->appendChild($firstChild);
+
+        $dom->appendDomElement($nextChild);
+
+        $list = $dom->xpath('foo');
+
+        $this->assertSame($list->item(0), $nextChild);
+    }
 }

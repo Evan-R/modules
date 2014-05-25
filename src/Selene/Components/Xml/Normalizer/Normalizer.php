@@ -149,24 +149,6 @@ class Normalizer implements NormalizerInterface
     }
 
     /**
-     * ensureTraversable
-     *
-     * @param mixed $data
-     * @access public
-     * @return array
-     */
-    public function ensureTraversable($data, $ignoreobjects = false)
-    {
-        if (!$this->isTraversable($data)) {
-            if (is_object($data)) {
-                $data = $this->ensureBuildable($data, $ignoreobjects);
-            }
-        }
-
-        return $data;
-    }
-
-    /**
      * isArrayAble
      *
      * @param  mixed $reflection a reflection object
@@ -206,10 +188,6 @@ class Normalizer implements NormalizerInterface
 
         if ($this->isXMLElement($data)) {
             return $data;
-        }
-
-        if ($this->isTraversable($data)) {
-            return $this->ensureBuildable($data);
         }
 
         $reflection = new ReflectionObject($data);
@@ -402,13 +380,22 @@ class Normalizer implements NormalizerInterface
      * @access public
      * @return mixed
      */
-    public function setIgnoredAttributes($attributes)
+    public function setIgnoredAttributes(array $attributes)
     {
-        if (is_array($attributes)) {
-            $this->ignoredAttributes = array_merge($this->ignoredAttributes, $attributes);
-            return;
-        }
-        $this->ignoredAttributes[] = $attributes;
+        $this->ignoredAttributes = $attributes;
+    }
+
+    /**
+     * addIgnoredAttribute
+     *
+     * @param mixed $attribute
+     *
+     * @access public
+     * @return void
+     */
+    public function addIgnoredAttribute($attribute)
+    {
+        $this->ignoredAttributes[] = $attribute;
     }
 
     /**
@@ -418,15 +405,13 @@ class Normalizer implements NormalizerInterface
      * @access public
      * @return mixed
      */
-    public function setIgnoredObjects($classes)
+    public function setIgnoredObjects(array $classes)
     {
-        if (is_array($classes)) {
-            foreach ($classes as $classname) {
-                $this->addIgnoredObject($classname);
-            }
-            return;
+        $this->ignoredObjects = [];
+
+        foreach ($classes as $classname) {
+            $this->addIgnoredObject($classname);
         }
-        return $this->addIgnoredObject($classes);
     }
 
     /**

@@ -19,6 +19,7 @@ use \Selene\Components\Xml\Tests\Normalizer\Stubs\ArrayableStub;
 use \Selene\Components\Xml\Tests\Normalizer\Stubs\ConvertToArrayStub;
 use \Selene\Components\Xml\Tests\Normalizer\Stubs\SinglePropertyStub;
 use \Selene\Components\Xml\Tests\Normalizer\Stubs\NestedPropertyStub;
+use \Selene\Components\Xml\Tests\Normalizer\Stubs\TraversableStub;
 
 /**
  * @class NormalizerTest extends \PHPUnit_Framework_TestCase
@@ -101,7 +102,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $normalizer = new Normalizer;
 
-        $normalizer->addIgnoredObject('\Selene\Components\Xml\Tests\Normalizer\Stubs\NestedPropertyStub');
+        $normalizer->setIgnoredObjects((array)'\Selene\Components\Xml\Tests\Normalizer\Stubs\NestedPropertyStub');
         $data = ['foo' => ['bar' => new NestedPropertyStub]];
         $normalized = $normalizer->ensureArray($data);
 
@@ -139,13 +140,47 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $normalizer = new Normalizer;
 
-        $normalizer->setIgnoredAttributes(array('foo'));
+        $normalizer->setIgnoredAttributes(['foo']);
 
         $data = array('foo' => 'foo', 'bar' => 'bar');
         $object = new ArrayableStub($data);
 
         $this->assertEquals(['bar' => 'bar'], $normalizer->ensureArray($data));
         $this->assertEquals(['bar' => 'bar'], $normalizer->ensureArray($object));
+
+        $normalizer->addIgnoredAttribute('bar');
+
+        $this->assertEquals([], $normalizer->ensureArray($data));
+    }
+
+
+    /** @test */
+    public function itShouldIgnoreIgnoredClasses()
+    {
+        $normalizer = new Normalizer;
+
+        $normalizer->setIgnoredAttributes(['foo']);
+
+        $data = new \StdClass;
+        $data->foo = 'bar';
+        $data->bar = 'baz';
+
+        $this->assertEquals(['bar' => 'baz'], $normalizer->ensureArray($data));
+    }
+
+    /** @test */
+    public function itShouldConvertObjects()
+    {
+        $data = new \DOMDocument;
+        $data->loadXML('<data><foo>bar</foo></data>');
+
+        $normalizer = new Normalizer;
+        $this->assertSame($data, $normalizer->ensureArray($data));
+
+
+        $data = new TraversableStub($asset = ['foo' => 'bar', 'bam' => 'baz']);
+
+        $this->assertSame($asset, $normalizer->ensureArray($data));
     }
 
     /** @test */
@@ -157,6 +192,26 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
         $normalizer = new Normalizer;
         $this->assertEquals(['foo' => 'foo', 'bar' => 'bar'], $normalizer->ensureArray($obj));
+    }
+
+    /** @test */
+    public function itShouldIgnoredNonArrayables()
+    {
+        $normalizer = new Normalizer;
+        $this->assertNull($normalizer->ensureArray('string'));
+    }
+
+    /** @test */
+    public function itShouldEnsureBuildable()
+    {
+        $normalizer = new Normalizer;
+        $xml = new \DOMDocument;
+
+        $data = new TraversableStub($asset = ['foo' => 'bar', 'bam' => 'baz']);
+
+        $this->assertSame($xml, $normalizer->ensureBuildable($xml));
+        $this->assertSame($asset, $normalizer->ensureBuildable($data));
+        $this->assertNull($normalizer->ensureBuildable(null));
     }
 
     /**

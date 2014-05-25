@@ -254,7 +254,8 @@ class Parser implements ParserInterface
         }
 
         if (is_numeric($val)) {
-            return ctype_digit($val) ? intval($val) : floatval($val);
+            return StringHelper::strStartsWith($val, '0x') ? hexdec($val) :
+                (ctype_digit($val) ? intval($val) : floatval($val));
         } elseif (($lval = strtolower($val)) === 'true' || $lval === 'false') {
             return $lval === 'true' ? true : false;
         }
