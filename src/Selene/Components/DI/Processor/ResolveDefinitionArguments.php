@@ -11,7 +11,7 @@
 
 namespace Selene\Components\DI\Processor;
 
-use \Selene\Components\DI\Refetence;
+use \Selene\Components\DI\Reference;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 use \Selene\Components\DI\Definition\DefinitionInterface;
@@ -47,8 +47,6 @@ class ResolveDefinitionArguments implements ProcessInterface
             $this->replaceSetterArguments($definition);
             $this->replaceFactoryArgsuments($definition);
         }
-
-        //var_dump($container->getParameters()->all());
     }
 
     /**
@@ -112,7 +110,7 @@ class ResolveDefinitionArguments implements ProcessInterface
 
         array_unshift($arguments, $definition->getClass());
 
-        $definition->setArguments($args);
+        $definition->setArguments($arguments);
     }
 
 
@@ -154,12 +152,7 @@ class ResolveDefinitionArguments implements ProcessInterface
         }
 
         if (is_scalar($argument)) {
-            $parsed = $this->container->getParameters()->resolveParam($argument);
-            //var_dump('__arg_start__');
-            //var_dump($argument);
-            //var_dump($parsed);
-            //var_dump('__arg_end__');
-            return $parsed;
+            return $this->container->getParameters()->resolveParam($argument);
         }
 
         return $argument;

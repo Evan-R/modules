@@ -9,22 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Stubs;
+namespace DI\Stubs;
 
 /**
- * @class FooServiceFactory
+ * @class RequiredService
  * @package Selene\Components\DI\Tests\Stubs
  * @version $Id$
  */
-class ServiceFactory
+class RequiredService
 {
-    public static function makeFoo($class, array $options = [])
-    {
-        return new $class($options);
-    }
 
-    public static function makeBar($class, FooService $foo)
-    {
-        return new $class($foo);
-    }
 }

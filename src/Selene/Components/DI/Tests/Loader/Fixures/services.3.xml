@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container>
+  <parameters>
+    <parameter id="nested" type="array">
+      <items>
+        <item>a</item>
+        <item>b</item>
+        <item key="nested">
+          <items>
+            <item>1</item>
+            <item>2</item>
+            <item key="bar">baz</item>
+          </items>
+        </item>
+        <item key="foo">bar</item>
+      </items>
+    </parameter>
+  </parameters>
+  <services></services>
+</container>

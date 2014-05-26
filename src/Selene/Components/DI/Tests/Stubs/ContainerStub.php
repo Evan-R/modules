@@ -11,20 +11,17 @@
 
 namespace Selene\Components\DI\Tests\Stubs;
 
+use \Selene\Components\DI\Container;
+
 /**
- * @class FooServiceFactory
+ * @class ContainerStub
  * @package Selene\Components\DI\Tests\Stubs
  * @version $Id$
  */
-class ServiceFactory
+class ContainerStub extends Container
 {
-    public static function makeFoo($class, array $options = [])
+    protected function getServiceFoo()
     {
-        return new $class($options);
-    }
-
-    public static function makeBar($class, FooService $foo)
-    {
-        return new $class($foo);
+        return $this->services['foo'] = new \StdClass;
     }
 }

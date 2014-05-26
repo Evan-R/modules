@@ -19,6 +19,7 @@ use \Selene\Components\DI\Processor\ResolveDefinitionFactoryArgsPass;
 use \Selene\Components\DI\Processor\ResolveDefinitionArguments;
 use \Selene\Components\DI\Processor\ResolveDefinitionDependencies;
 use \Selene\Components\DI\Processor\ResolveParentDefinition;
+use \Selene\Components\DI\Processor\ResolveCircularReference;
 use \Selene\Components\DI\Processor\RemoveAbstractDefinition;
 use \Selene\Components\Config\Resource\FileResource;
 use \Selene\Components\Config\Resource\ObjectResource;
@@ -181,6 +182,7 @@ class Builder implements BuilderInterface
         $processor->add(new ResolveParentDefinition, ProcessorInterface::OPTIMIZE);
         $processor->add(new ResolveDefinitionDependencies, ProcessorInterface::OPTIMIZE);
         $processor->add(new ResolveDefinitionArguments, ProcessorInterface::OPTIMIZE);
+        $processor->add(new ResolveCircularReference, ProcessorInterface::OPTIMIZE);
         $processor->add(new RemoveAbstractDefinition, ProcessorInterface::REMOVE);
 
         $this->configured = true;

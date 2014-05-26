@@ -13,8 +13,13 @@
     "selene/common":"dev-development"
   },
   "require-dev": {
+    "phpunit/phpunit": "~4.0",
+    "league/phpunit-coverage-listener":"dev-master",
     "selene/config":"dev-development",
     "selene/testsuite":"dev-development"
+  },
+  "suggest": {
+    "selene/config":""
   },
   "autoload": {
     "psr-4": {"Selene\\Components\\DI\\": ""}

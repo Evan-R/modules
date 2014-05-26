@@ -357,7 +357,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @access public
      * @return mixed
      */
-    public function addMetaData($tagName, array $parameters = [])
+    public function setMetaData($tagName, array $parameters = [])
     {
         $data = new MetaData($tagName, $parameters);
         $this->meta[$data->getName()] = $data;
@@ -389,23 +389,6 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     public function hasMetaData($name = null)
     {
         return null !== $name ? isset($this->meta[$name]) : (bool) $this->meta;
-    }
-
-    /**
-     * replaceMetaData
-     *
-     * @param mixed $name
-     * @param array $parameters
-     *
-     * @access public
-     * @return mixed
-     */
-    public function replaceMetaData($name, array $parameters = [])
-    {
-        $data = new MetaData($name, $parameters);
-
-        $this->meta[$data->getName()] = [];
-        $this->meta[$data->getName()][] = $data;
     }
 
     /**
@@ -545,7 +528,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @access public
      * @return DefinitionInterface this instance.
      */
-    public function setFactory($class, $method = 'make')
+    public function setFactory($class, $method = null)
     {
         $this->setFactoryCallback(null !== $method ? [$class, $method] : $class);
 

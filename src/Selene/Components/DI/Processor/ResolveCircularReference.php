@@ -13,22 +13,20 @@ namespace Selene\Components\DI\Processor;
 
 use \Selene\Components\DI\Definition;
 use \Selene\Components\DI\ContainerInterface;
+use \Selene\Components\DI\Definition\DefinitionInterface;
 use \Selene\Components\DI\Exception\CircularReferenceException;
 
 /**
  * @class ResolveCircularReference implements ProcessInterface
  * @see ProcessInterface
  *
- * @package Selene\Components\DI
+ * @package Selene\Components\DI\Processor
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class ResolveCircularReference implements ProcessInterface
 {
     private $container;
-
-    private $resolving;
 
     /**
      * resolve
@@ -42,67 +40,83 @@ class ResolveCircularReference implements ProcessInterface
     {
         $this->container = $container;
 
-
-        foreach ($services = $container->getDefinitions() as $id => $service) {
-            $this->resolving = $id;
-            $this->checkCircularReference($service->getArguments(), $services, $id);
-
-            foreach ((array)$service->getSetters() as $setter) {
-                $this->checkCircularReference(array_values($setter), $services, $id);
-            }
+        foreach ($container->getDefinitions() as $id => $definition) {
+            // requiring the service in a setter argument is fine:
+            $this->checkDefininition($definition, $id, $id);
         }
+    }
 
-        $this->resolving = null;
+    /**
+     * checkDefininition
+     *
+     * @param DefinitionInterface $definition
+     * @param mixed $current
+     *
+     * @access private
+     * @return void
+     */
+    private function checkDefininition(DefinitionInterface $definition, $current, $self = null)
+    {
+        $this->checkCircularReference($definition->getArguments(), $current);
+
+        $this->checkSetterArguments((array)$definition->getSetters(), $current, $self);
     }
 
     /**
      * checkCircularReference
      *
      * @param array $attributes
-     * @param array $services
-     * @param mixed $current
+     * @param void $current
+     * @param void $self
      *
      * @access protected
-     * @return mixed
+     * @return void
      */
-    protected function checkCircularReference(array $attributes, array $services, $current)
+    protected function checkCircularReference(array $attributes, $current, $self = null)
     {
         foreach ($attributes as $attribute) {
-            if ($this->container->isReference($attribute)) {
 
-                if (isset($services[$current])) {
-
-                    $id = null;
-                    $service = $services[$current];
-
-                    if ($this->resolving === $id) {
-                        throw new CircularReferenceException(
-                            sprintf('service \'%s\' has circular reference \'%s\'', $current, $id)
-                        );
-                    }
-
-                    if ($service->hasArguments()) {
-                        $this->checkCircularReference($service->getArguments(), $services, $id);
-                    }
-
-                    if ($service->hasSetters()) {
-                        $this->checkCircularReference($service->getSetters(), $services, $id);
-                    }
-                }
+            if (is_array($attribute)) {
+                $this->checkCircularReference($attribute, $current, $self);
+                continue;
             }
+
+            if (!$this->container->isReference($attribute)) {
+                continue;
+            }
+
+            if ($self === ($id = $attribute->get()) && null !== $self) {
+                continue;
+            }
+
+            if ($current === $id) {
+                throw new CircularReferenceException(
+                    sprintf('Service \'%s\' has circular reference on \'%s\'', $current, $id)
+                );
+            }
+
+            $this->checkDefininition($this->container->getDefinition($id), $current, $id, $self);
         }
     }
 
     /**
-     * isProtorype
+     * checkSetterArguments
      *
-     * @param Definition $service
+     * @param array $setters
+     * @param mixed $current
+     * @param mixed $self
      *
-     * @access protected
-     * @return mixed
+     * @access private
+     * @return void
      */
-    protected function isProtorype(Definition $service)
+    private function checkSetterArguments(array $setters, $current, $self = null)
     {
-        return ContainerInterface::SCOPE_PROTOTYPE === $service->getScope();
+        foreach ($setters as $setter) {
+
+            $method = key($setter);
+            $arguments = $setter[$method];
+
+            $this->checkCircularReference($arguments, $current, $self);
+        }
     }
 }

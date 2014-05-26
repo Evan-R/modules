@@ -51,9 +51,9 @@ interface DefinitionInterface
     public function setAbstract($abstract);
     public function isAbstract();
 
-    public function addMetadata($tagname, array $parameters = []);
+    public function setMetadata($tagname, array $parameters = []);
     public function getMetaData($tagname = null);
-    public function hasMetaData($tagname);
+    public function hasMetaData($tagname = null);
 
     public function setFile($file);
     public function getFile();

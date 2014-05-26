@@ -31,7 +31,6 @@ use \Selene\Components\DI\Exception\CircularReferenceException;
  */
 class Container implements ContainerInterface
 {
-    const FOO = 0;
     /**
      * parameters
      *
@@ -116,6 +115,17 @@ class Container implements ContainerInterface
     }
 
     /**
+     * isLocked
+     *
+     * @access public
+     * @return boolean
+     */
+    public function isLocked()
+    {
+        return $this->parameters instanceof StaticParameters;
+    }
+
+    /**
      * set a parameter on the parameters collection.
      *
      * @param string $parameter  the parameter key
@@ -172,12 +182,12 @@ class Container implements ContainerInterface
      * @param ParameterInterface $parameters
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function replaceParameters(ParameterInterface $parameters)
     {
         if ($this->isLocked()) {
-            throw new \BadMethodCallException();
+            throw new \BadMethodCallException('can\'t replace parameters on a locked container');
         }
         $this->parameters = $parameters;
     }
@@ -186,26 +196,13 @@ class Container implements ContainerInterface
      * getFlaggedDefinitions
      *
      * @access public
-     * @return mixed
+     * @return array
      */
-    public function getDefinitionMetaData()
+    public function findDefinitionsWithMetaData($name = null)
     {
-        return array_filter($this->getDefinitions(), function ($def) {
-            return (bool)$def->getMetaData();
+        return array_filter($this->getDefinitions(), function ($def) use ($name) {
+            return (bool)$def->hasMetaData($name);
         });
-    }
-
-    /**
-     * removeDefinition
-     *
-     * @param mixed $id
-     *
-     * @access public
-     * @return void
-     */
-    public function removeDefinition($id)
-    {
-        unset($this->definitions[$id]);
     }
 
     /**
@@ -235,82 +232,7 @@ class Container implements ContainerInterface
      */
     public function setDefinition($id, DefinitionInterface $service)
     {
-        $id = strtolower($id);
         return $this->definitions[$id] = $service;
-    }
-
-    /**
-     * Injects a service into the container.
-     *
-     * @param string $id the service id.
-     * @param Object $instance the service instance.
-     * @param string $scope the service scope.
-     *
-     * @throws InvalidArgumentException when the scope contains `prototype`.
-     * @throws DomainException
-     * @access public
-     * @return void
-     */
-    public function inject($id, $instance, $scope = self::SCOPE_CONTAINER)
-    {
-        if (static::inScopes(static::SCOPE_PROTOTYPE, $scope)) {
-            throw new InvalidArgumentException(sprintf('An injected service must not have a prototype scope'));
-        }
-
-        $id = $this->resolveId($id);
-        $defined = $this->hasDefinition($id);
-
-        if (!$this->isLocked()) {
-            if (!$defined) {
-                $this->define($id)
-                    ->setInjected(true);
-            } else {
-                $this->getDefinition($id)->setInjected(true);
-            }
-        }
-
-        $this->injected[$id] = true;
-        $this->services[$id] = $instance;
-
-        $this->sync($id);
-    }
-
-    /**
-     * Retrieve a service by its id.
-     *
-     * @param string $id the service id.
-     *
-     * @access public
-     * @throws ContainerResolveException if the service is not resolveable.
-     * @throws BadMethodCallException if a setter doesn't exist on a service.
-     * @return mixed
-     */
-    public function get($id)
-    {
-
-        if (method_exists($this, $method = sprintf('get%sService', static::camelCaseStr($id)))) {
-            return $this->{$method}($id);
-        }
-
-        // treat internal services as undefiend.
-        if (!$this->hasDefinition($id) || (empty($this->building) && $this->getDefinition($id)->isInternal())) {
-
-            throw new ContainerResolveException(sprintf('A service with id %s was is not defined', $id));
-        }
-
-        if (isset($this->services[$id = $this->resolveId($id)])) {
-            return $this->services[$id];
-        }
-
-        if ($this->getDefinition($id)->isAbstract()) {
-            throw new ContainerResolveException(
-                sprintf('Service %s is declared abstract. Instantiating abstract services is not allowed.', $id)
-            );
-        }
-
-        $instance = $this->buildService($id);
-
-        return $this->getDefinition($id)->scopeIsContainer() ? $this->services[$id] = $instance : $instance;
     }
 
     /**
@@ -350,19 +272,127 @@ class Container implements ContainerInterface
     {
         return $this->definitions;
     }
+    /**
+     * removeDefinition
+     *
+     * @param mixed $id
+     *
+     * @access public
+     * @return void
+     */
+    public function removeDefinition($id)
+    {
+        unset($this->definitions[$id]);
+    }
 
     /**
-     * Like `Container::hasDefinition()` but also checks for `$this->services`.
+     * Injects a service into the container.
+     *
+     * @param string $id the service id.
+     * @param Object $instance the service instance.
+     * @param string $scope the service scope.
+     *
+     * @throws InvalidArgumentException when the scope contains `prototype`.
+     * @throws DomainException
+     * @access public
+     * @return void
+     */
+    public function inject($id, $instance, $scope = self::SCOPE_CONTAINER)
+    {
+        if (static::inScopes(static::SCOPE_PROTOTYPE, $scope)) {
+            throw new InvalidArgumentException(sprintf('An injected service must not have a prototype scope'));
+        }
+
+        $id = $this->resolveId($id);
+
+        $defined = $this->hasDefinition($id);
+
+        if (!$this->isLocked()) {
+            if (!$defined) {
+                $this->define($id)
+                    ->setInjected(true);
+            } else {
+                $this->getDefinition($id)->setInjected(true);
+            }
+        }
+
+        $this->injected[$id] = true;
+        $this->services[$id] = $instance;
+
+        $this->sync($id);
+    }
+
+    /**
+     * Retrieve a service by its id.
+     *
+     * @param string $id the service id.
+     *
+     * @access public
+     * @throws ContainerResolveException if the service is not resolveable.
+     * @throws BadMethodCallException if a setter doesn't exist on a service.
+     * @return mixed
+     */
+    public function get($id)
+    {
+        if ($this->hasService($id = $this->resolveId($id))) {
+            return $this->getService($id);
+        }
+
+        if (method_exists($this, $method = sprintf('getService%s', static::camelCaseStr($id)))) {
+            return $this->{$method}($id);
+        }
+
+        // treat internal services as undefiend.
+        if (!$this->hasDefinition($id) || (empty($this->building) && $this->getDefinition($id)->isInternal())) {
+            throw new ContainerResolveException(sprintf('A service with id %s was is not defined', $id));
+        }
+
+        if ($this->getDefinition($id)->isAbstract()) {
+            throw new ContainerResolveException(
+                sprintf('Service %s is declared abstract. Instantiating abstract services is not allowed.', $id)
+            );
+        }
+
+        $instance = $this->buildService($id);
+
+        return $this->getDefinition($id)->scopeIsContainer() ? $this->services[$id] = $instance : $instance;
+    }
+
+    /**
+     * getServices
+     *
+     * @access public
+     * @return array
+     */
+    public function getServices()
+    {
+        return $this->services;
+    }
+
+    /**
+     * Checks if a service is resolved.
      *
      * @param string $id the service id.
      *
      * @access public
      * @return boolean
      */
-    public function hasService($id)
+    protected function hasService($id)
     {
-        $id = $this->resolveId($id);
-        return isset($this->services[$id]) || array_key_exists($id, $this->definitions);
+        return isset($this->services[$id]);
+    }
+
+    /**
+     * Get a service instance.
+     *
+     * @param mixed $id
+     *
+     * @access protected
+     * @return Object
+     */
+    protected function getService($id)
+    {
+        return $this->services[$id];
     }
 
     /**
@@ -422,11 +452,11 @@ class Container implements ContainerInterface
      * @param mixed $alias
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function removeAlias($alias)
     {
-        unset($this->Aliases[$alias]);
+        unset($this->aliases[$alias]);
     }
 
     /**
@@ -440,24 +470,8 @@ class Container implements ContainerInterface
     public function isReference($reference)
     {
         return $reference instanceof Reference ||
-            (is_string($reference) &&
-            (
-                0 === strpos($reference, static::SERVICE_REF_INDICATOR)
-                //0 === strpos($reference, static::SERVICE_REF_INDICATOR) &&
-                //$this->hasDefinition($this->getReferenceId($reference))
-            )
+            ((is_string($reference) && 0 === strpos($reference, static::SERVICE_REF_INDICATOR))
         );
-    }
-
-    /**
-     * isLocked
-     *
-     * @access public
-     * @return boolean
-     */
-    public function isLocked()
-    {
-        return $this->parameters instanceof StaticParameters;
     }
 
     /**
@@ -481,16 +495,6 @@ class Container implements ContainerInterface
         $this->services = array_merge($container->getServices(), $this->services);
     }
 
-    /**
-     * getServices
-     *
-     * @access public
-     * @return array
-     */
-    public function getServices()
-    {
-        return $this->services;
-    }
 
     /**
      * resolveId
@@ -529,7 +533,22 @@ class Container implements ContainerInterface
      */
     public static function camelCaseStr($str)
     {
-        return StringHelper::strCamelCase($str, ['_' => ' ', '.' => 'Nss ', '\\' => 'Dbs ']);
+        return StringHelper::strCamelCaseAll($str, ['_' => ' ', '.' => 'Nss ', '\\' => 'Dbs ']);
+    }
+
+    /**
+     * getReferenceId
+     *
+     * @param string|object $reference a string or an instance of Reference
+     *
+     * @access protected
+     * @return string
+     */
+    protected function getReferenceId($reference)
+    {
+        return 0 === strpos($reference, static::SERVICE_REF_INDICATOR) ?
+            substr($reference, strlen(static::SERVICE_REF_INDICATOR)) :
+            (string)$reference;
     }
 
     /**
@@ -590,7 +609,7 @@ class Container implements ContainerInterface
      * @param DefinitionInterface $parent
      *
      * @access protected
-     * @return mixed
+     * @return Object returns a class instance.
      */
     protected function buildFromFactory(DefinitionInterface $definition, DefinitionInterface $parent = null)
     {
@@ -600,6 +619,30 @@ class Container implements ContainerInterface
             $parent ? $parent->getArguments() : $definition->getArguments()
         );
     }
+
+    /**
+     * callFactory
+     *
+     * @param string $class
+     * @param string|array $factory
+     * @param array $arguments
+     *
+     * @throws InvalidArgumentException if $factory is unresolvable
+     * @access protected
+     * @return mixed|object an instance of the class defined by a factory.
+     */
+    protected function callFactory($class, $factory, array $arguments)
+    {
+        $arguments = $this->getServiceArguments($arguments);
+        array_unshift($arguments, $class);
+
+        if (is_callable($factory = $this->parameters->resolveParam($factory))) {
+            return call_user_func_array($factory, $arguments);
+        }
+
+        throw new InvalidArgumentException('Factory is not callable');
+    }
+
 
     /**
      * buildFromDefinition
@@ -686,6 +729,7 @@ class Container implements ContainerInterface
      * @param mixed $method
      * @param mixed $arguments
      *
+     * @throws \BadMethodCallException
      * @access protected
      * @return void
      */
@@ -700,45 +744,6 @@ class Container implements ContainerInterface
         $arguments = $this->getServiceArguments($arguments);
 
         call_user_func_array([$instance, $method], $arguments);
-    }
-
-
-    /**
-     * callFactory
-     *
-     * @param string $class
-     * @param string|array $factory
-     * @param array $arguments
-     *
-     * @throws InvalidArgumentException if $factory is unresolvable
-     * @access protected
-     * @return mixed|object an instance of the class defined by a factory.
-     */
-    protected function callFactory($class, $factory, array $arguments)
-    {
-        $arguments = $this->getServiceArguments($arguments);
-        array_unshift($arguments, $class);
-
-        if (is_callable($factory = $this->parameters->resolveParam($factory))) {
-            return call_user_func_array($factory, $arguments);
-        }
-
-        throw new InvalidArgumentException('Factory is not callable');
-    }
-
-    /**
-     * getReferenceId
-     *
-     * @param string|object $reference a string or an instance of Reference
-     *
-     * @access protected
-     * @return string
-     */
-    protected function getReferenceId($reference)
-    {
-        return 0 === strpos($reference, static::SERVICE_REF_INDICATOR) ?
-            substr($reference, strlen(static::SERVICE_REF_INDICATOR)) :
-            (string)$reference;
     }
 
     /**
@@ -802,7 +807,6 @@ class Container implements ContainerInterface
             if (empty($synced)) {
                 return $this->applySetter($instance, $method, $arguments);
             }
-
         };
 
         $this->pushSyncedCallers($synced, $callback);

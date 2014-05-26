@@ -28,6 +28,13 @@ class Processor implements ProcessorInterface
     protected $processes;
 
     /**
+     * processed
+     *
+     * @var array
+     */
+    protected $processed;
+
+    /**
      * container
      *
      * @var ContainerInterface
@@ -40,6 +47,7 @@ class Processor implements ProcessorInterface
     public function __construct()
     {
         $this->processes = [];
+        $this->processed = [];
     }
 
     /**
@@ -47,15 +55,25 @@ class Processor implements ProcessorInterface
      *
      * @param ContainerInterface $container
      * @access public
-     * @return void
+     * @return boolean false if allready processed
      */
     public function process(ContainerInterface $container)
     {
+        if ($this->isProcessed($container)) {
+            return false;
+        }
+
         $this->container = $container;
+
+        $this->sort();
 
         foreach ($this->processes as $group) {
             $this->processGroup($group);
         }
+
+        $this->setProcessed($container);
+
+        return true;
     }
 
     /**
@@ -87,5 +105,43 @@ class Processor implements ProcessorInterface
         foreach ($group as $process) {
             $process->process($this->container);
         }
+    }
+
+    /**
+     * isProcessed
+     *
+     * @param ContainerInterface $container
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function isProcessed(ContainerInterface $container)
+    {
+        return in_array(spl_object_hash($container), $this->processed);
+    }
+
+    /**
+     * setProcessed
+     *
+     * @param ContainerInterface $container
+     *
+     * @access protected
+     * @return void
+     */
+    protected function setProcessed(ContainerInterface $container)
+    {
+        $this->processed[] = spl_object_hash($container);
+    }
+
+    /**
+     * sort
+     *
+     *
+     * @access private
+     * @return void
+     */
+    private function sort()
+    {
+        ksort($this->processes, SORT_REGULAR);
     }
 }

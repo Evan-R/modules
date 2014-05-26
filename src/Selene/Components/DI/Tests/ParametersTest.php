@@ -56,6 +56,22 @@ class ParametersTest extends TestCase
         );
     }
 
+    /** @test */
+    public function itShouldHaveArrayAccess()
+    {
+        $parameters = $this->getParameters($params = ['foo' => 'bar', 'fuzz' => 'ball']);
+
+        $this->assertSame('bar', $parameters['foo']);
+        unset($parameters['foo']);
+
+        $this->assertFalse($parameters->has('foo'));
+
+        $parameters['foo'] = 'baz';
+
+        $this->assertSame('baz', $parameters['foo']);
+        $this->assertTrue(isset($parameters['foo']));
+    }
+
     /**
      * @test
      */
@@ -72,6 +88,21 @@ class ParametersTest extends TestCase
         $parameters->set('foo', 'nonfoo');
         $this->assertSame('nonfoo', $parameters->get('Foo'));
 
+    }
+
+    /** @test */
+    public function itShouldThrowExceptionIfTryingToGetNonDefinedParameter()
+    {
+        $parameters = $this->getParameters($params = ['foo' => 'bar']);
+
+        try {
+            $parameters->get('baz');
+        } catch (\Selene\Components\DI\Exception\ParameterNotFoundException $e) {
+            $this->assertSame('Parameter \'baz\' was not found', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
     }
 
     /**
@@ -210,8 +241,28 @@ class ParametersTest extends TestCase
         $this->assertTrue($parametersA->isResolved());
 
         $this->assertTrue($parametersA->has('fuzz'));
+
+
+        try {
+            $parametersA->merge($parametersA);
+        } catch (\LogicException $e) {
+            $this->assertSame(sprintf('%s: cannot merge same instance', get_class($parametersA)), $e->getMessage());
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
     }
 
+    /** @test */
+    public function itShouldRemoveParameters()
+    {
+        $parameters = $this->getParameters($paramsA = ['foo' => 'bar']);
+
+        $this->assertTrue($parameters->has('foo'));
+
+        $parameters->remove('foo');
+
+        $this->assertFalse($parameters->has('foo'));
+    }
 
     public function testEscapeValue()
     {

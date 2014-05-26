@@ -58,9 +58,6 @@ class PhpDumper implements ContainerAwareInterface
     {
         $this->process();
 
-        //echo '<pre>';
-        //echo $this->dumpContents();
-        //echo '</pre>';
         return $this->dumpContents();
     }
 

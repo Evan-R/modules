@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container>
+  <parameters>
+  </parameters>
+
+  <services>
+    <service id="test_listener" class="Selene\Packages\Framework\Events\TestListener">
+      <meta name="app_events">
+        <data event-name="kernel.handle_request" event-handler="onKernelHandleRequest"/>
+        <data event-name="kernel.handle_exception" event-handler="onKernelException"/>
+      </meta>
+    </service>
+    <service id="test_listener_b" class="Selene\Packages\Framework\Events\TestListener">
+      <meta name="app_events">
+        <data event-name="kernel.handle_request" event-handler="onKernelHandleRequest"/>
+      </meta>
+      <meta name="test" foo="bar" bar="baz"/>
+
+      <meta name=""/>
+      <meta name="test" foo="bar" bar="baz"/>
+    </service>
+  </services>
+</container>

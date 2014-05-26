@@ -135,10 +135,26 @@ abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
     {
         $def = $this->createDefinition('bar');
 
-        $def->addMetaData('foo');
+        $def->setMetaData('foo');
 
         $this->assertTrue($def->hasMetaData('foo'));
-        $this->assertInstanceof('\Selene\Components\DI\Meta\MetaDataInterface', $data = $def->getMetaData('foo'));
+        $data = $def->getMetaData('foo');
+        $this->assertInstanceof('\Selene\Components\DI\Meta\MetaDataInterface', $data);
+
+        $def->setMetaData('foo', []);
+
+        $this->assertInstanceof('\Selene\Components\DI\Meta\MetaDataInterface', $def->getMetaData('foo'));
+        $this->assertFalse($data === $def->getMetaData('foo'));
+    }
+
+    /** @test
+     *  @expectedException \InvalidArgumentException
+     */
+    public function itShouldThrowExceptionWhenSettingAFactoryClosure()
+    {
+        $def = $this->createDefinition('test');
+        $def->setFactory(function () {
+        });
     }
 
     abstract protected function createDefinition($class = null, $arguments = [], $scope = null);

@@ -114,7 +114,7 @@ class Parameters implements ParameterInterface
         }
 
         throw new ParameterNotFoundException(
-            sprintf('parameter %s was not found', $param)
+            sprintf('Parameter \'%s\' was not found', $param)
         );
     }
 

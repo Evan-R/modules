@@ -47,7 +47,7 @@ class StaticParameters extends Parameters
      */
     public function set($param, $value)
     {
-        $this->handleException('set');
+        return $this->handleException('set');
     }
 
     /**
@@ -60,7 +60,7 @@ class StaticParameters extends Parameters
      */
     public function resolveParam($param)
     {
-        $this->handleException('resolveValue');
+        return $this->handleException('resolveValue');
     }
 
     /**
@@ -73,7 +73,7 @@ class StaticParameters extends Parameters
      */
     public function resolveValue($param)
     {
-        $this->handleException('resolveValue');
+        return $this->handleException('resolveValue');
     }
 
     /**
@@ -99,7 +99,7 @@ class StaticParameters extends Parameters
      */
     public function has($param)
     {
-        array_key_exists($param, $this->parameters());
+        return array_key_exists($param, $this->parameters);
     }
 
     /**
@@ -140,7 +140,7 @@ class StaticParameters extends Parameters
             );
         }
 
-        $this->replaceParameters(array_merge($this->getParameters(), $parameters->all()));
+        $this->parameters = array_merge($this->getParameters(), $parameters->all());
     }
 
     /**
@@ -165,6 +165,6 @@ class StaticParameters extends Parameters
      */
     private function handleException($method)
     {
-        throw new \Exception(sprintf('connot call %s() on a locked parameter collection', $method));
+        throw new \BadMethodCallException(sprintf('connot call %s() on a locked parameter collection', $method));
     }
 }

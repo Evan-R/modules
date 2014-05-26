@@ -53,6 +53,40 @@ class ServiceDefinitionTest extends DefinitionTest
         $definition->addScope($scope);
 
         $this->assertSame(ContainerInterface::SCOPE_CONTAINER, $scope & $definition->getScope());
+
+        $this->assertTrue($definition->hasScope(ContainerInterface::SCOPE_CONTAINER));
+
+        $definition->addScope(25);
+
+        $this->assertTrue($definition->hasScope(ContainerInterface::SCOPE_CONTAINER));
+        $this->assertTrue($definition->hasScope(25));
+    }
+
+    /** @test */
+    public function itShouldThrowLogicExceptionWhenSettingInjectedWithWrongScopeAndViceVersa()
+    {
+        $definition = new ServiceDefinition('StdClass');
+        $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE);
+
+        try {
+            $definition->setInjected(true);
+        } catch (\LogicException $e) {
+            $this->assertSame('Cannot inject a service that has not container scope', $e->getMessage());
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $definition = new ServiceDefinition('StdClass');
+        $definition->setInjected(true);
+
+        try {
+            $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE);
+        } catch (\LogicException $e) {
+            $this->assertSame('Cannot set prototype scope on an injected service', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
     }
 
     /**

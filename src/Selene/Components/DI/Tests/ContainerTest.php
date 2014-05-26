@@ -15,6 +15,7 @@ use \Mockery as m;
 use \Selene\Components\DI\Container;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\Reference;
+use \Selene\Components\DI\Parameters;
 use \Selene\Components\DI\DefinitionInterface;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 use \Selene\Components\DI\Tests\Stubs\FooService;
@@ -22,6 +23,8 @@ use \Selene\Components\DI\Tests\Stubs\BarService;
 use \Selene\Components\DI\Tests\Stubs\ChildService;
 use \Selene\Components\DI\Tests\Stubs\SetterAwareService;
 use \Selene\Components\DI\Tests\Stubs\ParentService;
+use \Selene\Components\DI\Tests\Stubs\ContainerStub;
+use \Selene\Components\DI\Tests\Stubs\ServiceFactory;
 use \Selene\Components\DI\Exception\ContainerResolveException;
 
 /**
@@ -44,12 +47,122 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldSetAndRetrieveParameters()
+    {
+        $container = $this->createContainer();
+
+        $this->assertFalse($container->hasParameter('foo'));
+
+        $container->setParameter('foo', 'bar');
+        $this->assertTrue($container->hasParameter('foo'));
+
+        $this->assertSame('bar', $container->getParameter('foo'));
+
+        $this->assertInstanceof('Selene\Components\DI\ParameterInterface', $container->getParameters());
+
+        $parameters = m::mock('Selene\Components\DI\ParameterInterface');
+
+        $container->replaceParameters($parameters);
+
+        $this->assertSame($parameters, $container->getParameters());
+    }
+
+    /** @test */
+    public function itShouldThrowExceptionOnParamReplacementIfContainerIsLocked()
+    {
+        $container = new Container(m::mock('Selene\Components\DI\StaticParameters'));
+
+        try {
+            $container->replaceParameters(m::mock('Selene\Components\DI\ParameterInterface'));
+        } catch (\BadMethodCallException $e) {
+            $this->assertSame('can\'t replace parameters on a locked container', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('test splipped');
+    }
+
+    /** @test */
     public function servicesShouldBeDefinableAndRecognized()
     {
         $container = $this->createContainer();
 
         $container->define('foo.service');
         $this->assertTrue($container->hasDefinition('foo.service'));
+    }
+
+    /** @test */
+    public function definitionsShouldBeRetreivable()
+    {
+        $container = $this->createContainer();
+
+        foreach (['foo', 'bar', 'baz'] as $name) {
+            $container->setDefinition($name, m::mock('\Selene\Components\DI\Definition\DefinitionInterface'));
+        }
+
+        $this->assertSame(3, count($container->getDefinitions()));
+    }
+
+    /** @test */
+    public function definitionsShouldBeRemoveable()
+    {
+        $container = $this->createContainer();
+
+        $container->define('foo', 'stdClass');
+        $this->assertTrue($container->hasDefinition('foo'));
+
+        $container->removeDefinition('foo');
+        $this->assertFalse($container->hasDefinition('foo'));
+    }
+
+    /** @test */
+    public function itShouldFindDefinitionsWithMetaData()
+    {
+        $defs = [];
+        $container = $this->createContainer();
+
+        foreach (['foo', 'bar', 'baz'] as $i => $name) {
+            $defs[$name] = m::mock('\Selene\Components\DI\Definition\DefinitionInterface');
+            $container->setDefinition($name, $defs[$name]);
+        }
+
+        $defs['foo']->shouldReceive('hasMetaData')->andReturn(true);
+        $defs['bar']->shouldReceive('hasMetaData')->andReturn(false);
+        $defs['baz']->shouldReceive('hasMetaData')->andReturn(true);
+
+        $meta = $container->findDefinitionsWithMetaData();
+
+        $this->assertSame(2, count($meta));
+
+        $defs = [];
+        $container = $this->createContainer();
+
+        foreach (['foo', 'bar', 'baz'] as $i => $name) {
+            $defs[$name] = m::mock('\Selene\Components\DI\Definition\DefinitionInterface');
+            $container->setDefinition($name, $defs[$name]);
+        }
+
+        $defs['foo']->shouldReceive('hasMetaData')->with('meta')->andReturn(false);
+        $defs['bar']->shouldReceive('hasMetaData')->with('meta')->andReturn(true);
+        $defs['baz']->shouldReceive('hasMetaData')->with('meta')->andReturn(false);
+
+        $meta = $container->findDefinitionsWithMetaData('meta');
+
+        $this->assertSame($defs['bar'], $meta['bar']);
+    }
+
+    /** @test */
+    public function itShouldReturnResolvedServices()
+    {
+        $container = $this->createContainer();
+
+        $this->assertSame([], $container->getServices());
+
+        $container->inject('foo', $service = new \StdClass);
+
+        $this->assertSame(['foo' => $service], $container->getServices());
     }
 
     /** @test */
@@ -217,6 +330,30 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($service, $container->get('bar'));
     }
 
+    /**
+     * @test
+     * @expectedException \InvalidArgumentException
+     */
+    public function itShouldThrowExceptionIfAliasAndServiceNameExists()
+    {
+        $container = $this->createContainer();
+
+        $container->define('foo');
+
+        $container->setAlias('foo', 'bar');
+    }
+
+    /**
+     * @test
+     * @expectedException \InvalidArgumentException
+     */
+    public function itShouldThrowExceptionIfAliasAndServiceNameMatch()
+    {
+        $container = $this->createContainer();
+
+        $container->setAlias('foo', 'foo');
+    }
+
     /** @test */
     public function testDefinitionInheritance()
     {
@@ -277,6 +414,56 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @test */
+    public function itShouldThrowExceptionOnCircularReference()
+    {
+        $container = $this->createContainer();
+
+        $container->define('foo', '\Selene\Components\DI\Tests\Stubs\BarService')->addArgument(new Reference('foo'));
+
+        try {
+            $container->get('foo');
+        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+            $this->assertSame('service foo is in a circular reference', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('test splipped');
+    }
+
+    /** @test */
+    public function itShouldThrowInvalidArgumentExceptionIfDefinitionClassDoesNotExist()
+    {
+        $container = $this->createContainer();
+        $container->define('service', 'SomeFakeClass');
+
+        try {
+            $container->get('service');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Class SomeFakeClass does not exist', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('test splipped');
+    }
+
+    /** @test */
+    public function itShouldRequireFileOnDefinitions()
+    {
+        $container = $this->createContainer();
+        $container->define('foo', $class = 'DI\Stubs\RequiredService')
+            ->setFile(__DIR__.DIRECTORY_SEPARATOR.'Stubs'.DIRECTORY_SEPARATOR.'RequiredService.php');
+
+        $this->assertFalse(class_exists($class));
+        $container->get('foo');
+        $this->assertTrue(class_exists($class));
+    }
+
     /** @test */
     public function injectedServicesShouldSynchronizeSetters()
     {
@@ -329,6 +516,129 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($foo, $dependent->foo);
         $this->assertSame($bar, $dependent->bar);
+    }
+
+    /** @test */
+    public function itShouldResolveStaticConstructors()
+    {
+        $container = new ContainerStub;
+
+        $this->assertInstanceof('stdClass', $service = $container->get('foo'));
+
+        $this->assertSame($service, $container->get('foo'));
+    }
+
+    /** @test */
+    public function aliasesShouldBeSettable()
+    {
+        $container = $this->createContainer();
+
+        $container->define('foo', 'stdClass');
+
+        $container->setAlias('bar', 'foo');
+
+        $this->assertInstanceof('stdClass', $service = $container->get('bar'));
+
+        $this->assertInstanceof('Selene\Components\DI\Alias', $container->getAlias('bar'));
+
+        $container->removeAlias('bar');
+
+        try {
+            $container->get('bar');
+        } catch (\Selene\Components\DI\Exception\ContainerResolveException $e) {
+            $this->assertSame('A service with id bar was is not defined', $e->getMessage());
+        }
+    }
+
+    /** @test */
+    public function containerShouldBeMergable()
+    {
+        $container = new Container;
+        $container->setParameter('test', 'abc');
+
+        $mock = m::mock('Selene\Components\DI\ContainerInterface');
+        $mock->shouldReceive('isLocked')->once()->andReturn(false);
+        $mock->shouldReceive('getServices')->once()->andReturn(['foo' => new \StdClass]);
+        $mock->shouldReceive('getParameters')->once()->andReturn($params = new Parameters);
+        $mock->shouldReceive('getDefinitions')->once()->andReturn([]);
+        $params->set('testB', 'def');
+
+        $container->merge($mock);
+
+        $container->hasParameter('testB');
+        $this->assertInstanceof('stdClass', $container->get('foo'));
+    }
+
+    /** @test */
+    public function itShouldBuildDefinitionsWithFactory()
+    {
+        $container = new Container;
+        $container->setParameter('foo_args', $args = [1, 2, 4]);
+        $container
+            ->define('foo_service', $serviceClass = 'Selene\Components\DI\Tests\Stubs\FooService')
+            ->setFactory('Selene\Components\DI\Tests\Stubs\ServiceFactory', 'makeFoo')
+            ->addArgument('%foo_args%');
+
+        $service = $container->get('foo_service');
+
+        $this->assertInstanceof($serviceClass, $service);
+        $this->assertSame($args, $service->getOptions());
+
+        $container
+            ->define('bar_service', $serviceClassB = 'Selene\Components\DI\Tests\Stubs\BarService')
+            ->setFactory('Selene\Components\DI\Tests\Stubs\ServiceFactory', 'makeBar')
+            ->addArgument(new Reference('foo_service'));
+
+        $serviceB = $container->get('bar_service');
+
+        $this->assertInstanceof($serviceClassB, $serviceB);
+        $this->assertInstanceof($serviceClass, $serviceB->getFoo());
+        $this->assertSame($service, $serviceB->getFoo());
+
+        $container
+            ->define('bar_service_b', $serviceClassB = 'Selene\Components\DI\Tests\Stubs\BarService')
+            ->setFactory('Selene\Components\DI\Tests\Stubs\ServiceFactory', 'makeBarB');
+
+        try {
+            $container->get('bar_service_b');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Factory is not callable', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('test splipped');
+    }
+
+    /** @test */
+    public function containerShouldNotBeMergableIfOneMemberIsLocked()
+    {
+        $container = new Container;
+
+        $mock = m::mock('Selene\Components\DI\ContainerInterface');
+        $mock->shouldReceive('isLocked')->andReturn(true);
+
+        try {
+            $container->merge($mock);
+        } catch (\BadMethodCallException $e) {
+            $this->assertSame('cannot merge a locked container', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $mock = m::mock('Selene\Components\DI\ContainerInterface');
+        $mock->shouldReceive('isLocked')->andReturn(false);
+        $container = new Container(m::mock('Selene\Components\DI\StaticParameters'));
+        try {
+            $container->merge($mock);
+        } catch (\BadMethodCallException $e) {
+            $this->assertSame('cannot merge a locked container', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
     }
 
     protected function getDefaultMockArgs($class = null, array $arguments = [], array $custom = [])

@@ -74,7 +74,19 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services.1.xml');
 
         $this->assertTrue($container->hasDefinition('foo_service'));
+        $this->assertTrue($container->hasDefinition('foo_alias'));
         $this->assertSame('StdClass', $container->getDefinition('foo_service')->getClass());
+
+        $loader->load('services.1.1.xml');
+
+        $this->assertTrue($container->hasDefinition('bar_service'));
+        $this->assertTrue($container->getDefinition('bar_service')->isInjected());
+
+        $this->assertTrue($container->hasDefinition('bar_child'));
+        $this->assertSame('bar_service', $container->getDefinition('bar_child')->getParent());
+
+        $this->assertTrue($container->hasDefinition('factory_service'));
+        $this->assertTrue($container->getDefinition('factory_service')->hasFactory());
     }
 
     /** @test */
@@ -103,6 +115,21 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($dir.DIRECTORY_SEPARATOR.'imported.0.xml', (string)$resources[1]);
     }
 
+
+    /** @test */
+    public function isShouldParseImportedPackageConfig()
+    {
+        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+
+        $loader->load('services.2.xml');
+
+        $this->assertSame([['foo' => 'bar']], $builder->getExtensionConfig('acme'));
+
+        $loader->load('services.2.1.xml');
+
+        $this->assertSame([], $builder->getExtensionConfig(''));
+    }
+
     /** @test */
     public function itShouldLoadAllFilesWhenRequested()
     {
@@ -126,6 +153,39 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($dirA.DIRECTORY_SEPARATOR.'services.0.xml', (string)$resources[0]);
         $this->assertSame($dirB.DIRECTORY_SEPARATOR.'services.0.xml', (string)$resources[1]);
+    }
+
+    /** @test */
+    public function itShouldParseParmetersArray()
+    {
+        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+
+        $loader->load('services.3.xml', false);
+
+        $this->assertTrue($container->hasParameter('nested'));
+
+        $params = $container->getParameter('nested');
+
+        $expected = [
+            'a',
+            'b',
+            'nested' => [1, 2, 'bar' => 'baz'],
+            'foo' => 'bar'
+        ];
+
+        $this->assertSame($expected, $params);
+    }
+
+    /** @test */
+    public function itShouldParseMetaDataInDefinitions()
+    {
+        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+
+        $loader->load('services.4.xml', false);
+
+        $def = $container->getDefinition('test_listener');
+
+        $this->assertTrue($def->hasMetaData('app_events'));
     }
 
     protected function getLoaderMock($builder = null, $container = null, $locator = null)

@@ -56,6 +56,7 @@ class ResolveParentDefinition implements ProcessInterface
     private function repeatProcess()
     {
         $filtered = $this->filterDefinitions($this->container->getDefinitions());
+
         $count = count($filtered);
 
         if (0 < $count) {
@@ -129,8 +130,8 @@ class ResolveParentDefinition implements ProcessInterface
             $def->setFactory($factoryClass, $method);
         }
 
-        if ($definition->hasArguments()) {
-            $this->setParentArgs($def, $definition);
+        if ($def->hasArguments()) {
+            $this->repalceParentArgs($def, $definition);
         }
 
         // append metadata:
@@ -160,7 +161,7 @@ class ResolveParentDefinition implements ProcessInterface
      * @access private
      * @return void
      */
-    private function setParentArgs(ServiceDefinition $definition, ParentDefinition $parent)
+    private function repalceParentArgs(ServiceDefinition $definition, ParentDefinition $parent)
     {
         foreach ($parent->getArguments() as $index => $argument) {
             if (is_string($index) && 0 === strpos($index, 'index_')) {
@@ -169,6 +170,14 @@ class ResolveParentDefinition implements ProcessInterface
             } elseif (is_int($index)) {
                 $definition->addArgument($argument);
             }
+        }
+    }
+
+    private function setParentArguments(ServiceDefinition $definition, ServiceDefinition $parent)
+    {
+        var_dump($parent);
+        foreach ($definition->getArguments() as $index => $argument) {
+            $definition->addArgument($argument);
         }
     }
 
@@ -210,6 +219,6 @@ class ResolveParentDefinition implements ProcessInterface
      */
     private function prepareDefinition(DefinitionInterface $definition)
     {
-        return new ParentDefinition($definition->getParent());
+        return new ParentDefinition($id = $definition->getParent());
     }
 }

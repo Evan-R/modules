@@ -23,6 +23,7 @@ use \Selene\Components\DI\Definition\DefinitionInterface;
 use \Selene\Components\Config\Resource\Loader;
 use \Selene\Components\Config\Resource\LocatorInterface;
 use \Selene\Components\Config\Traits\XmlLoaderHelperTrait;
+use \Selene\Components\Common\Helper\ListHelper;
 
 /**
  * @class XmlLoader XmlLoader
@@ -51,9 +52,6 @@ class XmlLoader extends Loader
 
     protected function doLoad($file)
     {
-        if (!$this->checkPathIntegrity($file)) {
-            return;
-        }
 
         $this->builder->addFileResource($file);
 
@@ -70,9 +68,6 @@ class XmlLoader extends Loader
 
         // parse parameters that are marked as package nodes.
         $this->parsePackageConfig($xml);
-
-        // parse the config parameters
-        $this->parseParams($xml);
     }
 
     /**
@@ -130,10 +125,10 @@ class XmlLoader extends Loader
      * @access protected
      * @return mixed
      */
-    protected function checkPathIntegrity($path)
-    {
-        return stream_is_local($path) && is_file($path);
-    }
+    //protected function checkPathIntegrity($path)
+    //{
+    //    return stream_is_local($path) && is_file($path);
+    //}
 
     /**
      * Parse parameter nodes of the resource file.
@@ -148,25 +143,6 @@ class XmlLoader extends Loader
         foreach ($xml->xpath('/container/parameters/parameter') as $parameter) {
             $this->container->setParameter($parameter->getAttribute('id'), $this->getPhpValue($parameter));
         }
-    }
-
-    /**
-     * parseParams
-     *
-     * @param DOMDocument $xml
-     *
-     * @access private
-     * @return void
-     */
-    protected function parseParams(DOMDocument $xml)
-    {
-        $params = [];
-
-        foreach ($xml->xpath('/parameters') as $parameter) {
-            $params[] = $this->getParser()->parseDomElement($parameter);
-        }
-
-        return $params;
     }
 
     /**
@@ -198,7 +174,9 @@ class XmlLoader extends Loader
 
         foreach ($parameter->xpath('items/item') as $item) {
 
-            if (!($value = $this->getAttributeValue($item, 'use', false))) {
+            if (0 < $item->xpath('items')->length) {
+                $value = $this->getParameterArray($item);
+            } elseif (!($value = $this->getAttributeValue($item, 'use', false))) {
                 $value = $this->getValueFromString($item->nodeValue);
             }
 
@@ -211,27 +189,30 @@ class XmlLoader extends Loader
         return $array;
     }
 
-    /**
-     * Parse a parameter node marked as concat.
-     *
-     * @param DOMElement $parameter the parameter node.
-     *
-     * @access private
-     * @return string
-     */
-    private function concatParameters(DOMElement $parameter)
+    private function parseMetaData(DOMElement $service, DefinitionInterface $definition)
     {
-        $parts = [];
+        foreach ($service->xpath('meta') as $tagNode) {
 
-        foreach ($parameter->xpath('items/item') as $item) {
-
-            if (!($value = $this->getAttributeValue($item, 'use', false))) {
-                $value = $this->getValueFromString($item->nodeValue);
+            if (!($name = $this->getAttributeValue($tagNode, 'name'))) {
+                continue;
             }
 
-            $parts[] = $value;
+            $attrs = [];
+
+            $dataAttrs = [];
+
+            foreach ($tagNode->xpath("./@*[name() != 'name' and name() != 'data']") as $attribute) {
+                $attrs[] = [$attrName = $attribute->nodeName => $this->getAttributeValue($tagNode, $attrName)];
+            }
+
+            foreach ($tagNode->xpath("data/@*[name() != 'name']") as $attribute) {
+                $dataAttrs[] = [
+                    $attrName = $attribute->nodeName => $this->getAttributeValue($attribute->parentNode, $attrName)
+                ];
+            }
+
+            $definition->setMetaData($name, array_merge($attrs, $dataAttrs));
         }
-        return implode('', $parts);
     }
 
     /**
@@ -255,6 +236,7 @@ class XmlLoader extends Loader
      *
      * @param DOMElement $service the service node.
      *
+     * @throws \InvalidArgumentException if class attribute is missing.
      * @access private
      * @return void
      */
@@ -282,19 +264,20 @@ class XmlLoader extends Loader
             $def = new ParentDefinition($def->getParent());
         }
 
-        foreach ($service->xpath('meta/data') as $tagNode) {
-            $attrs = $this->getParser()->parseDomElement($tagNode);
-            $def->addMetaData($attrs);
-        }
+        $this->parseMetaData($service, $def);
 
         if ($class = $this->getAttributeValue($service, 'class', false)) {
             $def->setClass($class);
-        } elseif ($factory = $this->getAttributeValue($service, 'factory', false)) {
+        }
+
+        if ($factory = $this->getAttributeValue($service, 'factory', false)) {
             $method = $this->getAttributeValue($service, 'factory-method', 'make');
             $def->setFactory($factory, $method);
-        } elseif (!$def instanceof ParentDefinition) {
-            throw new \RuntimeException(
-                sprintf('either service class or factory is missing for service id %s', $id)
+        }
+
+        if (!$class && !$def instanceof ParentDefinition) {
+            throw new \InvalidArgumentException(
+                sprintf('Definition \'%s\' must define its class unless it has a parent definition', $id)
             );
         }
 
@@ -392,8 +375,6 @@ class XmlLoader extends Loader
             return (string)$parameter->nodeValue;
         } elseif ('constant' === $type && defined($const = (string)$parameter->nodeValue)) {
             return constant($const);
-        } elseif ('concat' === $type) {
-            return $this->concatParameters($parameter);
         }
         return $this->getValueFromString((string)$parameter->nodeValue);
     }

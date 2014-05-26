@@ -24,8 +24,9 @@ interface ParameterInterface extends \ArrayAccess
 
     public function has($param);
 
-    public function all();
+    public function remove($param);
 
+    public function all();
 
     public function merge(ParameterInterface $parameters);
 }

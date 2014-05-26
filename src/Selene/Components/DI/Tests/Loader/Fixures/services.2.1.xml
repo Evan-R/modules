@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container>
+
+  <imports>
+    <import>imported.1.xml</import>
+  </imports>
+
+  <parameters></parameters>
+  <services></services>
+</container>

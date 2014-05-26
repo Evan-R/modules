@@ -3,5 +3,8 @@
 <container>
   <parameters>
     <parameter id="foo">bar</parameter>
+    <parameter id="bar" type="string">10</parameter>
+    <parameter id="baz">10</parameter>
+    <parameter id="const" type="constant">PHP_VERSION</parameter>
   </parameters>
 </container>
