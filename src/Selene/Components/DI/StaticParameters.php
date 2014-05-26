@@ -136,7 +136,7 @@ class StaticParameters extends Parameters
     {
         if (!$parameters instanceof StaticParameters) {
             throw new \InvalidArgumentException(
-                sprintf('%s can only be merged with as static parameter collection', __CLASS__)
+                sprintf('%s can only be merged with as static parameter collection', get_class($this))
             );
         }
 
