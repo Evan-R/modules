@@ -12,7 +12,6 @@
 namespace Selene\Components\DI\Definition;
 
 use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\Common\Interfaces\JsonableInterface;
 use \Selene\Components\DI\Meta\Data as MetaData;
 use \Selene\Components\DI\Meta\MetaDataInterface;
 
@@ -25,7 +24,7 @@ use \Selene\Components\DI\Meta\MetaDataInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class AbstractDefinition implements DefinitionInterface, \Serializable, JsonableInterface
+class AbstractDefinition implements DefinitionInterface
 {
     /**
      * class
@@ -355,7 +354,7 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      * @param array $parameters
      *
      * @access public
-     * @return mixed
+     * @return DefinitionInterface this instance.
      */
     public function setMetaData($tagName, array $parameters = [])
     {
@@ -376,6 +375,21 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
     public function getMetaData($name = null)
     {
         return null !== $name ? ($this->hasMetaData($name) ? $this->meta[$name] : []) : (array)$this->meta;
+    }
+
+    /**
+     * removeMetaData
+     *
+     * @param mixed $tagName
+     *
+     * @access public
+     * @return DefinitionInterface this instance.
+     */
+    public function removeMetaData($tagName)
+    {
+        unset($this->meta[$tagName]);
+
+        return $this;
     }
 
     /**
@@ -621,15 +635,16 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
      */
     public function merge(DefinitionInterface $definition)
     {
-        $this->parent     = $definition->getParent() ?: $this->parent;
-        $this->class      = $definition->getClass() ?: $this->class;
-        $this->file       = $definition->getFile() ?: $this->file;
-        $this->factory    = $definition->getFactory() ?: $this->factory;
-        $this->injected   = $definition->isInjected() ? true : $this->injected;
-        $this->internal   = $definition->isInternal() ? true : $this->internal;
-        $this->abstract   = $definition->isAbstract() ? true : $this->abstract;
-
         $this->setScope($definition->getScope());
+        $this->setFile($definition->getFile() ?: $this->file);
+        $this->setClass($definition->getClass() ?: $this->class);
+        $this->setParent($definition->getParent() ?: $this->parent);
+
+        $this->setInjected($definition->isInjected() ? true : $this->injected);
+        $this->setInternal($definition->isInternal() ? true : $this->internal);
+        $this->setAbstract($definition->isAbstract() ? true : $this->abstract);
+
+        $this->factory = $definition->getFactory() ?: $this->factory;
 
         foreach ($definition->getSetters() as $setter) {
             $method = key($setter);
@@ -652,65 +667,6 @@ class AbstractDefinition implements DefinitionInterface, \Serializable, Jsonable
         }
 
         return $this;
-    }
-
-    /**
-     * serialize
-     *
-     * @access public
-     * @return mixed
-     */
-    public function serialize()
-    {
-        $data = [
-            'class'     => $this->class,
-            'parent'    => $this->parent,
-            'arguments' => $this->arguments,
-            'setters'   => $this->setters,
-            'file'      => $this->file,
-            'scope'     => $this->scope,
-            'factory'   => $this->factory,
-            'injected'  => $this->injected,
-            'internal'  => $this->internal,
-            'abstract'  => $this->abstract,
-        ];
-
-        return json_encode($data);
-    }
-
-    /**
-     * unserialize
-     *
-     * @param array $data
-     *
-     * @access public
-     * @return mixed
-     */
-    public function unserialize($data)
-    {
-        $data = json_decode($data, true);
-
-        $this->class     = $data['class'];
-        $this->parent    = $data['parent'];
-        $this->arguments = $data['arguments'];
-        $this->setters   = $data['setters'];
-        $this->file      = $data['file'];
-        $this->scope     = $data['scope'];
-        $this->factory   = $data['factory'];
-        $this->injected  = $data['injected'];
-        $this->internal  = $data['internal'];
-        $this->abstract  = $data['abstract'];
-    }
-
-    /**
-     * toJson
-     *
-     * @access public
-     * @return mixed
-     */
-    public function toJson()
-    {
-        return json_encode($this->serialize());
     }
 
     /**

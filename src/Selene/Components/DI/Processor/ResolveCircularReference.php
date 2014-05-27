@@ -26,15 +26,20 @@ use \Selene\Components\DI\Exception\CircularReferenceException;
  */
 class ResolveCircularReference implements ProcessInterface
 {
+    /**
+     * container
+     *
+     * @var ContainerInterface
+     */
     private $container;
 
     /**
-     * resolve
+     * Resolve circular references among service definitions.
      *
      * @param ContainerInterface $container
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function process(ContainerInterface $container)
     {
@@ -47,7 +52,7 @@ class ResolveCircularReference implements ProcessInterface
     }
 
     /**
-     * checkDefininition
+     * Check a definition's arguemnts and setters.
      *
      * @param DefinitionInterface $definition
      * @param mixed $current
@@ -63,12 +68,15 @@ class ResolveCircularReference implements ProcessInterface
     }
 
     /**
-     * checkCircularReference
+     * Check if an attribute is a reference and matches the current resolving
+     * service definition.
      *
      * @param array $attributes
-     * @param void $current
-     * @param void $self
+     * @param string $current
+     * @param string $self
      *
+     * @throws \Selene\Components\DI\Exception\CircularReferenceException if
+     * a circular reference occurred.
      * @access protected
      * @return void
      */
@@ -89,22 +97,26 @@ class ResolveCircularReference implements ProcessInterface
                 continue;
             }
 
+            // if the reference id matches the current resolving, a circular
+            // reference occured:
             if ($current === $id) {
                 throw new CircularReferenceException(
                     sprintf('Service \'%s\' has circular reference on \'%s\'', $current, $id)
                 );
             }
 
+            // if all tests passes, continue to check the definitions arguments
+            // and setters list:
             $this->checkDefininition($this->container->getDefinition($id), $current, $id, $self);
         }
     }
 
     /**
-     * checkSetterArguments
+     * Extract Setter arguments and pass them to the reference check.
      *
      * @param array $setters
-     * @param mixed $current
-     * @param mixed $self
+     * @param string $current
+     * @param string $self
      *
      * @access private
      * @return void

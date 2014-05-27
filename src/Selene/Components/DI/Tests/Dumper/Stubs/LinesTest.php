@@ -36,7 +36,8 @@ class LinesTest extends \PHPUnit_Framework_TestCase
     {
         $lines = new Lines;
         $lines->indent();
-        $this->assertSame('    foo', (string)$lines->add('foo'));
+        $lines->add('foo');
+        $this->assertSame('    foo', $lines->dump());
 
         $lines = new Lines;
         $lines->indent();
@@ -62,5 +63,34 @@ class LinesTest extends \PHPUnit_Framework_TestCase
             ->add('baz');
 
         $this->assertSame("foo\n    bar\nbaz", (string)$lines);
+    }
+
+    /** @test */
+    public function itShouldAddNewLies()
+    {
+
+        $lines = new Lines;
+        $lines
+            ->add('foo')
+            ->emptyLine()
+        ->end();
+
+        $this->assertSame("foo\n", (string)$lines);
+    }
+
+    /** @test */
+    public function itShouldSetOuputIndent()
+    {
+        $lines = new Lines;
+        $lines
+            ->add('foo')
+            ->indent()
+            ->add('bar')
+            ->end()
+            ->add('baz');
+
+        $lines->setOutputIndentation(4);
+
+        $this->assertSame("    foo\n        bar\n    baz", (string)$lines);
     }
 }

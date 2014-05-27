@@ -212,8 +212,8 @@ class Parameters implements ParameterInterface
      */
     public function resolve()
     {
-        if ($this->resolved) {
-            return;
+        if ($this->isResolved()) {
+            return $this;
         }
 
         $resolved = array();

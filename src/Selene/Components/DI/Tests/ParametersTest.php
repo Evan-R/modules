@@ -105,6 +105,16 @@ class ParametersTest extends TestCase
         }
     }
 
+    /** @test */
+    public function itShouldResolveObjects()
+    {
+        $parameters = $this->getParameters($params = ['foo' => new \StdClass]);
+
+        $params = $parameters->resolve()->all();
+
+        $this->assertInstanceof('stdClass', $params['foo']);
+    }
+
     /**
      * @test
      */
@@ -200,7 +210,7 @@ class ParametersTest extends TestCase
     /**
      * @test
      */
-    public function testResolveShouldResetAfterSettingNewParam()
+    public function resolveShouldResetAfterSettingNewParam()
     {
         $parameters = $this->getParameters($params = ['foo' => 'bar', 'bar' => 'bam']);
         $parameters->resolve();
@@ -264,7 +274,8 @@ class ParametersTest extends TestCase
         $this->assertFalse($parameters->has('foo'));
     }
 
-    public function testEscapeValue()
+    /** @test */
+    public function itShouldEscapeValues()
     {
         $parameters = $this->getParameters();
 
@@ -273,6 +284,18 @@ class ParametersTest extends TestCase
 
         $this->assertEquals('I\'m a %%foo%%', $parameters->get('bar'), '->escapeValue() escapes % by doubling it');
         $this->assertEquals(array('bar' => array('ding' => 'I\'m a bar %%foo %%bar', 'zero' => null)), $parameters->get('foo'), '->escapeValue() escapes % by doubling it');
+    }
+
+    /** @test */
+    public function itSouldUnEscapeStringsInArrays()
+    {
+        $parameters = $this->getParameters();
+
+        $data = $parameters->unescape([
+            'foo' => '%%bar%%'
+        ]);
+
+        $this->assertSame(['foo' => '%bar%'], $data);
     }
 
     ///**

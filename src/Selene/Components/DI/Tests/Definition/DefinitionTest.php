@@ -131,6 +131,16 @@ abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldHaveSetters()
+    {
+        $def = $this->createDefinition('foo');
+        $def->addSetter('setBar', []);
+
+        $this->assertTrue($def->hasSetter('setBar'));
+        $this->assertFalse($def->hasSetter('setFoo'));
+    }
+
+    /** @test */
     public function itShouldBeTaggable()
     {
         $def = $this->createDefinition('bar');
@@ -145,6 +155,48 @@ abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceof('\Selene\Components\DI\Meta\MetaDataInterface', $def->getMetaData('foo'));
         $this->assertFalse($data === $def->getMetaData('foo'));
+    }
+
+    /** @test */
+    public function itShouldBeMergable()
+    {
+        $defA = $this->createDefinition('a');
+        $defB = $this->createDefinition('b');
+
+        $defB->setClass('Foo');
+
+        $defA->merge($defB);
+        $this->assertSame('Foo', $defA->getClass());
+
+        $defA = $this->createDefinition('a');
+        $defB = $this->createDefinition('b');
+
+        $defA->setMetaData('foo', ['a']);
+        $defB->setMetaData('bar', ['b']);
+
+        $defA->merge($defB);
+        $this->assertTrue($defA->hasMetaData('foo'));
+        $this->assertTrue($defA->hasMetaData('bar'));
+
+        $defA = $this->createDefinition('a');
+        $defB = $this->createDefinition('b');
+
+        $defA->setArguments(['a', 'b', 'c', 'd']);
+        $defB->setArguments([1, 2, 3]);
+
+        $defA->merge($defB);
+
+        $this->assertSame([1, 2, 3, 'd'], $defA->getArguments());
+
+        $defA = $this->createDefinition('a');
+        $defB = $this->createDefinition('b');
+
+        $defA->setArguments([1, 2, 3]);
+        $defB->setArguments($args = ['a', 'b', 'c', 'd']);
+
+        $defA->merge($defB);
+
+        $this->assertSame($args, $defA->getArguments());
     }
 
     /** @test

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container>
+  <services>
+    <service id="abstract_parent" class="StdClass">
+      <arguments>
+        <argument>1</argument>
+        <argument>2</argument>
+        <argument>3</argument>
+      </arguments>
+    </service>
+
+    <service id="concrete" class="StdClass" injected="false" parent="abstract_parent">
+      <arguments>
+        <argument index="1">replaced</argument>
+      </arguments>
+    </service>
+  </services>
+</container>

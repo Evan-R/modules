@@ -158,12 +158,12 @@ class Builder implements BuilderInterface
      * configure
      *
      * @access public
-     * @return void
+     * @return boolean
      */
     public function configure()
     {
         if ($this->configured) {
-            return;
+            return false;
         }
 
         return $this->configureProcessor($this->processor);
@@ -175,7 +175,7 @@ class Builder implements BuilderInterface
      * @param ProcessorInterface $processor
      *
      * @access protected
-     * @return void
+     * @return boolean
      */
     protected function configureProcessor(ProcessorInterface $processor)
     {
@@ -185,7 +185,7 @@ class Builder implements BuilderInterface
         $processor->add(new ResolveCircularReference, ProcessorInterface::OPTIMIZE);
         $processor->add(new RemoveAbstractDefinition, ProcessorInterface::REMOVE);
 
-        $this->configured = true;
+        return $this->configured = true;
     }
 
     /**

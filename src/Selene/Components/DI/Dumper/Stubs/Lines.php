@@ -60,6 +60,8 @@ class Lines implements StubInterface
 
         $this->indents = new \SplStack;
         $this->indents->push(0);
+
+        $this->setOutputIndentation(0);
     }
 
     /**
@@ -79,7 +81,7 @@ class Lines implements StubInterface
      */
     public function dump()
     {
-        return implode($this->getImplodeSeparator(), $this->lines);
+        return $this->doIndent($this->outputIndentation) . implode($this->getImplodeSeparator(), $this->lines);
     }
 
     /**

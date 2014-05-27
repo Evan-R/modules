@@ -277,7 +277,7 @@ class XmlLoader extends Loader
 
         if (!$class && !$def instanceof ParentDefinition) {
             throw new \InvalidArgumentException(
-                sprintf('Definition \'%s\' must define its class unless it has a parent definition', $id)
+                sprintf('Definition "%s" must define its class unless it has a parent definition', $id)
             );
         }
 

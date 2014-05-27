@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container>
+  <services>
+    <service id="foo_service" class="SomeClass">
+      <setters>
+        <setter calls="setFoo">
+          <arguments>
+            <argument>foo</argument>
+          </arguments>
+        </setter>
+      </setters>
+    </service>
+  </services>
+</container>

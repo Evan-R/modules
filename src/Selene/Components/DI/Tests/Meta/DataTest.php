@@ -23,29 +23,72 @@ class DataTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $Data = new Data('foo');
-        $this->assertInstanceof('Selene\Components\DI\Meta\MetaDataInterface', $Data);
+        $data = new Data('foo');
+        $this->assertInstanceof('Selene\Components\DI\Meta\MetaDataInterface', $data);
     }
 
     /** @test */
     public function itShouldSetItsName()
     {
-        $Data = new Data(['name' => 'foo']);
+        $data = new Data(['name' => 'foo']);
 
-        $this->assertSame('foo', $Data->getName());
+        $this->assertSame('foo', $data->getName());
 
-        $Data = new Data('foo');
+        $data = new Data('foo');
 
-        $this->assertSame('foo', $Data->getName());
+        $this->assertSame('foo', $data->getName());
     }
 
     /** @test */
     public function itShouldGetAttributes()
     {
-        $Data = new Data('foo', ['foo' => 'bar']);
+        $data = new Data('foo', ['foo' => 'bar']);
 
-        $this->assertSame('bar', $Data->get('foo'));
-        $this->assertNull($Data->get('bar'));
-        $this->assertSame('test', $Data->get('bar', 'test'));
+        $this->assertSame('bar', $data->get('foo'));
+        $this->assertNull($data->get('bar'));
+        $this->assertSame('test', $data->get('bar', 'test'));
+    }
+
+    /** @test */
+    public function itShouldGetNestedParams()
+    {
+        $data = new Data('foo', [['baz' => 'baz'], ['foo' => 'baz'], ['foo' => 'bar']]);
+
+        $this->assertSame(['baz', 'bar'], $data->get('foo'));
+    }
+
+    /** @test */
+    public function itShouldReturnParameters()
+    {
+        $data = new Data('foo', $params = ['foo' => 'baz']);
+
+        $this->assertSame($params, $data->getParameters());
+
+        $data = new Data(['name' => 'foo', 'foo' => 'baz']);
+
+        $this->assertSame($params, $data->getParameters());
+    }
+
+    /** @test */
+    public function itShouldBeStringable()
+    {
+        $data = new Data('foo');
+        $this->assertSame('foo', (string)$data);
+    }
+
+    /** @test */
+    public function isShouldThrowExceptionIfNameIsMissing()
+    {
+        $dummy = new Data('foo');
+        try {
+            $data = new Data(['foo']);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(sprintf('%s: No name given', get_class($dummy)), $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('test splipped');
     }
 }

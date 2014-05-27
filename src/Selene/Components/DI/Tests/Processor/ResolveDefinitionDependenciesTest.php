@@ -55,6 +55,28 @@ class ResolveDefinitionDependenciesTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldNotSetAFileIfNotRequired()
+    {
+        $params = $this->getParametersMock();
+        $params->shouldReceive('resolveParam')->with('%foo.class%')->andReturn('stdClass');
+
+        $def = new Definition('%foo.class%');
+
+        $definitions = [
+            'foo' => $def
+        ];
+
+        $container = $this->getContainerMock($params, $definitions);
+
+        $process = new ResolveDefinitionDependencies;
+
+        $process->process($container);
+
+        $this->assertSame('stdClass', $def->getClass());
+        $this->assertFalse($def->requiresFile());
+    }
+
+    /** @test */
     public function itShouldThrowExceptionIfClassDoesNotExist()
     {
 

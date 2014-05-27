@@ -36,7 +36,11 @@ class Aliases implements \ArrayAccess
      */
     public function __construct(array $aliases = [])
     {
-        $this->aliases = $aliases;
+        $this->aliases = [];
+
+        foreach ($aliases as $id => $alias) {
+            $this->set($id, $alias);
+        }
     }
 
     /**

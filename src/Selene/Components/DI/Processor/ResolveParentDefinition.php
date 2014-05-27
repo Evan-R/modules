@@ -108,14 +108,6 @@ class ResolveParentDefinition implements ProcessInterface
             $def->setScope($scope);
         }
 
-        if ($definition->isAbstract()) {
-            $def->setAbstract(true);
-        }
-
-        if ($definition->isInjected()) {
-            $def->setInjected(true);
-        }
-
         if ($definition->requiresFile()) {
             $def->setFile($definition->getFile());
         }
@@ -134,10 +126,17 @@ class ResolveParentDefinition implements ProcessInterface
             $this->repalceParentArgs($def, $definition);
         }
 
+        if ($removed = $definition->getObsoleteMetaData()) {
+            foreach ($removed as $dataName) {
+                $def->removeMetaData($dataName);
+            }
+        }
+
         // append metadata:
         if ($definition->hasMetaData()) {
+
             foreach ($definition->getMetaData() as $data) {
-                $def->addMetaData($data->getName(), $data->getParameters());
+                $def->setMetaData($data->getName(), $data->getParameters());
             }
         }
 
@@ -173,14 +172,6 @@ class ResolveParentDefinition implements ProcessInterface
         }
     }
 
-    private function setParentArguments(ServiceDefinition $definition, ServiceDefinition $parent)
-    {
-        var_dump($parent);
-        foreach ($definition->getArguments() as $index => $argument) {
-            $definition->addArgument($argument);
-        }
-    }
-
     /**
      * filterDefinitions
      *
@@ -195,7 +186,7 @@ class ResolveParentDefinition implements ProcessInterface
 
         foreach ($definitions as $id => $definition) {
 
-            if ($definition->isAbstract()) {
+            if ($definition->isAbstract() || $definition->isInjected()) {
                 continue;
             }
 
@@ -219,6 +210,6 @@ class ResolveParentDefinition implements ProcessInterface
      */
     private function prepareDefinition(DefinitionInterface $definition)
     {
-        return new ParentDefinition($id = $definition->getParent());
+        return (new ParentDefinition($id = $definition->getParent()))->merge($definition);
     }
 }

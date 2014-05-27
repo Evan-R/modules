@@ -74,13 +74,6 @@ class Container implements ContainerInterface
     protected $instances;
 
     /**
-     * injected
-     *
-     * @var array
-     */
-    protected $injected;
-
-    /**
      * building
      *
      * @var array
@@ -305,18 +298,12 @@ class Container implements ContainerInterface
 
         $id = $this->resolveId($id);
 
-        $defined = $this->hasDefinition($id);
-
+        // if the container is unlocked, define the injected service
         if (!$this->isLocked()) {
-            if (!$defined) {
-                $this->define($id)
-                    ->setInjected(true);
-            } else {
-                $this->getDefinition($id)->setInjected(true);
-            }
+            $definition = $this->hasDefinition($id) ? $this->getDefinition($id) : $this->define($id);
+            $definition->setClass(get_class($instance))->setInjected(true);
         }
 
-        $this->injected[$id] = true;
         $this->services[$id] = $instance;
 
         $this->sync($id);

@@ -77,6 +77,6 @@ trait FormatterTrait
      */
     public function exportVar($param)
     {
-        return preg_replace('~NULL~', 'null', var_export($param, true));
+        return preg_replace(['~NULL~', '~FALSE~', '~TRUE~'], ['null', 'false', 'true'], var_export($param, true));
     }
 }

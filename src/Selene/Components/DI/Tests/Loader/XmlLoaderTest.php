@@ -188,6 +188,68 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($def->hasMetaData('app_events'));
     }
 
+    /** @test */
+    public function itiShoultThrowExceptionIfClassIsMissing()
+    {
+
+        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+
+        try {
+            $loader->load('errored.0.xml', false);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(
+                'Definition "foo_service" must define its class unless it has a parent definition',
+                $e->getMessage()
+            );
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('test splipped');
+    }
+
+    /** @test */
+    public function itShouldSetSetters()
+    {
+        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+        $loader->load('services.6.xml', false);
+
+        $def = $container->getDefinition('foo_service');
+
+        $this->assertTrue($def->hasSetters());
+
+        $setters = $def->getSetters();
+
+        $this->assertSame('setFoo', key($setters[0]));
+        $this->assertSame(['foo'], $setters[0][key($setters[0])]);
+    }
+
+    /** @test */
+    public function itShouldConvertToParentDefinition()
+    {
+        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+        $loader->load('services.5.xml', false);
+
+        $this->assertInstanceof(
+            'Selene\Components\DI\Definition\ParentDefinition',
+            $container->getDefinition('concrete')
+        );
+    }
+
+    /** @test */
+    public function itShouldReplaceParentArguments()
+    {
+        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+        $loader->load('services.5.xml', false);
+
+        $def = $container->getDefinition('concrete');
+
+        $args = $def->getArguments();
+
+        $this->assertTrue(isset($args['index_1']));
+    }
+
     protected function getLoaderMock($builder = null, $container = null, $locator = null)
     {
         $builder =   $builder = $builder ?: m::mock('\Selene\Components\DI\BuilderInterface');

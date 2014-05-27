@@ -1,6 +1,7 @@
 {
   "name": "selene/di",
   "description": "Selene Dependency Injection Component",
+  "keywords": ["dependency-injection", "ioc", "selene"], 
   "license": "MIT",
   "authors": [
     {

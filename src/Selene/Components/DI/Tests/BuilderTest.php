@@ -98,6 +98,43 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($builder->build());
     }
 
+    /** @test */
+    public function itShouldBeConfiGurable()
+    {
+        $builder = new Builder($container = $this->getContainerMock());
+
+        $this->assertTrue($builder->configure());
+        $this->assertFalse($builder->configure());
+    }
+
+    /** @test */
+    public function itPassMethodCallsToItsContainer()
+    {
+        $builder = new Builder($container = $this->getContainerMock());
+
+        $container->shouldReceive('getDefinitions')->andReturn([]);
+
+        $this->assertSame([], $builder->getDefinitions());
+    }
+
+    /** @test */
+    public function itPassCheckIfPassedMethodExists()
+    {
+        $builder = new Builder($container = $this->getContainerMock());
+
+        $container->shouldReceive('getDefinitions')->andReturn([]);
+
+        try {
+            $builder->getStuff();
+        } catch (\BadMethodCallException $e) {
+            $this->assertTrue(false !== stripos($e->getMessage(), 'getStuff'));
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+        $this->fail('test splipped');
+    }
+
     /**
      * prepareContainerToBuild
      *

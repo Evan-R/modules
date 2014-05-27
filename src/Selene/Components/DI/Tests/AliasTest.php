@@ -11,32 +11,29 @@
 
 namespace Selene\Components\DI\Tests;
 
-use \Selene\Components\DI\Aliases;
-use \Selene\Components\TestSuite\TestCase;
+use \Selene\Components\DI\Alias;
 
-/**
- * @class AliasTest
- * @package Selene\Components\DI\Tests
- * @version $Id$
- */
-class AliasTest extends TestCase
+class AliasTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @test
-     */
-    public function testSetAndGetAliases()
+    /** @test */
+    public function itShouldBeInstantiable()
     {
-        $alias = new Aliases();
-        $alias->set('bar', 'foo');
-        $this->assertEquals('foo', $alias->get('bar'));
+        $this->assertInstanceof('Selene\Components\DI\Alias', new Alias('foo'));
     }
 
-    /**
-     * @test
-     */
-    public function testGetAndReturnDefault()
+    /** @test */
+    public function itShouldNotBeInternal()
     {
-        $alias = new Aliases(['bar' => 'foo']);
-        $this->assertEquals('foo', $alias->get('foo'));
+        $this->assertFalse((new Alias('foo'))->isInternal());
+    }
+
+    /** @test */
+    public function itShouldBeInternal()
+    {
+        $this->assertTrue((new Alias('foo', true))->isInternal());
+        $alias = new Alias('foo');
+
+        $alias->setInternal(true);
+        $this->assertTrue($alias->isInternal());
     }
 }

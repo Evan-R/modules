@@ -17,9 +17,23 @@ namespace Selene\Components\DI\Definition;
  */
 class ParentDefinition extends AbstractDefinition
 {
+    /**
+     * removedMetaData
+     *
+     * @var array
+     */
+    private $obsoleteMetaData;
+
+    /**
+     * @param mixed $parent
+     *
+     * @access public
+     * @return mixed
+     */
     public function __construct($parent)
     {
         $this->parent = $parent;
+        $this->obsoleteMetaData = [];
     }
 
     /**
@@ -38,5 +52,32 @@ class ParentDefinition extends AbstractDefinition
         }
         $this->arguments['index_'  .(string)(int)$index] = $argument;
         //var_dump($this->arguments);
+    }
+
+    /**
+     * removeMetaData
+     *
+     * @param mixed $name
+     *
+     * @access public
+     * @return mixed
+     */
+    public function removeMetaData($name)
+    {
+        $this->obsoleteMetaData[] = $name;
+
+        return parent::removeMetaData($name);
+    }
+
+    /**
+     * getObsoleteMetaData
+     *
+     *
+     * @access public
+     * @return array
+     */
+    public function getObsoleteMetaData()
+    {
+        return $this->obsoleteMetaData;
     }
 }

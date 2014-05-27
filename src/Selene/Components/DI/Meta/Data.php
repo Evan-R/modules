@@ -12,6 +12,7 @@
 namespace Selene\Components\DI\Meta;
 
 use \Selene\Components\Common\Traits\Getter;
+use \Selene\Components\Common\Helper\ListHelper;
 
 /**
  * @class Data
@@ -21,6 +22,8 @@ use \Selene\Components\Common\Traits\Getter;
 class Data implements MetaDataInterface
 {
     use Getter;
+
+    protected $name;
 
     /**
      * arguments
@@ -48,7 +51,7 @@ class Data implements MetaDataInterface
      */
     public function getName()
     {
-        return $this->getDefault($this->parameters, 'name');
+        return $this->name;
     }
 
     /**
@@ -62,7 +65,32 @@ class Data implements MetaDataInterface
      */
     public function get($parameter, $default = null)
     {
+        if (ListHelper::arrayIsList($this->parameters)) {
+
+            $params = [];
+
+            foreach ($this->parameters as $param) {
+                if (!$value = $this->getDefault((array)$param, $parameter, null)) {
+                    continue;
+                }
+                $params[] = $value;
+            }
+
+            return (bool)$params ? $params : null;
+        }
+
         return $this->getDefault($this->parameters, $parameter, $default);
+    }
+
+    /**
+     * getParameters
+     *
+     * @access public
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
     }
 
     /**
@@ -92,8 +120,11 @@ class Data implements MetaDataInterface
         }
 
         if (!isset($parameters['name'])) {
-            throw new \InvalidArgumentException('no name given');
+            throw new \InvalidArgumentException(sprintf('%s: No name given', get_class($this)));
         }
+
+        $this->name = $parameters['name'];
+        unset($parameters['name']);
 
         $this->parameters = $parameters;
     }
