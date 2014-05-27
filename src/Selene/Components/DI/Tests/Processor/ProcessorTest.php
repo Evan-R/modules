@@ -59,6 +59,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($processor->process($container));
         $this->assertFalse($processor->process($container));
+
+        //new container:
+        $this->assertTrue($processor->process($this->getContainerMock()));
     }
 
     /**

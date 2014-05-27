@@ -1,6 +1,8 @@
 [![Build Status](https://api.travis-ci.org/seleneapp/di.png?branch=development)](https://travis-ci.org/seleneapp/di)
 [![HHVM Status](http://hhvm.h4cc.de/badge/selene/di.png)](http://hhvm.h4cc.de/package/selene/di)
 
+[![Coverage Status](https://coveralls.io/repos/seleneapp/di/badge.png)](https://coveralls.io/r/seleneapp/di)
+
 ## Setup
 
 ```php
