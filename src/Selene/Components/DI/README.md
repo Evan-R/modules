@@ -1,7 +1,10 @@
 [![Build Status](https://api.travis-ci.org/seleneapp/di.png?branch=development)](https://travis-ci.org/seleneapp/di)
+[![Latest Stable Version](https://poser.pugx.org/selene/di/v/stable.png)](https://packagist.org/packages/selene/di) 
+[![Latest Unstable Version](https://poser.pugx.org/selene/di/v/unstable.png)](https://packagist.org/packages/selene/di) 
+[![License](https://poser.pugx.org/selene/di/license.png)](https://packagist.org/packages/selene/di)
 [![HHVM Status](http://hhvm.h4cc.de/badge/selene/di.png)](http://hhvm.h4cc.de/package/selene/di)
 
-[![Coverage Status](https://coveralls.io/repos/seleneapp/di/badge.png)](https://coveralls.io/r/seleneapp/di)
+[![Coverage Status](https://coveralls.io/repos/seleneapp/di/badge.png?branch=development)](https://coveralls.io/r/seleneapp/di?branch=development)
 
 ## Setup
 
