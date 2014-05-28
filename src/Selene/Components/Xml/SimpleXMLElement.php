@@ -26,13 +26,6 @@ use \SimpleXMLElement as SimpleXML;
 class SimpleXMLElement extends SimpleXML
 {
     /**
-     * boolish
-     *
-     * @var array
-     */
-    public static $boolish = ['yes', 'no', 'true', 'false'];
-
-    /**
      * argumentsAsArray
      *
      * @access public
@@ -41,11 +34,11 @@ class SimpleXMLElement extends SimpleXML
     public function attributesAsArray($namespace = null)
     {
         $attributes = [];
-        $attr = $this->xpath('./@*');
 
-        foreach ($attr as $key => $value) {
+        foreach ($this->attributes() as $key => $value) {
             $attributes[$key] = $this->getPhpValue((string)$value);
         }
+
         return $attributes;
     }
 
@@ -81,12 +74,16 @@ class SimpleXMLElement extends SimpleXML
                 break;
             case ($content instanceof \DOMNode):
                 $dom = new \DOMDocument();
-                $dom->appendChild($content);
-                $content = $dom->saveXML($dom->childNodes->item(0));
+                $import = $dom->importNode($content, true);
+                $dom->appendChild($import);
+                $content = $dom->saveXML($dom->firstChild);
                 break;
             default:
                 throw new \InvalidArgumentException(
-                    'expected arguement 1 to be String, SimpleXMLElement, DOMNode, or DOMDocument, instead saw ' . gettype($content)
+                    sprintf(
+                        'expected arguement 1 to be String, SimpleXMLElement, DOMNode, or DOMDocument, instead saw %s',
+                        gettype($content)
+                    )
                 );
         }
 
@@ -122,7 +119,7 @@ class SimpleXMLElement extends SimpleXML
      */
     public function appendChildFromXmlString($xml)
     {
-        $dom = new DOMDocument;
+        $dom = new \DOMDocument;
         $dom->loadXML($xml);
 
         $element = simplexml_import_dom($dom);
@@ -155,14 +152,13 @@ class SimpleXMLElement extends SimpleXML
     protected function getPhpValue($value)
     {
         switch (true) {
-            case is_bool($value):
-                return $value ? 'true' : 'false';
             case is_numeric($value):
-                return ctype_digit($value) ? intval($value) : floatval($value);
-            case in_array($value, static::$boolish):
-                return ('false' === $value || 'no' === $value) ? false : true;
+                return 0 === strpos($value, '0x') ?
+                    hexdec($value) : (ctype_digit($value) ? intval($value) : floatval($value));
+            case in_array(strtolower($value), ['true', 'false']):
+                return 'false' === $value ? false : true;
             default:
-                return clear_value(trim($value));
+                return clearValue(trim($value));
         };
     }
 }

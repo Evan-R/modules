@@ -118,6 +118,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
         $parser->setIndexKey('item');
 
+        $this->assertSame('item', $parser->getIndexKey());
+
         $xmlString = '<data><aas><item>1</item></aas></data>';
 
         $data = $parser->parse($xmlString);
