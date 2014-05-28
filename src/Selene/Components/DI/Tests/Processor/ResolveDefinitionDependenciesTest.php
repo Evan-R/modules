@@ -96,7 +96,7 @@ class ResolveDefinitionDependenciesTest extends \PHPUnit_Framework_TestCase
         try {
             $process->process($container);
         } catch (\InvalidArgumentException $e) {
-            $this->assertSame('class "Foo\FooClass" does not exist', $e->getMessage());
+            $this->assertSame('class "Foo\FooClass" required by service "foo" does not exist', $e->getMessage());
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
@@ -127,13 +127,139 @@ class ResolveDefinitionDependenciesTest extends \PHPUnit_Framework_TestCase
         try {
             $process->process($container);
         } catch (\InvalidArgumentException $e) {
-            $this->assertSame('file "'.$file.'" does not exist', $e->getMessage());
+            $this->assertSame('file "'.$file.'" required by service "foo" does not exist', $e->getMessage());
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
         }
 
         $this->fail('test splipped');
+    }
+
+    /** @test */
+    public function itShoultThrowExceptionIfFactoryClassDoesNotExists()
+    {
+
+        $container = new Container;
+
+        $container
+            ->define('foo_service', 'stdClass')
+            ->setFactory('some_callback');
+
+
+        $process = new ResolveDefinitionDependencies;
+
+        try {
+            $process->process($container);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals(
+                'Service factory for service "foo_service" requires a valid callback',
+                $e->getMessage()
+            );
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $container = new Container;
+        $container
+            ->define('bar_service', 'stdClass')
+            ->setFactory('FooFactory::make');
+
+        $process = new ResolveDefinitionDependencies;
+
+        try {
+            $process->process($container);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals(
+                'class "FooFactory" required by service "bar_service" does not exist',
+                $e->getMessage()
+            );
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+
+        $container = new Container;
+
+        $container->setParameter('foo_factory.class', 'BarFactory');
+        $container
+            ->define('bar_service', 'stdClass')
+            ->setFactory('%foo_factory.class%', 'makeFoo');
+
+        $process = new ResolveDefinitionDependencies;
+
+        try {
+            $process->process($container);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals(
+                'class "BarFactory" required by service "bar_service" does not exist',
+                $e->getMessage()
+            );
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('test splipped');
+    }
+
+    /** @test */
+    public function itShouldBeOkWehnRequireingTheFile()
+    {
+        $file = __DIR__.DIRECTORY_SEPARATOR.'Fixures'.DIRECTORY_SEPARATOR.'class.0.php';
+
+        $container = new Container;
+        $container
+            ->define('foo_service', 'stdClass')
+            ->setFile($file)
+            ->setFactory('FooFactory::make');
+
+        $process = new ResolveDefinitionDependencies;
+
+        $this->assertNull($process->process($container));
+    }
+
+    /** @test */
+    public function itShouldThrowIfFactoryMethodDoesNotExists()
+    {
+        $file = __DIR__.DIRECTORY_SEPARATOR.'Fixures'.DIRECTORY_SEPARATOR.'class.0.php';
+
+        $container = new Container;
+        $container
+            ->define('foo_service', 'stdClass')
+            ->setFile($file)
+            ->setFactory('FooFactory', 'makeFoo');
+
+        $process = new ResolveDefinitionDependencies;
+
+        try {
+            $process->process($container);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals(
+                'Service factory for service "foo_service" requires a valid callback',
+                $e->getMessage()
+            );
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('test splipped');
+    }
+
+    /** @test */
+    public function itShouldBeOkIfFactoryIsValidCallback()
+    {
+        $file = __DIR__.DIRECTORY_SEPARATOR.'Fixures'.DIRECTORY_SEPARATOR.'function.0.php';
+        $container = new Container;
+        $container
+            ->define('foo_service', 'stdClass')
+            ->setFile($file)
+            ->setFactory('DiTests\makeFoo');
+
+        $process = new ResolveDefinitionDependencies;
+
+        $this->assertNull($process->process($container));
     }
 
     /**

@@ -20,6 +20,7 @@ use \Selene\Components\DI\Dumper\Stubs\Constructor;
 use \Selene\Components\DI\Dumper\Stubs\ClassHeader;
 use \Selene\Components\DI\Dumper\Stubs\ClassFooter;
 use \Selene\Components\DI\Dumper\Stubs\Property;
+use \Selene\Components\DI\Dumper\Stubs\String;
 use \Selene\Components\DI\Dumper\Stubs\UseStatements;
 use \Selene\Components\DI\Dumper\Stubs\NamespaceStatement;
 use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
@@ -70,23 +71,39 @@ class PhpDumper implements ContainerAwareInterface
         return $this->dump();
     }
 
+    protected function getClassPropertyValues()
+    {
+        return [
+            ['cmap', 'protected', null, 'array'],
+            ['icmap', 'protected', null, 'array'],
+            ['internals', 'protected', null, 'array'],
+            ['locked', 'protected', null, 'boolean'],
+        ];
+    }
+
     /**
      * startProcess
      *
      * @access protected
-     * @return mixed
+     * @return void
      */
     protected function process()
     {
-        $header = new ClassHeader($this->className, '\\'.get_class($this->container), new NamespaceStatement($this->namespace), new UseStatements);
+        $header = new ClassHeader(
+            $this->className,
+            '\\'.get_class($this->container),
+            new NamespaceStatement($this->namespace),
+            new UseStatements
+        );
 
         $this->add($header);
 
-        $this->add(new Property('cmap', 'protected', null, 'array'));
-        $this->add(new Property('icmap', 'protected', null, 'array'));
-        $this->add(new Property('internals', 'protected', null, 'array'));
-        $this->add(new Property('locked', 'protected', null, 'boolean'));
+        // add properties
+        foreach ($this->getClassPropertyValues() as $prop) {
+            $this->add(new Property($prop[0], $prop[1], $prop[2], $prop[3]));
+        }
 
+        // add constructor
         $this->add(new Constructor);
 
         foreach ($this->getContainer()->getDefinitions() as $id => $definition) {
@@ -104,14 +121,19 @@ class PhpDumper implements ContainerAwareInterface
             $this->add(new ServiceMethod($this->getContainer(), $id));
         }
 
-        $this->add($this->getDefaultClassMethods());
-
-        $this->add($this->mapConstructorNames());
-        $this->add($this->getDefaultParameters());
+        $this->add(new String($this->getDefaultClassMethods()));
+        $this->add(new String($this->mapConstructorNames()));
+        $this->add(new String($this->getDefaultParameters()));
 
         $this->add(new ClassFooter);
     }
 
+    /**
+     * getContainerClassName
+     *
+     * @access protected
+     * @return string
+     */
     protected function getContainerClassName()
     {
         return $this->namespace . '\\' .$this->className;

@@ -67,7 +67,10 @@ class XmlLoader extends Loader
         $this->parseServices($xml);
 
         // parse parameters that are marked as package nodes.
+        $key = $this->getParser()->getIndexKey();
+        $this->getParser()->setIndexKey('item');
         $this->parsePackageConfig($xml);
+        $this->getParser()->setIndexKey($key);
     }
 
     /**

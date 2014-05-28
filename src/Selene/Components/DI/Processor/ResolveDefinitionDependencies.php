@@ -39,8 +39,8 @@ class ResolveDefinitionDependencies implements ProcessInterface
         $parameters = $container->getParameters();
 
         foreach ($container->getDefinitions() as $id => $definition) {
-            $this->checkClassIntegrity($definition, $parameters);
-            $this->checkFileIntegrity($definition, $parameters);
+            $this->checkFileIntegrity($definition, $parameters, $id);
+            $this->checkClassIntegrity($definition, $parameters, $id);
         }
     }
 
@@ -53,16 +53,81 @@ class ResolveDefinitionDependencies implements ProcessInterface
      * @access private
      * @return void
      */
-    private function checkClassIntegrity(DefinitionInterface $definition, ParameterInterface $parameters)
+    private function checkClassIntegrity(DefinitionInterface $definition, ParameterInterface $parameters, $id)
     {
+        if ($definition->requiresFile()) {
+            include_once $definition->getFile();
+        }
 
         $class = $parameters->resolveParam($definition->getClass());
 
-        if (!$definition->requiresFile() && (0 < strlen($class) && !class_exists($class))) {
-            throw new \InvalidArgumentException(sprintf('class "%s" does not exist', $class));
+        if (!$class || (0 < strlen($class) && !class_exists($class))) {
+            throw $this->getClassException($class, $id);
         }
 
         $definition->setClass($class);
+
+        $this->checkServiceFactory($definition, $parameters, $id);
+    }
+
+    /**
+     * checkServiceFactory
+     *
+     * @param DefinitionInterface $definition
+     *
+     * @throws \InvalidArgumentException if the class does not exist.
+     * @access private
+     * @return void
+     */
+    private function checkServiceFactory(DefinitionInterface $definition, ParameterInterface $parameters, $id)
+    {
+        if (!$definition->hasFactory()) {
+            return;
+        }
+
+        list ($class, $method) = $this->getFactoryCallback($parameters->resolveParam($definition->getFactory()));
+
+        if ($class && !class_exists($class)) {
+            throw $this->getClassException($class, $id);
+        }
+
+        if (!$class && !is_callable($method) || ($class && !(new \ReflectionClass($class))->hasMethod($method))) {
+            throw new \InvalidArgumentException(
+                sprintf('Service factory for service "%s" requires a valid callback', $id)
+            );
+        }
+    }
+
+    /**
+     * Extract class and method from a factoty parameter.
+     *
+     * @param mixed $factory
+     *
+     * @access private
+     * @return array
+     */
+    private function getFactoryCallback($factory)
+    {
+        if (is_array($factory)) {
+            return $factory;
+        }
+        return array_pad(explode('::', $factory), -2, null);
+    }
+
+    /**
+     * throwClassException
+     *
+     * @param mixed $class
+     * @param mixed $id
+     *
+     * @access private
+     * @return \InvalidArgumentException
+     */
+    private function getClassException($class, $id)
+    {
+        return new \InvalidArgumentException(
+            sprintf('class "%s" required by service "%s" does not exist', $class, $id)
+        );
     }
 
     /**
@@ -74,14 +139,16 @@ class ResolveDefinitionDependencies implements ProcessInterface
      * @access private
      * @return void
      */
-    private function checkFileIntegrity(DefinitionInterface $definition, ParameterInterface $parameters)
+    private function checkFileIntegrity(DefinitionInterface $definition, ParameterInterface $parameters, $id)
     {
         if (!$definition->requiresFile()) {
             return;
         }
 
         if (!is_file($file = $parameters->resolveParam($definition->getFile()))) {
-            throw new \InvalidArgumentException(sprintf('file "%s" does not exist', $file));
+            throw new \InvalidArgumentException(
+                sprintf('file "%s" required by service "%s" does not exist', $file, $id)
+            );
         }
 
         $definition->setFile($file);
