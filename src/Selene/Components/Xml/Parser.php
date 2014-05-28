@@ -120,6 +120,17 @@ class Parser implements ParserInterface
     }
 
     /**
+     * getIndexKey
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getIndexKey()
+    {
+        return $this->getListKey();
+    }
+
+    /**
      * Set a custom function to normalize an xml node name to a php array key name.
      *
      * By default, hyphens are converted to underscores.
