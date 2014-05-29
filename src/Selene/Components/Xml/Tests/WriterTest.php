@@ -48,7 +48,12 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         });
 
         $xml = $writer->dump($args, 'foo');
-        $this->assertXmlStringEqualsXmlString('<foo><bar>baz</bar></foo>', $xml);
+        $this->assertXmlStringEqualsXmlString(
+            '<foo>
+                <bar>baz</bar>
+            </foo>',
+            $xml
+        );
     }
 
     /** @test */
@@ -77,8 +82,12 @@ class WriterTest extends \PHPUnit_Framework_TestCase
 
         $xml = $writer->dump($args);
         $this->assertXmlStringEqualsXmlString(
-            '<root><tags><tag>mysql</tag>
-            <tag>postgres</tag></tags></root>',
+            '<root>
+                <tags>
+                    <tag>mysql</tag>
+                    <tag>postgres</tag>
+                </tags>
+            </root>',
             $xml
         );
     }
@@ -96,8 +105,11 @@ class WriterTest extends \PHPUnit_Framework_TestCase
 
         $xml = $writer->dump($args);
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo id="10"><val>value</val>
-            </foo></root>',
+            '<root>
+                <foo id="10">
+                    <val>value</val>
+                </foo>
+            </root>',
             $xml
         );
 
@@ -109,8 +121,11 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $writer->addMappedAttribute('*', 'id');
         $xml = $writer->dump($args);
         $this->assertXmlStringEqualsXmlString(
-            '<root><bar id="10"><val>value</val>
-            </bar></root>',
+            '<root>
+                <bar id="10">
+                    <val>value</val>
+                </bar>
+            </root>',
             $xml
         );
     }
@@ -130,8 +145,11 @@ class WriterTest extends \PHPUnit_Framework_TestCase
 
         $xml = $writer->dump($args);
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo soma="true"><val>value</val>
-            </foo></root>',
+            '<root>
+                <foo soma="true">
+                    <val>value</val>
+                </foo>
+            </root>',
             $xml
         );
     }
@@ -152,7 +170,14 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $xml = $writer->dump($args);
 
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo><id><item>1</item><item>2</item></id></foo></root>',
+            '<root>
+                <foo>
+                    <id>
+                        <item>1</item>
+                        <item>2</item>
+                    </id>
+                </foo>
+            </root>',
             $xml
         );
     }
@@ -169,7 +194,11 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $xml = $writer->dump($args);
 
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo><value type="string">2</value></foo></root>',
+            '<root>
+                <foo>
+                    <value type="string">2</value>
+                </foo>
+            </root>',
             $xml
         );
 
@@ -180,7 +209,11 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $xml = $writer->dump($args);
 
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo><value type="string">true</value></foo></root>',
+            '<root>
+                <foo>
+                    <value type="string">true</value>
+                </foo>
+            </root>',
             $xml
         );
 
@@ -191,7 +224,11 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $xml = $writer->dump($args);
 
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo><value><![CDATA[<a>link</a>]]></value></foo></root>',
+            '<root>
+                <foo>
+                    <value><![CDATA[<a>link</a>]]></value>
+                </foo>
+            </root>',
             $xml
         );
     }
@@ -209,7 +246,9 @@ class WriterTest extends \PHPUnit_Framework_TestCase
 
         $xml = $writer->dump($args);
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo id="10">value</foo></root>',
+            '<root>
+                <foo id="10">value</foo>
+            </root>',
             $xml
         );
     }
@@ -226,7 +265,12 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $xml = $writer->dump($args);
 
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo><item>0</item><item>1</item></foo></root>',
+            '<root>
+                <foo>
+                    <item>0</item>
+                    <item>1</item>
+                </foo>
+            </root>',
             $xml
         );
 
@@ -235,7 +279,12 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $xml = $writer->dump($args);
 
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo><i>0</i><i>1</i></foo></root>',
+            '<root>
+                <foo>
+                    <i>0</i>
+                    <i>1</i>
+                </foo>
+            </root>',
             $xml
         );
     }
@@ -254,7 +303,10 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $xml = $writer->dump($args);
 
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo>0</foo><foo>1</foo></root>',
+            '<root>
+                <foo>0</foo>
+                <foo>1</foo>
+            </root>',
             $xml
         );
     }
@@ -271,7 +323,11 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $xml = $writer->dump($args);
 
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo><bar>baz</bar></foo></root>',
+            '<root>
+                <foo>
+                    <bar>baz</bar>
+                </foo>
+            </root>',
             $xml
         );
     }
@@ -321,7 +377,10 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $xml = $writer->dump($data);
 
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo>true</foo><bar>false</bar></root>',
+            '<root>
+                <foo>true</foo>
+                <bar>false</bar>
+            </root>',
             $xml
         );
     }
@@ -335,7 +394,10 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $xml = $writer->dump($data);
 
         $this->assertXmlStringEqualsXmlString(
-            '<root><foo>12</foo><bar>1.2</bar></root>',
+            '<root>
+                <foo>12</foo>
+                <bar>1.2</bar>
+            </root>',
             $xml
         );
     }
@@ -362,7 +424,14 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $data = ['data' => $xml];
 
         $xml = $writer->dump($data);
-        $this->assertXmlStringEqualsXmlString('<root><data><foo>bar</foo></data></root>', $xml);
+        $this->assertXmlStringEqualsXmlString(
+            '<root>
+                <data>
+                    <foo>bar</foo>
+                </data>
+            </root>',
+            $xml
+        );
     }
 
     /** @test */
@@ -377,7 +446,14 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $data = ['slam' => $dom];
 
         $xml = $writer->dump($data);
-        $this->assertXmlStringEqualsXmlString('<root><slam><foo>bar</foo></slam></root>', $xml);
+        $this->assertXmlStringEqualsXmlString(
+            '<root>
+                <slam>
+                    <foo>bar</foo>
+                </slam>
+            </root>',
+            $xml
+        );
     }
 
     /** @test */
