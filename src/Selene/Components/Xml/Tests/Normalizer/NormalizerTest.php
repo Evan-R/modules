@@ -106,7 +106,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $data = ['foo' => ['bar' => new NestedPropertyStub]];
         $normalized = $normalizer->ensureArray($data);
 
-        $this->assertEquals(['foo' => []], $normalized);
+        $this->assertEquals(['foo' => ['bar' => null]], $normalized);
     }
 
     /** @test */
@@ -124,7 +124,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $normalizer = new Normalizer;
 
-        $data = ['bar' => 'bar', 'foo' => []];
+        $data = ['bar' => 'bar', 'foo' => [null]];
 
         $objectA = new ConvertToArrayStub();
 
@@ -132,7 +132,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $objectA->setFoo($foo);
 
         $out = $normalizer->ensureArray($objectA);
-        $this->assertEquals([], $out['foo']);
+        $this->assertEquals($data, $out);
     }
 
     /** @test */
@@ -175,12 +175,19 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $data->loadXML('<data><foo>bar</foo></data>');
 
         $normalizer = new Normalizer;
-        $this->assertSame($data, $normalizer->ensureArray($data));
+        $this->assertSame($data, $normalizer->ensureBuildable($data));
 
 
         $data = new TraversableStub($asset = ['foo' => 'bar', 'bam' => 'baz']);
 
         $this->assertSame($asset, $normalizer->ensureArray($data));
+
+        $data = ['foo' => $dom = new \DOMDocument];
+        $dom->loadXML('<data><foo>bar</foo></data>');
+
+        $normalizer = new Normalizer;
+        $this->assertSame($data, $normalizer->ensureBuildable($data));
+
     }
 
     /** @test */

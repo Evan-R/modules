@@ -277,6 +277,26 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(3840, Parser::getPhpValue('0xF00'));
     }
 
+    /** @test */
+    public function itIsExpectedThat()
+    {
+        $xml =
+        '<data>
+            <x:nodes>
+                <x:node>1</x:node>
+                <x:node>2</x:node>
+                <x:node>3</x:node>
+            </x:nodes>
+        </data>';
+
+        $parser = new Parser;
+        $parser->setPluralizer(function ($string) {
+            return $string . 's';
+        });
+
+        $result = $parser->parse($xml);
+    }
+
     /**
      * tearDown
      *

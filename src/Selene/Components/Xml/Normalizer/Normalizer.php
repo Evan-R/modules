@@ -82,14 +82,32 @@ class Normalizer implements NormalizerInterface
      */
     public function ensureArray($data)
     {
-        switch (true) {
-            case $this->isTraversable($data):
-                return $this->recursiveConvertArray($data);
-            case is_object($data):
-                return $this->convertObject($data);
-            default:
-                return;
+        if (!is_array($result = $this->convertValue($data))) {
+            return;
         }
+
+        return $result;
+    }
+
+    /**
+     * convertValue
+     *
+     * @param mixed $data
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function convertValue($data)
+    {
+        if ($this->isTraversable($data)) {
+            return $this->recursiveConvertArray($data);
+        }
+
+        if (is_object($data)) {
+            return $this->convertObject($data) ?: null;
+        }
+
+        return $data;
     }
 
     /**
@@ -102,16 +120,19 @@ class Normalizer implements NormalizerInterface
      */
     public function ensureBuildable($data)
     {
-        switch (true) {
-            case $this->isXMLElement($data):
-                return $data;
-            case $this->isTraversable($data):
-                return $this->recursiveConvertArray($data);
-            case is_object($data):
-                return $this->convertObject($data);
-            default:
-                return;
+        if ($this->isXMLElement($data)) {
+            return $data;
         }
+
+        if ($this->isTraversable($data)) {
+            return $this->recursiveConvertArray($data);
+        }
+
+        if (is_object($data)) {
+            return $this->convertObject($data) ?: null;
+        }
+
+        return $data;
     }
 
     /**
@@ -134,17 +155,10 @@ class Normalizer implements NormalizerInterface
                 continue;
             }
 
-            if (is_scalar($value)) {
-                $attrValue = $value;
-            } else {
-                $attrValue = $this->ensureBuildable($value);
-            }
-
-            if (!is_null($attrValue)) {
-                $out[$nkey] = $attrValue;
-            }
+            $out[$nkey] = is_scalar($value) ? $value : $this->convertValue($value);
 
         }
+
         return $out;
     }
 

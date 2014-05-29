@@ -100,6 +100,19 @@ class WriterTest extends \PHPUnit_Framework_TestCase
             </foo></root>',
             $xml
         );
+
+        $writer = new Writer($this->getNormalizerMock());
+
+        $args = [
+            'bar' => ['id' => 10, 'val' => 'value']
+        ];
+        $writer->addMappedAttribute('*', 'id');
+        $xml = $writer->dump($args);
+        $this->assertXmlStringEqualsXmlString(
+            '<root><bar id="10"><val>value</val>
+            </bar></root>',
+            $xml
+        );
     }
 
     /** @test */
@@ -124,10 +137,10 @@ class WriterTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itShouldThrowExceptionOnInvalidAttributeValue()
+    public function itShouldIgnoreInvalidAttributeContent()
     {
         $args = [
-            'foo' => ['id' => [1, 2], 'zz' => 'bar']
+            'foo' => ['id' => [1, 2]]
         ];
 
         $writer = new Writer($this->getNormalizerMock());
@@ -136,17 +149,12 @@ class WriterTest extends \PHPUnit_Framework_TestCase
           'foo' => ['id']
         ]);
 
-        try {
-            $xml = $writer->dump($args);
-        } catch (\InvalidArgumentException $e) {
-            $this->assertSame('Cannot use none scalar value as value for attribute id', $e->getMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
-            return;
-        }
+        $xml = $writer->dump($args);
 
-        $this->fail('test failed');
+        $this->assertXmlStringEqualsXmlString(
+            '<root><foo><id><item>1</item><item>2</item></id></foo></root>',
+            $xml
+        );
     }
 
     /** @test */
@@ -286,6 +294,34 @@ class WriterTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldGetCorretBooleans()
+    {
+        $data = ['foo' => true, 'bar' => false];
+        $writer = new Writer($this->getNormalizerMock());
+
+        $xml = $writer->dump($data);
+
+        $this->assertXmlStringEqualsXmlString(
+            '<root><foo>true</foo><bar>false</bar></root>',
+            $xml
+        );
+    }
+
+    /** @test */
+    public function itShouldGetCorrectNumbers()
+    {
+        $data = ['foo' => 12, 'bar' => 1.2];
+        $writer = new Writer($this->getNormalizerMock());
+
+        $xml = $writer->dump($data);
+
+        $this->assertXmlStringEqualsXmlString(
+            '<root><foo>12</foo><bar>1.2</bar></root>',
+            $xml
+        );
+    }
+
+    /** @test */
     public function itIsExpectedThat()
     {
         $writer = new Writer($this->getNormalizerMock());
@@ -323,6 +359,18 @@ class WriterTest extends \PHPUnit_Framework_TestCase
 
         $xml = $writer->dump($data);
         $this->assertXmlStringEqualsXmlString('<root><slam><foo>bar</foo></slam></root>', $xml);
+    }
+
+    /** @test */
+    public function itIsExpectedItWillIgnoreEmptyNodes()
+    {
+        $writer = new Writer(new Normalizer);
+
+        $data = ['test' => ['foo' => null]];
+
+        $xml = $writer->dump($data, 'data');
+
+        $this->assertXmlStringEqualsXmlString('<data><test/></data>', $xml);
     }
 
     protected function getNormalizerMock()

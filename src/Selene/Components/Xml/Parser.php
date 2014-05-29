@@ -13,12 +13,12 @@ namespace Selene\Components\Xml;
 
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
+use \Selene\Components\Xml\Loader\Loader;
+use \Selene\Components\Xml\Loader\LoaderInterface;
 use \Selene\Components\Common\Helper\clearValue;
 use \Selene\Components\Common\Helper\ListHelper;
 use \Selene\Components\Common\Helper\StringHelper;
 use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\Xml\Loader\Loader;
-use \Selene\Components\Xml\Loader\LoaderInterface;
 
 /**
  * @class Parser
@@ -172,13 +172,11 @@ class Parser implements ParserInterface
             $xml = $this->convertDocument($xml);
         }
 
-        if ($root = $xml->documentElement) {
-            $children = $this->parseDomElement($root);
-            $results = [$xml->documentElement->nodeName => $children];
-            return $results;
+        if (!$root = $xml->documentElement) {
+            throw new \InvalidArgumentException('DOM has no root element');
         }
 
-        throw new \InvalidArgumentException('DOM has no root element');
+        return [$xml->documentElement->nodeName => $this->parseDomElement($root)];
     }
 
     /**
@@ -194,9 +192,7 @@ class Parser implements ParserInterface
         $opts = $this->getLoaderConfig();
         $opts[LoaderInterface::FROM_STRING] = !(is_file($xml) && stream_is_local($xml));
 
-        $dom = $this->loader->load($xml, $opts);
-
-        return $this->parseDom($dom);
+        return $this->parseDom($this->loader->load($xml, $opts));
     }
 
     /**
@@ -267,7 +263,9 @@ class Parser implements ParserInterface
         if (is_numeric($val)) {
             return StringHelper::strStartsWith($val, '0x') ? hexdec($val) :
                 (ctype_digit($val) ? intval($val) : floatval($val));
-        } elseif (($lval = strtolower($val)) === 'true' || $lval === 'false') {
+        }
+
+        if (($lval = strtolower($val)) === 'true' || $lval === 'false') {
             return $lval === 'true' ? true : false;
         }
 
@@ -392,6 +390,7 @@ class Parser implements ParserInterface
     private function prepareTextValue(DOMElement $xml, array $attributes = null)
     {
         $text = static::getElementText($xml, true);
+
         return (isset($attributes['type']) && 'text' === $attributes['type']) ?
             clearValue($text) :
             static::getPhpValue($text, null, $this);
@@ -492,11 +491,11 @@ class Parser implements ParserInterface
     {
         $elementAttrs = $xml->xpath('./@*');
 
-        if (0 === $elementAttrs->length) {
-            return [];
-        }
-
         $attrs = [];
+
+        if (0 === $elementAttrs->length) {
+            return $attrs;
+        }
 
         foreach ($elementAttrs as $key => $attribute) {
 
@@ -552,7 +551,8 @@ class Parser implements ParserInterface
      */
     private function getEqualNodes(DOMElement $node, $prefix = null)
     {
-        $name = is_null($prefix) ? $node->nodeName : sprintf("%s:%s", $prefix, $node->nodeName);
+        $name = $this->prefixKey($node->nodeName, $prefix);
+
         return $node->xpath(
             sprintf(".|following-sibling::*[name() = '%s']|preceding-sibling::*[name() = '%s']", $name, $name)
         );
@@ -571,7 +571,7 @@ class Parser implements ParserInterface
      */
     private function prefixKey($key, $prefix = null)
     {
-        return $prefix ? sprintf('%s::%s', $prefix, $key) : $key;
+        return $prefix ? sprintf('%s:%s', $prefix, $key) : $key;
     }
 
     /**
@@ -585,7 +585,6 @@ class Parser implements ParserInterface
      */
     private function convertDocument(\DOMDocument $xml)
     {
-        $xml = $this->loader->load($xml->saveXML(), [LoaderInterface::FROM_STRING => true]);
-        return $xml;
+        return $this->loader->load($xml->saveXML(), [LoaderInterface::FROM_STRING => true]);
     }
 }

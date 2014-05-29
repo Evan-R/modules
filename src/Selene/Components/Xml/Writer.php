@@ -290,11 +290,8 @@ class Writer
 
         foreach ($data as $key => $value) {
 
-            if (!is_scalar($value)) {
-
-                if (!$value = $normalizer->ensureBuildable($value)) {
-                    continue;
-                }
+            if (!is_scalar($value) && !($value = $normalizer->ensureBuildable($value))) {
+                continue;
             }
 
             if ($this->mapAttributes($DOMNode, $normalizer->normalize($key), $value)) {
@@ -308,7 +305,6 @@ class Writer
             }
 
             if (is_array($value) && !is_int($key)) {
-
 
                 if (ListHelper::arrayIsList($value)) {
                     if (($skey = $this->inflect($key)) && ($key !== $skey)) {
@@ -397,17 +393,16 @@ class Writer
     {
         if ($attrName = $this->getAttributeName($DOMNode, $key)) {
 
-            if (is_array($value)) {
-                foreach ($value as $attrKey => $attrValue) {
-                    $DOMNode->setAttribute($attrKey, $this->getAttributeValue($attrValue, $attrKey));
-                }
-            } else {
-                $DOMNode->setAttribute($attrName, $this->getAttributeValue($value, $attrName));
+            foreach ((array)$value as $attrKey => $attrValue) {
+                $DOMNode->setAttribute($attrKey, $this->getAttributeValue($attrValue, $attrKey));
             }
 
             return true;
 
-        } elseif ($this->isMappedAttribute($DOMNode->nodeName, $key) && $this->isValidNodeName($key)) {
+        } elseif ($this->isMappedAttribute($DOMNode->nodeName, $key) &&
+            $this->isValidNodeName($key) &&
+            is_scalar($value)
+        ) {
 
             $DOMNode->setAttribute($key, $this->getAttributeValue($value, $key));
 
@@ -490,7 +485,7 @@ class Writer
                 }
                 return $this->createText($dom, $DOMNode, $value);
             default:
-                return $value;
+                return;
         }
     }
 
@@ -557,13 +552,9 @@ class Writer
     {
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
-        } elseif (!is_scalar($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Cannot use none scalar value as value for attribute %s', $attrKey)
-            );
         }
 
-        return $value;
+        return is_scalar($value) ? $value : null;
     }
 
     /**
