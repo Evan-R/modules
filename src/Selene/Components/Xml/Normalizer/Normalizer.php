@@ -61,8 +61,6 @@ class Normalizer implements NormalizerInterface
 
     /**
      * Creates a new Normalizer instance.
-     *
-     * @access public
      */
     public function __construct()
     {
@@ -73,10 +71,31 @@ class Normalizer implements NormalizerInterface
     }
 
     /**
+     * normalize
+     *
+     * @param mixed $value
+     *
+     * @return string
+     */
+    public function normalize($value)
+    {
+        $ovalue = $value;
+
+        if (!isset($this->normalized[$value])) {
+            $this->normalized[$ovalue] = $this->normalizeString($value);
+        }
+
+        return $this->normalized[$ovalue];
+    }
+
+    /**
      * ensureArray
+     *
+     * Will be removed.
      *
      * @param mixed $data
      * @access public
+     *
      * @deprecated
      * @return array
      */
@@ -87,27 +106,6 @@ class Normalizer implements NormalizerInterface
         }
 
         return $result;
-    }
-
-    /**
-     * convertValue
-     *
-     * @param mixed $data
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function convertValue($data)
-    {
-        if ($this->isTraversable($data)) {
-            return $this->recursiveConvertArray($data);
-        }
-
-        if (is_object($data)) {
-            return $this->convertObject($data) ?: null;
-        }
-
-        return $data;
     }
 
     /**
@@ -133,6 +131,91 @@ class Normalizer implements NormalizerInterface
         }
 
         return $data;
+    }
+
+    /**
+     * setIgnoredAttributes
+     *
+     * @access public
+     * @return void
+     */
+    public function setIgnoredAttributes(array $attributes)
+    {
+        $this->ignoredAttributes = $attributes;
+    }
+
+    /**
+     * addIgnoredAttribute
+     *
+     * @param mixed $attribute
+     *
+     * @access public
+     * @return void
+     */
+    public function addIgnoredAttribute($attribute)
+    {
+        $this->ignoredAttributes[] = $attribute;
+    }
+
+    /**
+     * setIgnoredAttributes
+     *
+     * @param mixed $attributes
+     * @access public
+     * @return void
+     */
+    public function setIgnoredObjects(array $classes)
+    {
+        $this->ignoredObjects = [];
+
+        foreach ($classes as $classname) {
+            $this->addIgnoredObject($classname);
+        }
+    }
+
+    /**
+     * addIgnoredObject
+     *
+     * @param mixed $classname
+     * @access public
+     * @return void
+     */
+    public function addIgnoredObject($classname)
+    {
+        $this->ignoredObjects[] = preg_replace('~^\\\~', '', strtolower($classname));
+    }
+
+    /**
+     * convertValue
+     *
+     * @param mixed $data
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function convertValue($data)
+    {
+        if ($this->isTraversable($data)) {
+            return $this->recursiveConvertArray($data);
+        }
+
+        if (is_object($data)) {
+            return $this->convertObject($data) ?: null;
+        }
+
+        return $data;
+    }
+
+    /**
+     * isTraversable
+     *
+     * @param mixed $data
+     * @access protected
+     * @return boolean
+     */
+    protected function isTraversable($data)
+    {
+        return ListHelper::isTraversable($data);
     }
 
     /**
@@ -175,22 +258,10 @@ class Normalizer implements NormalizerInterface
     }
 
     /**
-     * isTraversable
-     *
-     * @param mixed $data
-     * @access protected
-     * @return boolean
-     */
-    public function isTraversable($data)
-    {
-        return ListHelper::isTraversable($data);
-    }
-
-    /**
      * convertObject
      *
-     * @param mixed $data
-     * @access protected
+     * @param Object $data
+     *
      * @return array
      */
     protected function convertObject($data)
@@ -222,8 +293,22 @@ class Normalizer implements NormalizerInterface
 
         $this->getObjectGetterValues($methods, $data, $out);
 
-        $this->getObjectProperties($properties, $data, $out);
+        $this->setObjectProperties($properties, $data, $out);
+
         return $out;
+    }
+
+    /**
+     * isGetMethod
+     *
+     * @param mixed $method
+     * @access public
+     * @return boolean
+     */
+    protected function isGetMethod(\ReflectionMethod $method)
+    {
+        return 'get' === substr($method->name, 0, 3) && strlen($method->name) > 3 &&
+            0 === $method->getNumberOfRequiredParameters();
     }
 
     /**
@@ -237,18 +322,18 @@ class Normalizer implements NormalizerInterface
     protected function getObjectGetterValues($methods, $object, array &$out = [])
     {
         foreach ($methods as $method) {
-            $this->getObjectGetterValue($method, $object, $out);
+            $this->setObjectGetterValue($method, $object, $out);
         }
     }
     /**
-     * getObjectGetterValue
+     * setObjectGetterValue
      *
      * @param ReflectionMethod $method
      * @param array $out
-     * @access protected
-     * @return array
+     *
+     * @return void
      */
-    protected function getObjectGetterValue(ReflectionMethod $method, $object, array &$out = [])
+    protected function setObjectGetterValue(ReflectionMethod $method, $object, array &$out = [])
     {
         if (!$this->isGetMethod($method)) {
             return;
@@ -271,20 +356,23 @@ class Normalizer implements NormalizerInterface
     }
 
     /**
-     * convertObjectProperties
+     * Set opbject properties to an output array.
      *
      * @param array $properties
+     * @param mixed $data
      * @param array $out
-     * @access protected
-     * @return mixed
+     *
+     * @return void
      */
-    protected function getObjectProperties(array $properties, $data, array &$out = [])
+    protected function setObjectProperties(array $properties, $data, array &$out = [])
     {
         foreach ($properties as $property) {
             $prop =  $property->getName();
+
             if (in_array($name = $this->normalize($prop), $this->ignoredAttributes)) {
                 continue;
             }
+
             $out[$prop] = $this->getObjectPropertyValue($property, $prop, $data);
         }
     }
@@ -294,7 +382,7 @@ class Normalizer implements NormalizerInterface
      *
      * @param \ReflectionProperty $property
      * @param mixed $prop
-     * @access protected
+     *
      * @return mixed
      */
     protected function getObjectPropertyValue(\ReflectionProperty $property, $prop, $data)
@@ -316,42 +404,22 @@ class Normalizer implements NormalizerInterface
     /**
      * isCircularReference
      *
-     * @access protected
-     * @return mixed
+     * @return boolean
      */
     protected function isCircularReference($data)
     {
-        $hash = spl_object_hash($data);
-        $circularReference = in_array($hash, $this->objectCache);
+        $circularReference = in_array($hash = spl_object_hash($data), $this->objectCache);
         $this->objectCache[] = $hash;
 
         return $circularReference;
     }
 
     /**
-     * normalize
-     *
-     * @param mixed $value
-     * @access public
-     * @return string
-     */
-    public function normalize($value)
-    {
-        $ovalue = $value;
-
-        if (!isset($this->normalized[$value])) {
-            $this->normalized[$ovalue] = $this->normalizeString($value);
-        }
-
-        return $this->normalized[$ovalue];
-    }
-
-    /**
      * normalizeString
      *
-     * @param mixed $string
-     * @access protected
-     * @return mixed
+     * @param string $string
+     *
+     * @return string
      */
     protected function normalizeString($string)
     {
@@ -363,89 +431,11 @@ class Normalizer implements NormalizerInterface
     }
 
     /**
-     * isAllUpperCase
-     *
-     * @param mixed $str
-     * @access private
-     * @return mixed
-     */
-    private function isAllUpperCase($str)
-    {
-        $str = preg_replace('/[^a-zA-Z0-9]/', null, $str);
-        return ctype_upper($str);
-    }
-
-    /**
-     * isGetMethod
-     *
-     * @param mixed $method
-     * @access public
-     * @return boolean
-     */
-    public function isGetMethod(\ReflectionMethod $method)
-    {
-        return 'get' === substr($method->name, 0, 3) && strlen($method->name) > 3 &&
-            0 === $method->getNumberOfRequiredParameters();
-    }
-
-    /**
-     * setIgnoredAttributes
-     *
-     * @access public
-     * @return mixed
-     */
-    public function setIgnoredAttributes(array $attributes)
-    {
-        $this->ignoredAttributes = $attributes;
-    }
-
-    /**
-     * addIgnoredAttribute
-     *
-     * @param mixed $attribute
-     *
-     * @access public
-     * @return void
-     */
-    public function addIgnoredAttribute($attribute)
-    {
-        $this->ignoredAttributes[] = $attribute;
-    }
-
-    /**
-     * setIgnoredAttributes
-     *
-     * @param mixed $attributes
-     * @access public
-     * @return mixed
-     */
-    public function setIgnoredObjects(array $classes)
-    {
-        $this->ignoredObjects = [];
-
-        foreach ($classes as $classname) {
-            $this->addIgnoredObject($classname);
-        }
-    }
-
-    /**
-     * addIgnoredObject
-     *
-     * @param mixed $classname
-     * @access public
-     * @return mixed
-     */
-    public function addIgnoredObject($classname)
-    {
-        $this->ignoredObjects[] = preg_replace('~^\\\~', '', strtolower($classname));
-    }
-
-    /**
      * isIgnoredObject
      *
-     * @param mixed $oject
-     * @access protected
-     * @return mixed
+     * @param object $oject
+     *
+     * @return boolean
      */
     protected function isIgnoredObject($object)
     {
@@ -453,5 +443,19 @@ class Normalizer implements NormalizerInterface
             strtolower($class = ($parent = get_parent_class($object)) ? $parent : get_class($object)),
             $this->ignoredObjects
         );
+    }
+
+    /**
+     * isAllUpperCase
+     *
+     * @param string $str
+     *
+     * @return boolean
+     */
+    private function isAllUpperCase($str)
+    {
+        $str = preg_replace('/[^a-zA-Z0-9]/', null, $str);
+
+        return ctype_upper($str);
     }
 }
