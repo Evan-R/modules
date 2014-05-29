@@ -207,11 +207,9 @@ class Writer
     {
         if (true !== $normalize && !$this->isValidNodeName($key)) {
             throw new \InvalidArgumentException(sprintf('%s is an invalid node name', $key));
-        } else {
-            $key = $this->normalizer->normalize($key);
         }
 
-        $this->nodeValueKey = $key;
+        $this->nodeValueKey = $this->normalizer->normalize($key);
     }
 
     /**
@@ -230,11 +228,9 @@ class Writer
 
         if (true !== $normalize && !$this->isValidNodeName($key)) {
             throw new \InvalidArgumentException(sprintf('%s is an invalid node name', $key));
-        } else {
-            $key = $this->normalizer->normalize($key);
         }
 
-        $this->indexKey = $key;
+        $this->indexKey = $this->normalizer->normalize($key);
     }
 
 
@@ -290,10 +286,10 @@ class Writer
         }
 
         if (ListHelper::isTraversable($data) && !$this->isXmlElement($data)) {
-            $this->buildXmlFromTraversable($dom, $DOMNode, $normalizer->ensureBuildable($data));
-        } else {
-            $this->setElementValue($dom, $DOMNode, $data);
+            return $this->buildXmlFromTraversable($dom, $DOMNode, $normalizer->ensureBuildable($data));
         }
+
+        $this->setElementValue($dom, $DOMNode, $data);
     }
 
     /**
@@ -335,11 +331,9 @@ class Writer
             // if this is a non scalar value at this time, just set the
             // value on the element
             if ($this->isXMLElement($value)) {
-
                 $node = $dom->createElement($normalizer->normalize($key));
                 $DOMNode->appendChild($node);
                 $this->setElementValue($dom, $node, $value);
-
                 continue;
             }
 
@@ -370,10 +364,8 @@ class Writer
             $parentNode = $dom->createElement($key);
 
             if (!$useKey) {
-
                 $parentNode = $dom->createElement($key);
                 $this->buildXmlFromTraversable($dom, $parentNode, $value);
-
             } else {
 
                 foreach ($value as $arrayValue) {
@@ -425,7 +417,7 @@ class Writer
      *
      * @return boolean
      */
-    private function mapAttributes(\DOMNode &$DOMNode, $key, $value)
+    private function mapAttributes(\DOMNode $DOMNode, $key, $value)
     {
         if ($attrName = $this->getAttributeName($DOMNode, $key)) {
 
@@ -434,12 +426,9 @@ class Writer
             }
 
             return true;
+        }
 
-        } elseif ($this->isMappedAttribute($DOMNode->nodeName, $key) &&
-            $this->isValidNodeName($key) &&
-            is_scalar($value)
-        ) {
-
+        if (is_scalar($value) && $this->isMappedAttribute($DOMNode->nodeName, $key) && $this->isValidNodeName($key)) {
             $DOMNode->setAttribute($key, $this->getAttributeValue($value, $key));
 
             return true;
@@ -525,11 +514,11 @@ class Writer
         $element = $dom->createElement($name);
 
         if ($hasAttributes && $this->nodeValueKey === $name) {
-            $this->setElementValue($dom, $DOMNode, $value);
-        } else {
-            $this->setElementValue($dom, $element, $value);
-            $DOMNode->appendChild($element);
+            return $this->setElementValue($dom, $DOMNode, $value);
         }
+
+        $this->setElementValue($dom, $element, $value);
+        $DOMNode->appendChild($element);
     }
 
     /**
@@ -591,6 +580,7 @@ class Writer
         $text = $dom->createTextNode($value);
         $attr = $dom->createAttribute('type');
         $attr->value = $type;
+
         $DOMNode->appendChild($text);
         $DOMNode->appendChild($attr);
     }
