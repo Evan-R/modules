@@ -241,6 +241,25 @@ class WriterTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldShouldUseParentKeyAsIndexIfNoneSpecified()
+    {
+        $writer = new Writer($this->getNormalizerMock());
+
+        $writer->useKeyAsIndex(null);
+
+        $args = [
+            'foo' => [0, 1]
+        ];
+
+        $xml = $writer->dump($args);
+
+        $this->assertXmlStringEqualsXmlString(
+            '<root><foo>0</foo><foo>1</foo></root>',
+            $xml
+        );
+    }
+
+    /** @test */
     public function itShouldConvertXmlElements()
     {
         $args = [

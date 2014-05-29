@@ -80,10 +80,11 @@ class Writer
     protected $indexKey;
 
     /**
-     * @param String $normalizer
-     * @param NormalizerInterface $normalizer
+     * Create a new xml writer instance.
      *
-     * @access public
+     * @param NormalizerInterface $normalizer the normalizer instance.
+     * @param string $encoding the default encoding
+     *
      */
     public function __construct(NormalizerInterface $normalizer = null, $encoding = 'UTF-8')
     {
@@ -95,68 +96,10 @@ class Writer
     }
 
     /**
-     * Dump the input data to a xml string.
-     *
-     * @access public
-     * @return string
-     */
-    public function dump($data, $rootName = 'root')
-    {
-        $dom = $this->writeToDom($data, $rootName);
-        return $dom->saveXML();
-    }
-
-    /**
-     * Write the input data to a DOMDocument
-     *
-     * @param mixed $data
-     * @param string $rootName
-     *
-     * @access public
-     * @return DOMDocument
-     */
-    public function writeToDom($data, $rootName = 'root')
-    {
-        $dom = new DOMDocument('1.0', $this->getEncoding());
-
-        $root = $dom->createElement($rootName);
-
-        $this->buildXML($dom, $root, $data);
-        $dom->appendChild($root);
-
-        return $dom;
-    }
-
-    /**
-     * setNormalizer
-     *
-     * @param NormalizerInterface $normalizer
-     * @access public
-     * @return void
-     */
-    public function setNormalizer(NormalizerInterface $normalizer)
-    {
-        $this->normalizer = $normalizer;
-    }
-
-    /**
-     * setInflector
-     *
-     * @param callable $inflector
-     *
-     * @access public
-     * @return void
-     */
-    public function setInflector(callable $inflector)
-    {
-        $this->inflector = $inflector;
-    }
-
-    /**
      * setEncoding
      *
      * @param mixed $encoding
-     * @access public
+     *
      * @return void
      */
     public function setEncoding($encoding)
@@ -165,10 +108,54 @@ class Writer
     }
 
     /**
+     * getEncoding
+     *
+     * @return string
+     */
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    /**
+     * setNormalizer
+     *
+     * @param NormalizerInterface $normalizer
+     *
+     * @return void
+     */
+    public function setNormalizer(NormalizerInterface $normalizer)
+    {
+        $this->normalizer = $normalizer;
+    }
+
+    /**
+     * getNormalizer
+     *
+     * @return Thapp\XmlBuilder\NormalizerInterface
+     */
+    public function getNormalizer()
+    {
+        return $this->normalizer;
+    }
+
+    /**
+     * setInflector
+     *
+     * @param callable $inflector
+     *
+     * @return void
+     */
+    public function setInflector(callable $inflector)
+    {
+        $this->inflector = $inflector;
+    }
+
+    /**
      * setAttributeMapp
      *
      * @param array $map
-     * @access public
+     *
      * @return void
      */
     public function setAttributeMap(array $map)
@@ -177,11 +164,43 @@ class Writer
     }
 
     /**
+     * addMappedAttribute
+     *
+     * @param mixed $nodeName
+     * @param mixed $attribute
+     *
+     * @return void
+     */
+    public function addMappedAttribute($nodeName, $attribute)
+    {
+        $this->attributemap[$nodeName][] = $attribute;
+    }
+
+    /**
+     * isMappedAttribute
+     *
+     * @param mixed $name
+     * @param mixed $key
+     *
+     * @return boolean
+     */
+    public function isMappedAttribute($name, $key)
+    {
+        $map = isset($this->attributemap[$name]) ? $this->attributemap[$name] : [];
+
+        if (isset($this->attributemap['*'])) {
+            $map = array_merge($this->attributemap['*'], $map);
+        }
+
+        return in_array($key, $map);
+    }
+
+    /**
      * useKeyAsValue
      *
      * @param mixed $key
      *
-     * @access public
+     * @throws \InvalidArgumentException if $key is not null and an invalid nodename.
      * @return void
      */
     public function useKeyAsValue($key, $normalize = false)
@@ -199,54 +218,59 @@ class Writer
      * setIndexKey
      *
      * @param string $key
-     * @access public
+     *
+     * @throws \InvalidArgumentException if $key is an invalid nodename.
      * @return void
      */
     public function useKeyAsIndex($key, $normalize = false)
     {
+        if (null === $key) {
+            return $this->indexKey = null;
+        }
+
         if (true !== $normalize && !$this->isValidNodeName($key)) {
             throw new \InvalidArgumentException(sprintf('%s is an invalid node name', $key));
         } else {
             $key = $this->normalizer->normalize($key);
         }
 
-        return $this->indexKey = $key;
+        $this->indexKey = $key;
     }
 
-    /**
-     * addMappedAttribute
-     *
-     * @param mixed $nodeName
-     * @param mixed $attribute
-     *
-     * @access public
-     * @return mixed
-     */
-    public function addMappedAttribute($nodeName, $attribute)
-    {
-        $this->attributemap[$nodeName][] = $attribute;
-    }
 
     /**
-     * getEncoding
+     * Dump the input data to a xml string.
      *
-     * @access public
+     * @param mixed $data
+     * @param string $rootName the xml root element name
+     *
      * @return string
      */
-    public function getEncoding()
+    public function dump($data, $rootName = 'root')
     {
-        return $this->encoding;
+        $dom = $this->writeToDom($data, $rootName);
+
+        return $dom->saveXML();
     }
 
     /**
-     * getNormalizer
+     * Write the input data to a DOMDocument
      *
-     * @access public
-     * @return Thapp\XmlBuilder\NormalizerInterface
+     * @param mixed $data
+     * @param string $rootName the xml root element name
+     *
+     * @return DOMDocument
      */
-    public function getNormalizer()
+    public function writeToDom($data, $rootName = 'root')
     {
-        return $this->normalizer;
+        $this->buildXML(
+            $dom = new DOMDocument('1.0', $this->getEncoding()),
+            $root = $dom->createElement($rootName),
+            $data
+        );
+        $dom->appendChild($root);
+
+        return $dom;
     }
 
     /**
@@ -254,10 +278,10 @@ class Writer
      *
      * @param DOMNode $DOMNode
      * @param mixed $data
-     * @access protected
+     *
      * @return void
      */
-    protected function buildXML(DOMDocument $dom, \DOMNode &$DOMNode, $data)
+    protected function buildXML(DOMDocument $dom, \DOMNode $DOMNode, $data)
     {
         $normalizer = $this->getNormalizer();
 
@@ -279,7 +303,7 @@ class Writer
      * @param mixed $data
      * @param NormalizerInterface $normalizer
      * @param mixed $ignoreObjects
-     * @access protected
+     *
      * @return void
      */
     protected function buildXmlFromTraversable(\DOMDocument $dom, \DOMNode $DOMNode, $data)
@@ -304,37 +328,18 @@ class Writer
                 $key = $this->indexKey;
             }
 
-            if (is_array($value) && !is_int($key)) {
+            if (is_array($value) && !is_int($key) && $this->appendDomList($normalizer, $dom, $DOMNode, $key, $value)) {
+                continue;
+            }
 
-                if (ListHelper::arrayIsList($value)) {
-                    if (($skey = $this->inflect($key)) && ($key !== $skey)) {
-                        $parentNode = $dom->createElement($key);
-                        foreach ($value as $arrayValue) {
-                            $this->appendDOMNode($dom, $parentNode, $skey, $arrayValue);
-                        }
-                        $DOMNode->appendChild($parentNode);
-                    } elseif (null !== $this->indexKey) {
-                        $parentNode = $dom->createElement($key);
-                        $this->buildXmlFromTraversable($dom, $parentNode, $value);
-                        $DOMNode->appendChild($parentNode);
-                    } else {
-                        foreach ($value as $arrayValue) {
-                            $this->appendDOMNode(
-                                $dom,
-                                $DOMNode,
-                                $this->inflect($normalizer->normalize($key)),
-                                $arrayValue
-                            );
-                        }
-                    }
-                    continue;
-                }
-            } elseif ($this->isXMLElement($value)) {
-                // if this is a non scalar value at this time, just set the
-                // value on the element
+            // if this is a non scalar value at this time, just set the
+            // value on the element
+            if ($this->isXMLElement($value)) {
+
                 $node = $dom->createElement($normalizer->normalize($key));
                 $DOMNode->appendChild($node);
                 $this->setElementValue($dom, $node, $value);
+
                 continue;
             }
 
@@ -345,25 +350,58 @@ class Writer
     }
 
     /**
-     * Appends a dom node to the DOM.
+     * appendDomList
      *
-     * @param DOMNode $DOMNode
-     * @param string  $name
-     * @param mixed   $value
-     * @param boolean $hasAttributes
+     * @param \DOMDocument $dom
+     * @param mixed $DOMNode
+     * @param mixed $key
+     * @param mixed $value
      *
-     * @access protected
-     * @return void
+     * @return boolean
      */
-    protected function appendDOMNode(\DOMDocument $dom, $DOMNode, $name, $value = null, $hasAttributes = false)
+    protected function appendDomList(NormalizerInterface $normalizer, \DOMDocument $dom, $DOMNode, $key, $value)
     {
-        $element = $dom->createElement($name);
-
-        if ($hasAttributes && $this->nodeValueKey === $name) {
-            $this->setElementValue($dom, $DOMNode, $value);
-        } elseif ($this->setElementValue($dom, $element, $value)) {
-            $DOMNode->appendChild($element);
+        if (!ListHelper::arrayIsList($value)) {
+            return false;
         }
+
+        if (($useKey = ($skey = $this->inflect($key)) && ($key !== $skey)) || (null !== $this->indexKey)) {
+
+            $parentNode = $dom->createElement($key);
+
+            if (!$useKey) {
+
+                $parentNode = $dom->createElement($key);
+                $this->buildXmlFromTraversable($dom, $parentNode, $value);
+
+            } else {
+
+                foreach ($value as $arrayValue) {
+                    $this->appendDOMNode($dom, $parentNode, $skey, $arrayValue);
+                }
+            }
+
+            return $DOMNode->appendChild($parentNode);
+        }
+
+        // if anything fails, append the domnodes directly.
+        foreach ($value as $arrayValue) {
+            $this->appendDOMNode($dom, $DOMNode, $this->inflect($normalizer->normalize($key)), $arrayValue);
+        }
+
+        return true;
+    }
+
+    /**
+     * isValidNodeName
+     *
+     * @param mixed $name
+     *
+     * @return boolean
+     */
+    protected function isValidNodeName($name)
+    {
+        return strlen($name) > 0 && false === strpos($name, ' ') && preg_match('#^[\pL_][\pL0-9._-]*$#ui', $name);
     }
 
     /**
@@ -371,7 +409,6 @@ class Writer
      *
      * @param mixed $string
      *
-     * @access protected
      * @return string
      */
     protected function inflect($string)
@@ -386,10 +423,9 @@ class Writer
     /**
      * mapAttributes
      *
-     * @access protected
      * @return boolean
      */
-    protected function mapAttributes(\DOMNode &$DOMNode, $key, $value)
+    private function mapAttributes(\DOMNode &$DOMNode, $key, $value)
     {
         if ($attrName = $this->getAttributeName($DOMNode, $key)) {
 
@@ -413,14 +449,98 @@ class Writer
     }
 
     /**
+     * setElementValue
+     *
+     * @param DOMNode $DOMNode
+     * @param mixed $value
+     *
+     * @return null|boolean retuns false if no value was set, else null;
+     */
+    private function setElementValue(DOMDocument $dom, DOMElement $DOMNode, $value = null)
+    {
+        if ($value instanceof \SimpleXMLElement) {
+            return $DOMNode->appendChild($dom->importNode(dom_import_simplexml($value), true));
+        }
+
+        if ($value instanceof \DOMDocument) {
+            return $DOMNode->appendDomElement($value->firstChild);
+        }
+
+        if ($value instanceof \DOMElement) {
+            return $dom->appendDomElement($value, $DOMNode);
+        }
+
+        if (is_array($value) || $value instanceof \Traversable) {
+            return $this->buildXML($dom, $DOMNode, $value);
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return $this->createText($dom, $DOMNode, (string)$value);
+        }
+
+        if (is_bool($value)) {
+            return $this->createText($dom, $DOMNode, $value ? 'true' : 'false');
+        }
+
+        if (is_string($value) || null === $value) {
+            return $this->appendTextNode($dom, $DOMNode, (string)$value);
+        }
+
+        return false;
+    }
+
+    /**
+     * appendTextNode
+     *
+     * @param \DOMDocument $dom
+     * @param mixed $DOMNode
+     * @param mixed $value
+     *
+     * @return void
+     */
+    private function appendTextNode(\DOMDocument $dom, $DOMNode, $value)
+    {
+        if (in_array(strtolower($value), ['true', 'false']) || is_numeric($value)) {
+            return $this->createTextNodeWithTypeAttribute($dom, $DOMNode, $value, 'string');
+        }
+        if (preg_match('/(<|>|&)/i', $value)) {
+            return $this->createCDATASection($dom, $DOMNode, $value);
+        }
+
+        return $this->createText($dom, $DOMNode, $value);
+    }
+
+    /**
+     * Appends a dom node to the DOM.
+     *
+     * @param DOMNode $DOMNode
+     * @param string  $name
+     * @param mixed   $value
+     * @param boolean $hasAttributes
+     *
+     * @return void
+     */
+    private function appendDOMNode(\DOMDocument $dom, $DOMNode, $name, $value = null, $hasAttributes = false)
+    {
+        $element = $dom->createElement($name);
+
+        if ($hasAttributes && $this->nodeValueKey === $name) {
+            $this->setElementValue($dom, $DOMNode, $value);
+        } else {
+            $this->setElementValue($dom, $element, $value);
+            $DOMNode->appendChild($element);
+        }
+    }
+
+    /**
      * getAttributeName
      *
      * @param DOMNode $parent
      * @param mixed $key
-     * @access protected
+     *
      * @return string|boolean
      */
-    protected function getAttributeName(\DOMNode $parent, $key)
+    private function getAttributeName(\DOMNode $parent, $key)
     {
         if (0 === strpos($key, '@') && $this->isValidNodeName($attrName = substr($key, 1))) {
             return $attrName;
@@ -430,78 +550,17 @@ class Writer
     }
 
     /**
-     * isMappedAttribute
-     *
-     * @param mixed $name
-     * @param mixed $key
-     * @access public
-     * @return boolean
-     */
-    public function isMappedAttribute($name, $key)
-    {
-        $map = isset($this->attributemap[$name]) ? $this->attributemap[$name] : [];
-
-        if (isset($this->attributemap['*'])) {
-            $map = array_merge($this->attributemap['*'], $map);
-        }
-
-        return in_array($key, $map);
-    }
-
-    /**
-     * setElementValue
-     *
-     * @param DOMNode $DOMNode
-     * @param mixed $value
-     */
-    protected function setElementValue(DOMDocument $dom, DOMElement $DOMNode, $value = null)
-    {
-        switch (true) {
-            case $value instanceof \SimpleXMLElement:
-                $node = dom_import_simplexml($value);
-                $node = $dom->importNode($node, true);
-                $DOMNode->appendChild($node);
-                break;
-            case $value instanceof \DOMDocument:
-                $DOMNode->appendDomElement($value->firstChild);
-                break;
-            case $value instanceof \DOMElement:
-                $dom->appendDomElement($value, $DOMNode);
-                break;
-            case is_array($value) || $value instanceof \Traversable:
-                $this->buildXML($dom, $DOMNode, $value);
-                return true;
-            case is_int($value):
-            case is_float($value):
-                return $this->createText($dom, $DOMNode, (string)$value);
-            case is_bool($value):
-                return $this->createText($dom, $DOMNode, $value ? 'true' : 'false');
-            case is_string($value):
-                if (in_array(strtolower($value), ['true', 'false']) || is_numeric($value)) {
-                    return $this->createTextNodeWithTypeAttribute($dom, $DOMNode, (string)$value, 'string');
-                }
-                if (preg_match('/(<|>|&)/i', $value)) {
-                    return $this->createCDATASection($dom, $DOMNode, $value);
-                }
-                return $this->createText($dom, $DOMNode, $value);
-            default:
-                return;
-        }
-    }
-
-    /**
      * createText
      *
      * @param DOMNode $DOMNode
      * @param string  $value
-     * @access protected
+     *
      * @return boolean
      */
-    protected function createText(\DOMDocument $dom, \DOMNode $DOMNode, $value)
+    private function createText(\DOMDocument $dom, \DOMNode $DOMNode, $value)
     {
         $text = $dom->createTextNode($value);
         $DOMNode->appendChild($text);
-        return true;
     }
 
     /**
@@ -509,15 +568,13 @@ class Writer
      *
      * @param DOMNode $DOMNode
      * @param string  $value
-     * @access protected
+     *
      * @return boolean
      */
-    protected function createCDATASection(\DOMDocument $dom, \DOMNode $DOMNode, $value)
+    private function createCDATASection(\DOMDocument $dom, \DOMNode $DOMNode, $value)
     {
         $cdata = $dom->createCDATASection($value);
         $DOMNode->appendChild($cdata);
-
-        return true;
     }
 
     /**
@@ -526,18 +583,16 @@ class Writer
      * @param DOMNode $DOMNode
      * @param mixed   $value
      * @param string  $type
-     * @access protected
+     *
      * @return boolean
      */
-    protected function createTextNodeWithTypeAttribute(\DOMDocument $dom, \DOMNode $DOMNode, $value, $type = 'int')
+    private function createTextNodeWithTypeAttribute(\DOMDocument $dom, \DOMNode $DOMNode, $value, $type = 'int')
     {
         $text = $dom->createTextNode($value);
         $attr = $dom->createAttribute('type');
         $attr->value = $type;
         $DOMNode->appendChild($text);
         $DOMNode->appendChild($attr);
-
-        return true;
     }
 
     /**
@@ -545,27 +600,14 @@ class Writer
      *
      * @param mixed $value
      *
-     * @access protected
      * @return mixed
      */
-    protected function getAttributeValue($value, $attrKey = null)
+    private function getAttributeValue($value, $attrKey = null)
     {
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
 
         return is_scalar($value) ? $value : null;
-    }
-
-    /**
-     * isValidNodeName
-     *
-     * @param mixed $name
-     * @access protected
-     * @return boolean
-     */
-    protected function isValidNodeName($name)
-    {
-        return strlen($name) > 0 && false === strpos($name, ' ') && preg_match('#^[\pL_][\pL0-9._-]*$#ui', $name);
     }
 }
