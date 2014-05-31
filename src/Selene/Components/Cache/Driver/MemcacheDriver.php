@@ -51,7 +51,7 @@ class MemcacheDriver extends MemcachedDriver
     {
         $expires = $this->getExpiryTime($expires);
 
-        $cached = $this->driver->set($key, $data, $expires);
+        $cached = $this->driver->set($key, $data, $compressed ? MEMCACHE_COMPRESSED : null, $expires);
 
         return $cached;
     }
