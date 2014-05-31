@@ -1,8 +1,8 @@
 #!/bin/sh
 
-version=`php -v|grep -o "5\.[0-9]"`;
+version=`php -v|grep -o "[PHP ]5\.[0-9]"`;
 
-if [ $version == '5.4' ]
+if [ $version == '5.4'];
 	then 
 		curl -o APC-3.1.10.tgz http://pecl.php.net/get/APC-3.1.10.tgz
 		tar -xzf APC-3.1.10.tgz
@@ -11,7 +11,7 @@ if [ $version == '5.4' ]
 		rm APC-3.1.10.tgz
 		echo "extension=apc.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
 		echo "apc.enable_cli=On" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
-
+        
 		curl -o APCU-4.0.4.tgz http://pecl.php.net/get/apcu-4.0.4.tgz
 		tar -xzf APCU-4.0.4.tgz
 		sh -c "cd APCU-4.0.4 && phpize && ./configure && make && sudo make install && cd .."
