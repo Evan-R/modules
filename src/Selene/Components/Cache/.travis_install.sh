@@ -21,3 +21,12 @@ if [ $version == '5.4'];
 		echo "apcu.enable_cli=On" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
 		phpenv rehash    
 fi
+
+if [ $TRAVIS_PHP_VERSION != "hhvm" ]; 
+	then 
+		printf "\n" | pecl install -f memcached-2.0.1
+		echo "extension=\"memcached.so\"" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+		printf "\n" | pecl install -f memcache
+		echo "extension=\"memcache.so\"" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+		phpenv rehash
+fi;
