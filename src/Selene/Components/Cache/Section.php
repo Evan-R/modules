@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Cache;
 
+use \Closure;
+
 /**
  * @class Section
  * @package
@@ -46,6 +48,7 @@ class Section implements CacheInterface
         $this->cache = $storage;
         $this->section = $section;
     }
+
     /**
      * get
      *
@@ -121,7 +124,6 @@ class Section implements CacheInterface
      * @param mixed $cacheid
      * @param int $value
      *
-     * @access public
      * @return mixed
      */
     public function decrement($key, $value = 1)
@@ -132,8 +134,8 @@ class Section implements CacheInterface
     /**
      * Flush data from cache
      *
-     * @param Mixed $cacheid
-     * @access public
+     * @param string $key
+     *
      * @return void
      */
     public function purge($key = null)
@@ -147,8 +149,8 @@ class Section implements CacheInterface
     /**
      * Check if an item is already cached
      *
-     * @param String $cacheid the cache item identifier
-     * @access public
+     * @param string $cacheid the cache item identifier
+     *
      * @return Boolean
      */
     public function has($key)
@@ -164,7 +166,6 @@ class Section implements CacheInterface
      * @param mixed $expires
      * @param mixed $compressed
      *
-     * @access public
      * @return mixed
      */
     public function setDefault($key, Closure $callback, $expires = null, $compressed = false)
@@ -174,6 +175,7 @@ class Section implements CacheInterface
         }
 
         $this->set($key, $data = $callback(), $expires, $compressed);
+
         return $data;
     }
 
@@ -195,7 +197,6 @@ class Section implements CacheInterface
     /**
      * getKey
      *
-     *
      * @access protected
      * @return mixed
      */
@@ -208,7 +209,6 @@ class Section implements CacheInterface
      * getItemKey
      *
      *
-     * @access protected
      * @return mixed
      */
     protected function getItemKey($key)
@@ -219,13 +219,11 @@ class Section implements CacheInterface
     /**
      * getSectionKey
      *
-     *
-     * @access protected
      * @return mixed
      */
     protected function getSectionKey()
     {
-        if (is_null($key = $this->cache->get($skey = $this->getKey()))) {
+        if (null === ($key = $this->cache->get($skey = $this->getKey()))) {
             $this->cache->seal($skey, $key = rand(1, 10000));
         }
 

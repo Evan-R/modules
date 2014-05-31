@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Stream\Cache\Driver;
+namespace Selene\Components\Cache\Driver;
 
 /**
  * Class DriverAPC
@@ -22,6 +22,13 @@ namespace Stream\Cache\Driver;
  */
 class ApcDriver extends AbstractDriver
 {
+    /**
+     * @access public
+     */
+    public function __construct()
+    {
+        $this->apcu = extension_loaded('apcu');
+    }
 
     /**
      * check if cached item exists
@@ -32,7 +39,7 @@ class ApcDriver extends AbstractDriver
      */
     public function cachedItemExists($key)
     {
-        return apc_exists($key);
+        return $this->hasApcu() ? apcu_exists($key) : apc_exists($key);
     }
 
     /**
@@ -44,7 +51,7 @@ class ApcDriver extends AbstractDriver
      */
     public function getFromCache($key)
     {
-        return apc_fetch($key);
+        return $this->hasApcu() ? apcu_fetch($key) : apc_fetch($key);
     }
 
     /**
@@ -60,7 +67,7 @@ class ApcDriver extends AbstractDriver
      */
     public function writeToCache($key, $data, $expires = 60, $compressed = false)
     {
-        apc_store($key, $data, $expires);
+        $this->hasApcu() ? apcu_store($key, $data, $expires) : apc_store($key, $data, $expires);
     }
 
     /**
@@ -86,7 +93,7 @@ class ApcDriver extends AbstractDriver
      */
     public function deleteFromCache($key)
     {
-        apc_delete($key);
+        $this->hasApcu() ? apcu_delete($key) : apc_delete($key);
     }
 
     /**
@@ -97,7 +104,7 @@ class ApcDriver extends AbstractDriver
      */
     public function flushCache()
     {
-        apc_clear_cache('user');
+        $this->hasApcu() ? apcu_clear_cache('user') : apc_clear_cache('user');
     }
 
     /**
@@ -111,7 +118,7 @@ class ApcDriver extends AbstractDriver
      */
     protected function incrementValue($key, $value)
     {
-        apc_inc($key, $value);
+        $this->hasApcu() ? apcu_inc($key, $value) : apc_inc($key, $value);
     }
 
     /**
@@ -125,6 +132,17 @@ class ApcDriver extends AbstractDriver
      */
     protected function decrementValue($key, $value)
     {
-        apc_dec($key, $value);
+        $this->hasApcu() ? apcu_dec($key, $value) : apc_dec($key, $value);
+    }
+
+    /**
+     * hasApcu
+     *
+     * @access private
+     * @return boolean
+     */
+    private function hasApcu()
+    {
+        return $this->apcu;
     }
 }

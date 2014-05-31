@@ -12,8 +12,8 @@
 
 namespace Selene\Components\Cache\Driver;
 
-use Memcached;
-use RuntimeException;
+use \Memcached;
+use \RuntimeException;
 
 /**
  * @class MemcachedConnection
@@ -23,46 +23,76 @@ use RuntimeException;
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT
  */
-class MemcachedConnection
+class MemcachedConnection implements ConnectionInterface
 {
     /**
      * memcached
      *
      * @var Memcached
-     * @access private
      */
     private $memcached;
 
     /**
-     * __construct
+     * servers
      *
+     * @var array
+     */
+    private $servers;
+
+    /**
      * @param Memcached $memcached
      * @access public
-     * @return void
      */
-    public function __construct(Memcached $memcached, array $servers)
+    public function __construct(Memcached $memcached = null, array $servers = [])
     {
-        $this->memcached = $memcached;
-        $this->init($servers);
+        $this->servers   = $servers;
+        $this->memcached = $memcached ?: new Memcached;
     }
 
     /**
-     * init
+     * connect
      *
-     * @param array $servers
      * @access public
-     * @throws RuntimeException
-     * @return Memcached
+     * @return boolean
      */
-    public function init(array $servers)
+    public function connect()
     {
-        $this->memcached->addServers($servers);
-
-        if ($this->memcached->getVersion() === false) {
-            throw new RuntimeException('Cannot initialize memcache');
+        if ($this->isConnected()) {
+            return false;
         }
 
-        return $this->memcached;
+        $this->memcached->addServers($this->servers);
+
+        if (!$this->isConnected()) {
+            throw new RuntimeException('Cannot initialize Memcached');
+        }
+
+        return true;
+    }
+
+    /**
+     * close
+     *
+     * @access public
+     * @return mixed
+     */
+    public function close()
+    {
+        // quit doesn't always close the connection
+        $this->memcached->quit();
+
+        return $this->isConnected() ? false : true;
+    }
+
+    /**
+     * isConnected
+     *
+     * @access public
+     * @return mixed
+     */
+    public function isConnected()
+    {
+        return (bool)$this->memcached->getVersion();
     }
 
     /**
@@ -72,7 +102,7 @@ class MemcachedConnection
      * @access public
      * @return mixed
      */
-    public function getMemcached()
+    public function getDriver()
     {
         return $this->memcached;
     }

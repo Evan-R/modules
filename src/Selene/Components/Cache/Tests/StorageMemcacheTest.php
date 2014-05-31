@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Stream\Cache package
+ * This File is part of the Selene\Components\Cache\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -11,19 +11,14 @@
 
 namespace Selene\Components\Cache\Tests;
 
-use Memcached;
+use Memcache;
 use Selene\Components\Cache\Storage;
-use Selene\Components\Cache\Driver\MemcachedDriver;
-use Selene\Components\Cache\Driver\MemcachedConnection;
+use Selene\Components\Cache\Driver\MemcacheDriver;
+use Selene\Components\Cache\Driver\MemcacheConnection;
 
-/**
- * Class: StorageMemcachedTest
- *
- * @see \TestCases
- */
-class StorageMemcachedTest extends StorageTestCase
+class StorageMemcacheTest extends StorageTestCase
 {
-    protected $memcached;
+    protected $memcache;
 
     protected $connection;
 
@@ -35,8 +30,8 @@ class StorageMemcachedTest extends StorageTestCase
      */
     protected function setUp()
     {
-        if (!extension_loaded('memcached')) {
-            $this->markTestSkipped('Environment doesn\'t support Memcached');
+        if (!extension_loaded('memcache')) {
+            $this->markTestSkipped('Environment doesn\'t support Memcache');
         }
 
         $servers = [
@@ -47,11 +42,10 @@ class StorageMemcachedTest extends StorageTestCase
             ]
             ];
 
-        $connection = new MemcachedConnection(new Memcached('memcached_test'), $servers);
-        $connection->connect();
+        $connection = new MemcacheConnection(new Memcache('memcache_test'), $servers);
 
         $this->connection = $connection;
-        $this->cache = new Storage(new MemcachedDriver($connection), 'mycache');
+        $this->cache = new Storage(new MemcacheDriver($connection), 'mycache');
     }
 
     /**
@@ -62,10 +56,12 @@ class StorageMemcachedTest extends StorageTestCase
      */
     protected function tearDown()
     {
-        //$this->cache->purge();
         parent::tearDown();
 
         if ($this->connection) {
+
+            $this->connection->getDriver()->flush();
+
             $this->connection->close();
         }
     }

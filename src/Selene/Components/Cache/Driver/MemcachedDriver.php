@@ -30,7 +30,7 @@ class MemcachedDriver extends AbstractDriver
      * @var Memcached
      * @access private
      */
-    private $memcached;
+    protected $driver;
 
     /**
      * __construct
@@ -39,9 +39,20 @@ class MemcachedDriver extends AbstractDriver
      * @access public
      * @return void
      */
-    public function __construct(MemcachedConnection $connection)
+    public function __construct(ConnectionInterface $connection)
     {
-        $this->memcached  = $connection->getMemcached();
+        $this->setDriver($connection);
+    }
+
+    protected function setDriver(ConnectionInterface $connection)
+    {
+        if (!($driver = $connection->getDriver()) instanceof \Memcached) {
+            throw new \InvalidArgumentException();
+        }
+
+        $connection->connect();
+
+        $this->driver = $driver;
     }
 
     /**
@@ -53,7 +64,7 @@ class MemcachedDriver extends AbstractDriver
      */
     public function cachedItemExists($key)
     {
-        if (!$has = $this->memcached->get($key)) {
+        if (!$has = $this->driver->get($key)) {
             return false;
         }
         return true;
@@ -68,7 +79,7 @@ class MemcachedDriver extends AbstractDriver
      */
     public function getFromCache($key)
     {
-        return $this->memcached->get($key);
+        return $this->driver->get($key);
     }
 
     /**
@@ -84,17 +95,34 @@ class MemcachedDriver extends AbstractDriver
      */
     public function writeToCache($key, $data, $expires = 60, $compressed = false)
     {
-        $expires = is_int($expires) ?
+        $expires = $this->getExpiryTime($expires);
+
+        $cmp = $this->driver->getOption(Memcached::OPT_COMPRESSION);
+
+        $this->driver->setOption(Memcached::OPT_COMPRESSION, $compressed);
+
+        $cached = $this->driver->set($key, $data, $expires);
+
+        $this->driver->setOption(Memcached::OPT_COMPRESSION, $cmp);
+
+        return $cached;
+    }
+
+    /**
+     * getExpiryTime
+     *
+     * @param mixed $expires
+     *
+     * @access protected
+     * @return int
+     */
+    protected function getExpiryTime($expires)
+    {
+        return is_int($expires) ?
             (time() + ($expires * 60)) :
             (is_string($expires) ?
             strtotime($expires) :
             (time() + ($this->default * 60)));
-
-        $this->memcached->setOption(Memcached::OPT_COMPRESSION, $compressed);
-        $cached = $this->memcached->set($key, $data, $expires);
-        $this->memcached->setOption(Memcached::OPT_COMPRESSION, false);
-
-        return $cached;
     }
 
     /**
@@ -122,7 +150,7 @@ class MemcachedDriver extends AbstractDriver
      */
     protected function incrementValue($key, $value)
     {
-        return $this->memcached->increment($key, $value);
+        return $this->driver->increment($key, $value);
     }
 
     /**
@@ -136,7 +164,7 @@ class MemcachedDriver extends AbstractDriver
      */
     protected function decrementValue($key, $value)
     {
-        return $this->memcached->decrement($key, $value);
+        return $this->driver->decrement($key, $value);
     }
 
     /**
@@ -148,7 +176,7 @@ class MemcachedDriver extends AbstractDriver
      */
     public function deleteFromCache($key)
     {
-        return $this->memcached->delete($key);
+        return $this->driver->delete($key);
     }
 
     /**
@@ -159,6 +187,6 @@ class MemcachedDriver extends AbstractDriver
      */
     public function flushCache()
     {
-        return $this->memcached->flush();
+        return $this->driver->flush();
     }
 }

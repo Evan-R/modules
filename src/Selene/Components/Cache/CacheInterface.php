@@ -11,7 +11,7 @@
 
 namespace Selene\Components\Cache;
 
-use Closure;
+use \Closure;
 
 /**
  * Interface: InterfaceCache

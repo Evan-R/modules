@@ -11,9 +11,9 @@
 
 namespace Selene\Components\Cache;
 
-use Closure;
-use ArrayAccess;
-use Selene\Components\Cache\Driver\DriverInterface;
+use \Closure;
+use \ArrayAccess;
+use \Selene\Components\Cache\Driver\DriverInterface;
 
 /**
  * Class: Storage
