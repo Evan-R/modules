@@ -93,21 +93,31 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     protected $packageProviders;
 
     /**
+     * version
+     *
+     * @var string
+     */
+    protected static $version = '1.0.0 pre alpha';
+
+    /**
      * testEnv
      *
      * @var string
      */
     protected static $testEnv = 'testing';
 
-    protected static $version = '1.0.0 α';
+    /**
+     * prodEnv
+     *
+     * @var string
+     */
+    protected static $prodEnv = 'production';
 
     /**
      * Create a new Application instance.
      *
-     * @param mixed $environment
-     * @param mixed $debug
-     *
-     * @access public
+     * @param string $environment
+     * @param boolean $debug
      */
     public function __construct($environment, $debug = true)
     {
@@ -144,6 +154,26 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         }
 
         return $response;
+    }
+
+    /**
+     * run
+     *
+     * @param Request $request
+     *
+     * @return void
+     */
+    public function run(Request $request = null)
+    {
+        $this->boot();
+
+        $request =  $request ?: Request::createFromGlobals();
+
+        $response = $this->handle($request, self::MASTER_REQUEST, self::$prodEnv === $this->getEnvironment());
+
+        $response->send();
+
+        $this->terminate($request, $response);
     }
 
     /**
@@ -601,6 +631,12 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         return $paths;
     }
 
+    /**
+     * version
+     *
+     * @access public
+     * @return mixed
+     */
     public static function version()
     {
         return static::$version;

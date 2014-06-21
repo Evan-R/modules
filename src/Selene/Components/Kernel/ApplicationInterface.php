@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Kernel;
 
+use \Symfony\Component\HttpFoundation\Request;
+
 /**
  * @class ApplicationInterface
  * @package Selene\Components\Kernel
@@ -18,7 +20,31 @@ namespace Selene\Components\Kernel;
  */
 interface ApplicationInterface
 {
+    /**
+     * Boot the application
+     *
+     * @return void
+     */
     public function boot();
 
+    /**
+     * Starts the application
+     *
+     * @return void
+     */
+    public function run(Request $request = null);
+
+    /**
+     * getLoadedPackages
+     *
+     * @return array
+     */
     public function getLoadedPackages();
+
+    /**
+     * Get application version.
+     *
+     * @return string
+     */
+    public static function version();
 }

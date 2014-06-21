@@ -24,17 +24,39 @@ use \Selene\Components\Common\SeparatorParser;
  */
 class PathParser extends SeparatorParser
 {
-    public function __construct($main = '__main__')
+    public function __construct($defaultNamespace = '__main__')
     {
-        $this->main = $main;
+        $this->defaultNamespace = $defaultNamespace;
     }
 
     public function parse($string)
     {
-        list($namespace, $subpath, $template) = parent::parse($string);
+        list($namespace, $subpath, $template) = parent::parse($name = $this->prepareString($string));
 
-        $namespace = $namespace ?: $this->main;
+        $namespace = $namespace ?: $this->defaultNamespace;
 
-        return [$namespace, strtr($subpath, ['.' => DIRECTORY_SEPARATOR]) . DIRECTORY_SEPARATOR . $template];
+        return [
+            trim($name, ':'),
+            $namespace,
+            ltrim(strtr($subpath, ['.' => DIRECTORY_SEPARATOR]) . DIRECTORY_SEPARATOR . $template, DIRECTORY_SEPARATOR)
+        ];
+    }
+
+    /**
+     * prepareString
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    protected function prepareString($string)
+    {
+        if (2 !== ($count = substr_count($string, ':'))) {
+            while ($count++ < 2) {
+                $string = ':'.$string;
+            }
+        }
+
+        return $string;
     }
 }

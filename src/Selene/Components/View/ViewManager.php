@@ -62,11 +62,30 @@ class ViewManager implements ManagerInterface
      */
     public function render($template, array $context = [])
     {
-        if (!$engine = $this->findEngine($template)) {
+        if (!$engine = $this->findEngine(basename($template))) {
             throw new \RuntimeException(sprintf('no suitable template engine found for %s', $template));
         }
 
         return $engine->render($template, $context);
+    }
+
+
+    /**
+     * prepareString
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    protected function prepareString($string)
+    {
+        if (2 !== ($count = substr_count($string, ':'))) {
+            while ($count++ < 2) {
+                $string = ':'.$string;
+            }
+        }
+
+        return $string;
     }
 
     /**
