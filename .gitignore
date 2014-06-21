@@ -1,2 +1,5 @@
 /vendor/
+/report/
+/src/Selene/Adapters
+/src/Selene/Packages
 /.subsplit/
