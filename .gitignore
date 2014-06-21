@@ -1,5 +1,13 @@
 /vendor/
+/vendor
+vendor/
 /report/
+report/
+/report
+/tmp
+tmp/
 /src/Selene/Adapters
 /src/Selene/Packages
+/src/Selene/Flux
 /.subsplit/
+_*
