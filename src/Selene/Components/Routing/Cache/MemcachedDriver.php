@@ -42,7 +42,9 @@ class MemcachedDriver implements DriverInterface
      */
     public function __construct(MemcachedConnection $connection)
     {
-        $this->memcached = $connection->getMemcached();
+        $connection->connect();
+
+        $this->memcached = $connection->getDriver();
     }
 
     /**
@@ -84,8 +86,7 @@ class MemcachedDriver implements DriverInterface
     public function remove($id)
     {
         if ($this->has($id)) {
-            $file = $this->getFile($id);
-            return @unlink($file);
+            return $this->memcached->delete($id);
         }
 
         return false;

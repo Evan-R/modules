@@ -118,6 +118,7 @@ class WriterTest extends \PHPUnit_Framework_TestCase
         $args = [
             'bar' => ['id' => 10, 'val' => 'value']
         ];
+
         $writer->addMappedAttribute('*', 'id');
         $xml = $writer->dump($args);
         $this->assertXmlStringEqualsXmlString(

@@ -1,15 +1,25 @@
 <?php
 
+/**
+ * This File is part of the Selene\Components\Routing package
+ *
+ * (c) Thomas Appel <mail@thomas-appel.com>
+ *
+ * For full copyright and license information, please refer to the LICENSE file
+ * that was distributed with this package.
+ */
+
 namespace Selene\Components\Routing;
 
 use \Symfony\Component\HttpFoundation\Request;
 use \Selene\Components\Events\DispatcherInterface;
-use \Selene\Components\Routing\Events\RouteFilterEvent;
-use \Selene\Components\Routing\Events\RouteDispatchEvent;
-use \Selene\Components\Routing\Events\RouteFilterAfterEvent;
-use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
 use \Selene\Components\Routing\Exception\RouteNotFoundException;
-use \Selene\Components\Routing\Controller\ResolverInterface;
+use \Selene\Components\Routing\Matchers\MatchContext;
+use \Selene\Components\Routing\Controller\Dispatcher as ControllerDispatcher;
+use \Selene\Components\Routing\Events\RouteDispatchEvent;
+use \Selene\Components\Routing\Events\RouteNotFoundEvent;
+use \Selene\Components\Routing\Events\RouteFilterEvent;
+use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
 
 /**
  * @class Router implements RouterInterface
@@ -30,96 +40,41 @@ class Router implements RouterInterface
 
     const FILTER_AFTER  = 'filter_after';
 
-    /**
-     * routes
-     *
-     * @var \Selene\Components\Routing\RouteCollectionInterface
-     */
-    protected $routes;
+    private $routes;
 
-    protected $resovler;
+    private $events;
 
-    /**
-     * events
-     *
-     * @var DispatcherInterface
-     */
-    protected $events;
+    private $matcher;
+
+    private $dispatcher;
 
     /**
-     * booted
-     *
-     * @var mixed
-     */
-    protected $booted;
-
-    /**
-     * prepared
-     *
-     * @var boolean
-     */
-    protected $prepared;
-
-    /**
-     * matcher
-     *
-     * @var \Selene\Components\Routing\RouteCollectionInterface
-     */
-    protected $matcher;
-
-    /**
-     * filters
-     *
-     * @var mixed
-     */
-    protected $filters;
-
-    /**
-     * actionSet
-     *
-     * @var boolean
-     */
-    protected $actionSet;
-
-    /**
-     * filters
-     *
-     * @var mixed
-     */
-    protected $filterEvents;
-
-    /**
-     * @param RouteCollectionInterface $routes
-     * @param ResolverInterface $resolver
-     * @param DispatcherInterface $events
      * @param RouteMatcherInterface $matcher
+     * @param Dispatcher $events
      *
      * @access public
      */
-    public function __construct(
-        RouteCollectionInterface $routes,
-        ResolverInterface $resolver,
-        DispatcherInterface $events,
-        RouteMatcherInterface $matcher
-    ) {
-        $this->routes    = $routes;
-        $this->resolver  = $resolver;
-        $this->matcher   = $matcher ? : new RouteMatcher;
-        $this->events    = $events ? : new Dispatcher;
+    public function __construct(RouteMatcherInterface $matcher, ControllerDispatcher $dispatcher)
+    {
+        $this->matcher    = $matcher;
+        $this->dispatcher = $dispatcher;
+    }
 
-        $this->filters = [];
-        $this->filtersEvents = [];
+    public function setEvents(DispatcherInterface $events)
+    {
+        $this->events = $events;
+    }
 
-        $this->booted = false;
-        $this->actionSet = false;
+    public function getEvents()
+    {
+        return $this->events;
     }
 
     /**
      * setRoutes
      *
-     * @param RouteCollectionInterface
+     * @param RouteCollectionInterface $routes
      *
-     * @access public
      * @return void
      */
     public function setRoutes(RouteCollectionInterface $routes)
@@ -131,7 +86,7 @@ class Router implements RouterInterface
      * getRoutes
      *
      * @access public
-     * @return \Selene\Components\Routing\RouteCollectionInterface
+     * @return RouteCollectionInterface
      */
     public function getRoutes()
     {
@@ -139,152 +94,72 @@ class Router implements RouterInterface
     }
 
     /**
-     * getMatcher
-     *
-     * @access public
-     * @return \Selene\Components\Routing\RouteMatcherInterface
-     */
-    public function getMatcher()
-    {
-        return $this->matcher;
-    }
-
-    /**
-     * getControllerResolver
-     *
-     *
-     * @access public
-     * @return \Selene\Components\Routing\Controller\ResolverInterface
-     */
-    public function getControllerResolver()
-    {
-        return $this->resolver;
-    }
-
-    /**
-     * registerFilter
-     *
-     * @param callable $filter
-     *
-     * @access public
-     * @return mixed
-     */
-    public function registerFilter($name, $filter)
-    {
-        $this->filters[$name] = $filter;
-    }
-
-    /**
-     * boot
-     *
-     * @param DispatcherInterface $events
-     *
-     * @access public
-     * @return mixed
-     */
-    public function boot()
-    {
-        if ($this->booted) {
-            return;
-        }
-
-        if (!$this->events) {
-            throw new \BadMethodCallException('cannot boot router, event dispatcher is not set');
-        }
-
-        $this->booted = true;
-    }
-
-    /**
-     * registerRouteFilterEvents
-     *
-     * @param Route $route
-     * @param array $filters
-     * @param mixed $type
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function registerRouteFilterEvents(Route $route, array $filters, $type)
-    {
-        foreach ($filters as $filter) {
-            if ($this->hasFilter($filter)) {
-                $this->events->on($this->getRouteFilterEventName($route, $type), $this->filters[$filter]);
-            }
-        }
-    }
-
-    /**
-     * dispatch
+     * Dispatch a route collections agaibts a request
      *
      * @param Request $request
      *
-     * @throws \BadMethodCallException if no dispatcher was set.
-     * @throws RouteNotFoundException if no route was found
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function dispatch(Request $request)
     {
-        $this->boot();
 
-        if (!$route = $this->findRoute($request)) {
-
-            return $this->routeNotFound($request);
+        if (!$context = $this->matcher->matches($request, $this->prepareRoutes())) {
+            $this->handleNotFound($request);
         }
 
-        $this->prepareDispatchRoute($route, $request);
+        return $this->dispatchRoute($context);
+    }
 
-        if ($result = $this->fireBeforeEvents($route, $request)) {
-            $this->abortBeforeDispatch($route, $request);
+    /**
+     * Dispatch events on the route retreival.
+     *
+     * @param Route $route the matched route.
+     *
+     * @return void
+     */
+    protected function dispatchRoute(MatchContext $context)
+    {
+        if ($result = $this->fireBeforeFilters(
+            $request = $context->getRequest(),
+            $route   = $context->getRoute()
+        )) {
+
+            $this->events->dispatch('router_dispatch', $event = new RouteFilterAbortEvent($result));
+
             return;
         }
 
-        return $this
-            ->fireRouteDispatchEvent($route, $request)
-            ->getResponse();
-    }
+        if (!$result = $this->dispatcher->dispatch($context)) {
+            throw new RouteNotFoundException(
+                sprintf('No handler found for Route "%s".', $context->getRequest()->getPathInfo())
+            );
+        }
 
-    /**
-     * routeNotFound
-     *
-     * @param Request $request
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function routeNotFound(Request $request)
-    {
-        $this->events->dispatch('route_not_found', new RouteNotFoundEvent($request));
-    }
+        $event = $this->fireRouteDispatchEvent($context->getRoute(), $context->getRequest());
+        $event->setResponse($result);
 
-    /**
-     * abortBeforeDispatch
-     *
-     * @param Route $route
-     * @param Request $request
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function abortBeforeDispatch(Route $route, Request $request)
-    {
-        $this->events->dispatch('router_abort', new RouteFilterAbortEvent($route, $request));
-    }
-
-    /**
-     * fireRouteDispatchEvent
-     *
-     * @param Route $route
-     * @param Request $request
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function fireRouteDispatchEvent(Route $route, Request $request)
-    {
-        $this->events->dispatch('router_dispatch', $event = $this->prepareDispatchEvent($route, $request));
         return $event;
+    }
+
+    /**
+     * fireBeforeFilters
+     *
+     * @param Request $request
+     * @param Route $route
+     *
+     * @return void
+     */
+    protected function fireBeforeFilters(Request $request, Route $route)
+    {
+        foreach ((array)$route->getBeforeFilters() as $filter) {
+            if ($result = $this->events->dispatch(
+                static::FILTER_BEFORE . '.' . $filter,
+                new RouteFilterEvent($route, $request)
+            )) {
+
+                return current($result);
+            }
+        }
     }
 
     /**
@@ -298,214 +173,48 @@ class Router implements RouterInterface
      */
     protected function prepareDispatchEvent(Route $route, Request $request)
     {
-        $event = new RouteDispatchEvent($route, $request);
+        return new RouteDispatchEvent($route, $request);
+    }
 
-        $this->setControllerAction($event);
-        $this->fireAfterEvents($event);
+    /**
+     * Fire the not found event.
+     *
+     * @param Request $request
+     *
+     * @access protected
+     * @return void
+     */
+    protected function handleNotFound(Request $request)
+    {
+        if (!$this->events) {
+            throw new RouteNotFoundException(
+                sprintf('Route "%s" not found.', $request->getPathInfo())
+            );
+        }
+
+        $this->events->dispatch('route_not_found', new RouteNotFoundEvent($request));
+    }
+
+    protected function fireRouteDispatchEvent(Route $route, Request $request)
+    {
+        $this->events->dispatch('router_dispatch', $event = $this->prepareDispatchEvent($route, $request));
 
         return $event;
     }
 
     /**
-     * fireBeforeEvents
+     * prepareRoutes
      *
-     * @param Route $route
-     * @param Request $request
-     *
-     * @access protected
-     * @return mixed
+     * @access private
+     * @throws \RuntimeException
+     * @return RouteCollectionInterface
      */
-    protected function fireBeforeEvents(Route $route, Request $request)
+    private function prepareRoutes()
     {
-        $event = $this->getRouteFilterEventName($route, static::ROUTE_BEFORE);
-
-        return $this->events->until($event, new RouteFilterEvent($route, $request));
-    }
-
-    /**
-     * fireAfterEvents
-     *
-     * @param RouteDispatchEvent $event
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function fireAfterEvents(RouteDispatchEvent $event)
-    {
-        $route = $event->getRoute();
-        $eventName = $this->getRouteFilterEventName($route, static::ROUTE_BEFORE);
-        $this->events->dispatch($eventName, new RouteFilterAfterEvent($event));
-    }
-
-    /**
-     * findRoute
-     *
-     * @param Request $request
-     *
-     * @access public
-     * @return mixed
-     */
-    public function findRoute(Request $request)
-    {
-        $this->prepareMatcher();
-
-        if ($this->matcher->matches($request, $this->getRoutes())) {
-            return $this->matcher->getMatchedRoute();
-        }
-    }
-
-    /**
-     * hasFilter
-     *
-     * @access public
-     * @return bool
-     */
-    public function hasFilter($name)
-    {
-        return isset($this->filters[$name]);
-    }
-
-    /**
-     * prepareDispatchRoute
-     *
-     * @param Route $route
-     * @param Request $request
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function prepareDispatchRoute(Route $route, Request $request)
-    {
-        if ($filters = $this->findRouteFilters($route, static::ROUTE_BEFORE)) {
-            $this->registerRouteFilterEvents($route, $filters, static::ROUTE_BEFORE);
+        if (!$routes = $this->getRoutes()) {
+            throw \RuntimeException;
         }
 
-        if ($filter = $this->findRouteFilters($route, static::ROUTE_AFTER)) {
-            $this->registerRouteFilterEvents($route, $filters, static::ROUTE_AFTER);
-        }
-    }
-
-    /**
-     * prepareAction
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function prepareAction()
-    {
-        if ($this->actionSet) {
-            return;
-        }
-
-        $this->events->on('router_dispatch', [$this, 'getControllerAction']);
-    }
-
-    /**
-     * getControllerAction
-     *
-     * @param mixed $event
-     *
-     * @access protected
-     * @return mixed
-     */
-    public function setControllerAction(RouteDispatchEvent $event)
-    {
-        $route = $event->getRoute();
-        $action = $this->resolver->find(
-            $route->getAction(),
-            $event->getRequest()->getMethod()
-        );
-
-        $event->setResponse(call_user_func_array($action, $route->getParameters()));
-    }
-
-
-    /**
-     * getRouteFilterEventName
-     *
-     * @param Route $route
-     * @param mixed $type
-     *
-     * @access protected
-     * @return string
-     */
-    protected function getRouteFilterEventName(Route $route, $type)
-    {
-        return $type . '.' . $route->getName();
-    }
-
-    /**
-     * prepareMatcher
-     *
-     * @access protected
-     * @return void
-     */
-    protected function prepareMatcher()
-    {
-        if ($this->prepared) {
-            return;
-        }
-
-        $this->matcher->onHostMatch(function (Route $route, array $params) {
-            return $this->setHostParameters($route, $params);
-        });
-
-        $this->matcher->onRouteMatch(function (Route $route, array $params) {
-            return $this->setRouteParameters($route, $params);
-        });
-
-        $this->matcher->prepareMatchers();
-
-        $this->prepared = true;
-    }
-
-    /**
-     * findRouteFilter
-     *
-     * @param Route $route
-     * @param string $type
-     *
-     * @access protected
-     * @return mixed will return a filter parameter if any or false if none
-     */
-    protected function findRouteFilters(Route $route, $type = self::ROUTE_BEFORE)
-    {
-        $currentRoute = $route;
-
-        $method = $type === static::ROUTE_BEFORE ? 'getBeforeFilters' : 'getAfterFilters';
-
-        while ($currentRoute) {
-
-            if (null !== ($filters = call_user_func([$currentRoute, $method])) && (!empty($filters))) {
-                return $filters;
-            }
-
-            $currentRoute = $this->getRoutes()->get($currentRoute->getParent());
-        }
-        return false;
-    }
-
-    /**
-     * setRouteParameter
-     *
-     * @access public
-     * @return void
-     */
-    protected function setRouteParameters(Route $route, array $params)
-    {
-        $params = array_intersect_key($params, array_flip($route->getVars()));
-        $route->setParams($params);
-    }
-
-    /**
-     * setHostParameter
-     *
-     * @access protected
-     * @return void
-     */
-    protected function setHostParameters(Route $route, array $params)
-    {
-        $params = array_intersect_key($params, array_flip($route->getHostVars()));
-        $route->setHostParams($params);
+        return $routes;
     }
 }

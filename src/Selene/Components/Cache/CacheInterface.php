@@ -22,6 +22,10 @@ use \Closure;
  */
 interface CacheInterface
 {
+    const COMPRESSED = true;
+
+    const UNCOMPRESSED = false;
+
     /**
      * Retreive cached data by id
      *

@@ -17,6 +17,7 @@ use \Selene\Components\Routing\Matchers\HostMatcher;
 use \Selene\Components\Routing\Matchers\RegexPathMatcher;
 use \Selene\Components\Routing\Matchers\StaticPathMatcher;
 use \Selene\Components\Routing\Matchers\DirectPathMatcher;
+use \Selene\Components\Routing\Matchers\MatchContext;
 
 /**
  * @class RouteMatcher
@@ -25,69 +26,28 @@ use \Selene\Components\Routing\Matchers\DirectPathMatcher;
  */
 class RouteMatcher implements RouteMatcherInterface
 {
-    protected $route;
-
-    protected $matchers;
+    /**
+     * matchers
+     *
+     * @var array
+     */
+    private $matchers;
 
     /**
-     * routeMatchCallback
+     * prepared
      *
-     * @var mixed
+     * @var boolean
      */
-    protected $callbacks;
+    private $prepared;
+
+    private $matchContext;
 
     /**
-     * onMatch
-     *
-     * @param callable $matchCallBack
-     *
-     * @access public
-     * @return void
+     * Create new RouteMatcher instance
      */
-    public function onRouteMatch(callable $callback)
+    public function __construct()
     {
-        $this->callbacks['route'] = $callback;
-    }
-
-    /**
-     * onHostMatch
-     *
-     * @param callable $matchCallBack
-     *
-     * @access public
-     * @return void
-     */
-    public function onHostMatch(callable $callback)
-    {
-        $this->callbacks['host'] = $callback;
-    }
-
-    /**
-     * prepareMatcher
-     *
-     * @access protected
-     * @return mixed
-     */
-    public function prepareMatchers()
-    {
-        if (isset($this->callbacks['host'])) {
-            $this->getHostMatcher()->onMatch($this->callbacks['host']);
-        }
-
-        if (isset($this->callbacks['route'])) {
-            $this->getRegexpPathMatcher()->onMatch($this->callbacks['route']);
-        }
-    }
-
-    /**
-     * getMatchedRoute
-     *
-     * @access public
-     * @return Route
-     */
-    public function getMatchedRoute()
-    {
-        return $this->route ?: false;
+        $this->prepared = false;
     }
 
     /**
@@ -96,12 +56,13 @@ class RouteMatcher implements RouteMatcherInterface
      * @param Request $request
      * @param RouteCollectionInterface $routes
      *
-     * @access public
      * @return mixed
      */
     public function matches(Request $request, RouteCollectionInterface $routes)
     {
-        $this->route = null;
+        $this->prepareMatchers();
+
+        $matchedRoute = null;
 
         //just filter routes that matches the current request method.
         $routes = $routes->findByMethod($request->getMethod());
@@ -125,16 +86,40 @@ class RouteMatcher implements RouteMatcherInterface
             } elseif ($noVars = (0 === count($route->getVars())) &&
                 $matchesHost && $this->directMatch($route, $request)
             ) {
-                $this->route = $route;
-                return true;
+                break;
             // try to match the match the path reqexp.
             } elseif ($this->matchPathRegexp($route, $request) && $matchesHost) {
-                $this->route = $route;
-                return true;
+                break;
             }
         }
 
-        return false;
+        return $this->getMatchContext($request);
+    }
+
+    /**
+     * prepareMatcher
+     *
+     * @return void
+     */
+    protected function prepareMatchers()
+    {
+        if ($this->prepared) {
+            return;
+        }
+
+        $this->prepared = true;
+
+        $this->getHostMatcher()->onMatch(function ($route) {
+            $this->matchContext = new MatchContext($route, []);
+        });
+
+        $this->getDirectMatcher()->onMatch(function (Route $route) {
+            $this->matchContext = new MatchContext($route, []);
+        });
+
+        $this->getRegexpPathMatcher()->onMatch(function (Route $route, $params = []) {
+            $this->matchContext = new MatchContext($route, $params);
+        });
     }
 
     /**
@@ -143,7 +128,6 @@ class RouteMatcher implements RouteMatcherInterface
      * @param Route $route
      * @param MatcherInterface $matcher
      *
-     * @access protected
      * @return bool
      */
     protected function matchHost(Route $route, Request $request)
@@ -157,7 +141,6 @@ class RouteMatcher implements RouteMatcherInterface
      * @param Route $route
      * @param Request $request
      *
-     * @access protected
      * @return mixed
      */
     protected function matchStaticPath(Route $route, Request $request)
@@ -171,7 +154,6 @@ class RouteMatcher implements RouteMatcherInterface
      * @param Route $route
      * @param Request $request
      *
-     * @access protected
      * @return mixed
      */
     protected function matchPathRegexp(Route $route, Request $request)
@@ -185,7 +167,6 @@ class RouteMatcher implements RouteMatcherInterface
      * @param Route $route
      * @param Request $request
      *
-     * @access protected
      * @return mixed
      */
     protected function directMatch(Route $route, Request $request)
@@ -196,7 +177,6 @@ class RouteMatcher implements RouteMatcherInterface
     /**
      * getStaticPathMatcher
      *
-     * @access protected
      * @return MatcherInterface
      */
     protected function getStaticPathMatcher()
@@ -208,6 +188,11 @@ class RouteMatcher implements RouteMatcherInterface
         return $this->matchers['static_path'];
     }
 
+    /**
+     * getDirectMatcher
+     *
+     * @return mixed
+     */
     protected function getDirectMatcher()
     {
         if (!isset($this->matchers['direct'])) {
@@ -247,6 +232,11 @@ class RouteMatcher implements RouteMatcherInterface
         return $this->matchers['host'];
     }
 
+    /**
+     * getDirectPathMatcher
+     *
+     * @return mixed
+     */
     protected function getDirectPathMatcher()
     {
         if (!isset($this->matchers['direct_path'])) {
@@ -254,5 +244,21 @@ class RouteMatcher implements RouteMatcherInterface
         }
 
         return $this->matchers['direct_path'];
+    }
+
+    /**
+     * @return MatchContext
+     */
+    private function getMatchContext(Request $request)
+    {
+        if (!$context = $this->matchContext) {
+            return false;
+        }
+
+        $context->setRequest($request);
+
+        $this->matchContext = null;
+
+        return $context;
     }
 }

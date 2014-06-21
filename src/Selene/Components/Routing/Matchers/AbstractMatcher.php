@@ -50,6 +50,7 @@ abstract class AbstractMatcher implements MatcherInterface
             $this->callCallback($route, $matches);
             return true;
         }
+
         return false;
     }
 

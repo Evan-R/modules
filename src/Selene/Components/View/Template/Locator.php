@@ -172,14 +172,15 @@ class Locator implements LocatorInterface
 
         if ($this->parser->supports($file)) {
 
-            list ($package, $subpath, $template) = $this->parser->parse($file);
+            list ($package, $template) = $this->parser->parse($file);
 
             if (isset($this->pathAliases[$package])) {
-                return $this->aliasCache[$file] = $this->getPathAlias($package, $subpath, $template);
+                return $this->aliasCache[$file] = $this->getPathAlias($package, $template);
             }
         }
 
-        return $this->aliasCache[$path] = $path . DIRECTORY_SEPARATOR . $template;
+        //return $this->aliasCache[$path] = $file;
+        return $this->aliasCache[$path] = $path . DIRECTORY_SEPARATOR . $file;
     }
 
     /**
@@ -192,11 +193,11 @@ class Locator implements LocatorInterface
      * @access protected
      * @return string
      */
-    protected function getPathAlias($package, $subpath, $template)
+    protected function getPathAlias($package, $template)
     {
-        $subpath = 0 < strlen($subpath) ? DIRECTORY_SEPARATOR . $subpath : $subpath;
+        //$subpath = 0 < strlen($subpath) ? DIRECTORY_SEPARATOR . $subpath : $subpath;
 
-        return $this->pathAliases[$package] . DIRECTORY_SEPARATOR . 'Resources' . $subpath . DIRECTORY_SEPARATOR .
-            'view' . DIRECTORY_SEPARATOR . $template;
+        //return $this->pathAliases[$package] . DIRECTORY_SEPARATOR . 'Resources' . $subpath . DIRECTORY_SEPARATOR .
+            //'view' . DIRECTORY_SEPARATOR . $template;
     }
 }

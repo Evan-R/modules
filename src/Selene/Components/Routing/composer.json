@@ -10,17 +10,20 @@
   "license": "MIT",
   "require": {
     "php":">=5.4.0",
-    "selene/common":"dev-development"
+    "selene/common":"dev-development",
+    "selene/events":"dev-development",
+    "symfony/http-foundation": "~2.4.0"
   },
   "require-dev": {
-    "symfony/http-foundation": "~2.4.0",
-    "symfony/http-kernel": "~2.4.0",
+    "phpunit/phpunit": "~4.0",
     "mockery/mockery": "dev-master",
-    "phpunit/phpunit": "~4.0"
+    "selene/di":"dev-development",
+    "league/phpunit-coverage-listener":"dev-master",
+    "symfony/http-kernel": "~2.4.0"
   },
   "suggest": {
     "selene/cache": "Utilize memcached route caching",
-    "symfony/http-foundation": "For route matching"
+    "selene/di":""
   },
   "autoload": {
     "psr-4": {"Selene\\Components\\Routing\\": ""}

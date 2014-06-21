@@ -65,21 +65,24 @@ class Data implements MetaDataInterface
      */
     public function get($parameter, $default = null)
     {
-        if (ListHelper::arrayIsList($this->parameters)) {
-
-            $params = [];
-
-            foreach ($this->parameters as $param) {
-                if (!$value = $this->getDefault((array)$param, $parameter, null)) {
-                    continue;
-                }
-                $params[] = $value;
-            }
-
-            return (bool)$params ? $params : null;
+        if (!is_string($parameter)) {
+            return;
         }
 
-        return $this->getDefault($this->parameters, $parameter, $default);
+        if (!ListHelper::arrayIsList($this->parameters)) {
+            return $this->getDefault($this->parameters, $parameter, $default);
+        }
+
+        $params = [];
+
+        foreach ($this->parameters as $param) {
+            if (!$value = $this->getDefault((array)$param, $parameter, null)) {
+                continue;
+            }
+            $params[] = $value;
+        }
+
+        return (bool)$params ? $params : null;
     }
 
     /**
@@ -124,6 +127,7 @@ class Data implements MetaDataInterface
         }
 
         $this->name = $parameters['name'];
+
         unset($parameters['name']);
 
         $this->parameters = $parameters;

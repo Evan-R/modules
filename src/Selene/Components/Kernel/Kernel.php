@@ -196,6 +196,7 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
     protected function handleRequest(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         $this->router->dispatch($request);
+
         return $this->filterResponse();
     }
 
@@ -247,6 +248,7 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
         }
 
         $event = $this->responseStack->pop();
+
         $response = $event->getResponse();
 
         if ($response instanceof Response) {
@@ -258,6 +260,10 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
 
     protected function handleRequestException(Request $request, \Exception $e)
     {
-        $this->getEvents()->dispatch('kernel.handle_exception', new KernelExceptionEvent($request, $e));
+        var_dump(
+            sprintf('FATAL exception %s : %s', get_class($e), $e->getMessage())
+        );
+        die;
+        //$this->getEvents()->dispatch('kernel.handle_exception', new KernelExceptionEvent($request, $e));
     }
 }

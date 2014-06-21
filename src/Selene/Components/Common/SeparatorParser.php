@@ -48,7 +48,7 @@ class SeparatorParser implements SeparatorParserInterface
      */
     public function parse($string)
     {
-        list($first, $mid, $last) = explode(static::$separator, $string);
+        list($first, $mid, $last) = array_pad(explode(static::$separator, $string), 3, null);
 
         return [$first, $mid, $last];
     }

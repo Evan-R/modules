@@ -82,11 +82,11 @@ class ResolveDefinitionArguments implements ProcessInterface
         $setters = [];
 
 
-        foreach ($definition->getSetters() as $setter) {
+        foreach ($definition->getSetters() as $key => $setter) {
             $method = key($setter);
             $arguments = $setter[$method];
 
-            $setters[] = [$method => $args = $this->resolveArguments($arguments)];
+            $setters[$key] = [$method => $args = $this->resolveArguments($arguments)];
         }
 
         $definition->setSetters($setters);
@@ -126,8 +126,8 @@ class ResolveDefinitionArguments implements ProcessInterface
     {
         $args = [];
 
-        foreach ($arguments as $argument) {
-            $args[] = $this->resolveArgument($argument);
+        foreach ($arguments as $key => $argument) {
+            $args[$key] = $this->resolveArgument($argument);
         }
 
         return $args;

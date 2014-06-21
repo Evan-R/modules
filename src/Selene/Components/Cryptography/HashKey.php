@@ -11,6 +11,9 @@
 
 namespace Selene\Components\Cryptography;
 
+use \Selene\Components\Common\Helper\StringHelper;
+use \Selene\Components\Cryptography\Helper\BcConvertHelper;
+
 /**
  * @class HashKey
  * @see HashInterface
@@ -23,20 +26,6 @@ namespace Selene\Components\Cryptography;
 class HashKey implements HashInterface
 {
     /**
-     * character storage for bcBaseConvert fallback
-     *
-     * @var string
-     */
-    protected static $storage  = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-    /**
-     * register
-     *
-     * @var string
-     */
-    protected static $register = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-
-    /**
      * hash_hmac key
      *
      * @var string
@@ -44,9 +33,7 @@ class HashKey implements HashInterface
     private $key;
 
     /**
-     * @param mixed $key
-     *
-     * @access public
+     * @param string $key
      */
     public function __construct($key = null)
     {
@@ -64,7 +51,8 @@ class HashKey implements HashInterface
      */
     public function hash($value, array $options = null)
     {
-        $options = is_array($options) ? $options : ['secret' => $this->key];
+        $options = $this->getOptions($options ?: []);
+
         return $this->generate($value, $options);
     }
 
@@ -78,13 +66,9 @@ class HashKey implements HashInterface
      * @access public
      * @return bool
      */
-    public function check($value, $hash, $options = null)
+    public function check($input, $hash, $options = null)
     {
-        if (strlen($hash) !== 22) {
-            return false;
-        }
-
-        return strpos($this->hash($value, $options), $hash) !== false;
+        return StringHelper::strSafeCompare($hash, $this->hash($input, $options));
     }
 
     /**
@@ -92,78 +76,36 @@ class HashKey implements HashInterface
      *
      * @param mixed $value
      * @param mixed $options
+     *
+     * @return string
      */
     private function generate($value, $options)
     {
         $base = hash_hmac('md5', $value, $options['secret']);
 
-        if (function_exists('gmp_init')) {
-
-            $init = gmp_init($base, 16);
-            $out  = gmp_strval($init, 62);
-
-        } else {
-            $out = $this->bcBaseConvert($base, 16, 62);
+        if (!function_exists('gmp_init')) {
+            return  BcConvertHelper::baseConvert($base, 16, 62);
         }
 
-        return $out;
+        $init = gmp_init($base, 16);
+
+        return  gmp_strval($init, 62);
     }
 
     /**
-     * bcBaseConvert
+     * getOptions
      *
-     * @param mixed $value
-     * @param mixed $sourceformat
-     * @param mixed $targetformat
+     * @param array $options
+     *
+     * @access private
+     * @return array
      */
-    private function bcBaseConvert($value, $sourceformat, $targetformat)
+    private function getOptions(array $options = [])
     {
-
-        if (max($sourceformat, $targetformat) > strlen(static::$storage)) {
-            trigger_error('Bad Format max: ' . strlen(static::$storage), E_USER_ERROR);
+        if (!isset($options['secret'])) {
+            $options['secret'] = $this->key;
         }
 
-        if (min($sourceformat, $targetformat) < 2) {
-            trigger_error('Bad Format min: 2', E_USER_ERROR);
-        }
-
-        $dec    = '0';
-        $level  = 0;
-        $result = '';
-        $value  = trim((string)$value, "\r\n\t +");
-        $prefix = '-' === $value{0} ? '-' : '';
-        $value  = ltrim($value, "-0");
-        $len    = strlen($value);
-
-        for ($i = 0; $i < $len; $i++) {
-
-            $val = strpos(static::$storage, $value{$len - 1 - $i});
-
-            if (false === $val) {
-                trigger_error('Bad Char in input 1', E_USER_ERROR);
-            }
-
-            if ($val >= $sourceformat) {
-                trigger_error('Bad Char in input 2', E_USER_ERROR);
-            }
-
-            $dec = bcadd($dec, bcmul(bcpow($sourceformat, $i), $val));
-        }
-
-        if (10 === $targetformat) {
-            return $prefix . $dec;
-        }
-
-        while (1 !== bccomp(bcpow($targetformat, $level++), $dec)) {
-        }
-
-        for ($i = ($level - 2); $i >= 0; $i--) {
-            $factor  = bcpow($targetformat, $i);
-            $number  = bcdiv($dec, $factor, 0);
-            $dec     = bcmod($dec, $factor);
-            $result .= static::$register{$number};
-        }
-        $result = empty($result) ? '0' : $result;
-        return $prefix . $result;
+        return $options;
     }
 }

@@ -45,9 +45,8 @@ class ViewManager implements ManagerInterface
      * @access public
      * @return mixed
      */
-    public function __construct(LoaderInterface $loader, array $engines = [])
+    public function __construct(array $engines = [])
     {
-        $this->loader = $loader;
         $this->engines = [];
         $this->registerEngines($engines);
     }
@@ -67,7 +66,7 @@ class ViewManager implements ManagerInterface
             throw new \RuntimeException(sprintf('no suitable template engine found for %s', $template));
         }
 
-        return $engine->render($this->loader->load($template), $context);
+        return $engine->render($template, $context);
     }
 
     /**
@@ -80,8 +79,7 @@ class ViewManager implements ManagerInterface
      */
     protected function findTemplate($template)
     {
-        $file = $this->locator->locate($template);
-        return $file;
+        return $template;
     }
 
     /**

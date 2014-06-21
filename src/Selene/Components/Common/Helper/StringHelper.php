@@ -50,8 +50,8 @@ class StringHelper
         $string .= $pad;
         $input  .= $pad;
 
-        $strLen = strlen($string);
-        $inpLen = strlen($input);
+        $strLen = mb_strlen($string);
+        $inpLen = mb_strlen($input);
 
         $result = $strLen ^ $inpLen;
 
@@ -88,7 +88,7 @@ class StringHelper
      */
     public static function strNull(&$input)
     {
-        return is_string($input) ? (0 === strlen($input) ? null : $input) : $input;
+        return is_string($input) ? (0 === mb_strlen($input) ? null : $input) : $input;
     }
 
     /**
@@ -354,7 +354,7 @@ class StringHelper
      */
     public static function strEndsWith($string, $sequence)
     {
-        return 0 === strcmp($sequence, (substr($string, - strlen($sequence))));
+        return 0 === strcmp($sequence, (substr($string, - mb_strlen($sequence))));
     }
 
     /**
@@ -367,7 +367,7 @@ class StringHelper
      */
     public static function striEndsWith($string, $sequence)
     {
-        return 0 === strcasecmp($sequence, (substr($string, - strlen($sequence))));
+        return 0 === strcasecmp($sequence, (substr($string, - mb_strlen($sequence))));
     }
 
     /**

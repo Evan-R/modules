@@ -117,7 +117,17 @@ class FilesystemDriver implements DriverInterface
      */
     private function putContent($file, $content)
     {
+        $this->ensureExists(dirname($file));
+        touch($file);
+
         return file_put_contents($file, serialize($content));
+    }
+
+    private function ensureExists($dir)
+    {
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
     }
 
     /**

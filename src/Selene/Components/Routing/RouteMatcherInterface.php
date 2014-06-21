@@ -21,26 +21,6 @@ use \Symfony\Component\HttpFoundation\Request;
 interface RouteMatcherInterface
 {
     /**
-     * onRouteMatch
-     *
-     * @param callable $callback
-     *
-     * @access public
-     * @return void
-     */
-    public function onRouteMatch(callable $callback);
-
-    /**
-     * onHostMatch
-     *
-     * @param callable $callback
-     *
-     * @access public
-     * @return void
-     */
-    public function onHostMatch(callable $callback);
-
-    /**
      * matches
      *
      * @param Request $request
@@ -50,12 +30,4 @@ interface RouteMatcherInterface
      * @return mixed
      */
     public function matches(Request $request, RouteCollectionInterface $routes);
-
-    /**
-     * getMatchedRoute
-     *
-     * @access public
-     * @return Route
-     */
-    public function getMatchedRoute();
 }

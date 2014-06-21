@@ -12,25 +12,70 @@
 namespace Selene\Adapters\Twig\Loaders;
 
 use \Twig_LoaderInterface as LoaderInterface;
+use \Selene\Components\View\Template\ResolverInterface;
+use \Selene\Components\View\Template\LoaderInterface as TemplateLoaderInterface;
 
 /**
  * @class FileLoader
  * @package Selene\Adapters\Twig\Loaders
  * @version $Id$
  */
-class FileLoader implements LoaderInterface
+class FileLoader implements LoaderInterface, TemplateLoaderInterface
 {
+    /**
+     * paths
+     *
+     * @var array
+     */
+    protected $paths;
+
+    /**
+     * cache
+     *
+     * @var array
+     */
+    protected $cache;
+
+    /**
+     * parser
+     *
+     * @var PathParser
+     */
+    protected $parser;
+
+    public function __construct(ResolverInterface $resolver)
+    {
+        $this->cache = [];
+        $this->resolver = $resolver;
+    }
+
     /**
      * getSource
      *
      * @param mixed $source
      *
-     * @access public
-     * @return mixed
+     * @return string
      */
-    public function getSource($source)
+    public function getSource($name)
     {
-        return file_get_contents($source);
+        return file_get_contents($this->findTemplate($name));
+    }
+
+    public function load($name)
+    {
+        return $this->findTempalte($name);
+    }
+
+    /**
+     * findTemplate
+     *
+     * @param mixed $name
+     *
+     * @return string
+     */
+    protected function findTemplate($name)
+    {
+        return $this->resolver->resolve($name);
     }
 
     /**
@@ -44,20 +89,33 @@ class FileLoader implements LoaderInterface
     public function getCacheKey($name)
     {
         $key = hash('sha256', $name);
+
         return $key;
     }
 
     /**
      * isFresh
      *
-     * @param mixed $name
-     * @param mixed $time
+     * @param string $name
+     * @param int $time
      *
-     * @access public
-     * @return mixed
+     * @return boolean
      */
     public function isFresh($name, $time)
     {
-        return filemtime($name) < $time;
+        return filemtime($this->findTemplate($name)) < $time;
+    }
+
+    /**
+     * isValid
+     *
+     * @param string $name
+     * @param int $time
+     *
+     * @return boolean
+     */
+    public function isValid($name, $time)
+    {
+        return $this->isFresh($name, $time);
     }
 }

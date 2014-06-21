@@ -23,6 +23,7 @@ interface DefinitionInterface
 
     public function addArgument($argument);
     public function getArguments();
+    public function getArgument($index);
     public function setArguments(array $arguments);
     public function replaceArgument($argument, $index);
 

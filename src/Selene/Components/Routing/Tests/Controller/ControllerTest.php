@@ -64,7 +64,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
         $controller = $this->setupController();
         $controller->getContainer()->shouldReceive('get')->with('view')->andReturn($view = m::mock('View'));
-        $view->shouldReceive('render')->with($str)->andReturn($str);
+        $view->shouldReceive('render')->with($str, [])->andReturn($str);
 
         $this->assertSame($str, $controller->callAction('actionIndex', [$str]));
     }

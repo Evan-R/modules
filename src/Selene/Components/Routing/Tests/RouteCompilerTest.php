@@ -258,7 +258,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
         $route = m::mock('Selene\Components\Routing\Route');
         $route->constraints = ['host' => [], 'route' => []];
 
-        $route->shouldReceive('getPath')->andReturn($path);
+        $route->shouldReceive('getPattern')->andReturn($path);
         $route->shouldReceive('getName')->andReturn($name);
         $route->shouldReceive('getMethods')->andReturn((array)$method);
 

@@ -697,15 +697,18 @@ class Container implements ContainerInterface
         foreach ($setters as $setter) {
 
             $method = key($setter);
-            $arguments = $setter[$method];
 
-            $synced = $this->getSyncedArguments($arguments);
+            $synced = $this->getSyncedArguments($arguments = $setter[$method]);
 
+            // if this caller needs injected services, it will be enqued to the
+            // sync callback, otherwise, call the caller directlty.
             if (!empty($synced)) {
+
                 $this->createSyncCallback($instance, $method, $arguments, $synced);
-            } else {
-                $this->applySetter($instance, $method, $arguments);
+                continue;
             }
+
+            $this->applySetter($instance, $method, $arguments);
         }
     }
 

@@ -21,5 +21,5 @@ interface LoaderInterface
 
     public function load($template);
 
-    public function isValid($template);
+    public function isValid($template, $time);
 }

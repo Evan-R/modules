@@ -183,12 +183,31 @@ class AbstractDefinition implements DefinitionInterface
     }
 
     /**
+     * getArgument
+     *
+     * @param int $index
+     *
+     * @throws \OutOfBoundsException if index exceeds argument count.
+     * @return mixed
+     */
+    public function getArgument($index)
+    {
+        if (!array_key_exists($i = (int)$index, ($args = $this->getArguments()))) {
+            throw new \OutOfBoundsException(
+                sprintf('Cannot get argument at index %s, index is out of bounds', $i)
+            );
+        }
+
+        return $args[$i];
+    }
+
+    /**
      * replaceArgument
      *
      * @param mixed $argument
      * @param mixed $index
      *
-     * @access public
+     * @throws \OutOfBoundsException if index exceeds argument count.
      * @return DefinitionInterface this instance.
      */
     public function replaceArgument($argument, $index)

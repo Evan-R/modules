@@ -18,5 +18,8 @@ namespace Selene\Components\Routing\Events;
  */
 class RouteFilterAbortEvent extends RouteDispatchEvent
 {
-
+    public function __construct($result = null)
+    {
+        $this->setResponse($result);
+    }
 }

@@ -126,6 +126,10 @@ class RouteCompiler
             );
 
             $tokens[] = ['variable', $offsetChar, $regexp, $paramName, $optional];
+
+            if ($optional && null === $route->getDefault($paramName)) {
+                $route->setDefault($paramName, null);
+            }
         }
 
         if (null !== $tail && 0 < strlen($tail)) {
@@ -198,13 +202,13 @@ class RouteCompiler
     private static function getRequirement(Route $route, $param, $host = false)
     {
         if (!$host) {
-            return static::getPathRequirement($route, $param);
+            return static::getPatternRequirement($route, $param);
         }
         return static::getHostRequirement($route, $param);
     }
 
     /**
-     * getPathRequirement
+     * getPatternRequirement
      *
      * @param Route $route
      * @param mixed $param
@@ -212,7 +216,7 @@ class RouteCompiler
      * @access private
      * @return mixed
      */
-    private static function getPathRequirement(Route $route, $param)
+    private static function getPatternRequirement(Route $route, $param)
     {
         if ($req = $route->getParamConstraint($param, null, false)) {
             return $req;

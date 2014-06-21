@@ -55,7 +55,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @var Selene\Components\Kernel\Debugger
      */
-    protected $debugger;
+    public $debugger;
 
     /**
      * configLoader
@@ -99,6 +99,8 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      */
     protected static $testEnv = 'testing';
 
+    protected static $version = '1.0.0 α';
+
     /**
      * Create a new Application instance.
      *
@@ -140,6 +142,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
             throw $e;
             return;
         }
+
         return $response;
     }
 
@@ -386,10 +389,8 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $class = $ns . '\\' . $className;
 
-
-
-        if (true) {
-        //if (!$cache->isValid()) {
+        //if (true) {
+        if (!$cache->isValid()) {
 
             $builder = $this->buildContainer($cache, $class, $file);
             $dumper = new PhpDumper($this->container, $ns, $className, $this->getContainerServiceId());
@@ -397,7 +398,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
             $cache->write($dumper->dump(), $builder->getResources());
 
         }
-
 
         return $this->loadContainerCache($class, $file);
     }
@@ -599,5 +599,10 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     {
         $paths = ListHelper::arrayFlatten($this->packageProviders);
         return $paths;
+    }
+
+    public static function version()
+    {
+        return static::$version;
     }
 }

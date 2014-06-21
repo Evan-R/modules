@@ -16,6 +16,7 @@ use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Exception\ContainerResolveException;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
 use \Selene\Components\Common\SeparatorParserInterface;
+use \Selene\Components\Routing\Mapper\ParameterMapper;
 
 /**
  * @class Resolver implements ResolverInterface, ContainerAwareInterface
@@ -53,7 +54,8 @@ class Resolver implements ResolverInterface, ContainerAwareInterface
     /**
      * find
      *
-     * @param Route $route
+     * @param string $action
+     * @param string $method http verb
      *
      * @throws \RuntimeException
      * @access public

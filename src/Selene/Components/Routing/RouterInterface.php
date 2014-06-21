@@ -24,17 +24,17 @@ use \Selene\Components\Events\DispatcherInterface;
  */
 interface RouterInterface
 {
-    public function setRoutes(RouteCollectionInterface $routes);
+    //public function setRoutes(RouteCollectionInterface $routes);
 
-    public function getRoutes();
+    //public function getRoutes();
 
-    public function getMatcher();
+    //public function getMatcher();
 
     public function dispatch(Request $request);
 
-    public function findRoute(Request $request);
+    //public function findRoute(Request $request);
 
-    public function registerFilter($name, $filter);
+    //public function registerFilter($name, $filter);
 
-    public function boot();
+    //public function boot();
 }

@@ -111,4 +111,15 @@ abstract class PackageConfiguration extends Configuration
     {
         return $this->packagePath;
     }
+
+    protected function mergeValues(array $values)
+    {
+        $config = [];
+
+        foreach ($values as $v) {
+            $config = array_merge($config, $v);
+        }
+
+        return $config;
+    }
 }

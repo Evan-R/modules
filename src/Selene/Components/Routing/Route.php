@@ -109,6 +109,28 @@ class Route implements Serializable
         $this->setMethods((array)$methods);
     }
 
+    public function filterBefore($filter)
+    {
+        if (!is_string($filter)) {
+            return;
+        }
+
+        $this->requirements['_before'][] = $filter;
+
+        return $this;
+    }
+
+    public function filterAfter($filter)
+    {
+        if (!is_string($filter)) {
+            return;
+        }
+
+        $this->requirements['_after'][] = $filter;
+
+        return $this;
+    }
+
     /**
      * addBeforeFilter
      *
@@ -122,6 +144,8 @@ class Route implements Serializable
         if (is_string($filters)) {
             $filters = explode('|', $filters);
         }
+
+        $this->requirements['_before'] = [];
 
         foreach ((array)$filters as $filter) {
             if (!in_array($filter, $this->requirements['_before'])) {
@@ -156,6 +180,8 @@ class Route implements Serializable
         if (is_string($filters)) {
             $filters = explode('|', $filters);
         }
+
+        $this->requirements['_after'] = [];
 
         foreach ((array)$filters as $filter) {
             if (!in_array($filter, $this->requirements['_after'])) {
@@ -324,6 +350,7 @@ class Route implements Serializable
     public function setDefaults(array $defaults)
     {
         $this->defaults['route'] = $defaults;
+
         return $this;
     }
 
@@ -339,6 +366,7 @@ class Route implements Serializable
     public function setDefault($var, $value)
     {
         $this->defaults['route'][$var] = $value;
+
         return $this;
     }
 
@@ -353,6 +381,7 @@ class Route implements Serializable
     public function setHostDefaults(array $defaults)
     {
         $this->defaults['host'] = $defaults;
+
         return $this;
     }
 
@@ -368,6 +397,7 @@ class Route implements Serializable
     public function setHostDefault($var, $value)
     {
         $this->defaults['host'][$var] = $value;
+
         return $this;
     }
 
@@ -512,10 +542,6 @@ class Route implements Serializable
      */
     public function setHostConstraint($param, $regexp)
     {
-        //if (!isset($this->requirements['_constraints']['host'])) {
-        //    $this->requirements['_constraints']['host'] = [];
-        //}
-
         $this->requirements['_constraints']['host'][$param] = $regexp;
 
         return $this;

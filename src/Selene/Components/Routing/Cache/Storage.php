@@ -58,10 +58,10 @@ class Storage implements StorageInterface
     public function write(RouteCollectionInterface $routes)
     {
         if ($this->driver->has($this->storeId)) {
-            $this->driver->replace($this->storeId, $routes);
-        } else {
-            $this->driver->put($this->storeId, $routes);
+            return $this->driver->replace($this->storeId, $routes);
         }
+
+        return $this->driver->put($this->storeId, $routes);
     }
 
     /**

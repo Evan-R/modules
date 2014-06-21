@@ -68,9 +68,9 @@ class Loader implements LoaderInterface
      * @access public
      * @return boole
      */
-    public function isValid($file)
+    public function isValid($file, $time)
     {
-        return filemtime($file) <= $this->time;
+        return filemtime($file) <= $time ?: $this->time;
     }
 
     /**

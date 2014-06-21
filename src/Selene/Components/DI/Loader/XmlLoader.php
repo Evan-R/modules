@@ -379,6 +379,7 @@ class XmlLoader extends Loader
         } elseif ('constant' === $type && defined($const = (string)$parameter->nodeValue)) {
             return constant($const);
         }
+
         return $this->getValueFromString((string)$parameter->nodeValue);
     }
 

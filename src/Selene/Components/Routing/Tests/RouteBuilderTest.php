@@ -29,7 +29,7 @@ class RouteBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new RouteBuilder;
 
-        $route = $builder->define('GET', 'foo', '/foo');
+        $route = $builder->define('GET', 'foo', '/foo', ['_action' => 'foo']);
 
         $this->assertInstanceof('\Selene\Components\Routing\Route', $route);
     }
@@ -43,9 +43,9 @@ class RouteBuilderTest extends \PHPUnit_Framework_TestCase
             '/',
             ['_host' => 'localhost', '_before' => 'auth'],
             function ($builder) {
-                $builder->define('GET', 'foo', '/foo');
+                $builder->define('GET', 'foo', '/foo', ['_action' => 'foo']);
                 $builder->group('/bar', function ($builder) {
-                    $builder->define('GET', 'foo.foo', '/foo');
+                    $builder->define('GET', 'foo.foo', '/foo', ['_action' => 'bar']);
                 });
             }
         );
@@ -62,31 +62,31 @@ class RouteBuilderTest extends \PHPUnit_Framework_TestCase
         $routes = $builder->getRoutes();
 
         $this->assertTrue($routes->has('user_photos.index'));
-        $this->assertEquals('/user/photos', $routes->get('user_photos.index')->getPath());
+        $this->assertEquals('/user/photos', $routes->get('user_photos.index')->getPattern());
         $this->assertEquals(['GET', 'HEAD'], $routes->get('user_photos.index')->getMethods());
 
         $this->assertTrue($routes->has('user_photos.create'));
-        $this->assertEquals('/user/photos/create', $routes->get('user_photos.create')->getPath());
+        $this->assertEquals('/user/photos/create', $routes->get('user_photos.create')->getPattern());
         $this->assertEquals(['GET', 'HEAD'], $routes->get('user_photos.create')->getMethods());
 
         $this->assertTrue($routes->has('user_photos.new'));
-        $this->assertEquals('/user/photos', $routes->get('user_photos.new')->getPath());
+        $this->assertEquals('/user/photos', $routes->get('user_photos.new')->getPattern());
         $this->assertEquals(['POST'], $routes->get('user_photos.new')->getMethods());
 
         $this->assertTrue($routes->has('user_photos.show'));
-        $this->assertEquals('/user/photos/{resource}', $routes->get('user_photos.show')->getPath());
+        $this->assertEquals('/user/photos/{resource}', $routes->get('user_photos.show')->getPattern());
         $this->assertEquals(['GET', 'HEAD'], $routes->get('user_photos.show')->getMethods());
 
         $this->assertTrue($routes->has('user_photos.edit'));
-        $this->assertEquals('/user/photos/edit/{resource}', $routes->get('user_photos.edit')->getPath());
+        $this->assertEquals('/user/photos/edit/{resource}', $routes->get('user_photos.edit')->getPattern());
         $this->assertEquals(['GET', 'HEAD'], $routes->get('user_photos.edit')->getMethods());
 
         $this->assertTrue($routes->has('user_photos.update'));
-        $this->assertEquals('/user/photos/{resource}', $routes->get('user_photos.update')->getPath());
+        $this->assertEquals('/user/photos/{resource}', $routes->get('user_photos.update')->getPattern());
         $this->assertEquals(['PUT', 'PATCH'], $routes->get('user_photos.update')->getMethods());
 
         $this->assertTrue($routes->has('user_photos.delete'));
-        $this->assertEquals('/user/photos/{resource}', $routes->get('user_photos.delete')->getPath());
+        $this->assertEquals('/user/photos/{resource}', $routes->get('user_photos.delete')->getPattern());
         $this->assertEquals(['DELETE'], $routes->get('user_photos.delete')->getMethods());
     }
 

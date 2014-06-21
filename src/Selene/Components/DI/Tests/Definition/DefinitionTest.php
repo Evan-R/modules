@@ -74,6 +74,31 @@ abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($def->requiresFile());
     }
 
+    /** @test */
+    public function itShouldGetArgumentAtIndex()
+    {
+        $def = $this->createDefinition('foo');
+        $def->setArguments([1, 2, 3]);
+
+        $this->assertSame(2, $def->getArgument(1));
+    }
+
+    /** @test */
+    public function itShouldThrowIfIndexIsOutOfBounds()
+    {
+        $def = $this->createDefinition('foo');
+        $def->setArguments([1, 2, 3]);
+
+        try {
+            $this->assertSame(2, $def->getArgument(3));
+        } catch (\OutOfBoundsException $e) {
+            $this->assertSame('Cannot get argument at index 3, index is out of bounds', $e->getMessage());
+            return;
+        }
+
+        $this->fail('test slipped');
+    }
+
     /**
      * @test
      */
