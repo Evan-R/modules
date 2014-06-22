@@ -24,9 +24,14 @@ use \Selene\Components\Common\SeparatorParser;
  */
 class PathParser extends SeparatorParser
 {
-    public function __construct($defaultNamespace = '__main__')
+    public function __construct($defaultNamespace = '__root__')
     {
         $this->defaultNamespace = $defaultNamespace;
+    }
+
+    public function getDefaultNamespace()
+    {
+        return $this->defaultNamespace;
     }
 
     public function parse($string)

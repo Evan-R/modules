@@ -14,6 +14,8 @@ namespace Selene\Components\Routing;
 use \Selene\Components\Common\Traits\Getter;
 
 /**
+ * Creates Routes on a route collection.
+ *
  * @class RouteBuilder
  *
  * @package Selene\Components\Routing
@@ -77,13 +79,12 @@ class RouteBuilder
     }
 
     /**
-     * group
+     * Starts a new entry point for grouping routes.
      *
-     * @param mixed $prefix
+     * @param string $prefix
      * @param array $requirements
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function group($prefix, $requirements = [], $groupConstructor = null)
     {
@@ -101,9 +102,8 @@ class RouteBuilder
     }
 
     /**
-     * endGroup
+     * Ends the group.
      *
-     * @access public
      * @return RouteBuilder
      */
     public function endGroup()
@@ -120,7 +120,6 @@ class RouteBuilder
      *
      * @param Route $route
      *
-     * @access public
      * @return RouteBuilder
      */
     public function add(Route $route)
@@ -131,7 +130,7 @@ class RouteBuilder
     }
 
     /**
-     * addRoutes
+     * Add a bunch of routes to the collection.
      *
      * @param RouteCollectionInterface $routes
      *
@@ -145,7 +144,7 @@ class RouteBuilder
     }
 
     /**
-     * getRoutes
+     * Get the route collection.
      *
      * @access public
      * @return RouteCollectionInterface
@@ -156,15 +155,14 @@ class RouteBuilder
     }
 
     /**
-     * get
+     * Define a route using the GET http verb.
      *
-     * @param mixed $name
-     * @param mixed $pattern
+     * @param string $name
+     * @param string $pattern
      * @param mixed $controller
      * @param mixed $requirements
      *
-     * @access public
-     * @return mixed
+     * @return Route
      */
     public function get($name, $pattern, $controller, $requirements = [])
     {
@@ -172,15 +170,14 @@ class RouteBuilder
     }
 
     /**
-     * post
+     * Define a route using the POST http verb.
      *
      * @param mixed $name
      * @param mixed $pattern
      * @param mixed $controller
      * @param mixed $requirements
      *
-     * @access public
-     * @return mixed
+     * @return Route
      */
     public function post($name, $pattern, $controller, $requirements = [])
     {
@@ -188,15 +185,14 @@ class RouteBuilder
     }
 
     /**
-     * put
+     * Define a route using the PUT http verb.
      *
      * @param mixed $name
      * @param mixed $pattern
      * @param mixed $controller
      * @param mixed $requirements
      *
-     * @access public
-     * @return mixed
+     * @return Route
      */
     public function put($name, $pattern, $controller, $requirements = [])
     {
@@ -204,15 +200,14 @@ class RouteBuilder
     }
 
     /**
-     * delete
+     * Define a route using the DELETE http verb.
      *
      * @param mixed $name
      * @param mixed $pattern
      * @param mixed $controller
      * @param mixed $requirements
      *
-     * @access public
-     * @return mixed
+     * @return Route
      */
     public function delete($name, $pattern, $controller, $requirements = [])
     {
@@ -220,15 +215,14 @@ class RouteBuilder
     }
 
     /**
-     * any
+     * Define a route using any of the GET, POST, PUT, DELETE http verbs.
      *
      * @param mixed $name
      * @param mixed $pattern
      * @param mixed $controller
      * @param mixed $requirements
      *
-     * @access public
-     * @return mixed
+     * @return Route
      */
     public function any($name, $pattern, $controller, $requirements = [])
     {
@@ -259,8 +253,6 @@ class RouteBuilder
         $requirements['_action'] = $controller;
         return $requirements;
     }
-
-
 
     /**
      * prefixPattern

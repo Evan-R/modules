@@ -14,21 +14,46 @@ namespace Selene\Components\Routing\Mapper;
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Maps Request parameters to Controller arguments.
+ *
  * @class ParamterMapper
  * @package Selene\Components\Routing
  * @version $Id$
  */
 class ParameterMapper
 {
+    /**
+     * pool
+     *
+     * @var array
+     */
     private $pool;
 
+    /**
+     * request
+     *
+     * @var Request
+     */
     private $request;
 
+    /**
+     * Creates a new ParameterMapper
+     */
     public function __construct()
     {
         $this->pool = [];
     }
 
+    /**
+     * map
+     *
+     * @param Request $request
+     * @param array $input
+     * @param \ReflectionObject $ref
+     * @param string $method
+     *
+     * @return array
+     */
     public function map(Request $request, array $input, \ReflectionObject $ref, $method)
     {
         if (!$rm = $this->getReflectionMethod($ref, $method)) {
@@ -52,6 +77,14 @@ class ParameterMapper
         return $args;
     }
 
+    /**
+     * parameterIsRequest
+     *
+     * @param Request $request
+     * @param \ReflectionParameter $param
+     *
+     * @return boolean
+     */
     private function parameterIsRequest(Request $request, \ReflectionParameter $param)
     {
         try {
@@ -65,11 +98,14 @@ class ParameterMapper
         return 0 === strcmp(get_class($request), $class->getName());
     }
 
-    private function getRequestReflection(Request $request)
-    {
-        return $this->request ? $this->request : $this->request = new \ReflectionObject($request);
-    }
-
+    /**
+     * getReflectionMethod
+     *
+     * @param \ReflectionObject $ref
+     * @param string $method
+     *
+     * @return \ReflectionMethod
+     */
     private function getReflectionMethod(\ReflectionObject $ref, $method)
     {
         $name = $ref->getName();
@@ -80,7 +116,5 @@ class ParameterMapper
         if ($ref->hasMethod($method) && (($rm = $ref->getMethod($method)) && $rm->isPublic())) {
             return $this->pool[$name][$method] = $rm;
         }
-
-        return false;
     }
 }
