@@ -27,7 +27,6 @@ use \Selene\Components\DI\Exception\CircularReferenceException;
  * @package Selene\Components\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class Container implements ContainerInterface
 {

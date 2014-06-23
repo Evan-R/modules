@@ -30,35 +30,23 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testTestCase()
     {
         $matcher = new RouteMatcher;
 
-        $matcher->onRouteMatch(function (Route $route, array $params) use (&$i) {
-            $params = array_intersect_key($params, array_flip($route->getVars()));
-            $route->setParams($params);
-            var_dump($route->getParams());
-        });
-
-        $matcher->prepareMatchers();
-
-        //$request = Request::create('/bar', 'GET');
-        $request = m::mock('\Symfony\Component\HttpFoundation\Request');
-
-        $request->shouldReceive('getMethod')->andReturn('GET');
-        $request->shouldReceive('getRequestUri')->andReturn('/bar');
-        $request->shouldReceive('getHost')->andReturn(null);
+        $request = Request::create('/bar', 'GET');
 
         $routes = new RouteCollection();
 
-        $routes->add($a = new Route('index', '/{foo?}', 'GET'));
-        $routes->add($b = new Route('user', '/user', 'GET'));
-        $routes->add($c = new Route('image', '/image', 'GET'));
+        $routes->add($a = new Route('index', '/{foo?}', 'GET', ['_action' => 'foo']));
+        $routes->add($b = new Route('user', '/user', 'GET', ['_action' => 'foo']));
+        $routes->add($c = new Route('image', '/image', 'GET', ['_action' => 'foo']));
 
-        $this->assertTrue($matcher->matches($request, $routes));
+        $this->assertInstanceof(
+            'Selene\Components\Routing\Matchers\MatchContext',
+            $matcher->matches($request, $routes)
+        );
     }
 
     protected function populateCollection(RouteCollectionInterface $routes, array $args)

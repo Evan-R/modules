@@ -114,8 +114,6 @@ class PathResolver implements ResolverInterface, LocatorInterface
 
         list ($name, $namespace, $template) = $this->parser->parse($name);
 
-        //var_dump($name, $namespace, $template);
-
         if (!isset($this->paths[$namespace])) {
             throw new \InvalidArgumentException(sprintf('namespace %s does not exist', $namespace));
         }

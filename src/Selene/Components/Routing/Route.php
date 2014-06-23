@@ -131,6 +131,23 @@ class Route implements Serializable
         return $this;
     }
 
+    public function parameterIsOptional($parameter)
+    {
+        $vars = (array)$this->getVars();
+
+        if (!in_array($parameter, $vars)) {
+            return false;
+        }
+
+        foreach ($this->getDefaultVar($this->compiledArgs, 'tokens') as $token) {
+            if ('variable' === $token[0] && true === $token[4]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * addBeforeFilter
      *
@@ -735,6 +752,15 @@ class Route implements Serializable
     private function setCompiledResults(array $results)
     {
         $this->compiledArgs = $results;
+    }
+
+    public function getTokens()
+    {
+        if (!$this->isCompiled()) {
+            return [];
+        }
+
+        return $this->compiledArgs['tokens'];
     }
 
     /**

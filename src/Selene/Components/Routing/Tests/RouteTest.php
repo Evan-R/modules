@@ -27,9 +27,23 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function itSouldCompile()
+    public function itSouldComplainIfNoActionIsSet()
     {
         $route = new Route('foo', '/foo/{bar}/{bam?}', 'GET');
+
+        try {
+            $route->compile();
+        } catch (\BadMethodCallException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function itSouldCompile()
+    {
+        $route = new Route('foo', '/foo/{bar}/{bam?}', 'GET', ['_action' => 'foo']);
         $route->compile();
 
         $this->assertTrue($route->isCompiled());
@@ -40,7 +54,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
      */
     public function itSouldBeCompiledAfterDeserialasation()
     {
-        $route = new Route('foo', '/foo/{bar}/{bam?}', 'GET');
+        $route = new Route('foo', '/foo/{bar}/{bam?}', 'GET', ['_action' => 'foo']);
 
         $str = serialize($route);
         $route = unserialize($str);
@@ -53,7 +67,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldPresentAStaticPathAfterCompilation()
     {
-        $route = new Route('foo', '/foo/{bar}/{bam?}', 'GET', ['_host' => '{sub}.domain.{tld}']);
+        $route = new Route('foo', '/foo/{bar}/{bam?}', 'GET', ['_host' => '{sub}.domain.{tld}', '_action' => 'foo']);
         $route->compile();
         $this->assertSame('/foo', $route->getStaticPath());
     }

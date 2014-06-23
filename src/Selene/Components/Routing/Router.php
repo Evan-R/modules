@@ -102,12 +102,13 @@ class Router implements RouterInterface
      */
     public function dispatch(Request $request)
     {
-
         if (!$context = $this->matcher->matches($request, $this->prepareRoutes())) {
             $this->handleNotFound($request);
+
+            return;
         }
 
-        return $this->dispatchRoute($context);
+        $this->dispatchRoute($context);
     }
 
     /**
@@ -137,8 +138,6 @@ class Router implements RouterInterface
 
         $event = $this->fireRouteDispatchEvent($context->getRoute(), $context->getRequest());
         $event->setResponse($result);
-
-        return $event;
     }
 
     /**
@@ -177,6 +176,22 @@ class Router implements RouterInterface
     }
 
     /**
+     * fireRouteDispatchEvent
+     *
+     * @param Route $route
+     * @param Request $request
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function fireRouteDispatchEvent(Route $route, Request $request)
+    {
+        $this->events->dispatch('router_dispatch', $event = $this->prepareDispatchEvent($route, $request));
+
+        return $event;
+    }
+
+    /**
      * Fire the not found event.
      *
      * @param Request $request
@@ -195,13 +210,6 @@ class Router implements RouterInterface
         $this->events->dispatch('route_not_found', new RouteNotFoundEvent($request));
     }
 
-    protected function fireRouteDispatchEvent(Route $route, Request $request)
-    {
-        $this->events->dispatch('router_dispatch', $event = $this->prepareDispatchEvent($route, $request));
-
-        return $event;
-    }
-
     /**
      * prepareRoutes
      *
@@ -212,7 +220,7 @@ class Router implements RouterInterface
     private function prepareRoutes()
     {
         if (!$routes = $this->getRoutes()) {
-            throw \RuntimeException;
+            throw new \RuntimeException;
         }
 
         return $routes;

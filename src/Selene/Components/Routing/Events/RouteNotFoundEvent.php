@@ -27,7 +27,7 @@ class RouteNotFoundEvent extends Event
 {
     private $request;
 
-    public function __construct(Request $requtest)
+    public function __construct(Request $request)
     {
         $this->request = $request;
     }

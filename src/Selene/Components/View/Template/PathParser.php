@@ -40,10 +40,12 @@ class PathParser extends SeparatorParser
 
         $namespace = $namespace ?: $this->defaultNamespace;
 
+        $ds = DIRECTORY_SEPARATOR;
+
         return [
-            trim($name, ':'),
+            strtr(trim($name, ':'), ['\\' => '.', '/' => '.']),
             $namespace,
-            ltrim(strtr($subpath, ['.' => DIRECTORY_SEPARATOR]) . DIRECTORY_SEPARATOR . $template, DIRECTORY_SEPARATOR)
+            ltrim(strtr($subpath, ['.' => $ds, ':' => $ds]) . DIRECTORY_SEPARATOR . $template, '\\/')
         ];
     }
 
@@ -62,6 +64,6 @@ class PathParser extends SeparatorParser
             }
         }
 
-        return $string;
+        return trim($string);
     }
 }

@@ -126,10 +126,6 @@ class RouteCompiler
             );
 
             $tokens[] = ['variable', $offsetChar, $regexp, $paramName, $optional];
-
-            if ($optional && null === $route->getDefault($paramName)) {
-                $route->setDefault($paramName, null);
-            }
         }
 
         if (null !== $tail && 0 < strlen($tail)) {
@@ -185,6 +181,8 @@ class RouteCompiler
             if (0 !== strlen($nextSeparator) || 0 === ($patternLen - $endOffset)) {
                 $regexp .= '+';
             }
+
+            //$route->setConstraint($paramName, $regexp);
         }
         return $regexp;
     }
@@ -204,6 +202,7 @@ class RouteCompiler
         if (!$host) {
             return static::getPatternRequirement($route, $param);
         }
+
         return static::getHostRequirement($route, $param);
     }
 
@@ -222,7 +221,8 @@ class RouteCompiler
             return $req;
         }
 
-        $route->setParamConstraint($param, static::REQUIREMENTS);
+        //$route->setParamConstraint($param, static::REQUIREMENTS);
+
         return false;
     }
 

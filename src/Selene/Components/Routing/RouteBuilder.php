@@ -251,6 +251,7 @@ class RouteBuilder
         }
 
         $requirements['_action'] = $controller;
+
         return $requirements;
     }
 
@@ -269,6 +270,7 @@ class RouteBuilder
         }
 
         $prefix = $this->getCurrentGroup()->getPrefix();
+
         return rtrim(('/' === $prefix ? $prefix : (rtrim($prefix, '/').'/')) . trim($pattern, '/'), '/');
     }
 
