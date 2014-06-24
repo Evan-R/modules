@@ -12,7 +12,7 @@
     "php":">=5.4.0",
     "selene/common":"dev-development",
     "selene/events":"dev-development",
-    "symfony/http-foundation": "~2.4.0"
+    "selene/http":"dev-development"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0",

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes>
+
+  <get name="index" path="/" action="indexAction"/>
+  <post name="index.create" path="/" action="indexCreateAction"/>
+  <put name="index.edit" path="/{id}" action="indexEditAction"/>
+  <delete name="index.delete" path="/{id}" action="indexDeleteAction"/>
+
+  <get name="baz" path="/baz" action="fooAction">
+    <host>localhost</host>
+  </get>
+
+  <get name="baz.show" path="/baz/{id}" action="fooAction">
+    <constaints>
+      <constraints key="id">(\d+)</constraints>
+    </constaints>
+  </get>
+
+  <route name="foo" path="/foo" method="GET" action="fooAction"/>
+  <route name="foo.bar" path="/foo/bar" method="GET|POST" action="fooBarAction"/>
+
+</routes>
+

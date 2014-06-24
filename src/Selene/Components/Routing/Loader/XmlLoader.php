@@ -46,25 +46,6 @@ class XmlLoader extends RoutingLoader
     }
 
     /**
-     * setRequirement
-     *
-     * @param mixed $route
-     * @param array $data
-     * @param mixed $attribute
-     *
-     * @access protected
-     * @return void
-     */
-    protected function setRequirement($route, array $data, $attribute)
-    {
-        if (!isset($data[$attribute])) {
-            return;
-        }
-
-        $route->setRequirement('_'.$attribute, $data[$attribute]);
-    }
-
-    /**
      * parseRoutes
      *
      * @param DOMDocument $xml
@@ -173,7 +154,7 @@ class XmlLoader extends RoutingLoader
         );
 
         if (!isset($requirements['prefix'])) {
-            throw new \InvalidArgumentException('Groupe requires an prefix.');
+            throw new \InvalidArgumentException('A routing group requires a prefix.');
         }
 
         $prefix = $requirements['prefix'];
@@ -341,16 +322,6 @@ class XmlLoader extends RoutingLoader
         }
 
         return $requirements;
-    }
-
-    protected static function getRouteClass()
-    {
-        return '\Selene\Components\Routing\Route';
-    }
-
-    protected function parseResources(DOMElement $routes)
-    {
-        return null;
     }
 
     private function getPhpValue(\DOMNode $parameter, $default = null)

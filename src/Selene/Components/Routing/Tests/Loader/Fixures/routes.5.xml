@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+  <get name="user" path="/user/{id}" action="userAction">
+    <constraints>
+      <constraint key="id">(\d+)</constraint>
+    </constraints>
+  </get>
+
+  <get name="members" path="/member/{id}" action="userAction">
+    <defaults>
+      <default key="id">12</default>
+    </defaults>
+  </get>
+
+  <get name="admin" path="/admin/{id}/{date?}" action="adminAction" host="selene.{tld}">
+    <constraints>
+      <constraint>(\d+)</constraint>
+    </constraints>
+    <constraintsHost>
+      <constraint key="tld">(dev|com)</constraint>
+    </constraintsHost>
+    <defaultsHost>
+      <default key="tld">dev</default>
+    </defaultsHost>
+  </get>
+</routes>

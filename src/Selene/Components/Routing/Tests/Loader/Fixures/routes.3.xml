@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes>
+  <routes name="index" prefix="/foo">
+    <get name="index.bar" path="/bar" action="fooBarAction"/>
+  </routes>
+</routes>

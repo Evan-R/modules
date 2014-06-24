@@ -429,6 +429,16 @@ class Route implements Serializable
         return $this->defaults['route'];
     }
 
+    public function getHostDefaults()
+    {
+        return $this->defaults['host'];
+    }
+
+    public function getHostDefault($var)
+    {
+        return $this->getDefaultVar($this->defaults['host'], $var);
+    }
+
     /**
      * getDefault
      *

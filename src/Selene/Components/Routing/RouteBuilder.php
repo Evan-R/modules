@@ -247,7 +247,7 @@ class RouteBuilder
      */
     public function resource($path, $resource, $actions = [], $resourceConstrait = null)
     {
-        $this->validateActions($actions);
+        $this->validateActions((array)$actions);
 
         $actions = empty($actions) ? $this->getDefaultActions() : $actions;
 

@@ -20,7 +20,19 @@ use \Symfony\Component\HttpFoundation\Request as SymfonyRequest;
  */
 interface RequestAwareInterface
 {
+    /**
+     * setRequest
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     *
+     * @return void
+     */
     public function setRequest(SymfonyRequest $request);
 
+    /**
+     * getRequest
+     *
+     * @return \Symfony\Component\HttpFoundation\Request
+     */
     public function getRequest();
 }
