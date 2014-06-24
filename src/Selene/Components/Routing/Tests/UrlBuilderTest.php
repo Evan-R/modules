@@ -15,6 +15,8 @@ use \Mockery as m;
 use \Selene\Components\Routing\Route;
 use \Selene\Components\Routing\UrlBuilder;
 use \Symfony\Component\HttpFoundation\Request;
+use \Selene\Components\Http\StackInterface;
+use \Selene\Components\Routing\RouteCollectionInterface;
 
 /**
  * @class UrlBuilderTest

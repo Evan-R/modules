@@ -45,13 +45,20 @@ abstract class RoutingLoader extends Loader
     protected $routes;
 
     /**
+     * @var string
+     */
+    protected $routesId;
+
+    /**
      * @param BuilderInterface $builder
      * @param LocaltorInterface $locator
      *
      * @access public
      */
-    public function __construct(BuilderInterface $builder, LocatorInterface $locator)
+    public function __construct(BuilderInterface $builder, LocatorInterface $locator, $routesId = 'routes')
     {
+        $this->routesId = $routesId;
+
         $this->container = $builder->getContainer();
         $this->builder = $builder;
         $this->routes = new RouteBuilder;
@@ -86,13 +93,13 @@ abstract class RoutingLoader extends Loader
      */
     protected function prepareContainer()
     {
-        if (!$this->container->hasDefinition('routes')) {
-            $this->container->define('routes', $this->getRouteCollectionClass());
+        if (!$this->container->hasDefinition($this->routesId)) {
+            $this->container->define($this->routesId, $this->getRouteCollectionClass());
         }
 
-        $routes = $this->container->get('routes');
+        $routes = $this->container->get($this->routesId);
 
-        $this->container->get('routes')->merge($this->routes->getRoutes());
+        $this->container->get($this->routesId)->merge($this->routes->getRoutes());
     }
 
     /**

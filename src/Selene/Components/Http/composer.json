@@ -1,0 +1,24 @@
+{
+    "name": "selene/http",
+    "description": "Http modules for selene",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thomas Appel",
+            "email": "mail@thomas-appel.com"
+        }
+    ],
+    "require": {
+        "selene/common": "dev-development",
+        "symfony/http-foundation": "~2.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0",
+        "mockery/mockery": "0.9.*@dev",
+        "league/phpunit-coverage-listener": "dev-master"
+    },
+    "autoload": {
+      "psr-4": {"Selene\\Components\\Http\\": ""}
+    },
+    "minimum-stability": "dev"
+}
