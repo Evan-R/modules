@@ -22,7 +22,7 @@ use \Selene\Components\Package\Tests\Stubs\StubPackage;
  * @package Selene\Components\Package\Tests
  * @version $Id$
  */
-class PackageTest extends TestCase
+class PackageTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldGetItsName()

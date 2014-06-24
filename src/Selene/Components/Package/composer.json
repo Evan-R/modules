@@ -14,7 +14,8 @@
     "selene/common":"dev-development"
   },
   "require-dev": {
-    "mockery/mockery": "dev-master"
+    "mockery/mockery": "0.9.*@dev",
+    "phpunit/phpunit": "~4.0"
   },
   "autoload": {
     "psr-4": {
