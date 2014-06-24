@@ -21,6 +21,24 @@
     "mockery/mockery": "0.9.*@dev",
     "mikey179/vfsStream": "1.2.0"
   },
+  "replace": {
+    "selene/cache": "self.version",
+    "selene/common": "self.version",
+    "selene/config": "self.version",
+    "selene/console": "self.version",
+    "selene/cryptography": "self.version",
+    "selene/di": "self.version",
+    "selene/events": "self.version",
+    "selene/filesystem": "self.version",
+    "selene/http": "self.version",
+    "selene/kernel": "self.version",
+    "selene/package": "self.version",
+    "selene/routing": "self.version",
+    "selene/stack": "self.version",
+    "selene/testsuite": "self.version",
+    "selene/view": "self.version",
+    "selene/xml": "self.version"
+  },
   "autoload": {
     "psr-4": {
       "Selene\\Components\\":""
