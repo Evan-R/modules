@@ -25,15 +25,16 @@ use \Selene\Components\TestSuite\TestCase;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class CacheTest extends TestCase
+class CacheTest extends \PHPUnit_Framework_TestCase
 {
     protected $root;
+
     protected $path;
 
     protected function setUp()
     {
-        $this->root = vfsStream::setUp('testdrive/cache');
-        $this->path = vfsStream::url('testdrive/cache');
+        $this->root = vfsStream::setUp('testdrive');
+        $this->path = vfsStream::url('testdrive');
     }
 
     /** @test */

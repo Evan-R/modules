@@ -16,6 +16,7 @@ use \Selene\Components\Routing\Route;
 use \Selene\Components\Routing\Router;
 use \Selene\Components\Routing\RouteCollection;
 use \Selene\Components\Routing\RouteCollectionInterface;
+use \Selene\Components\Events\Dispatcher;
 
 /**
  * @class RouterTest
@@ -68,11 +69,33 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $router->setEvents($this->events);
 
         $this->events->shouldReceive('dispatch')->andReturnUsing(function ($eventName, $event) {
-            $this->assertSame('route_not_found', $eventName);
+            $this->assertSame(Router::EVENT_ROUTE_NOT_FOUND, $eventName);
             $this->assertInstanceof('Selene\Components\Routing\Events\RouteNotFoundEvent', $event);
         });
 
         $this->assertNull($router->dispatch($request));
+    }
+
+    /** @test */
+    public function itIsExpectedThat()
+    {
+        $status = null;
+        $router = $this->getRouter();
+        $request = $this->getRequestMock();
+
+        $this->matcher->shouldReceive('matches')->andReturn(false);
+
+        $router->setEvents($events = new Dispatcher);
+        $router->setRoutes(new RouteCollection);
+
+        //$events->on(Router::EVENT_ON_DISPATCH, function ($event) use (&$status) {
+        //    var_dump('asd');
+        //    $status = $event->getResponse()->getStatus();
+        //});
+
+        //$router->dispatch($request);
+
+        //$this->assertSame(404, $status);
     }
 
     /**

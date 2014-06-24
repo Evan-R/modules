@@ -236,6 +236,69 @@ class RouteBuilder
     }
 
     /**
+     * resource
+     *
+     * @param string $path
+     * @param string $resource
+     * @param array  $actions
+     * @param array  $resourceConstrait
+     *
+     * @return RouteBuilder
+     */
+    public function resource($path, $resource, $actions = [], $resourceConstrait = null)
+    {
+        $this->validateActions($actions);
+
+        $actions = empty($actions) ? $this->getDefaultActions() : $actions;
+
+        foreach ($actions as $action) {
+
+            list ($pattern, $controllerAction, $name) = $this->getResourcePaths(trim($path, '/'), strtolower($action));
+
+            $route = $this->define(
+                $this->getResourceActionVerb($action),
+                $name,
+                $pattern,
+                ['_action' => $resource.':'.$controllerAction]
+            );
+
+            if (is_string($resourceConstrait)) {
+                $route->setConstraint('resource', $resourceConstrait);
+            }
+        }
+    }
+
+    private function validateActions(array $actions = [])
+    {
+        if (!(bool)$actions) {
+            return;
+        }
+
+        $defaults = $this->getDefaultActions();
+
+
+        foreach ($actions as $action) {
+            if (!in_array($action, $defaults)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Invalid action name "%s", action must be %s', $action, $this->lexDefaults($defaults))
+                );
+            }
+        }
+    }
+
+    private function lexDefaults(array $defaults)
+    {
+        $defaults = explode(',', '"'.implode('","', $defaults).'"');
+
+        if (1 < ($c = count($defaults))) {
+            $last = array_pop($defaults);
+            $defaults[] = 'or ' . $last;
+        }
+
+        return implode(', ', $defaults);
+    }
+
+    /**
      * extractShortcutArgs
      *
      * @param mixed $controller
@@ -289,37 +352,6 @@ class RouteBuilder
         }
 
         return array_merge_recursive($this->getCurrentGroup()->getRequirements(), $requirements);
-    }
-
-    /**
-     * resource
-     *
-     * @param mixed $name
-     * @param mixed $pattern
-     * @param mixed $resource
-     *
-     * @access public
-     * @return RouteBuilder
-     */
-    public function resource($path, $resource, $actions = [], $resourceConstrait = null)
-    {
-        $actions = empty($actions) ? $this->getDefaultActions() : $actions;
-
-        foreach ($actions as $action) {
-
-            list ($pattern, $controllerAction, $name) = $this->getResourcePaths(trim($path, '/'), strtolower($action));
-
-            $route = $this->define(
-                $this->getResourceActionVerb($action),
-                $name,
-                $pattern,
-                ['_action' => $resource.':'.$controllerAction]
-            );
-
-            if (is_string($resourceConstrait)) {
-                $route->setConstraint('resource', $resourceConstrait);
-            }
-        }
     }
 
     /**

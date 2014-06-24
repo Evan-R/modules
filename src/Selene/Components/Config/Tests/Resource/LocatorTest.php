@@ -51,7 +51,7 @@ class LocatorTest extends \PHPUnit_Framework_TestCase
 
         $files = $locator->locate($file, true);
 
-        $this->assertTrue(2 === count($files));
+        $this->assertSame(count($locations), count($files));
 
         $resource = $locator->locate($file, false);
 
@@ -63,6 +63,9 @@ class LocatorTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 ['dirA', 'dirB'], 'examplefile'
+            ],
+            [
+                ['dirC'], 'services.xml'
             ]
         ];
     }
@@ -70,10 +73,11 @@ class LocatorTest extends \PHPUnit_Framework_TestCase
     protected function setUpLocations(array $locations, $file)
     {
         $files = [];
+
         foreach ($locations as $loc) {
             mkdir($dir = $this->path.DIRECTORY_SEPARATOR.$loc);
-            touch($file = $dir.DIRECTORY_SEPARATOR.$file);
-            $files[] = $file;
+            touch($f = $dir.DIRECTORY_SEPARATOR.$file);
+            $files[] = $f;
         }
 
         return $files;

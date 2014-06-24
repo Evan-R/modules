@@ -181,7 +181,7 @@ class Route implements Serializable
      */
     public function getBeforeFilters()
     {
-        return $this->getDefaultVar($this->requirements, '_before');
+        return (array)$this->getDefaultVar($this->requirements, '_before', []);
     }
 
     /**
@@ -217,7 +217,7 @@ class Route implements Serializable
      */
     public function getAfterFilters()
     {
-        return $this->getDefaultVar($this->requirements, '_after');
+        return (array)$this->getDefaultVar($this->requirements, '_after', []);
     }
 
     /**

@@ -58,6 +58,7 @@ abstract class Configuration implements ConfigurationInterface
     final public function validate(array $config)
     {
         $validator = new Validator($this->getConfigTree(), $config);
+
         return $validator->validate();
     }
 
@@ -83,6 +84,7 @@ abstract class Configuration implements ConfigurationInterface
         if (null === $this->builder) {
             $this->builder = new Builder($name);
         }
+
         return $this->builder;
     }
 

@@ -24,7 +24,6 @@ use \Selene\Components\Package\Tests\Stubs\StubPackage;
  */
 class PackageTest extends TestCase
 {
-
     /** @test */
     public function itShouldGetItsName()
     {
@@ -57,6 +56,6 @@ class PackageTest extends TestCase
     public function itShouldGetItsMetaInfo()
     {
         $package = new StubPackage;
-        $this->assertSame(__DIR__.DIRECTORY_SEPARATOR.'Stubs'.DIRECTORY_SEPARATOR.'meta.xml', $package->getMeta());
+        $this->assertSame(__DIR__.DIRECTORY_SEPARATOR.'Stubs'.DIRECTORY_SEPARATOR.'package.xml', $package->getMeta());
     }
 }

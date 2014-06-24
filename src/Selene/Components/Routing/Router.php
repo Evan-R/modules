@@ -36,9 +36,13 @@ class Router implements RouterInterface
 
     const ROUTE_AFTER   = 'route_after';
 
-    const FILTER_BEFORE = 'filter_before';
+    const EVENT_FILTER_BEFORE = 'filter_before';
 
-    const FILTER_AFTER  = 'filter_after';
+    const EVENT_FILTER_AFTER  = 'filter_after';
+
+    const EVENT_ROUTE_NOT_FOUND = 'route_not_found';
+
+    const EVENT_ON_DISPATCH = 'router_dispatch';
 
     private $routes;
 
@@ -125,7 +129,7 @@ class Router implements RouterInterface
             $route   = $context->getRoute()
         )) {
 
-            $this->events->dispatch('router_dispatch', $event = new RouteFilterAbortEvent($result));
+            $this->events->dispatch(static::EVENT_ON_DISPATCH, $event = new RouteFilterAbortEvent($result));
 
             return;
         }
@@ -152,7 +156,20 @@ class Router implements RouterInterface
     {
         foreach ((array)$route->getBeforeFilters() as $filter) {
             if ($result = $this->events->dispatch(
-                static::FILTER_BEFORE . '.' . $filter,
+                static::EVENT_FILTER_BEFORE . '.' . $filter,
+                new RouteFilterEvent($route, $request)
+            )) {
+
+                return current($result);
+            }
+        }
+    }
+
+    protected function fireAfterFilters(Request $request, Route $route)
+    {
+        foreach ((array)$route->getBeforeFilters() as $filter) {
+            if ($result = $this->events->dispatch(
+                static::EVENT_FILTER_AFTER . '.' . $filter,
                 new RouteFilterEvent($route, $request)
             )) {
 
@@ -186,7 +203,7 @@ class Router implements RouterInterface
      */
     protected function fireRouteDispatchEvent(Route $route, Request $request)
     {
-        $this->events->dispatch('router_dispatch', $event = $this->prepareDispatchEvent($route, $request));
+        $this->events->dispatch(static::EVENT_ON_DISPATCH, $event = $this->prepareDispatchEvent($route, $request));
 
         return $event;
     }
@@ -207,7 +224,7 @@ class Router implements RouterInterface
             );
         }
 
-        $this->events->dispatch('route_not_found', new RouteNotFoundEvent($request));
+        $this->events->dispatch(static::EVENT_ROUTE_NOT_FOUND, new RouteNotFoundEvent($request));
     }
 
     /**

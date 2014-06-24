@@ -23,8 +23,8 @@
     "psr/log": "~1.0"
   },
   "require-dev": {
-    "mockery/mockery": "dev-master",
-    "mikey179/vfsStream": "dev-master",
+    "mockery/mockery": "0.9.*@dev",
+    "mikey179/vfsStream": "1.2.0",
     "symfony/dependency-injection":"~2.4.0"
   },
   "config": {

@@ -12,7 +12,6 @@
 namespace Selene\Components\Config;
 
 use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\DI\ContainerInterface;
 
 /**
  * @class ConfigrurationInterface

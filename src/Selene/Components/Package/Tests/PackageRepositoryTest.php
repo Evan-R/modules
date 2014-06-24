@@ -92,14 +92,14 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $pass = false;
         $builder = m::mock('\Selene\Components\DI\BuilderInterface');
-        $builder->shouldReceive('addFileResource')->with('meta.xml');
+        $builder->shouldReceive('addFileResource')->with('package.xml');
 
         $container = new Container;
         $builder->shouldReceive('getContainer')->andReturn($container);
 
         $package = m::mock('\Selene\Components\Package\PackageInterface');
 
-        $package->shouldReceive('getMeta')->andReturn('meta.xml');
+        $package->shouldReceive('getMeta')->andReturn('package.xml');
         $package->shouldReceive('getName')->andReturn('AcmePackage');
         $package->shouldReceive('getAlias')->andReturn('acme');
         $package->shouldReceive('getConfiguration')->andReturn(null);
@@ -149,7 +149,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $package = m::mock('\Selene\Components\Package\PackageInterface');
 
-        $package->shouldReceive('getMeta')->andReturn('meta.xml');
+        $package->shouldReceive('getMeta')->andReturn('package.xml');
         $package->shouldReceive('getName')->andReturn('AcmePackage');
         $package->shouldReceive('getAlias')->andReturn('acme');
         $package->shouldReceive('getConfiguration')->andReturn($config);
