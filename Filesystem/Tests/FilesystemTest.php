@@ -331,17 +331,80 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileEquals($source, $expected);
     }
 
+    /** @test */
+    public function itShouldMakeFileBackUps()
+    {
+        $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_file.txt';
+
+        file_put_contents($source, 'source_content', LOCK_EX);
+
+        $date = (new \DateTime())->format('Y-m-d-His');
+
+        $backup = $this->testDrive.DIRECTORY_SEPARATOR.'source_file.'.$date.'.txt~';
+
+        $this->fs->backup($source);
+
+        $this->assertFileExists($backup = $this->testDrive.DIRECTORY_SEPARATOR.'source_file.'.$date.'.txt~');
+
+        $this->assertFileEquals($source, $backup);
+    }
+
+    /** @test */
+    public function itShouldMakeFileBackUpsAndEnumerate()
+    {
+        $date = (new \DateTime())->format('Y-m-d-His');
+
+        $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_file.txt';
+        $backup = $this->testDrive.DIRECTORY_SEPARATOR.'source_file.'.$date.'.txt~';
+
+        file_put_contents($source, 'source_content', LOCK_EX);
+        file_put_contents($backup, 'source_content', LOCK_EX);
+
+        $this->fs->backup($source);
+
+        $this->assertFileExists($backup = $this->testDrive.DIRECTORY_SEPARATOR.'source_file.'.$date.'-1.txt~');
+
+        $this->assertFileEquals($source, $backup);
+    }
+
+    /** @test */
+    public function itShouldMakeDirecotyBackUps()
+    {
+        $this->buildTree();
+
+        $dir =  $this->testDrive.DIRECTORY_SEPARATOR.'source_tree';
+
+        $date = (new \DateTime())->format('Y-m-d-His');
+
+        $backup = $dir.'-'.$date.'~';
+
+        $this->fs->backup($dir);
+
+        $this->assertFileExists($backup);
+        $this->assertTrue(is_dir($backup));
+
+        $this->assertFileExists($backup.DIRECTORY_SEPARATOR.'.git');
+
+        $this->assertFileEquals($dir, $backup);
+    }
+
     /**
      * @test
      */
     public function testDirectoryCopy()
     {
         $this->buildTree();
+
         $source = $this->testDrive.DIRECTORY_SEPARATOR.'source_tree';
         $target = $this->testDrive.DIRECTORY_SEPARATOR.'target_tree';
 
-        $this->fs->copy($source, $target);
+        $this->assertTrue(!is_dir($target));
+
+        $bytes = $this->fs->copy($source, $target);
+
         $this->assertFileEquals($source, $target);
+
+        $this->assertTrue(is_dir($target), 'Target should be directory.');
     }
 
     /**

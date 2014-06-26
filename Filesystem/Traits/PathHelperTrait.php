@@ -78,20 +78,33 @@ trait PathHelperTrait
      */
     public function expandPath($path)
     {
+        $prefix = $this->isAbsolutePath($path) ? DIRECTORY_SEPARATOR : '';
+
         $bits = explode(DIRECTORY_SEPARATOR, str_replace('\\/', DIRECTORY_SEPARATOR, $path));
 
         $p = [];
 
+        $skip = 0;
+
         while (count($bits)) {
+
             $part = array_pop($bits);
-            if ('..' === $part) {
-                array_pop($bits);
-            } elseif ('' !== $part) {
+
+            if (0 === strcmp($part, '..')) {
+                $skip++;
+                continue;
+            }
+
+            if (0 < $skip) {
+                $skip--;
+                continue;
+            }
+
+            if ('' !== $part) {
                 $p[] = $part;
             }
         }
 
-        return implode(DIRECTORY_SEPARATOR, array_reverse($p));
+        return $prefix . trim(implode(DIRECTORY_SEPARATOR, array_reverse($p)), DIRECTORY_SEPARATOR);
     }
-
 }

@@ -22,7 +22,6 @@ use \Selene\Components\Filesystem\Traits\PathHelperTrait;
  * @package Selene\Components\Filesystem
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class Filesystem
 {
@@ -102,7 +101,6 @@ class Filesystem
      * @param int $directoryPermissions
      * @param int $filePermissions
      *
-     * @access public
      */
     public function __construct($directoryPermissions = 0755, $filePermissions = 0644)
     {
@@ -113,7 +111,6 @@ class Filesystem
     /**
      * create
      *
-     * @access public
      * @return Filesystem
      */
     public function create()
@@ -128,7 +125,6 @@ class Filesystem
      * @param integer $permissions
      * @param boolean $recursive
      *
-     * @access public
      * @return void
      */
     public function mkdir($dir, $permissions = 0755, $recursive = true)
@@ -146,7 +142,7 @@ class Filesystem
      * @param string $dir the directory path.
      *
      * @throws \Selene\Components\Filesystem\Exception\IOException
-     * @access public
+     *
      * @return void
      */
     public function rmdir($directory)
@@ -163,7 +159,7 @@ class Filesystem
      * Removes all conatining files and directories within the given directory.
      *
      * @throws \Selene\Components\Filesystem\Exception\IOException
-     * @access public
+     *
      * @return void
      */
     public function flush($directory)
@@ -184,8 +180,7 @@ class Filesystem
      *
      * @param string $directory path to the directory.
      *
-     * @access public
-     * @return bool
+     * @return boolean
      */
     public function isEmpty($directory)
     {
@@ -203,7 +198,7 @@ class Filesystem
      * @param integer $atime the accesstime as unix timestamp.
      *
      * @throws \Selene\Components\Filesystem\Exception\IOException
-     * @access public
+     *
      * @return boolean true if touching of the file was successful.
      */
     public function touch($file, $time = null, $atime = null)
@@ -220,8 +215,7 @@ class Filesystem
      *
      * @param string $file the file path.
      *
-     * @access public
-     * @return mixed
+     * @return boolean
      */
     public function unlink($file)
     {
@@ -233,17 +227,19 @@ class Filesystem
      *
      * @param mixed $file
      *
-     * @access public
-     * @return mixed
+     * @return boolean
      */
     public function remove($file)
     {
         if ($this->isFile($file)) {
             return $this->unlink($file);
         }
+
         if ($this->isDir($file)) {
             return $this->rmdir($file);
         }
+
+        return false;
     }
 
     /**
@@ -257,34 +253,51 @@ class Filesystem
      * @param boolean $replace
      *
      * @throws \Selene\Components\Filesystem\Exception\IOException
-     * @access public
+     *
      * @return integer returns the total count of bytes that where copied.
      */
     public function copy($source, $target = null, $replace = false)
     {
-        if (!$this->isFile($source) && !$this->isDir($source)) {
+        if ($this->isDir($source)) {
+            return $this->copyDir($source, $target, $replace);
+        }
+
+        if (!$this->isFile($source)) {
             throw new IOException(sprintf('%s: no such file or directory', $source));
         }
 
-        if (is_null($target)) {
-            $target = $this->enum($source, $this->getCopyStartOffset(), $this->getCopyPrefix());
-        } elseif ($this->exists($target)) {
-            if (!$replace) {
-                throw new IOException(sprintf('target %s exists', $target));
-            }
-            $this->remove($target);
-        }
+        $target = $this->validateCopyTarget($source, $target, $replace);
 
         $this->ensureDirectory(dirname($target));
 
-        $source = fopen($source, 'r');
-        $target = fopen($target, 'w+');
-        $result = stream_copy_to_stream($source, $target);
+        return $this->doCopyFile($source, $target);
+    }
 
-        fclose($source);
-        fclose($target);
+    /**
+     * copyDir
+     *
+     * @param string $source
+     * @param string $target
+     * @param boolean $replace
+     * @param boolean $followLinks
+     *
+     * @return integer
+     */
+    public function copyDir($source, $target = null, $replace = false, $followLinks = false)
+    {
+        if (!$this->isDir($source)) {
+            throw new IOException(sprintf('"%s" is not a directory', $source));
+        }
 
-        return $result;
+        $target = $this->validateCopyTarget($source, $target, $replace);
+
+        $flags = FilesystemIterator::SKIP_DOTS;
+
+        if ($followLinks) {
+            $flags = $flags | FilesystemIteratorF::OLLOW_SYMLINKS;
+        }
+
+        return $this->doCopyDir($source, $target, $flags);
     }
 
     /**
@@ -295,7 +308,7 @@ class Filesystem
      * @param boolean $recursive
      *
      * @throws \Selene\Components\Filesystem\Exception\IOException
-     * @access public
+     *
      * @return void
      */
     public function chmod($file, $permission = 0755, $recursive = true, $umask = 0000)
@@ -322,8 +335,8 @@ class Filesystem
      * @param mixed $param
      *
      * @throws \Selene\Components\Filesystem\Exception\IOException
-     * @access public
-     * @return mixed
+     *
+     * @return boolean
      */
     public function chown($file, $owner, $recursive = true)
     {
@@ -347,6 +360,8 @@ class Filesystem
                 throw new IOException(sprintf('could not change owner on %s', $item));
             }
         }
+
+        return true;
     }
 
     /**
@@ -355,8 +370,9 @@ class Filesystem
      * @param mixed $file
      * @param mixed $group
      *
-     * @access public
-     * @return void
+     * @throws \Selene\Components\Filesystem\Exception\IOException
+     *
+     * @return boolean
      */
     public function chgrp($file, $group, $recursive = true)
     {
@@ -380,6 +396,8 @@ class Filesystem
                 throw new IOException(sprintf('could not change group on %s', $item));
             }
         }
+
+        return true;
     }
 
     /**
@@ -388,8 +406,9 @@ class Filesystem
      * @param mixed $file
      * @param mixed $mode
      *
-     * @access public
-     * @return mixed
+     * @throws \InvalidArgumentException if file is invalid.
+     *
+     * @return boolean
      */
     public function mask($file, $mode = null)
     {
@@ -407,8 +426,7 @@ class Filesystem
      *
      * @param mixed $param
      *
-     * @access public
-     * @return bool
+     * @return boolean
      */
     public function exists($file)
     {
@@ -420,8 +438,7 @@ class Filesystem
      *
      * @param mixed $file
      *
-     * @access public
-     * @return bool
+     * @return boolean
      */
     public function isDir($file)
     {
@@ -433,8 +450,7 @@ class Filesystem
      *
      * @param mixed $file
      *
-     * @access public
-     * @return bool
+     * @return boolean
      */
     public function isFile($file)
     {
@@ -446,8 +462,7 @@ class Filesystem
      *
      * @param mixed $file
      *
-     * @access public
-     * @return bool
+     * @return boolean
      */
     public function isLink($file)
     {
@@ -455,11 +470,12 @@ class Filesystem
     }
 
     /**
-     * ensure
+     * Ensure that a directory exists.
      *
-     * @param mixed $file
+     * Will create the dircetory if needed.
      *
-     * @access public
+     * @param string $file
+     *
      * @return void
      */
     public function ensureDirectory($dir)
@@ -470,11 +486,12 @@ class Filesystem
     }
 
     /**
-     * ensureFile
+     * Ensure that a file exists.
      *
-     * @param mixed $file
+     * Will create the file if needed.
      *
-     * @access public
+     * @param string $file
+     *
      * @return void
      */
     public function ensureFile($file)
@@ -486,12 +503,11 @@ class Filesystem
     }
 
     /**
-     * userExists
+     * Checks if a user id exists.
      *
-     * @param mixed $uid
+     * @param string $uid
      *
-     * @access public
-     * @return bool
+     * @return boolean
      */
     public function uidExists($uid)
     {
@@ -503,11 +519,10 @@ class Filesystem
     }
 
     /**
-     * groupExists
+     * Checks if a goup id exists.
      *
-     * @param mixed $groupID
+     * @param sring $groupID
      *
-     * @access public
      * @return boolean
      */
     public function gidExists($gid)
@@ -520,12 +535,11 @@ class Filesystem
     }
 
     /**
-     * fileMTime
+     * Get the file modification time.
      *
-     * @param mixed $file
+     * @param string $file
      *
-     * @access public
-     * @return mixed
+     * @return integer
      */
     public function fileMTime($file)
     {
@@ -533,12 +547,11 @@ class Filesystem
     }
 
     /**
-     * fileATime
+     * Get the file access time.
      *
-     * @param mixed $file
+     * @param string $file
      *
-     * @access public
-     * @return mixed
+     * @return integer
      */
     public function fileATime($file)
     {
@@ -546,12 +559,11 @@ class Filesystem
     }
 
     /**
-     * fileCTime
+     * Get the file creation time.
      *
-     * @param mixed $file
+     * @param string $file
      *
-     * @access public
-     * @return mixed
+     * @return integer
      */
     public function fileCTime($file)
     {
@@ -561,9 +573,8 @@ class Filesystem
     /**
      * file
      *
-     * @param mixed $file
+     * @param string $file
      *
-     * @access public
      * @return File
      */
     public function file($file)
@@ -577,39 +588,11 @@ class Filesystem
      * @param string $directory
      * @param int    $flags
      *
-     * @access public
      * @return Directory
      */
     public function directory($directory, $flags = Directory::IGNORE_VCS)
     {
         return new Directory($this, $directory, $flags);
-    }
-
-    /**
-     * rmRecursive
-     *
-     * @param mixed $dir
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function rmRecursive($dir)
-    {
-        $iterator = new FilesystemIterator($dir, FilesystemIterator::CURRENT_AS_SELF|FilesystemIterator::SKIP_DOTS);
-
-        foreach ($iterator as $fileInfo) {
-
-            if ($fileInfo->isFile() or $fileInfo->isLink()) {
-                $this->unlink($fileInfo->getPathName());
-                continue;
-            }
-
-            if ($fileInfo->isDir()) {
-                $this->rmRecursive($dir = $fileInfo->getPathName());
-                rmdir($dir);
-                continue;
-            }
-        }
     }
 
     /**
@@ -619,7 +602,6 @@ class Filesystem
      * @param mixed $content
      * @param mixed $writeFlags
      *
-     * @access public
      * @return mixed
      */
     public function setContents($file, $content, $writeFlags = LOCK_EX)
@@ -635,7 +617,6 @@ class Filesystem
      * @param mixed $file
      * @param mixed $readFlags
      *
-     * @access public
      * @return mixed
      */
     public function getContents($file, $includepath = null, $context = null, $start = null, $stop = null)
@@ -650,7 +631,6 @@ class Filesystem
      *
      * @param mixed $param
      *
-     * @access public
      * @return mixed
      */
     public function rename($source, $target, $overwrite = false)
@@ -668,7 +648,6 @@ class Filesystem
      *
      * @param mixed $prefix
      *
-     * @access public
      * @return string
      */
     public function setCopyPrefix($prefix)
@@ -681,7 +660,6 @@ class Filesystem
      *
      * @param mixed $offset
      *
-     * @access public
      * @return mixed
      */
     public function setCopyStartOffset($offset)
@@ -692,7 +670,6 @@ class Filesystem
     /**
      * getCopyPrefix
      *
-     * @access protected
      * @return string
      */
     public function getCopyPrefix()
@@ -708,7 +685,6 @@ class Filesystem
      * getCopyStartOffset
      *
      *
-     * @access public
      * @return string
      */
     public function getCopyStartOffset()
@@ -734,10 +710,9 @@ class Filesystem
      * @param string  $prefix the enumeration static prefix, e.g. "copy".
      * @param boolean $pad    there's a prefix and paddin is true, it will add.
      *
-     * @access public
      * @return string
      */
-    public function enum($file, $start, $prefix = null, $pad = true)
+    public function enum($file, $start = 0, $prefix = null, $pad = true)
     {
         if ($this->isFile($file)) {
             return $this->enumFile($file, $start, $prefix, $pad);
@@ -749,12 +724,107 @@ class Filesystem
     }
 
     /**
+     * backup
+     *
+     * @param string $file
+     * @param string $dateFormat
+     * @param string $suffix
+     *
+     * @return void
+     */
+    public function backup($file, $dateFormat = 'Y-m-d-His', $suffix = '~')
+    {
+        $date = (new \DateTime())->format('Y-m-d-His');
+        $target = null;
+
+        if ($this->isFile($file)) {
+            $target = $this->getBackupFileName($file.$suffix, $date);
+        } elseif ($this->isDir($file)) {
+            $target =  $this->getBackupDirName($file, $date, $suffix);
+        }
+
+        if (null !== $target) {
+            $this->copy($file, $target);
+        }
+    }
+
+    /**
+     * rmRecursive
+     *
+     * @param mixed $dir
+     *
+     * @return mixed
+     */
+    protected function rmRecursive($dir)
+    {
+        $iterator = new FilesystemIterator($dir, FilesystemIterator::CURRENT_AS_SELF|FilesystemIterator::SKIP_DOTS);
+
+        foreach ($iterator as $fileInfo) {
+
+            if ($fileInfo->isFile() || $fileInfo->isLink()) {
+                $this->unlink($fileInfo->getPathName());
+                continue;
+            }
+
+            if ($fileInfo->isDir()) {
+                $this->rmRecursive($dir = $fileInfo->getPathName());
+                rmdir($dir);
+                continue;
+            }
+        }
+    }
+
+    /**
+     * getBackupFileName
+     *
+     * @param string $source
+     * @param string $date
+     *
+     * @return string
+     */
+    protected function getBackupFileName($source, $date)
+    {
+        $num       = 1;
+        $extension = pathinfo($source, PATHINFO_EXTENSION);
+        $basename  = basename($source, $extension);
+        $basename  = dirname($source).DIRECTORY_SEPARATOR.$basename.$date;
+        $file      = $basename.'.'.$extension;
+
+        while ($this->isFile($file)) {
+            $file = $basename . '-' . (string)$num++ .'.'.$extension;
+        }
+
+        return $file;
+    }
+
+    /**
+     * getBackupDirName
+     *
+     * @param string $source
+     * @param string $date
+     * @param string $suffix
+     *
+     * @return string
+     */
+    protected function getBackupDirName($source, $date, $suffix)
+    {
+        $num     = 1;
+        $dirname = $source . '-' .$date;
+        $dir     = $dirname.$suffix;
+
+        while ($this->isDir($dir)) {
+            $dir = $dirname . '-' . (string)$num++.$suffix;
+        }
+
+        return $dir;
+    }
+
+    /**
      * Enumerate a directory name based on its occurrance of the parent
      * directory.
      *
      * @param string $dir the path of directory.
      * @see \Selene\Components\Filesystem::enum()
-     * @access protected
      * @return string
      */
     protected function enumDir($dir, $start, $prefix = null, $pad = true)
@@ -776,7 +846,6 @@ class Filesystem
      * @param string $file the path of file.
      * @see \Selene\Components\Filesystem::enum()
      *
-     * @access protected
      * @return string
      */
     protected function enumFile($file, $start, $prefix = null, $pad = true)
@@ -804,7 +873,6 @@ class Filesystem
      * @param mixed $file
      * @param mixed $flags
      *
-     * @access protected
      * @return FilesystemIterator
      */
     protected function getIterator($file, $flags = FilesystemIterator::CURRENT_AS_SELF)
@@ -813,11 +881,85 @@ class Filesystem
     }
 
     /**
+     * doCopyFile
+     *
+     * @param mixed $source
+     * @param mixed $target
+     *
+     * @access protected
+     * @return integer
+     */
+    protected function doCopyFile($source, $target)
+    {
+        $source = fopen($source, 'r');
+        $target = fopen($target, 'w');
+
+        $bytes = stream_copy_to_stream($source, $target);
+
+        fclose($source);
+        fclose($target);
+
+        return $bytes;
+    }
+
+    /**
+     * doCopyDir
+     *
+     * @param string $source
+     * @param string $target
+     * @param integer $flags
+     *
+     * @return integer
+     */
+    protected function doCopyDir($source, $target, $flags)
+    {
+        $this->ensureDirectory($target);
+
+        $bytes = 0;
+
+        foreach (new FilesystemIterator($source, $flags) as $path => $info) {
+            $tfile = $target . DIRECTORY_SEPARATOR . $info->getBaseName();
+
+            if ($info->isDir()) {
+                $bytes += $this->doCopyDir($path, $tfile, $flags);
+            }
+
+            if ($info->isFile()) {
+                $bytes += $this->doCopyFile($path, $tfile);
+            }
+        }
+
+        return $bytes;
+    }
+
+    /**
+     * validateCopyTarget
+     *
+     * @param string $target
+     * @param boolean $replace
+     *
+     * @throws IOException
+     * @return string
+     */
+    private function validateCopyTarget($source, $target = null, $replace = false)
+    {
+        if (null === $target) {
+            $target = $this->enum($source, $this->getCopyStartOffset(), $this->getCopyPrefix());
+        } elseif ($this->exists($target)) {
+            if (!$replace) {
+                throw new IOException(sprintf('target %s exists', $target));
+            }
+            $this->remove($target);
+        }
+
+        return $target;
+    }
+
+    /**
      * ensureTraversable
      *
      * @param mixed $file
      *
-     * @access private
      * @return Traversable
      */
     private function ensureTraversable($file)
