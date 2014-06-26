@@ -125,14 +125,14 @@ class Filesystem
      * @param integer $permissions
      * @param boolean $recursive
      *
+     * @throws IOException
+     *
      * @return void
      */
     public function mkdir($dir, $permissions = 0755, $recursive = true)
     {
-        try {
-            mkdir($dir, $permissions, $recursive);
-        } catch (\Exception $e) {
-            throw new IOException($e->getMessage());
+        if (true !== @mkdir($dir, $permissions, $recursive)) {
+            throw new IOException(sprintf('[mkdir]: error creating directory "%s".', $dir));
         }
     }
 
@@ -151,7 +151,7 @@ class Filesystem
             $this->rmRecursive($directory);
             rmdir($directory);
         } catch (\Exception $e) {
-            throw new IOException(sprintf('could not remove directory %s', $directory));
+            throw new IOException(sprintf('[rmdir]: error remoing directory "%s".', $directory));
         }
     }
 
@@ -187,6 +187,7 @@ class Filesystem
         foreach ($this->getIterator($directory) as $file) {
             return false;
         }
+
         return true;
     }
 
@@ -606,7 +607,7 @@ class Filesystem
      */
     public function setContents($file, $content, $writeFlags = LOCK_EX)
     {
-        return is_null($writeFlags) ?
+        return null === $writeFlags ?
             file_put_contents($file, $content) :
             file_put_contents($file, $content, $writeFlags);
     }
@@ -621,7 +622,7 @@ class Filesystem
      */
     public function getContents($file, $includepath = null, $context = null, $start = null, $stop = null)
     {
-        return is_null($start) ?
+        return null === $start ?
             file_get_contents($file, $includepath, $context) :
             file_get_contents($file, $includepath, $context, $start, $stop);
     }
@@ -674,7 +675,7 @@ class Filesystem
      */
     public function getCopyPrefix()
     {
-        if (is_null($this->copyPrefix)) {
+        if (null === $this->copyPrefix) {
             return static::COPY_PREFIX;
         }
 
@@ -689,7 +690,7 @@ class Filesystem
      */
     public function getCopyStartOffset()
     {
-        if (is_null($this->copyStartOffset)) {
+        if (null === $this->copyStartOffset) {
             return static::COPY_START_OFFSET;
         }
 
@@ -823,48 +824,57 @@ class Filesystem
      * Enumerate a directory name based on its occurrance of the parent
      * directory.
      *
-     * @param string $dir the path of directory.
      * @see \Selene\Components\Filesystem::enum()
+     *
+     * @param string  $dir      the path of directory.
+     * @param integer $counter  the enumeration count offset.
+     * @param string  $prefix   the enumeration name prefix.
+     * @param boolean $prefix   if true, prefix will be padded with spaces.
+     *
      * @return string
      */
-    protected function enumDir($dir, $start, $prefix = null, $pad = true)
+    protected function enumDir($dir, $counter, $prefix = null, $pad = true)
     {
-        $prefix = is_null($prefix) ?
+        $prefix = null === $prefix ?
             $prefix :
             ($pad ? str_pad($prefix, strlen($prefix) + 2, ' ', STR_PAD_BOTH) : $prefix);
-        $i = $start;
-        while (is_dir(sprintf("%s%s%d", $dir, $prefix, $i))) {
-            $i++;
+
+        while (is_dir($target = sprintf("%s%s%d", $dir, $prefix, $counter))) {
+            $counter++;
         }
-        return sprintf("%s%s%d", $dir, $prefix, $i);
+        return $target;
     }
 
     /**
      * Enumerate a file name based on its occurrance of the parent
      * directory.
      *
-     * @param string $file the path of file.
      * @see \Selene\Components\Filesystem::enum()
+     *
+     * @param string $file the path of file.
+     * @param integer $counter  the enumeration count offset.
+     * @param string  $prefix   the enumeration name prefix.
+     * @param boolean $prefix   if true, prefix will be padded with spaces.
      *
      * @return string
      */
-    protected function enumFile($file, $start, $prefix = null, $pad = true)
+    protected function enumFile($file, $counter, $prefix = null, $pad = true)
     {
-        $prefix = is_null($prefix) ?
+        $prefix = null === $prefix ?
             $prefix :
             ($pad ? str_pad($prefix, strlen($prefix) + 2, ' ', STR_PAD_BOTH) : $prefix);
 
-        $name      = pathinfo($file, PATHINFO_FILENAME);
         $path      = dirname($file).DIRECTORY_SEPARATOR;
-        $extension = pathinfo($file, PATHINFO_EXTENSION);
-        $extension = strlen($extension) ? ".$extension" : '';
+        $extension = 0 < strlen($ext = pathinfo($file, PATHINFO_EXTENSION)) ? ".$ext" : '';
+        $basename = basename($file, $extension);
 
-        $i = $start;
+        $counte = $counter;
 
-        while (file_exists(sprintf("%s%s%s%d%s", $path, $name, $prefix, $i, $extension))) {
-            $i++;
+        while (file_exists($target = sprintf("%s%s%s%d%s", $path, $basename, $prefix, $counter, $extension))) {
+            $counter++;
         }
-        return sprintf("%s%s%s%d%s", $path, $name, $prefix, $i, $extension);
+
+        return $target;
     }
 
     /**
@@ -891,10 +901,11 @@ class Filesystem
      */
     protected function doCopyFile($source, $target)
     {
+        $size   = filesize($source);
         $source = fopen($source, 'r');
         $target = fopen($target, 'w');
 
-        $bytes = stream_copy_to_stream($source, $target);
+        $bytes = stream_copy_to_stream($source, $target, $size, 0);
 
         fclose($source);
         fclose($target);
@@ -904,6 +915,8 @@ class Filesystem
 
     /**
      * doCopyDir
+     *
+     * @TODO: integrate symlink copying.
      *
      * @param string $source
      * @param string $target
@@ -927,6 +940,10 @@ class Filesystem
             if ($info->isFile()) {
                 $bytes += $this->doCopyFile($path, $tfile);
             }
+
+            //if ($info->isLink()) {
+            //
+            //}
         }
 
         return $bytes;
