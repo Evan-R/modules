@@ -12,6 +12,11 @@
 namespace Selene\Components\Package;
 
 use \Selene\Components\Filesystem\Filesystem;
+use \Selene\Components\Events\DispatcherInterface;
+use \Selene\Components\Package\Events\PackageEvent;
+use \Selene\Components\Package\Events\PublishEvents;
+use \Selene\Components\Package\Events\PackagePublishEvent;
+use \Selene\Components\Package\Events\PackageExceptionEvent;
 use \Selene\Components\Package\Traits\FileBackUpHelper;
 use \Selene\Components\Package\Dumper\ConfigDumperInterface;
 use \Selene\Components\Package\Dumper\DelegateAbleDumperInterface;
@@ -31,9 +36,9 @@ class PackagePublisher
 
     const FORMAT_PHP = 'php';
 
-    const PUBLISH = 0;
+    const PUBLISHED = 0;
 
-    const NO_PUBLISH = 1;
+    const NOT_PUBLISHED = 1;
 
     /**
      * exceptions
@@ -67,6 +72,8 @@ class PackagePublisher
      * @var Filesystem
      */
     private $fs;
+
+    private $events;
 
     /**
      * @param Packages $packages
@@ -139,9 +146,11 @@ class PackagePublisher
      */
     public function setFileFormat($format)
     {
-        if (!$this->dumper || !$this->supports($format)) {
+        if (!$this->dumper || !$this->dumper->supports($format)) {
             throw new \InvalidArgumentException(sprintf('Format "%s" is unsupported', $format));
         }
+
+        $this->format = $format;
     }
 
     /**
@@ -164,6 +173,18 @@ class PackagePublisher
     public function setFilesystem(Filesystem $fs)
     {
         $this->fs = $fs;
+    }
+
+    /**
+     * setEvents
+     *
+     * @param DispatcherInterface $events
+     *
+     * @return void
+     */
+    public function setEvents(DispatcherInterface $events)
+    {
+        $this->events = $events;
     }
 
     /**
@@ -225,22 +246,49 @@ class PackagePublisher
      */
     public function publishPackage(IPackage $package, $target = null, $override = false, $force = false)
     {
-        $name = strtolower($package->getAlias());
-
         if (!$package instanceof ExportConfigInterface) {
-            return $this->publishDefault($name, $target, $override, $force);
+            return $this->publishDefault($package, $target, $override, $force);
         }
+
+        return $this->publishFiles($package, $target, $override);
+    }
+
+    /**
+     * publishFiles
+     *
+     * @param IPackage $package
+     * @param string   $target
+     * @param boolean  $override
+     *
+     * @return integer
+     */
+    protected function publishFiles(IPackage $package, $target = null, $override = false)
+    {
+        $this->notifyPublish($package);
 
         $package->getExports($files = new FileTargetRepository([], $this->getFilesystem()));
 
+        $path = $this->getPackagePath($package->getAlias(), $target ?: $this->targetPath);
+
         try {
-            $files->dumpFiles($this->getPackagePath($name, $target ?: $this->targetPath), $override);
+            foreach ($files->getFiles() as $file) {
 
-            return static::PUBLISH;
+                if (!$published = $files->dumpFile($file, $path, $override)) {
+                    $this->notifyNotPublished($package, $file->getSource());
 
+                    continue;
+                }
+
+                $this->notifyPublished($package, $published);
+            }
         } catch (\Exception $e) {
+
+            $this->notifyPublishException($package, $e);
+
             throw new \RuntimeException(sprintf('[%s]: %s', $name, $e->getMessage()));
         }
+
+        return static::PUBLISHED;
     }
 
     /**
@@ -253,20 +301,31 @@ class PackagePublisher
      *
      * @return void
      */
-    protected function publishDefault($name, $target = null, $override = false, $force = false)
+    protected function publishDefault(IPackage $package, $target = null, $override = false, $force = false)
     {
         if (!$force) {
             return static::NO_PUBLISH;
         }
 
+        $this->notifyPublish($package);
+
+        $name = $package->getAlias();
+
         $fs = $this->getFilesystem();
         $file = $this->getFile($name, $format = $this->getFileFormat());
 
         if ($this->backupIfOverride($fs, $file, $override)) {
+
             $fs->setContents($file, $this->dumper->dump($name, [], $format));
+            $this->notifyPublished($package, $file);
+
+            return static::PUBLISHED;
         }
 
-        return static::PUBLISH;
+        $this->notifyNotPublished($package, $file);
+
+        return static::NOT_PUBLISHED;
+
     }
 
     /**
@@ -311,6 +370,64 @@ class PackagePublisher
     }
 
     /**
+     * notifyPublish
+     *
+     * @param mixed $package
+     *
+     * @return void
+     */
+    protected function notifyPublish(IPackage $package)
+    {
+        if ($this->events) {
+            $this->events->dispatch(PublishEvents::EVENT_PUBLISH_PACKAGE, new PackageEvent($package));
+        }
+    }
+
+    /**
+     * notifyPublished
+     *
+     * @param mixed $package
+     * @param mixed $file
+     *
+     * @return void
+     */
+    protected function notifyPublished(IPackage $package, $file)
+    {
+        if ($this->events) {
+            $this->events->dispatch(PublishEvents::EVENT_PUBLISHED, new PackagePublishEvent($package, $file));
+        }
+    }
+
+    /**
+     * @param IPackage $package
+     * @param \Exception $e
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function notifyPublishException(IPackage $package, \Exception $e)
+    {
+        if ($this->events) {
+            $this->events->dispatch(PublishEvents::EVENT_PUBLISH_EXCEPTION, new PackageExceptionEvent($package, $e));
+        }
+    }
+
+    /**
+     * notifyPublished
+     *
+     * @param mixed $package
+     * @param mixed $file
+     *
+     * @return void
+     */
+    protected function notifyNotPublished(IPackage $package, $file)
+    {
+        if ($this->events) {
+            $this->events->dispatch(PublishEvents::EVENT_NOT_PUBLISHED, new PackagePublishEvent($package, $file));
+        }
+    }
+
+    /**
      * getFilesystem
      *
      * @access private
@@ -323,5 +440,12 @@ class PackagePublisher
         }
 
         return $this->fs;
+    }
+
+    private function fireEvent($event, $context)
+    {
+        if (null !== $this->events) {
+            $this->events->dispatch($event, $context);
+        }
     }
 }

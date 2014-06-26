@@ -93,6 +93,13 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     protected $packageProviders;
 
     /**
+     * applicationRoot
+     *
+     * @var string
+     */
+    protected $applicationRoot;
+
+    /**
      * version
      *
      * @var string
@@ -130,6 +137,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $this->packageResources = [];
         $this->packageProviders = [];
+        //var_dump($this->getApplicationRoot());
     }
 
     /**
@@ -195,9 +203,16 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $this->initializeContainer();
 
+        $this->injectServices();
+
         $this->bootKernelStack();
 
         $this->booted = true;
+    }
+
+    protected function injectServices()
+    {
+        $this->getContainer()->inject('app.package_repository', $this->packages);
     }
 
     /**
@@ -234,7 +249,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     {
         if (null === $this->applicationRoot) {
             $reflection = new \ReflectionObject($this);
-            $this->applicationRoot = dirname($reflection->getFile());
+            $this->applicationRoot = dirname($reflection->getFileName());
         }
 
         return $this->applicationRoot;
@@ -445,7 +460,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $class = $this->getContainerClass();
         $container = new $class(new Parameters($this->getDefaultParameters()));
-
 
         $this->setContainer($container);
 

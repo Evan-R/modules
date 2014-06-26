@@ -92,6 +92,8 @@ class FileTargetRepository implements FileRepositoryInterface
      * {@inheritdoc}
      *
      * @throws \InvalidArgumentException if source is not valid.
+     *
+     * @return string
      */
     public function dumpFile(FileTargetInterface $file, $targetPath, $override = false)
     {
@@ -103,6 +105,8 @@ class FileTargetRepository implements FileRepositoryInterface
 
         if ($this->backupIfOverride($this->fs, $target, $override)) {
             $this->fs->setContents($target, $file->getContents());
+
+            return $target;
         }
     }
 

@@ -12,6 +12,7 @@
 namespace Selene\Components\Package\Dumper;
 
 use \Selene\Components\DI\Dumper\Stubs\Lines;
+use \Selene\Components\DI\Dumper\Stubs\DocComment;
 use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
 
 /**
@@ -48,13 +49,23 @@ class PhpConfigDumper implements ConfigDumperInterface
             return;
         }
 
+        $comment = new DocComment(
+            'This file was automatically created',
+            'Created at ' . (new \DateTime())->format('Y-m-d:H:m:s') . '.',
+            [],
+            0
+        );
+
         return (new Lines)
             ->add('<?php')
+            ->emptyLine()
+            ->add($comment)
+            ->emptyLine()
+            ->add('$builder->addPackageConfig(')
+            ->indent()
+                ->add("'$name'" . ', ')
+                ->add($this->extractParams($contents))
             ->end()
-            ->add('\$builder->addPackageCondig(')
-            ->add($name)
-            ->add(', ')
-            ->add($this->exportVars($contents))
             ->add(');')
             ->end()
         ->dump();

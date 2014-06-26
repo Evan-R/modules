@@ -128,6 +128,7 @@ class ServiceBody extends Stub implements ContainerAwareInterface
 
             $args = $this->getArguments($argsList);
 
+
             if ((bool)$synced) {
                 $content[] = $this->createSynCallcack($synced, $method, $args);
             } else {
@@ -267,6 +268,7 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      */
     protected function getServiceArgs($definition)
     {
+        var_dump($this->getArguments($definition->getArguments()));
         return $this->getArguments($definition->getArguments());
     }
 
@@ -280,9 +282,10 @@ class ServiceBody extends Stub implements ContainerAwareInterface
             }
             if ($argument instanceof Reference) {
                 $args[$key] = $this->extractRefenceInstantiator($argument);
-            } elseif (!is_scalar($argument)) {
+            } elseif (null !== $argument && !is_scalar($argument)) {
                 $args[$key] = $this->extractParams($argument, 16);
             } elseif ($this->container->hasParameter($argument)) {
+                var_dump($argument);
                 $args[$key] = '$this->getParameter('.$argument.')';
             } else {
                 $args[$key] = $this->exportVar($argument);

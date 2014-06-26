@@ -107,6 +107,10 @@ class ResolveCircularReference implements ProcessInterface
 
             // if all tests passes, continue to check the definitions arguments
             // and setters list:
+            if (!$this->container->hasDefinition($id)) {
+                throw new \InvalidArgumentException(sprintf('A definition with id "%s" does not exist.', $id));
+            }
+
             $this->checkDefininition($this->container->getDefinition($id), $current, $id, $self);
         }
     }

@@ -241,6 +241,11 @@ class Builder implements BuilderInterface
         $this->extensions[$extension][] = $config;
     }
 
+    public function addPackageConfig($package, array $config)
+    {
+
+    }
+
     /**
      * Get all config arrays for a given extension id.
      *
@@ -253,6 +258,7 @@ class Builder implements BuilderInterface
     {
         return $this->getDefault($this->extensions, $extension, []);
     }
+
 
     /**
      * Get all extension config arrays.

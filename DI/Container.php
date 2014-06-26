@@ -519,7 +519,7 @@ class Container implements ContainerInterface
      */
     public static function camelCaseStr($str)
     {
-        return StringHelper::strCamelCaseAll($str, ['_' => ' ', '.' => 'Nss ', '\\' => 'Dbs ']);
+        return StringHelper::strCamelCaseAll($str, ['_' => ' ', ':' => ' ', '.' => 'Nss ', '\\' => 'Dbs ']);
     }
 
     /**
