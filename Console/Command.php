@@ -11,6 +11,7 @@
 
 namespace Selene\Components\Console;
 
+use \Selene\Components\Events\SubscriberInterface;
 use \Selene\Components\Events\DispatcherInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Symfony\Component\Console\Helper\TableHelper;
@@ -225,6 +226,10 @@ class Command extends SymfonyCommand
     {
         if (!$events = $this->getEvents()) {
             return;
+        }
+
+        if ($this instanceof SubscriberInterface) {
+            $events->addSubscriber($this);
         }
 
         foreach ((array)$this->getEventHandlers() as $event => $handler) {
