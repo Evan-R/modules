@@ -294,7 +294,7 @@ class Filesystem
         $flags = FilesystemIterator::SKIP_DOTS;
 
         if ($followLinks) {
-            $flags = $flags | FilesystemIteratorF::OLLOW_SYMLINKS;
+            $flags = $flags | FilesystemIterator::FOLLOW_SYMLINKS;
         }
 
         return $this->doCopyDir($source, $target, $flags);
