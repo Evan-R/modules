@@ -124,43 +124,6 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     }
 
     /**
-     * validateHandler
-     *
-     * @param mixed $event
-     * @param mixed $eventHandler
-     * @param string $caller
-     *
-     * @return array
-     */
-    private function validateHandler($event, $eventHandler, $caller = 'on')
-    {
-        if (null !== $eventHandler && !is_callable($eventHandler)) {
-            if ($this->isCallableService($eventHandler)) {
-                return $this->getEventHandlerFromServiceString($event, $eventHandler);
-            } else {
-                throw new \InvalidArgumentException(
-                    sprintf('%s::%s() expects argument 2 to be valid callback', get_class($this), $caller)
-                );
-            }
-        }
-
-        return [$eventHandler, null, null];
-    }
-
-    private function addListenerOnce($eventName, EventListenerInterface $eventHandler, $priority = 0)
-    {
-        $fn = function (EventInterface $event) use ($eventName, $eventHandler, &$fn) {
-
-            $dispatched = $eventHandler->handleEvent($event);
-            $this->off($eventName, $fn);
-
-            return $dispatched;
-        };
-
-        $this->bindEvent($eventName, $fn, $priority);
-    }
-
-    /**
      * Detach an eventhandler from an event
      *
      * @param array|string $events       the event name
@@ -171,12 +134,37 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     public function off($events, $eventHandler = null)
     {
         foreach ((array)$events as $event) {
+
             if (null !== $eventHandler && $this->detachEventByHandler($event, $eventHandler)) {
                 return;
             }
 
             unset($this->handlers[$event]);
         }
+    }
+
+    /**
+     * addListenerOnce
+     *
+     * @param mixed $eventName
+     * @param EventListenerInterface $eventHandler
+     * @param int $priority
+     *
+     * @access private
+     * @return void
+     */
+    private function addListenerOnce($eventName, EventListenerInterface $eventHandler, $priority = 0)
+    {
+        $fn = function (EventInterface $event) use ($eventName, $eventHandler, &$fn) {
+
+            $dispatched = $eventHandler->handleEvent($event);
+
+            $this->off($eventName, $fn);
+
+            return $dispatched;
+        };
+
+        $this->bindEvent($eventName, $fn, $priority);
     }
 
     /**
@@ -236,28 +224,10 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
             $parameters->setEventName($event);
         }
 
-        foreach ($this->handlers[$event] as $i => $handler) {
+        foreach ($this->handlers[$event] as $i => $handlers) {
 
-            $eventHandler = $handler[static::$handler];
-
-            if ($isEvent && $parameters->isPropagationStopped()) {
-                break;
-            }
-
-            if ($eventHandler instanceof EventListenerInterface) {
-                $res = $eventHandler->handleEvent($parameters);
-
-            } else {
-                $res = call_user_func_array($eventHandler, !is_array($parameters) ? [$parameters] : $parameters);
-            }
-
-            if (null !== $res) {
-                $results[] = $res;
-
-                // stop on first result;
-                if ($stopOnFirstResult) {
-                    return $results;
-                }
+            if (!$this->doDispatch($handlers, $parameters, $isEvent, $results, $stopOnFirstResult)) {
+                return $results;
             }
         }
 
@@ -287,37 +257,24 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     public function getEventHandlers($event = null)
     {
-        if (null === $event) {
-            $handlers = [];
+        $handlers = [];
 
-            foreach ($this->handlers as $handler) {
-                $stack = ['stack' => &$handlers] + ListHelper::arrayPluck(static::$handler, $handler);
-                call_user_func_array('array_push', $stack);
+        if (null === $event) {
+
+            foreach ($this->handlers as $event => $eventHandlers) {
+                $handlers = array_merge($handlers, $this->getEventHandlers($event));
             }
 
-            return $handlers;
-        }
+        } elseif (isset($this->handlers[$event])) {
 
-        if (isset($this->handlers[$event])) {
             $this->sort($event);
 
-            return ListHelper::arrayPluck(static::$handler, $this->handlers[$event]);
+            foreach ($this->handlers[$event] as $priority => $eventHandlers) {
+                $handlers = array_merge($handlers, $eventHandlers);
+            }
         }
 
-        return [];
-    }
-
-    /**
-     * isCallableService
-     *
-     * @param mixed $eventHandler
-     *
-     * @access private
-     * @return bool
-     */
-    private function isCallableService($eventHandler)
-    {
-        return is_string($eventHandler) && 0 === strpos($eventHandler, ContainerInterface::SERVICE_REF_INDICATOR);
+        return $handlers;
     }
 
     /**
@@ -341,9 +298,10 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         }
 
         list($method, $priority) = array_pad($eventSubscriptions, 2, 10);
+
         $eventHandler = [$subscriber, $method];
 
-        $list[] = compact('event', static::$handler, 'priority');
+        $list[] = [$event, [$subscriber, $method], $priority];
 
         return $list;
     }
@@ -359,13 +317,13 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     private function registerEvent($event, $eventHandler, $priority = 0)
     {
+        $eventHandler = $this->extractEventHandler($eventHandler);
+
         if ($eventHandler instanceof EventListenerInterface) {
             return $this->addListener($event, $eventHandler, $priority);
         }
 
-        list($eventHandler, $service, $method) = $this->validateHandler($event, $eventHandler, 'on');
-
-        $this->bindEvent($event, $eventHandler, $priority, $service, $method);
+        $this->bindEvent($event, $eventHandler, $priority);
     }
 
     /**
@@ -383,70 +341,156 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
             return $this->addListenerOnce($event, $eventHandler, $priority);
         }
 
-        list($eventHandler, $service, $method) = $this->validateHandler($event, $eventHandler, 'once');
-
-        $handler = $eventHandler;
+        $handler = $this->extractEventHandler($eventHandler);
 
         $eventHandler = function () use ($event, &$handler, &$eventHandler) {
             $dispatched = call_user_func_array($handler, func_get_args());
+
             $this->off($event, $eventHandler);
 
             return $dispatched;
         };
 
-        $this->bindEvent($event, $eventHandler, $priority, $service, $method);
+        $this->bindEvent($event, $eventHandler, $priority);
     }
-
 
     /**
      * Bind the Eventhandler to the dispatcher
      *
      * @param string    $event        the event name
-     * @param callable  $eventHandler a callable
+     * @param callable  $eventHandler a valid eventhandler
      * @param int       $priority     event fire priority
      *
-     * @access protected
      * @return void
      */
-    private function bindEvent($event, $eventHandler, $priority = null, $service = null, $method = null)
+    private function bindEvent($event, &$eventHandler, $priority = 0)
     {
-        $handler = compact('event', 'priority');
-        $handler[static::$handler] =& $eventHandler;
-
-        if (null === $priority) {
-            $priority = $this->findPriority($event);
-        }
-
-        if (null !== $service) {
-            $handler['uses'] = implode(static::EVTHANDLER_SEPARATOR, [$service, $method]);
-        }
-
         unset($this->sorted[$event]);
 
-        $this->handlers[$event][] = $handler;
+        $this->handlers[$event][(int)$priority][] = $eventHandler;
     }
 
     /**
-     * findPriority
+     * extractEventHandler
      *
-     * @param mixed $event
+     * @param mixed $eventHandler
      *
      * @access private
+     * @return array|EventListenerInterface
+     */
+    private function extractEventHandler($eventHandler)
+    {
+        if ($eventHandler instanceof EventListenerInterface || is_callable($eventHandler)) {
+            return $eventHandler;
+        }
+
+        if (!is_string($eventHandler) || 1 < substr_count($eventHandler, static::EVTHANDLER_SEPARATOR)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Invalid event handler "%s".',
+                    is_string($eventHandler) ? $eventHandler : (is_object($eventHandler) ?
+                    get_class($eventHandler) : gettype($eventHandler))
+                )
+            );
+        }
+
+        list($service, $method) = array_pad(explode(static::EVTHANDLER_SEPARATOR, $eventHandler), 2, null);
+
+        if (null === $this->container) {
+
+            throw new \InvalidArgumentException(
+                sprintf('Cannot set a service "%s" as handler, no service container is set.', $service)
+            );
+        }
+
+        if (!$this->container->has($service)) {
+            throw new \InvalidArgumentException(sprintf('A service with id "%s" is not defined.', $service));
+        }
+
+        return [$service, $method];
+    }
+
+    /**
+     * resolveHandler
+     *
+     * @param mixed $handler
+     *
+     * @return callable|EventListenerInterface
+     */
+    private function resolveHandler($handler)
+    {
+        if ($handler instanceof EventListenerInterface || is_callable($handler)) {
+            return $handler;
+        }
+
+        list ($service, $method) = $handler;
+
+        $object = $this->container->get($service);
+
+        if ($object instanceof EventListenerInterface && null === $method) {
+            return $object;
+        } elseif (null === $method) {
+            throw new \InvalidArgumentException(
+                sprintf('No callable method on service "%s".', $service)
+            );
+        }
+
+        return [$object, $method];
+    }
+
+    /**
+     * doDispatch
+     *
+     * @param array $handlers
+     * @param mixed $params
+     * @param mixed $isEvent
+     * @param mixed $results
+     * @param mixed $stopOnFirstResult
+     *
+     * @return boolean
+     */
+    private function doDispatch(array $handlers, $params, $isEvent, &$results = [], $stopOnFirstResult = false)
+    {
+        foreach ($handlers as $index => $handler) {
+
+            if ($isEvent && $params->isPropagationStopped()) {
+                break;
+            }
+
+            $res = $this->callListener($handler, $params);
+
+            if (null !== $res) {
+                $results[] = $res;
+
+                // stop on first result;
+                if ($stopOnFirstResult) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * callListener
+     *
+     * @param mixed $eventHandler
+     * @param mixed $parameters
+     *
      * @return mixed
      */
-    private function findPriority($event)
+    private function callListener($eventHandler, $parameters)
     {
-        if (!$this->sorted) {
-            $this->sort($event);
-        }
+        $eventHandler = $this->resolveHandler($eventHandler);
 
-        if (isset($this->handlers[$event])) {
-            $handler = $this->handlers[$event][count($this->handlers[$event]) - 1];
-            return $handler['priority'] - 1;
+        if ($eventHandler instanceof EventListenerInterface) {
+            return $eventHandler->handleEvent($parameters);
+        } else {
+            return call_user_func_array($eventHandler, !is_array($parameters) ? [$parameters] : $parameters);
         }
-
-        return 0;
     }
+
 
     /**
      * Sort eventhandler by their priority.
@@ -460,9 +504,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
             return;
         }
 
-        usort($this->handlers[$event], function ($a, $b) {
-            return $a['priority'] > $b['priority'] ? -1 : 1;
-        });
+        krsort($this->handlers[$event]);
 
         $this->sorted[$event] = true;
     }
@@ -478,72 +520,18 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     private function detachEventByHandler($event, $eventHandler)
     {
-        if ($isService = $this->isCallableService($eventHandler)) {
-            $classHandler = implode(
-                static::EVTHANDLER_SEPARATOR,
-                $this->extractService($eventHandler)
-            );
-        }
+        $eventHandler = $this->extractEventHandler($eventHandler);
 
-        foreach ($this->handlers[$event] as $index => &$handler) {
+        foreach ($this->handlers[$event] as $priority => $handlers) {
+            foreach ($handlers as $index => &$handler) {
 
-            if ($isService && isset($handler['uses']) && $classHandler === $handler['uses']) {
-                unset($this->handlers[$event][$index]);
-            } elseif ($eventHandler === $handler[static::$handler]) {
-                unset($this->handlers[$event][$index]);
+                if ($eventHandler === $handler) {
+                    unset($this->handlers[$event][$priority][$index]);
+                    break;
+                }
             }
         }
 
         return true;
-    }
-
-    /**
-     * getEventHandlerFromServiceString
-     *
-     * @param mixed $eventHandler
-     *
-     * @access protected
-     * @return array
-     */
-    private function getEventHandlerFromServiceString($event, $eventHandler)
-    {
-        if (is_string($eventHandler)) {
-            extract($this->extractService($eventHandler));
-
-            if (!$this->container) {
-                throw new \InvalidArgumentException(
-                    'Dispatcher tried to call service from service container, but no service container was found'
-                );
-            }
-
-            $eventHandler = function () use ($service, $method) {
-                return call_user_func_array([$this->container->getService($service), $method], func_get_args());
-            };
-
-            return [$eventHandler, $service, $method];
-        }
-
-        throw new \InvalidArgumentException('Eventhandler is invalid');
-    }
-
-    /**
-     * extractClass
-     *
-     * @param mixed $eventHandler
-     *
-     * @access protected
-     * @return array
-     */
-    private function extractService($eventHandler)
-    {
-        list($service, $method) = array_pad(
-            explode(static::EVTHANDLER_SEPARATOR, $eventHandler),
-            2,
-            'handleEvent'
-        );
-
-        $service = substr($service, strlen(ContainerInterface::SERVICE_REF_INDICATOR));
-
-        return compact('service', 'method');
     }
 }

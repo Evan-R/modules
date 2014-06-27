@@ -54,53 +54,48 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(StringHelper::strEquals($a, $b));
     }
 
-    /**
-     * @test
-     */
-    public function testStrCamelCase()
+    /** @test */
+    public function itShouldCamelCaseStrings()
     {
-        $this->assertEquals('fooBar', StringHelper::strCamelCase('fooBar'));
+        $this->assertEquals('fooBar', StringHelper::strCamelCase('foo_bar'));
     }
 
-    /**
-     * @test
-     */
-    public function testStrCamelCaseAll()
+    /** @test */
+    public function strCamelCaseAll()
     {
         $this->assertEquals('FooBar', StringHelper::strCamelCaseAll('foo_bar'));
     }
 
-    /**
-     * @test
-     */
-    public function testStrLowDash()
+    /** @test */
+    public function itShouldSnakeCaseStrings()
     {
         $this->assertEquals('foo_bar', StringHelper::strLowDash('fooBar'));
         $this->assertEquals('foo_bar_baz', StringHelper::strLowDash('fooBarBaz'));
     }
 
-    /**
-     * @test
-     */
-    public function testStrStartsWith()
+    /** @test */
+    public function itShouldSnakeCaseStringsUsingACustomDelimiter()
+    {
+        $this->assertEquals('foo@bar', StringHelper::strLowDash('fooBar', '@'));
+        $this->assertEquals('foo:bar:baz', StringHelper::strLowDash('fooBarBaz', ':'));
+    }
+
+    /** @test */
+    public function strStartsWith()
     {
         $this->assertTrue(StringHelper::strStartsWith('string', 'str'));
         $this->assertFalse(StringHelper::strStartsWith('string', 'sdr'));
     }
 
-    /**
-     * @test
-     */
-    public function testStrIStartsWith()
+    /** @test */
+    public function strIStartsWith()
     {
         $this->assertTrue(StringHelper::striStartsWith('String', 'str'));
         $this->assertTrue(StringHelper::striStartsWith('String', 'Str'));
     }
 
-    /**
-     * @test
-     */
-    public function testStrEndsWith()
+    /** @test */
+    public function strEndsWith()
     {
         $this->assertTrue(StringHelper::strEndsWith('string', 'ing'));
         $this->assertFalse(StringHelper::strEndsWith('string', 'ink'));
@@ -108,10 +103,8 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(StringHelper::strEndsWith('Foo\\Controller', 'Controller'));
     }
 
-    /**
-     * @test
-     */
-    public function testStriEndsWith()
+    /** @test */
+    public function striEndsWith()
     {
         $this->assertTrue(StringHelper::striEndsWith('string', 'ING'));
         $this->assertTrue(StringHelper::striEndsWith('STRING', 'ing'));
@@ -119,17 +112,13 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(StringHelper::striEndsWith('Controller\\Foo\\Controller', 'controller'));
     }
 
-    /**
-     * @test
-     */
-    public function testStrContains()
+    /** @test */
+    public function strContains()
     {
         $this->assertTrue(StringHelper::strContains('string', 'rin'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testSubstrAfter()
     {
         $this->assertEquals('doodle', StringHelper::substrAfter('--env=doodle', '='));
@@ -149,17 +138,13 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($inp, StringHelper::strNull($inp));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testSubstriAfter()
     {
         $this->assertEquals('DAACD', StringHelper::substriAfter('ABCDAACD', 'c'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testSubstrBefore()
     {
         $this->assertEquals('ABC', StringHelper::substrBefore('ABCDAACD', 'D'));
@@ -167,19 +152,15 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(StringHelper::substrBefore('ABCDAACD', 'x'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testSubstriBefore()
     {
         $this->assertEquals('ABC', StringHelper::substriBefore('ABCDAACD', 'D'));
         $this->assertEquals('ABC', StringHelper::substriBefore('ABCDAACD', 'd'));
     }
 
-    /**
-     * @test
-     */
-    public function testStrConcat()
+    /** @test */
+    public function strConcat()
     {
         $obj = $this->getMock('MyObject', array('__toString'));
         $obj->expects($this->any())->method('__toString')->will($this->returnValue('foo'));
@@ -188,56 +169,42 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo bar', StringHelper::strConcat($obj, ' ', 'bar'));
     }
 
-    /**
-     * @test
-     */
-    public function testStrEscapeStr()
+    /** @test */
+    public function strEscapeStr()
     {
         $this->assertSame('%%foo%%', StringHelper::strEscape('%foo%', '%'));
         $this->assertSame('this is @@foo@@ and %bar%', StringHelper::strEscape('this is @foo@ and %bar%', '@'));
     }
 
-    /**
-     * @test
-     */
-    public function testStrUnescapeStr()
+    /** @test */
+    public function strUnescapeStr()
     {
         $this->assertSame('%foo%', StringHelper::strUnescape('%%foo%%', '%'));
         $this->assertSame('this is @foo@ and %bar%', StringHelper::strUnescape('this is @@foo@@ and %bar%', '@'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testContainedAndStartsWith()
     {
         //$this->assertTrue(containedAndStartsWith(['foo', 'baz', 'bar'], 'fooBar'));
         //$this->assertFalse(containedAndStartsWith(['foo', 'baz', 'bar'], 'FooBar'));
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testContainedAndEndsWith()
     {
         //$this->assertTrue(containedAndEndsWith(['foo', 'baz', 'bar'], 'Barfoo'));
         //$this->assertFalse(containedAndEndsWith(['foo', 'baz', 'bar'], 'BarFoo'));
     }
 
-    /**
-     * @test
-     * @dataProvider strRandLengthProvider
-     */
-    public function testStrRand($length)
+    /** @test */
+    public function strRand($length)
     {
         $this->assertSame($length, strlen(StringHelper::strRand($length)));
     }
 
-    /**
-     * @test
-     * @dataProvider strRandLengthProvider
-     */
-    public function testStrQuickRand($length)
+    /** @test */
+    public function strQuickRand($length)
     {
         $this->assertSame($length, strlen(StringHelper::strQuickRand($length)));
     }

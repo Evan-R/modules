@@ -26,6 +26,7 @@ class PackageExceptionEvent extends PackageEvent
     public function __construct(PackageInterface $package, \Exception $e)
     {
         $this->exception = $e;
+        parent::__construct($package);
     }
 
     /**

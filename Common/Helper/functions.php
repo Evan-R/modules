@@ -41,4 +41,12 @@ namespace {
     {
         return is_string($value) && 0 === strlen(trim($value)) ? null : $value;
     }
+
+    /**
+     * @see clearValue
+     */
+    function clear_value($value)
+    {
+        return clearValue($value);
+    }
 }

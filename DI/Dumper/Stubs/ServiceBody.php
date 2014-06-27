@@ -268,10 +268,16 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      */
     protected function getServiceArgs($definition)
     {
-        var_dump($this->getArguments($definition->getArguments()));
         return $this->getArguments($definition->getArguments());
     }
 
+    /**
+     * getArguments
+     *
+     * @param array $arguments
+     *
+     * @return array
+     */
     protected function getArguments(array $arguments)
     {
         $args = [];
@@ -285,7 +291,6 @@ class ServiceBody extends Stub implements ContainerAwareInterface
             } elseif (null !== $argument && !is_scalar($argument)) {
                 $args[$key] = $this->extractParams($argument, 16);
             } elseif ($this->container->hasParameter($argument)) {
-                var_dump($argument);
                 $args[$key] = '$this->getParameter('.$argument.')';
             } else {
                 $args[$key] = $this->exportVar($argument);

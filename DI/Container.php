@@ -344,6 +344,16 @@ class Container implements ContainerInterface
         return $this->getDefinition($id)->scopeIsContainer() ? $this->services[$id] = $instance : $instance;
     }
 
+    public function has($id)
+    {
+        return $this->hasServiceOrDefinition($id);
+    }
+
+    protected function hasServiceOrDefinition($id)
+    {
+        return $this->hasService($id) || $this->hasDefinition($id);
+    }
+
     /**
      * getServices
      *

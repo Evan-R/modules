@@ -22,7 +22,7 @@ use \RecursiveIteratorIterator;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class ListHelper
+final class ListHelper
 {
     /**
      * isTraversable

@@ -19,7 +19,7 @@ namespace Selene\Components\Common\Helper;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class StringHelper
+final class StringHelper
 {
     /**
      * rchars
@@ -413,6 +413,5 @@ class StringHelper
 
     private function __construct()
     {
-        return null;
     }
 }

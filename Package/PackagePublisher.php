@@ -22,6 +22,7 @@ use \Selene\Components\Package\Dumper\ConfigDumperInterface;
 use \Selene\Components\Package\Dumper\DelegateAbleDumperInterface;
 use \Selene\Components\Package\PackageRepositoryInterface as Packages;
 use \Selene\Components\Package\PackageInterface as IPackage;
+use \Selene\Components\Package\Exception\PublishException;
 
 /**
  * @class PackagePublisher
@@ -213,9 +214,7 @@ class PackagePublisher
             );
         }
 
-        $package = $this->packages->get($name);
-
-        return $this->publishPackage($package, $targetPath, $override, $force);
+        return $this->publishPackage($this->packages->get($name), $targetPath, $override, $force);
     }
 
     /**
@@ -246,7 +245,7 @@ class PackagePublisher
      */
     public function publishPackage(IPackage $package, $target = null, $override = false, $force = false)
     {
-        if (!$package instanceof ExportConfigInterface) {
+        if (!$package instanceof ExportResourceInterface) {
             return $this->publishDefault($package, $target, $override, $force);
         }
 
@@ -281,11 +280,8 @@ class PackagePublisher
 
                 $this->notifyPublished($package, $published);
             }
-        } catch (\Exception $e) {
-
+        } catch (PublishException $e) {
             $this->notifyPublishException($package, $e);
-
-            throw new \RuntimeException(sprintf('[%s]: %s', $name, $e->getMessage()));
         }
 
         return static::PUBLISHED;

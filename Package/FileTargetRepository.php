@@ -14,6 +14,7 @@ namespace Selene\Components\Package;
 use \Selene\Components\Filesystem\Filesystem;
 use \Selene\Components\Filesystem\Traits\PathHelperTrait;
 use \Selene\Components\Package\Traits\FileBackUpHelper;
+use \Selene\Components\Package\Exception\MissingFileException;
 
 /**
  * @class FileTargetRepository
@@ -98,7 +99,7 @@ class FileTargetRepository implements FileRepositoryInterface
     public function dumpFile(FileTargetInterface $file, $targetPath, $override = false)
     {
         if (!$file->isValid()) {
-            throw new \InvalidArgumentException(sprintf('source file "%s" does not exist.', $file->getSource()));
+            throw new MissingFileException(sprintf('source file "%s" does not exist.', $file->getSource()));
         }
 
         $target = $this->getTargetPath($file, $targetPath);

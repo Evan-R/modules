@@ -255,28 +255,66 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             $dispatcher->on('foo', 'bar');
         } catch (\InvalidArgumentException $e) {
             $this->assertSame(
-                get_class($dispatcher).'::on() expects argument 2 to be valid callback',
+                'Cannot set a service "bar" as handler, no service container is set.',
                 $e->getMessage()
             );
         }
 
+        $container = m::mock('Selene\Components\DI\ContainerInterface');
+        $container->shouldReceive('has')->with('bar')->andReturn(false);
+
+        $dispatcher->setContainer($container);
+
         try {
             $dispatcher->once('foo', 'bar');
         } catch (\InvalidArgumentException $e) {
-            $this->assertSame(
-                get_class($dispatcher).'::once() expects argument 2 to be valid callback',
-                $e->getMessage()
-            );
+            $this->assertSame('A service with id "bar" is not defined.', $e->getMessage());
+        }
+
+        try {
+            $dispatcher->once('foo', $handler = 'bar@baz@bam');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Invalid event handler "'.$handler.'".', $e->getMessage());
+
+        }
+
+        try {
+            $dispatcher->once('foo', new \stdClass);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Invalid event handler "stdClass".', $e->getMessage());
+
             return;
         }
 
         $this->fail('test failed');
     }
 
-    /**
-     * @test
-     */
-    public function testDispatchPriority()
+    /** @test */
+    public function itShouldThrowOnInvalidServiceMethod()
+    {
+        $dispatcher = $this->createDispatcher();
+
+        $container = m::mock('Selene\Components\DI\ContainerInterface');
+        $container->shouldReceive('has')->with('bar')->andReturn(true);
+        $container->shouldReceive('get')->with('bar')->andReturn(new \stdClass);
+
+        $dispatcher->setContainer($container);
+
+        $dispatcher->on('foo', 'bar');
+
+        try {
+            $dispatcher->dispatch('foo');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('No callable method on service "bar".', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('test failed');
+    }
+
+    /** @test */
+    public function itShouldDispatchEventsDependingOnTheirPriority()
     {
         $dispatcher = $this->createDispatcher();
 
@@ -309,25 +347,30 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['baz', 'foo', 'bar'], $result);
     }
 
-    /**
-     * @test
-     */
-    public function testBindCallable()
+    /** @test */
+    public function isShouldHandleACallableClassMethod()
     {
-        $class = m::mock('HandleAwareClass');
-        $class->shouldReceive('doHandleEvent')->andReturn(true);
+        $called = false;
 
+        $event = new Event;
         $dispatcher = $this->createDispatcher();
-        $dispatcher->on('foo', [$class, 'doHandleEvent']);
-        $result = $dispatcher->dispatch('foo');
 
-        $this->assertTrue(current($result));
+        $class = m::mock('HandleAwareClass');
+        $class->shouldReceive('doHandleEvent')
+            ->once()
+            ->with($event)
+            ->andReturnUsing(function () use (&$called) {
+                $called = true;
+            });
+
+        $dispatcher->on('foo', [$class, 'doHandleEvent']);
+        $dispatcher->dispatch('foo', $event);
+
+        $this->assertTrue($called, 'HandleAwareClass::doHandleEvent() should be called');
     }
 
-    /**
-     * @test
-     */
-    public function testBindClassDefinitionShouldCallHandleEvent()
+    /** @test */
+    public function bindClassDefinitionShouldCallHandleEvent()
     {
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('handleEvent')->andReturnUsing(
@@ -339,22 +382,52 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         );
 
         $container = m::mock('Selene\Components\DI\ContainerInterface');
-        $container->shouldReceive('getService')->with('some_service')->andReturn($class);
+        $container->shouldReceive('get')->with('some_service')->andReturn($class);
+        $container->shouldReceive('has')->with('some_service')->andReturn(true);
+
 
         $dispatcher = $this->createDispatcher($container);
 
-        $dispatcher->on('foo', '$some_service');
+        $dispatcher->on('foo', 'some_service@handleEvent');
+
         $result = $dispatcher->dispatch('foo');
 
         if (empty($result)) {
-            $this->fail();
+            $this->fail('event results should not be empty.');
         }
     }
 
-    /**
-     * @test
-     */
-    public function testBindClassDefinitionShouldCallDefinedMethod()
+    /** @test */
+    public function boundListenersShouldBeDispatched()
+    {
+        $event = new Event;
+
+        $class = m::mock('Selene\Components\Events\EventListenerInterface');
+        $class->shouldReceive('handleEvent')->with($event)->andReturnUsing(
+            function () {
+                $this->assertTrue(true);
+
+                return true;
+            }
+        );
+
+        $container = m::mock('Selene\Components\DI\ContainerInterface');
+        $container->shouldReceive('get')->with('some_service')->andReturn($class);
+        $container->shouldReceive('has')->with('some_service')->andReturn(true);
+
+        $dispatcher = $this->createDispatcher($container);
+
+        $dispatcher->on('foo', 'some_service');
+
+        $result = $dispatcher->dispatch('foo', $event);
+
+        if (empty($result)) {
+            $this->fail('event results should not be empty.');
+        }
+    }
+
+    /** @test */
+    public function bindingAServiceDefinitionShouldCallDefinedMethod()
     {
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('doHandle')->andReturnUsing(
@@ -366,11 +439,12 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         );
 
         $container = m::mock('Selene\Components\DI\ContainerInterface');
-        $container->shouldReceive('getService')->with('some_service')->andReturn($class);
+        $container->shouldReceive('get')->with('some_service')->andReturn($class);
+        $container->shouldReceive('has')->with('some_service')->andReturn(true);
 
         $dispatcher = $this->createDispatcher($container);
 
-        $dispatcher->on('foo', '$some_service@doHandle');
+        $dispatcher->on('foo', 'some_service@doHandle');
         $result = $dispatcher->dispatch('foo');
 
         if (empty($result)) {
@@ -378,9 +452,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testBindOnce()
     {
         $counter = 0;
@@ -398,6 +470,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $result = $dispatcher->dispatch('foo');
         $result = $dispatcher->dispatch('foo');
+
         $this->assertTrue(true);
     }
 
@@ -441,35 +514,24 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = $this->createDispatcher();
 
-        $dispatcher->on(
-            'foo',
-            function () {
-                return;
-            }
-        );
+        $dispatcher->on('foo', function () {
+            return;
+        });
 
-        $dispatcher->on(
-            'foo',
-            function () {
-                return;
-            }
-        );
+        $dispatcher->on('foo', function () {
+            return;
+        });
 
-        $dispatcher->on(
-            'foo',
-            function () {
-                return 'boom';
-            }
-        );
+        $dispatcher->on('foo', function () {
+            return 'boom';
+        });
 
-        $dispatcher->on(
-            'foo',
-            function () {
-                return 'bam';
-            }
-        );
+        $dispatcher->on('foo', function () {
+            return 'bam';
+        });
 
         $result = $dispatcher->until('foo');
+
         $this->assertSame(['boom'], $result);
     }
 
@@ -542,22 +604,25 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                     return true;
                 }
             )
-            ->shouldReceive('responde')->andReturnUsing(
+            ->shouldReceive('respond')->andReturnUsing(
                 function () {
                     return true;
                 }
             );
 
         $container = m::mock('Selene\Components\DI\ContainerInterface');
-        $container->shouldReceive('getService')->with('some_service')->andReturn($class);
+        $container->shouldReceive('get')->with('some_service')->andReturn($class);
+        $container->shouldReceive('has')->with('some_service')->andReturn(true);
 
         $dispatcher = $this->createDispatcher($container);
 
-        $dispatcher->on('foo', '$some_service');
-        $dispatcher->on('foo', '$some_service@responde');
-        $dispatcher->off('foo', '$some_service');
+        $dispatcher->on('foo', 'some_service');
+        $dispatcher->on('foo', 'some_service@respond');
+
+        $dispatcher->off('foo', 'some_service');
 
         $result = $dispatcher->dispatch('foo');
+
         $this->assertSame([true], $result);
     }
 
@@ -569,6 +634,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         };
         $baz = function () {
         };
+
         $dispatcher = $this->createDispatcher();
         $dispatcher->on('foo', $foo);
         $dispatcher->on('bar', $bar);
@@ -593,6 +659,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $result = $dispatcher->dispatch('bar.event');
         $this->assertSame(['bar'], $result);
     }
+
     /**
      * @test
      */
@@ -624,5 +691,10 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             return new Dispatcher();
         }
         return new Dispatcher($container);
+    }
+
+    protected function tearDown()
+    {
+        m::close();
     }
 }

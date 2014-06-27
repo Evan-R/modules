@@ -52,7 +52,6 @@ class PhpDumper implements ContainerAwareInterface
     }
 
     /**
-     * @access public
      * @return string
      */
     public function dump()
@@ -63,7 +62,6 @@ class PhpDumper implements ContainerAwareInterface
     }
 
     /**
-     * @access public
      * @return string
      */
     public function __toString()
@@ -71,6 +69,11 @@ class PhpDumper implements ContainerAwareInterface
         return $this->dump();
     }
 
+    /**
+     * getClassPropertyValues
+     *
+     * @return array
+     */
     protected function getClassPropertyValues()
     {
         return [
@@ -291,7 +294,7 @@ EOL;
     /**
      * {@inheritdoc}
      */
-    public function hasService(\$id)
+    public function has(\$id)
     {
         return array_key_exists(\$id, \$this->cmap);
     }
