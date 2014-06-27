@@ -374,12 +374,13 @@ class StringHelper
      * convert camelcase to low dash notation
      *
      * @param string $string
+     * @param string $delim
      *
      * @return string
      */
-    public static function strLowDash($string)
+    public static function strLowDash($string, $delim = '_')
     {
-        return strtolower(preg_replace('#[A-Z]#', '_$0', lcfirst($string)));
+        return strtolower(preg_replace('#[A-Z]#', $delim.'$0', lcfirst($string)));
     }
 
     /**
