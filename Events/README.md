@@ -6,6 +6,8 @@
 [![License](https://poser.pugx.org/selene/events/license.png)](https://packagist.org/packages/selene/events)
 [![HHVM Status](http://hhvm.h4cc.de/badge/selene/events.png)](http://hhvm.h4cc.de/package/selene/events)
 
+[![Coverage Status](https://coveralls.io/repos/seleneapp/events/badge.png?branch=development)](https://coveralls.io/r/seleneapp/events?branch=development)
+
 ## Setup
 
 ```php

@@ -12,7 +12,7 @@
 namespace Selene\Components\Events\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Events\ListenerDispatcher;
+use \Selene\Components\Events\EventQueueDispatcher;
 use \Selene\Components\Events\Tests\Stubs\ConcreteEvent;
 
 /**
@@ -22,12 +22,12 @@ use \Selene\Components\Events\Tests\Stubs\ConcreteEvent;
  * @package Selene\Components\Events\Tests
  * @version $Id$
  */
-class ListenerDispatcherTest extends \PHPUnit_Framework_TestCase
+class EventQueueDispatcherTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\Events\ListenerDispatcherInterface', new ListenerDispatcher);
+        $this->assertInstanceof('Selene\Components\Events\EventQueueDispatcherInterface', new EventQueueDispatcher);
     }
 
     /** @test */
@@ -43,7 +43,7 @@ class ListenerDispatcherTest extends \PHPUnit_Framework_TestCase
             $pass = true;
         });
 
-        $dispatcher = new ListenerDispatcher;
+        $dispatcher = new EventQueueDispatcher;
 
         $dispatcher->addListener('foo.bar', $listener);
         $dispatcher->dispatch($event);
@@ -74,7 +74,7 @@ class ListenerDispatcherTest extends \PHPUnit_Framework_TestCase
             $sequence[] = 'c';
         });
 
-        $dispatcher = new ListenerDispatcher;
+        $dispatcher = new EventQueueDispatcher;
 
         $dispatcher->addListener('event', $listenerC, 20);
         $dispatcher->addListener('event', $listenerA, 100);
@@ -106,7 +106,7 @@ class ListenerDispatcherTest extends \PHPUnit_Framework_TestCase
             $sequence[] = $event;
         });
 
-        $dispatcher = new ListenerDispatcher;
+        $dispatcher = new EventQueueDispatcher;
 
         $dispatcher->addListener('event.a', $listenerA);
         $dispatcher->addListener('event.b', $listenerB);

@@ -18,7 +18,7 @@ use \Selene\Components\Events\EventInterface;
  * @package Selene\Components\Events
  * @version $Id$
  */
-trait Factory
+trait EventQueueFactory
 {
     /**
      * queuedEvents

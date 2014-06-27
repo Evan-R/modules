@@ -12,7 +12,7 @@
 namespace Selene\Components\Events\Tests\Traits;
 
 use \Mockery as m;
-use \Selene\Components\Events\Traits\Factory;
+use \Selene\Components\Events\Traits\EventQueueFactory;
 
 /**
  * @class EventDispatcherTest extends TestCase
@@ -22,9 +22,9 @@ use \Selene\Components\Events\Traits\Factory;
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
-class FactoryTest extends \PHPUnit_Framework_TestCase
+class EventQueueFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    use Factory;
+    use EventQueueFactory;
 
     /** @test */
     public function itShouldQueueAndReleaseEvents()

@@ -12,11 +12,11 @@
 namespace Selene\Components\Events;
 
 /**
- * @class ListenerDispatcherInterface
+ * @class EventQueueDispatcherInterface
  * @package Selene\Components\Events
  * @version $Id$
  */
-interface ListenerDispatcherInterface
+interface EventQueueDispatcherInterface
 {
     /**
      * dispatch

@@ -12,11 +12,11 @@
 namespace Selene\Components\Events;
 
 /**
- * @class ListenerDispatcher
+ * @class EventQueueDispatcher
  * @package Selene\Components\Events
  * @version $Id$
  */
-class ListenerDispatcher implements ListenerDispatcherInterface
+class EventQueueDispatcher implements EventQueueDispatcherInterface
 {
     /**
      * listeners
@@ -58,6 +58,20 @@ class ListenerDispatcher implements ListenerDispatcherInterface
     }
 
     /**
+     * addListener
+     *
+     * @param EventListenerInteface $listener
+     *
+     * @return void
+     */
+    public function addListener($eventName, EventListenerInteface $listener, $priority = 0)
+    {
+        unset($this->sorted[$eventName]);
+
+        $this->listeners[$eventName][$priority][] = $listener;
+    }
+
+    /**
      * doDispatch
      *
      * @param EventInterface $event
@@ -71,20 +85,6 @@ class ListenerDispatcher implements ListenerDispatcherInterface
         if (isset($this->listeners[$name])) {
             $this->fireEvent($name, $event);
         }
-    }
-
-    /**
-     * addListener
-     *
-     * @param EventListenerInteface $listener
-     *
-     * @return void
-     */
-    public function addListener($eventName, EventListenerInteface $listener, $priority = 0)
-    {
-        unset($this->sorted[$eventName]);
-
-        $this->listeners[$eventName][$priority][] = $listener;
     }
 
     /**
