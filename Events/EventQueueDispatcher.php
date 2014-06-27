@@ -42,9 +42,7 @@ class EventQueueDispatcher implements EventQueueDispatcherInterface
     }
 
     /**
-     * Dispatches given events.
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function dispatch($events)
     {
@@ -58,11 +56,7 @@ class EventQueueDispatcher implements EventQueueDispatcherInterface
     }
 
     /**
-     * addListener
-     *
-     * @param EventListenerInteface $listener
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function addListener($eventName, EventListenerInteface $listener, $priority = 0)
     {
@@ -72,7 +66,7 @@ class EventQueueDispatcher implements EventQueueDispatcherInterface
     }
 
     /**
-     * doDispatch
+     * Dispatch an event.
      *
      * @param EventInterface $event
      *
@@ -88,7 +82,7 @@ class EventQueueDispatcher implements EventQueueDispatcherInterface
     }
 
     /**
-     * fireEvent
+     * Fires the event.
      *
      * @param mixed $eventName
      * @param EventInterface $event
@@ -105,9 +99,9 @@ class EventQueueDispatcher implements EventQueueDispatcherInterface
     }
 
     /**
-     * getSorted
+     * Get the sorted eventlisteners.
      *
-     * @param mixed $eventName
+     * @param string $eventName
      *
      * @return array
      */

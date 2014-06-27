@@ -19,9 +19,10 @@ namespace Selene\Components\Events;
 interface EventQueueDispatcherInterface
 {
     /**
-     * dispatch
+     * Dispatch events.
      *
-     * @access public
+     * @param array|EventInterface $events an event or an array of events
+     *
      * @return void
      */
     public function dispatch($events);
@@ -29,7 +30,9 @@ interface EventQueueDispatcherInterface
     /**
      * addListener
      *
+     * @param string $eventName
      * @param EventListenerInteface $listener
+     * @param int $priority
      *
      * @return void
      */
