@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Events;
 
+use \Selene\Components\Common\Helper\StringHelper;
+
 /**
  * @class Event
  * @package Selene\Components\Events
@@ -23,43 +25,42 @@ class Event implements EventInterface
      *
      * @var string
      */
-    protected $name;
+    protected $eventName;
 
     /**
      * isStopped
      *
-     * @var mixed
+     * @var boolean
      */
-    protected $isStopped = false;
+    protected $isStopped;
 
     /**
-     * setName
+     * Sets the event name.
      *
      * @param mixed $name
      *
      * @access public
      * @return void
      */
-    public function setName($name)
+    public function setEventName($name)
     {
-        $this->name = $name;
+        $this->eventName = $name;
     }
 
     /**
-     * @access public
+     * Gets the event name
+     *
      * @return string
      */
-    public function getName()
+    public function getEventName()
     {
-        return $this->name;
+        return $this->eventName ?: $this->getBaseEventName();
     }
 
     /**
-     * stopPropagation
+     * Stops the event from beeing further propagated.
      *
-     *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function stopPropagation()
     {
@@ -67,13 +68,24 @@ class Event implements EventInterface
     }
 
     /**
-     * isPropagationStopped
+     * Checks if the event propagation is stopped.
      *
-     * @access public
-     * @return mixed
+     * @return boolean
      */
     public function isPropagationStopped()
     {
-        return $this->isStopped;
+        return (boolean)$this->isStopped;
+    }
+
+    /**
+     * getBaseEventName
+     *
+     * @return string
+     */
+    private function getBaseEventName()
+    {
+        $name = basename(strtr(get_class($this), ['\\' => '/']));
+
+        return StringHelper::strLowDash($name, '.');
     }
 }

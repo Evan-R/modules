@@ -27,6 +27,17 @@ interface DispatcherInterface extends SubscriberAwareInterface
     const EVTHANDLER_SEPARATOR = '@';
 
     /**
+     * addListener
+     *
+     * @param string $event
+     * @param EventListenerInterface $listener
+     * @param int $priority
+     *
+     * @return void
+     */
+    public function addListener($event, EventListenerInterface $listener, $priority = 0);
+
+    /**
      * on
      *
      * @param mixed $
@@ -42,7 +53,6 @@ interface DispatcherInterface extends SubscriberAwareInterface
      * @param mixed $event
      * @param mixed $eventHanlder
      *
-     * @access public
      * @return void
      */
     public function once($event, $eventHanlder);
@@ -53,7 +63,6 @@ interface DispatcherInterface extends SubscriberAwareInterface
      * @param mixed $event
      * @param mixed $eventHanlder
      *
-     * @access public
      * @return void
      */
     public function off($event, $eventHanlder = null);
@@ -64,7 +73,6 @@ interface DispatcherInterface extends SubscriberAwareInterface
      * @param mixed $event
      * @param mixed $parameter
      *
-     * @access public
      * @return array
      */
     public function dispatch($event, $parameter = []);
@@ -75,7 +83,6 @@ interface DispatcherInterface extends SubscriberAwareInterface
      * @param mixed $event
      * @param mixed $parameter
      *
-     * @access public
      * @return mixed
      */
     public function until($event, $parameter = []);
@@ -85,8 +92,7 @@ interface DispatcherInterface extends SubscriberAwareInterface
      *
      * @param mixed $event
      *
-     * @access public
-     * @return mixed
+     * @return array
      */
     public function getEventHandlers($event = null);
 }

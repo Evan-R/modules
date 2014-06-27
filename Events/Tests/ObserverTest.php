@@ -18,10 +18,8 @@ use Selene\Components\Events\ObserveableInterface;
 
 class ObserverTest extends TestCase
 {
-    /**
-     * @expectedException Selene\Components\Events\Tests\Stubs\CounterOverflowException
-     */
-    public function testAddObserver()
+    /** @test */
+    public function isShouldIncrementNotofications()
     {
         $subject = new Stubs\ObservableStub;
         $observer = new Stubs\ObserverStub($this);
@@ -31,27 +29,23 @@ class ObserverTest extends TestCase
         $subject->increment();
         $subject->increment();
         $subject->increment();
+
+        $this->assertSame(3, $observer->counter);
     }
 
-    /**
-     * testAddObserver
-     *
-     *
-     * @access public
-     * @return mixed
-     */
-    public function testRemoveObserver()
+    /** @test */
+    public function isShouldRemoveObservers()
     {
         $subject = new Stubs\ObservableStub;
         $observer = new Stubs\ObserverStub($this);
 
-        $subject->addObserver($observer);
+        $subject->attach($observer);
 
         $subject->increment();
         $subject->increment();
-        $subject->removeObserver($observer);
+        $subject->detach($observer);
         $subject->increment();
 
-        $this->assertTrue(true);
+        $this->assertSame(2, $observer->counter);
     }
 }

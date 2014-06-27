@@ -11,12 +11,13 @@
 
 namespace Selene\Components\Events\Tests;
 
-use Mockery as m;
-use Selene\Components\TestSuite\TestCase;
-use Selene\Components\Events\Dispatcher;
-use Selene\Components\Events\Tests\Stubs\EventStub;
-use Selene\Components\Events\Tests\Stubs\EventSubscriberStub;
-use Selene\Components\DI\ContainerInterface;
+use \Mockery as m;
+use \Selene\Components\TestSuite\TestCase;
+use \Selene\Components\Events\Event;
+use \Selene\Components\Events\Dispatcher;
+use \Selene\Components\Events\Tests\Stubs\EventStub;
+use \Selene\Components\Events\Tests\Stubs\EventSubscriberStub;
+use \Selene\Components\DI\ContainerInterface;
 
 /**
  * @class EventDispatcherTest extends TestCase
@@ -27,24 +28,8 @@ use Selene\Components\DI\ContainerInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class EventDispatcherTest extends TestCase
+class DispatcherTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * createDispatcher
-     *
-     * @param ContainerInterface $container
-     *
-     * @access protected
-     * @return Dispatcher
-     */
-    protected function createDispatcher(ContainerInterface $container = null)
-    {
-        if (null === $container) {
-            return new Dispatcher();
-        }
-        return new Dispatcher($container);
-    }
-
     /**
      * @test
      */
@@ -52,23 +37,240 @@ class EventDispatcherTest extends TestCase
     {
         $dispatcher = $this->createDispatcher();
 
-        $dispatcher->on(
-            'foo',
-            function () {
-                return 'bar';
-            }
-        );
+        $dispatcher->on('foo', function () {
+            return 'bar';
+        });
 
-        $dispatcher->on(
-            'foo',
-            function () {
-                return 'baz';
-            }
-        );
+        $dispatcher->on('foo', function () {
+            return 'baz';
+        });
 
         $result = $dispatcher->dispatch('foo');
 
         $this->assertSame(['bar', 'baz'], $result);
+    }
+
+    /** @test */
+    public function itShouldBindMultipleEventsToOneHandler()
+    {
+        $called = 0;
+
+        $dispatcher = $this->createDispatcher();
+
+        $dispatcher->on(['foo', 'bar'], function () use (&$called) {
+            $called++;
+        });
+
+        $dispatcher->dispatch('foo');
+        $dispatcher->dispatch('bar');
+
+        $this->assertSame(2, $called);
+    }
+
+    /** @test */
+    public function itShouldBindMultipleEventsToOneHandlerOnce()
+    {
+        $called = 0;
+
+        $dispatcher = $this->createDispatcher();
+
+        $dispatcher->once(['foo', 'bar'], function () use (&$called) {
+            $called++;
+        });
+
+        $dispatcher->dispatch('foo');
+        $dispatcher->dispatch('bar');
+
+        $dispatcher->dispatch('foo');
+        $dispatcher->dispatch('bar');
+
+        $dispatcher->dispatch('foo');
+        $dispatcher->dispatch('bar');
+
+        $this->assertSame(2, $called);
+    }
+
+    /** @test */
+    public function itShouldDetachAllHandlers()
+    {
+        $called = 0;
+
+        $dispatcher = $this->createDispatcher();
+
+        $dispatcher->on('foo', function () use (&$called) {
+            $called++;
+        });
+
+        $dispatcher->on('foo', function () use (&$called) {
+            $called++;
+        });
+
+        $dispatcher->off('foo');
+
+        $dispatcher->dispatch('foo');
+
+        $this->assertSame(0, $called);
+
+        $this->assertSame([], $dispatcher->getEventHandlers());
+    }
+
+    /** @test */
+    public function itShouldAlwaysReturnAnArrayWhenGettingHandlers()
+    {
+        $dispatcher = $this->createDispatcher();
+        $this->assertSame([], $dispatcher->getEventHandlers());
+
+        $dispatcher = $this->createDispatcher();
+        $this->assertSame([], $dispatcher->getEventHandlers('foo'));
+    }
+
+    /** @test */
+    public function itShouldBindEventListeners()
+    {
+        $called = false;
+
+        $dispatcher = $this->createDispatcher();
+
+        $listener = m::mock('Selene\Components\Events\EventListenerInterface');
+        $listener->shouldReceive('handleEvent')->andReturnUsing(function () use (&$called) {
+            $called = true;
+        });
+
+        $event = m::mock('Selene\Components\Events\\EventInterface');
+
+        $event->shouldReceive('setEventName')->with('event');
+        $event->shouldReceive('getEventName')->andReturn('event');
+        $event->shouldReceive('isPropagationStopped')->andReturn(false);
+
+        $dispatcher->on('event', $listener);
+
+        $dispatcher->dispatch('event', $event);
+
+        $this->assertTrue($called, 'Listener should be called');
+    }
+
+    /** @test */
+    public function itShouldBindEventListenersOnce()
+    {
+        $called = 0;
+
+        $dispatcher = $this->createDispatcher();
+
+        $listener = m::mock('Selene\Components\Events\EventListenerInterface');
+
+        $listener->shouldReceive('handleEvent')->andReturnUsing(function () use (&$called) {
+            $called++;
+        });
+
+        $event = m::mock('Selene\Components\Events\\EventInterface');
+
+        $event->shouldReceive('setEventName')->with('event');
+        $event->shouldReceive('getEventName')->andReturn('event');
+        $event->shouldReceive('isPropagationStopped')->andReturn(false);
+
+        $dispatcher->once('event', $listener);
+
+        $dispatcher->dispatch('event', $event);
+        $dispatcher->dispatch('event', $event);
+        $dispatcher->dispatch('event', $event);
+
+        $this->assertSame(1, $called, 'Listener should be called');
+    }
+
+
+    /** @test */
+    public function itShouldDetatchAListener()
+    {
+        $called = 0;
+
+        $dispatcher = $this->createDispatcher();
+
+        $listenerA = m::mock('Selene\Components\Events\EventListenerInterface');
+
+        $listenerA->shouldReceive('handleEvent')->andReturnUsing(function () use (&$called) {
+            $called++;
+        });
+
+        $listenerB = m::mock('Selene\Components\Events\EventListenerInterface');
+
+        $listenerB->shouldReceive('handleEvent')->andReturnUsing(function () use (&$called) {
+            $called++;
+        });
+
+        $event = m::mock('Selene\Components\Events\\EventInterface');
+
+        $event->shouldReceive('setEventName')->with('event');
+        $event->shouldReceive('getEventName')->andReturn('event');
+        $event->shouldReceive('isPropagationStopped')->andReturn(false);
+
+        $dispatcher->on('event', $listenerA);
+        $dispatcher->on('event', $listenerB);
+
+        $dispatcher->dispatch('event', $event);
+
+        $dispatcher->off('event', $listenerA);
+
+        $dispatcher->dispatch('event', $event);
+
+        $dispatcher->off('event', $listenerB);
+
+        $dispatcher->dispatch('event', $event);
+
+        $this->assertSame(3, $called, 'Listener should be called');
+    }
+
+    /** @test */
+    public function itShouldReturnAllListenersForAEvent()
+    {
+        $dispatcher = $this->createDispatcher();
+
+        $dispatcher->on('foo', $a = function () {
+        });
+        $dispatcher->on('foo', $b = function () {
+        });
+
+        $this->assertSame([$a, $b], $dispatcher->getEventHandlers('foo'));
+    }
+
+    /** @test */
+    public function itShouldReturnAllListenersForAEventSorted()
+    {
+        $dispatcher = $this->createDispatcher();
+
+        $dispatcher->on('foo', $a = function () {
+        }, 10);
+
+        $dispatcher->on('foo', $b = function () {
+        }, 100);
+
+        $this->assertSame([$b, $a], $dispatcher->getEventHandlers('foo'));
+    }
+
+    /** @test */
+    public function itShouldThrowOnInvalidHandlers()
+    {
+        $dispatcher = $this->createDispatcher();
+
+        try {
+            $dispatcher->on('foo', 'bar');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(
+                get_class($dispatcher).'::on() expects argument 2 to be valid callback',
+                $e->getMessage()
+            );
+        }
+
+        try {
+            $dispatcher->once('foo', 'bar');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(
+                get_class($dispatcher).'::once() expects argument 2 to be valid callback',
+                $e->getMessage()
+            );
+            return;
+        }
+
+        $this->fail('test failed');
     }
 
     /**
@@ -406,5 +608,21 @@ class EventDispatcherTest extends TestCase
 
         $result = $dispatcher->dispatch('bar.event');
         $this->assertSame([], $result);
+    }
+
+    /**
+     * createDispatcher
+     *
+     * @param ContainerInterface $container
+     *
+     * @access protected
+     * @return Dispatcher
+     */
+    protected function createDispatcher(ContainerInterface $container = null)
+    {
+        if (null === $container) {
+            return new Dispatcher();
+        }
+        return new Dispatcher($container);
     }
 }

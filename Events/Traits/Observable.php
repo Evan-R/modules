@@ -36,7 +36,6 @@ trait Observable
      *
      * @param mixed $param
      *
-     * @access public
      * @return void
      */
     public function notify()
@@ -51,8 +50,7 @@ trait Observable
      *
      * @param ObserverInterface $observer
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function addObserver(ObserverInterface $observer)
     {
@@ -66,8 +64,7 @@ trait Observable
      *
      * @param ObserverInterface $observer
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function removeObserver(ObserverInterface $observer)
     {
@@ -81,8 +78,7 @@ trait Observable
      *
      * @param ObserverInterface $observer
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function attach(SplObserver $observer)
     {
@@ -94,12 +90,11 @@ trait Observable
      *
      * @param ObserverInterface $observer
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function detach(SplObserver $observer)
     {
-        return $this->removeObserver($observer);
+        $this->removeObserver($observer);
     }
 
 }

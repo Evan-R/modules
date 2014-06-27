@@ -42,7 +42,7 @@ interface EventInterface
      * @access public
      * @return string
      */
-    public function getName();
+    public function getEventName();
 
     /**
      * setName
@@ -52,5 +52,5 @@ interface EventInterface
      * @access public
      * @return void
      */
-    public function setName($name);
+    public function setEventName($name);
 }

@@ -22,6 +22,8 @@ use Selene\Components\Events\ObserveableInterface;
  */
 class ObserverStub implements ObserverInterface
 {
+    public $counter = 0;
+
     public function __construct(TestCase $test)
     {
         $this->test = $test;
@@ -34,8 +36,6 @@ class ObserverStub implements ObserverInterface
 
     public function notify(ObserveableInterface $subject)
     {
-        if ($subject->getCounter() === 3) {
-            throw new CounterOverflowException;
-        }
+        $this->counter++;
     }
 }

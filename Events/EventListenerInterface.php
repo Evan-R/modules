@@ -14,12 +14,10 @@ namespace Selene\Components\Events;
 /**
  * @interface EventHandlerInterface
  *
- * @package \Users\malcolm\www\selene_framework\src\Selene\Components\Events
+ * @package Selene\Components\Events
  * @version $Id$
- * @author Thomas Appel <mail@thomas-appel.com
- * @license MIT
  */
-interface EventHandlerInterface
+interface EventListenerInterface
 {
-    public function handleEvent();
+    public function handleEvent(EventInterface $event);
 }
