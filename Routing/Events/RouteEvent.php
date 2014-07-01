@@ -20,7 +20,7 @@ use \Symfony\Component\HttpFoundation\Request;
  * @package Selene\Components\Routing\Events
  * @version $Id$
  */
-abstract class RouteEvent
+abstract class RouteEvent extends Event
 {
 
     private $route;

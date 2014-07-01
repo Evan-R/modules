@@ -11,11 +11,13 @@
 
 namespace Selene\Components\Routing\Exception;
 
+use \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 /**
  * @class RouteNotFoundException
  * @package Selene\Components\Routing\Exception
  * @version $Id$
  */
-class RouteNotFoundException extends \RuntimeException
+class RouteNotFoundException extends NotFoundHttpException
 {
 }

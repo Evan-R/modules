@@ -22,4 +22,22 @@ namespace Selene\Components\Routing\Events;
  */
 class RouteFilterEvent extends RouteEvent
 {
+    private $response;
+
+    public function setResponse($result)
+    {
+        $this->stopPropagation();
+
+        $this->response = $result;
+    }
+
+    /**
+     * getResult
+     *
+     * @return mixed
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
 }

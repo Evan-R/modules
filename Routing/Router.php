@@ -12,14 +12,17 @@
 namespace Selene\Components\Routing;
 
 use \Symfony\Component\HttpFoundation\Request;
+use \Selene\Components\Events\Dispatcher;
 use \Selene\Components\Events\DispatcherInterface;
 use \Selene\Components\Routing\Exception\RouteNotFoundException;
 use \Selene\Components\Routing\Matchers\MatchContext;
-use \Selene\Components\Routing\Controller\Dispatcher as ControllerDispatcher;
 use \Selene\Components\Routing\Events\RouteDispatchEvent;
 use \Selene\Components\Routing\Events\RouteNotFoundEvent;
 use \Selene\Components\Routing\Events\RouteFilterEvent;
 use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
+use \Selene\Components\Routing\Events\RouterEvents as Events;
+use \Selene\Components\Routing\Controller\Dispatcher as Controllers;
+use \Selene\Components\Routing\RouteMatcherInterface as Matcher;
 
 /**
  * @class Router implements RouterInterface
@@ -32,46 +35,30 @@ use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
  */
 class Router implements RouterInterface
 {
-    const ROUTE_BEFORE  = 'route_before';
-
-    const ROUTE_AFTER   = 'route_after';
-
-    const EVENT_FILTER_BEFORE = 'filter_before';
-
-    const EVENT_FILTER_AFTER  = 'filter_after';
-
-    const EVENT_ROUTE_NOT_FOUND = 'route_not_found';
-
-    const EVENT_ON_DISPATCH = 'router_dispatch';
-
     private $routes;
 
     private $events;
 
     private $matcher;
 
-    private $dispatcher;
+    private $controllers;
 
     /**
-     * @param RouteMatcherInterface $matcher
-     * @param Dispatcher $events
-     *
-     * @access public
+     * @param Controllers $controllers
+     * @param RouteCollectionInterface $routes
+     * @param Matcher $matcher
+     * @param DispatcherInterface $events
      */
-    public function __construct(RouteMatcherInterface $matcher, ControllerDispatcher $dispatcher)
-    {
-        $this->matcher    = $matcher;
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function setEvents(DispatcherInterface $events)
-    {
-        $this->events = $events;
-    }
-
-    public function getEvents()
-    {
-        return $this->events;
+    public function __construct(
+        Controllers $controllers,
+        RouteCollectionInterface $routes,
+        Matcher $matcher = null,
+        DispatcherInterface $events = null
+    ) {
+        $this->routes      = $routes;
+        $this->controllers = $controllers;
+        $this->events      = $events ?: new Dispatcher;
+        $this->matcher     = $matcher ?: new RouteMatcher;
     }
 
     /**
@@ -98,6 +85,16 @@ class Router implements RouterInterface
     }
 
     /**
+     * getEvents
+     *
+     * @return DispatcherInterface
+     */
+    public function getEvents()
+    {
+        return $this->events;
+    }
+
+    /**
      * Dispatch a route collections agaibts a request
      *
      * @param Request $request
@@ -107,12 +104,10 @@ class Router implements RouterInterface
     public function dispatch(Request $request)
     {
         if (!$context = $this->matcher->matches($request, $this->prepareRoutes())) {
-            $this->handleNotFound($request);
-
-            return;
+            return $this->handleNotFound($request);
         }
 
-        $this->dispatchRoute($context);
+        return $this->dispatchRoute($context);
     }
 
     /**
@@ -124,24 +119,32 @@ class Router implements RouterInterface
      */
     protected function dispatchRoute(MatchContext $context)
     {
-        if ($result = $this->fireBeforeFilters(
-            $request = $context->getRequest(),
-            $route   = $context->getRoute()
-        )) {
+        $route   = $context->getRoute();
+        $request = $context->getRequest();
 
-            $this->events->dispatch(static::EVENT_ON_DISPATCH, $event = new RouteFilterAbortEvent($result));
-
-            return;
+        // if there's a result on the event, abort the routing.
+        if ($response  = $this->filterBefore($request, $route)) {
+            return $response;
         }
 
-        if (!$result = $this->dispatcher->dispatch($context)) {
-            throw new RouteNotFoundException(
+        if (!$result = $this->controllers->dispatch($context)) {
+            $this->handleNotFound(
+                $request,
                 sprintf('No handler found for Route "%s".', $context->getRequest()->getPathInfo())
             );
         }
 
-        $event = $this->fireRouteDispatchEvent($context->getRoute(), $context->getRequest());
+        $event = new RouteFilterEvent($route, $request);
         $event->setResponse($result);
+
+        $this->events->dispatch(Events::DISPATCHED, $event);
+
+        // if there's a result on the event, abort the routing.
+        if ($response  = $this->filterAfter($event)) {
+            return $response;
+        }
+
+        return $event->getResponse();
     }
 
     /**
@@ -150,31 +153,39 @@ class Router implements RouterInterface
      * @param Request $request
      * @param Route $route
      *
-     * @return void
+     * @return null|Response;
      */
-    protected function fireBeforeFilters(Request $request, Route $route)
+    protected function filterBefore(Request $request, Route $route)
     {
         foreach ((array)$route->getBeforeFilters() as $filter) {
-            if ($result = $this->events->dispatch(
-                static::EVENT_FILTER_BEFORE . '.' . $filter,
-                new RouteFilterEvent($route, $request)
-            )) {
 
-                return current($result);
+            // Listen for response
+            $this->events->dispatch(
+                Events::FILTER_BEFORE . '.' . $filter,
+                $event = new RouteFilterEvent($route, $request)
+            );
+
+            if ($result = $event->getResponse()) {
+
+                $event->setResponse($result);
+                $this->events->dispatch(Events::ABORT, $event);
+
+                return $event->getResponse();
             }
         }
     }
 
-    protected function fireAfterFilters(Request $request, Route $route)
+    /**
+     * filterAfter
+     *
+     * @param RouteFilterEvent $event
+     *
+     * @return void
+     */
+    protected function filterAfter(RouteFilterEvent $event)
     {
-        foreach ((array)$route->getBeforeFilters() as $filter) {
-            if ($result = $this->events->dispatch(
-                static::EVENT_FILTER_AFTER . '.' . $filter,
-                new RouteFilterEvent($route, $request)
-            )) {
-
-                return current($result);
-            }
+        foreach ((array)$event->getRoute()->getAfterFilters() as $filter) {
+            $this->events->dispatch(Events::FILTER_AFTER . '.' . $filter, $event);
         }
     }
 
@@ -203,7 +214,7 @@ class Router implements RouterInterface
      */
     protected function fireRouteDispatchEvent(Route $route, Request $request)
     {
-        $this->events->dispatch(static::EVENT_ON_DISPATCH, $event = $this->prepareDispatchEvent($route, $request));
+        $this->events->dispatch(Events::DISPATCH, $event = $this->prepareDispatchEvent($route, $request));
 
         return $event;
     }
@@ -212,19 +223,20 @@ class Router implements RouterInterface
      * Fire the not found event.
      *
      * @param Request $request
+     * @param string  $msg
      *
      * @access protected
      * @return void
      */
-    protected function handleNotFound(Request $request)
+    protected function handleNotFound(Request $request, $msg = null)
     {
-        if (!$this->events) {
-            throw new RouteNotFoundException(
-                sprintf('Route "%s" not found.', $request->getPathInfo())
-            );
-        }
+        $this->events->dispatch(Events::NOT_FOUND, new RouteNotFoundEvent($request));
 
-        $this->events->dispatch(static::EVENT_ROUTE_NOT_FOUND, new RouteNotFoundEvent($request));
+        throw new RouteNotFoundException(
+            $msg ?: sprintf('Route "%s" not found.', $request->getPathInfo()),
+            null,
+            404
+        );
     }
 
     /**
