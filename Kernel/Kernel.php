@@ -14,6 +14,7 @@ namespace Selene\Components\Kernel;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpFoundation\Response;
 use \Symfony\Component\HttpKernel\HttpKernelInterface;
+use \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use \Symfony\Component\HttpKernel\TerminableInterface;
 use \Selene\Components\Events\DispatcherInterface;
 use \Selene\Components\Routing\RouterInterface;
@@ -23,8 +24,15 @@ use \Selene\Components\DI\Traits\ContainerAwareTrait;
 use \Selene\Components\Events\SubscriberInterface;
 use \Selene\Components\Routing\Events\RouteDispatchEvent;
 use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
+use \Selene\Components\Kernel\Events\FilterResponseEvent;
 use \Selene\Components\Kernel\Events\HandleRequestEvent;
-use \Selene\Components\Kernel\Events\KernelExceptionEvent;
+use \Selene\Components\Kernel\Events\HandleResponsetEvent;
+use \Selene\Components\Kernel\Events\HandleExceptionEvent;
+use \Selene\Components\Kernel\Events\AbortRequestEvent;
+use \Selene\Components\Kernel\Events\HandleShutDownEvent;
+use \Selene\Components\Kernel\Events\HandleRequestEndEvent;
+use \Selene\Components\Kernel\Events\KernelEvents as Events;
+use \Selene\Components\Kernel\Subscriber\KernelSubscriber;
 
 /**
  * @class Kernel implements HttpKernelInterface
@@ -33,17 +41,9 @@ use \Selene\Components\Kernel\Events\KernelExceptionEvent;
  * @package Selene\Components\Kernel
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
-class Kernel implements HttpKernelInterface, SubscriberInterface
+class Kernel implements KernelInterface
 {
-    /**
-     * router
-     *
-     * @var mixed
-     */
-    private $router;
-
     /**
      * events
      *
@@ -74,39 +74,40 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
      * @access public
      * @return mixed
      */
-    public function __construct(DispatcherInterface $events, RouterInterface $router, RequestStack $stack = null)
+    public function __construct(DispatcherInterface $events, RequestStack $stack = null)
     {
         $this->events = $events;
-        $this->router = $router;
 
         $this->requestStack = $stack ?: new RequestStack;
-        $this->responseStack = new \SplStack;
-
-        $this->events->addSubscriber($this);
     }
 
     /**
      * handle
      *
      * @param Request $request
-     * @param mixed $type
-     * @param mixed $catch
+     * @param string  $type
+     * @param int     $catch
      *
-     * @access public
+     * @throws \Exception if $catch is false and program raised exception
+     * during request handling.
+     *
      * @return Response
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         $this->requestStack->push($request);
-        $this->getEvents()->dispatch('kernel.handle_request', new HandleRequestEvent($request));
 
         try {
             $response = $this->handleRequest($request, $type, $catch);
         } catch (\Exception $e) {
-            if ($catch) {
-                return $this->handleRequestException($request, $e);
+            if (!$catch) {
+
+                $this->endRequest($request, $type);
+
+                throw $e;
             }
-            throw $e;
+
+            return $this->handleRequestException($request, $e, $type);
         }
 
         return $response;
@@ -123,93 +124,11 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
      */
     public function terminate(Request $request, Response $response)
     {
-        $this->booted = false;
-
-        return null;
-    }
-
-    /**
-     * boot
-     *
-     * @access public
-     * @return mixed
-     */
-    public function boot()
-    {
-        if ($this->booted) {
-            return;
-        }
-
-        $this->setUpRouterEvents();
-    }
-
-    /**
-     * onRouterDispatch
-     *
-     * @access public
-     * @return mixed
-     */
-    public function onRouterDispatch(RouteDispatchEvent $event)
-    {
-        $this->responseStack->push($event);
-    }
-
-    /**
-     * onRouterDispatch
-     *
-     * @param RouteFilterAbortEvent $event
-     *
-     * @access public
-     * @return mixed
-     */
-    public function onRouterAbort(RouteFilterAbortEvent $event)
-    {
-        $this->responseStack->push($event);
-    }
-
-    /**
-     * getSubscriptions
-     *
-     * @param mixed $
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getSubscriptions()
-    {
-        return [
-            'router_dispatch' => 'onRouterDispatch',
-            'router_abort'    => 'onRouterAbort'
-        ];
-    }
-
-    /**
-     * handleRequest
-     *
-     * @param Request $request
-     * @param mixed $type
-     * @param mixed $catch
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function handleRequest(Request $request, $type = self::MASTER_REQUEST, $catch = true)
-    {
-        $this->router->dispatch($request);
-
-        return $this->filterResponse();
-    }
-
-    /**
-     * getRouter
-     *
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getRouter()
-    {
-        return $this->router;
+        //Fire finishing events
+        $this->getEvents()->dispatch(
+            Events::HANDLE_SHUTDOWN,
+            $event = new HandleShutDownEvent($request, $response)
+        );
     }
 
     /**
@@ -225,45 +144,118 @@ class Kernel implements HttpKernelInterface, SubscriberInterface
     }
 
     /**
-     * setUpRouterEvents
+     * registerKernelSubscriber
      *
-     * @access protected
+     * @param KernelSubscriber $subscriber
+     *
+     * @access public
      * @return void
      */
-    protected function setUpRouterEvents()
+    public function registerKernelSubscriber(SubscriberInterface $subscriber)
     {
-        $this->events->addSubscriber($this);
+        $this->getEvents()->addSubscriber($subscriber);
+    }
+
+    /**
+     * handleRequest
+     *
+     * @param Request $request
+     * @param int     $type
+     * @param boolean $catch
+     *
+     * @return Resoonse
+     */
+    protected function handleRequest(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    {
+        //Fire the first kernel event in order to retreive an response. If no
+        //response is set on the event, return a 404 response.
+        $this->events->dispatch(
+            Events::REQUEST,
+            $event = new HandleRequestEvent($this, $request, $type)
+        );
+
+        return $this->filterResponse($request, $event->getResponse() ?: new Response('Not Found', 404), $type);
     }
 
     /**
      * filterResponse
      *
-     * @access protected
-     * @return mixed
+     * @param Request  $request
+     * @param Response $response
+     * @param int      $type
+     *
+     * @return Resopnse
      */
-    protected function filterResponse()
+    protected function filterResponse(Request $request, Response $response, $type)
     {
-        if (!$this->responseStack->count()) {
-            throw new \Exception('no response given');
-        }
+        // Dispatch the `kernel.filter_response` event:
+        $this->events->dispatch(
+            Events::FILTER_RESPONSE,
+            $event = new FilterResponseEvent($this, $request, $type, $response)
+        );
 
-        $event = $this->responseStack->pop();
+        $this->endRequest($request, $type);
+
+        return $event->getResponse();
+    }
+
+    /**
+     * handleRequestException
+     *
+     * @param Request    $request
+     * @param \Exception $e
+     * @param int        $type
+     *
+     * @return Response
+     */
+    protected function handleRequestException(Request $request, \Exception $e, $type)
+    {
+        $this->events->dispatch(
+            Events::HANDLE_EXCEPTION,
+            $event = new HandleExceptionEvent($this, $request, $type, $e)
+        );
 
         $response = $event->getResponse();
 
-        if ($response instanceof Response) {
-            return $response;
+        if (!$response instanceof Response) {
+
+            $response = new Response($e->getMessage());
+
+            if ($e instanceof NotFoundHttpException) {
+                $response->setStatusCode($e->getStatusCode());
+            } else {
+                $response->setStatusCode(500);
+            }
         }
 
-        return new Response($response);
+        $response = $this->filterResponse($request, $response, $type);
+
+        $this->events->dispatch(
+            Events::ABORT_REQUEST,
+            $event = new AbortRequestEvent($this, $request, $type, $e)
+        );
+
+        //$this->endRequest($request, $type);
+
+        return $response;
     }
 
-    protected function handleRequestException(Request $request, \Exception $e)
+    /**
+     * endRequest
+     *
+     * @param Request $request
+     * @param mixed $type
+     *
+     * @access protected
+     * @return void
+     */
+    protected function endRequest(Request $request, $type)
     {
-        var_dump(
-            sprintf('FATAL exception %s : %s', get_class($e), $e->getMessage())
+        $this->events->dispatch(
+            Events::END_REQUEST,
+            new HandleRequestEndEvent($this, $request, $type)
         );
-        die;
-        //$this->getEvents()->dispatch('kernel.handle_exception', new KernelExceptionEvent($request, $e));
+
+        $this->requestStack->pop();
     }
 }

@@ -15,7 +15,11 @@ use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpFoundation\Response;
 use \Symfony\Component\HttpKernel\HttpKernelInterface;
 use \Symfony\Component\HttpKernel\TerminableInterface;
-use \Selene\Components\Events\DispatcherInterface;
+use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Components\Config\Resource\Locator;
+use \Selene\Components\Config\Resource\LoaderResolver;
+use \Selene\Components\Config\Resource\DelegatingLoader;
+use \Selene\Components\Config\Cache as ConfigCache;
 use \Selene\Components\Routing\RouterInterface;
 use \Selene\Components\DI\Builder;
 use \Selene\Components\DI\Processor\Processor;
@@ -24,16 +28,12 @@ use \Selene\Components\DI\Dumper\ContainerDumper;
 use \Selene\Components\DI\Parameters;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
-use \Selene\Components\Config\Cache as ConfigCache;
-use \Selene\Components\Stack\StackBuilder as KernelStackBuilder;
-use \Selene\Components\Package\PackageRepository;
-use \Selene\Components\Config\Resource\Locator;
-use \Selene\Components\Config\Resource\LoaderResolver;
-use \Selene\Components\Config\Resource\DelegatingLoader;
 use \Selene\Components\DI\Loader\XmlLoader;
 use \Selene\Components\DI\Loader\PhpLoader;
 use \Selene\Components\DI\Loader\CallableLoader;
-use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Components\Events\DispatcherInterface;
+use \Selene\Components\Package\PackageRepository;
+use \Selene\Components\Stack\StackBuilder as KernelStackBuilder;
 
 /**
  * @class Application implements HttpKernelInterface, TerminableInterface, ContainerAwareInterface
@@ -44,7 +44,6 @@ use \Selene\Components\Common\Helper\ListHelper;
  * @package Selene\Components\Kernel
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class Application implements ApplicationInterface, HttpKernelInterface, TerminableInterface, ContainerAwareInterface
 {
@@ -86,6 +85,13 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     protected $packageResources;
 
     /**
+     * containerCachePath
+     *
+     * @var void
+     */
+    protected $containerCachePath;
+
+    /**
      * packageProviders
      *
      * @var array
@@ -121,7 +127,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     protected static $prodEnv = 'production';
 
     /**
-     * Create a new Application instance.
+     * Constructor.
      *
      * @param string $environment
      * @param boolean $debug
@@ -137,7 +143,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $this->packageResources = [];
         $this->packageProviders = [];
-        //var_dump($this->getApplicationRoot());
     }
 
     /**
@@ -147,21 +152,18 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      * @param int $type
      * @param boolean $catch
      *
-     * @access public
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         try {
             $this->boot();
-            $response = $this->getKernelStack()->handle($request, $type, $catch);
+
+            return $this->getKernelStack()->handle($request, $type, $catch);
 
         } catch (\Exception $e) {
             throw $e;
-            return;
         }
-
-        return $response;
     }
 
     /**
@@ -171,13 +173,13 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @return void
      */
-    public function run(Request $request = null)
+    public function run(Request $request = null, $catch = true)
     {
-        $this->boot();
+        $request = $request ?: Request::createFromGlobals();
 
-        $request =  $request ?: Request::createFromGlobals();
+        $doCatch = null !== $catch ? (bool)$catch : self::$prodEnv === $this->getEnvironment();
 
-        $response = $this->handle($request, self::MASTER_REQUEST, self::$prodEnv === $this->getEnvironment());
+        $response = $this->handle($request, self::MASTER_REQUEST, $doCatch);
 
         $response->send();
 
@@ -190,7 +192,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      * Initialize packages, initialize the service container, boot the kernel
      * stack, and prepare the controller resolver.
      *
-     * @access public
      * @return void
      */
     public function boot()
@@ -200,11 +201,8 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         }
 
         $this->initializePackages();
-
         $this->initializeContainer();
-
         $this->injectServices();
-
         $this->bootKernelStack();
 
         $this->booted = true;
@@ -218,7 +216,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getContainerServiceName
      *
-     * @access public
      * @return string
      */
     public function getContainerServiceId()
@@ -231,7 +228,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @param mixed $path
      *
-     * @access public
      * @return voi
      */
     public function setApplicationRoot($path)
@@ -242,7 +238,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * Get the application directory.
      *
-     * @access public
      * @return string
      */
     public function getApplicationRoot()
@@ -260,7 +255,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @param mixed $path
      *
-     * @access public
      * @return void
      */
     public function setContainerCachePath($path)
@@ -271,7 +265,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getContainerCachePath
      *
-     * @access public
      * @return string
      */
     public function getContainerCachePath()
@@ -282,7 +275,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getLoadedPackages
      *
-     * @access public
      * @return PackageRepository
      */
     public function getLoadedPackages()
@@ -305,7 +297,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      * @param Request $request
      * @param Response $response
      *
-     * @access public
      * @return mixed
      */
     public function terminate(Request $request, Response $response)
@@ -318,7 +309,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getKernel
      *
-     * @access protected
      * @return \Symfony\Component\HttpFoundation\HttpKernelInterface
      */
     public function getKernel()
@@ -329,7 +319,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getKernelStack
      *
-     * @access public
      * @return \Selene\Components\Kernel\Stack
      */
     public function getKernelStack()
@@ -340,7 +329,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getRequestStack
      *
-     * @access public
      * @return mixed
      */
     public function getRequestStack()
@@ -351,7 +339,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * isDebugging
      *
-     * @access public
      * @return boolean
      */
     public function isDebugging()
@@ -362,7 +349,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * runsInConsole
      *
-     * @access public
      * @return mixed
      */
     public function runsInConsole()
@@ -373,7 +359,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * runsInTest
      *
-     * @access public
      * @return mixed
      */
     public function runsInTest()
@@ -386,7 +371,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @param mixed $name
      *
-     * @access public
      * @return mixed
      */
     public static function setTestEnvironmentName($name)
@@ -397,7 +381,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * loadConfig
      *
-     * @access protected
      * @return mixed
      */
     protected function loadConfig()
@@ -408,7 +391,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getContainerClass
      *
-     * @access protected
      * @return string
      */
     protected function getContainerClass()
@@ -419,7 +401,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * initializeContainer
      *
-     * @access protected
      * @return void
      */
     protected function initializeContainer()
@@ -452,7 +433,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @param ConfigCache $cache
      *
-     * @access protected
      * @return void
      */
     protected function buildContainer(ConfigCache $cache, $containerClass, $containerFile)
@@ -506,7 +486,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * loadContainerCache
      *
-     * @access protected
      * @return void
      */
     protected function loadContainerCache($class, $file)
@@ -521,7 +500,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getDefaultParameters
      *
-     * @access protected
      * @return mixed
      */
     protected function getDefaultParameters()
@@ -558,7 +536,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * bootKernelStack
      *
-     * @access protected
      * @return mixed
      */
     protected function bootKernelStack()
@@ -570,7 +547,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * registerPackages
      *
-     * @access protected
      * @return void
      */
     protected function registerPackages()
@@ -581,7 +557,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * initializePackages
      *
-     * @access protected
      * @return void
      */
     protected function initializePackages()
@@ -593,12 +568,12 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getPackageConfig
      *
-     * @access protected
      * @return array
      */
     protected function getPackageConfig()
     {
         $paths = [];
+
         foreach ($this->packages as $alias => $package) {
             $paths[] = $alias;
         }
@@ -611,7 +586,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @param array $packages
      *
-     * @access protected
      * @return array
      */
     protected function initPackages(array $packages)
@@ -634,21 +608,18 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getPackages
      *
-     *
-     * @access protected
-     * @abstract
      * @return array
      */
     protected function getPackageResources()
     {
         $paths = ListHelper::arrayFlatten($this->packageProviders);
+
         return $paths;
     }
 
     /**
      * version
      *
-     * @access public
      * @return mixed
      */
     public static function version()

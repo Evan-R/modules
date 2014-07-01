@@ -13,24 +13,23 @@ namespace Selene\Components\Kernel\Events;
 
 use \Selene\Components\Events\Event;
 use \Symfony\Component\HttpFoundation\Request;
-use \Symfony\Component\HttpKernel\HttpKernelInterface as Kernel;
+use \Symfony\Component\HttpFoundation\Response;
 
 /**
- * @class KernelEvent
+ * @class HandleShutDownEvent
  * @package Selene\Components\Kernel\Events
  * @version $Id$
  */
-abstract class KernelEvent extends Event
+class HandleShutDownEvent extends Event
 {
-    private $kernel;
     private $request;
-    private $requestType;
 
-    public function __construct(Kernel $kernel, Request $request, $type)
+    private $response;
+
+    public function __construct(Request $request, Response $response)
     {
-        $this->kernel = $kernel;
         $this->request = $request;
-        $this->requestType = $type;
+        $this->response = $response;
     }
 
     public function getRequest()
@@ -38,13 +37,8 @@ abstract class KernelEvent extends Event
         return $this->request;
     }
 
-    public function getKernel()
+    public function getResponse()
     {
-        return $this->kernel;
-    }
-
-    public function getRequestType()
-    {
-        return $this->requestType;
+        return $this->response;
     }
 }
