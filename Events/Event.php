@@ -25,14 +25,21 @@ class Event implements EventInterface
      *
      * @var string
      */
-    protected $eventName;
+    private $eventName;
 
     /**
      * isStopped
      *
      * @var boolean
      */
-    protected $isStopped;
+    private $isStopped;
+
+    /**
+     * eventDispatcher
+     *
+     * @var DispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
      * Sets the event name.
@@ -75,6 +82,28 @@ class Event implements EventInterface
     public function isPropagationStopped()
     {
         return (boolean)$this->isStopped;
+    }
+
+    /**
+     * setDispatcher
+     *
+     * @param DispatcherInterface $dispatcher
+     *
+     * @return void
+     */
+    public function setEventDispatcher(DispatcherInterface $dispatcher)
+    {
+        $this->eventDispatcher = $dispatcher;
+    }
+
+    /**
+     * getDispatcher
+     *
+     * @return DispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
     }
 
     /**

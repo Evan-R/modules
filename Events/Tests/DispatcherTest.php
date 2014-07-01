@@ -138,6 +138,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $event = m::mock('Selene\Components\Events\\EventInterface');
 
+        $event->shouldReceive('setEventDispatcher')->with($dispatcher);
         $event->shouldReceive('setEventName')->with('event');
         $event->shouldReceive('getEventName')->andReturn('event');
         $event->shouldReceive('isPropagationStopped')->andReturn(false);
@@ -164,6 +165,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $event = m::mock('Selene\Components\Events\\EventInterface');
 
+        $event->shouldReceive('setEventDispatcher')->with($dispatcher);
         $event->shouldReceive('setEventName')->with('event');
         $event->shouldReceive('getEventName')->andReturn('event');
         $event->shouldReceive('isPropagationStopped')->andReturn(false);
@@ -199,6 +201,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $event = m::mock('Selene\Components\Events\\EventInterface');
 
+        $event->shouldReceive('setEventDispatcher')->with($dispatcher);
         $event->shouldReceive('setEventName')->with('event');
         $event->shouldReceive('getEventName')->andReturn('event');
         $event->shouldReceive('isPropagationStopped')->andReturn(false);
@@ -290,6 +293,32 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldSetItsselfToAnEvent()
+    {
+        $dispatcherSet = false;
+        $dispatcher = $this->createDispatcher();
+
+        $event = m::mock('Selene\Components\Events\\EventInterface');
+
+        $event->shouldReceive('setEventDispatcher')->with($dispatcher)
+            ->andReturnUsing(function ($dsp) use (&$dispatcherSet, $dispatcher) {
+                $this->assertSame($dsp, $dispatcher);
+                $dispatcherSet = true;
+            });
+        $event->shouldReceive('setEventName')->with('foo');
+        $event->shouldReceive('getEventName')->andReturn('foo');
+        $event->shouldReceive('isPropagationStopped')->andReturn(false);
+
+        $dispatcher->on('foo', function ($event) {
+
+        });
+
+        $dispatcher->dispatch('foo', $event);
+
+        $this->assertTrue($dispatcherSet);
+    }
+
+    /** @test */
     public function itShouldThrowOnInvalidServiceMethod()
     {
         $dispatcher = $this->createDispatcher();
@@ -318,29 +347,17 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = $this->createDispatcher();
 
-        $dispatcher->on(
-            'foo',
-            function () {
-                return 'foo';
-            },
-            200
-        );
+        $dispatcher->on('foo', function () {
+            return 'foo';
+        }, 200);
 
-        $dispatcher->on(
-            'foo',
-            function () {
-                return 'bar';
-            },
-            100
-        );
+        $dispatcher->on('foo', function () {
+            return 'bar';
+        }, 100);
 
-        $dispatcher->on(
-            'foo',
-            function () {
-                return 'baz';
-            },
-            300
-        );
+        $dispatcher->on('foo', function () {
+            return 'baz';
+        }, 300);
 
         $result = $dispatcher->dispatch('foo');
 

@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Events\Tests;
 
+use \Mockery as m;
+use \Selene\Components\Events\Event;
 use \Selene\Components\Events\Tests\Stubs\ConcreteEvent;
 
 /**
@@ -48,5 +50,24 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $event->stopPropagation();
 
         $this->assertTrue($event->isPropagationStopped());
+    }
+
+    /** @test */
+    public function itShouldGetItsDispatcher()
+    {
+        $event = new Event;
+
+        $this->assertNull($event->getEventDispatcher());
+
+        $dispatcher = m::mock('Selene\Components\Events\DispatcherInterface');
+
+        $event->setEventDispatcher($dispatcher);
+
+        $this->assertSame($dispatcher, $event->getEventDispatcher());
+    }
+
+    protected function tearDown()
+    {
+        m::close();
     }
 }

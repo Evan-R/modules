@@ -39,7 +39,6 @@ interface EventInterface
      *
      * @param mixed $name
      *
-     * @access public
      * @return string
      */
     public function getEventName();
@@ -49,8 +48,23 @@ interface EventInterface
      *
      * @param string $name
      *
-     * @access public
      * @return void
      */
     public function setEventName($name);
+
+    /**
+     * setDispatcher
+     *
+     * @param DispatcherInterface $dispatcher
+     *
+     * @return void
+     */
+    public function setEventDispatcher(DispatcherInterface $dispatcher);
+
+    /**
+     * getDispatcher
+     *
+     * @return DispatcherInterface
+     */
+    public function getEventDispatcher();
 }
