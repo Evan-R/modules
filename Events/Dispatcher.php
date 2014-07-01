@@ -202,7 +202,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         $event->setEventDispatcher($this);
         $event->setEventName($eventName);
 
-        foreach ($this->getSorted($eventName) as $i => $handlers) {
+        foreach ($this->getSorted($eventName) as $handlers) {
 
             if (!$this->doDispatch($handlers, $event, $results, $stopOnFirstResult)) {
                 return $results;

@@ -8,6 +8,26 @@
 
 [![Coverage Status](https://coveralls.io/repos/seleneapp/events/badge.png?branch=development)](https://coveralls.io/r/seleneapp/events?branch=development)
 
+## Installation
+
+Installation is done via [composer](https://getcomposer.org).
+
+Add `selene/events` as requirement to your `composer.json` file.
+
+```json
+{
+	"require": {
+		"selene/events":"dev-development"
+	}
+}
+```
+
+Run `composer install` or `composer update`
+
+```bash
+$ composer install
+```
+
 ## Setup
 
 ```php
@@ -20,9 +40,14 @@ $events = new Dispatcher;
 
 ## Usage
 
-### Attaching event handlers
+### The Event Dipatcher
 
-And event handler can be any valid callable (`is_callable()` must return true)
+#### Attaching event handlers
+
+Event handlers can be any valid callable objects. If you use the dispatcher with a
+[DIC][1] (Dependency Injection Container), attaching services as handler is also possible. e.g.
+`myservice@handleStuff` or just `myservice` if the services implements
+`EventListenerInterface`.
 
 ```php
 <?php
@@ -39,10 +64,21 @@ $events->on('event_name', 'Static::method');
 
 ```
 
-### Handler priority
+You can also attach event listeners. An event listener must implement `EventListenerInterface`.
 
-`Dispatcher::on()` takes an integer value as third argument, specifiying the
-handler priority. A higher priority will be executed before a lower one.
+```php
+<?php
+
+$events->addListener('event_name', $eventListener);
+// same as
+$events->on('event_name', $eventListener);
+
+```
+
+#### Execution priority
+
+`Dispatcher::on()` as well as `Dispatcher::addListener` take an integer value as third argument, specifiying the
+execution priority of the handler callback. A callback with a higher priority value will be executed before a lower one.
 
 ```php
 <?php
@@ -55,7 +91,25 @@ $events->on('event_name', $callbackAfter, 0);
 ```
 --------
 
-### Detaching event handlers
+#### Attaching event handlers only once
+
+You can attach an event handler to execute excaclty one time. The handler will
+detach itself after being called the first time. 
+
+```php
+<?php
+
+$events->once('event_name', $callback);
+
+```
+
+#### Detaching event handlers
+
+You can either coose to remove a certain listener from a given event, or remove
+all listeners for an event.
+
+If no event handler is given, all events that are registered under the
+given event name will be cancled.
 
 ```php
 <?php
@@ -70,27 +124,15 @@ $events->off('event_name', $callback);
 
 ```
 
-### Attaching event handlers only once
-
-You can attach an event handler to execute excaclty one time (the first time
-the event is fired after the handler has been attached)
-
-```php
-<?php
-
-$events->once('event_name', $callback);
-
-```
-
-### Using the Event Dispatcher with Services
+#### Using the Event Dispatcher with Services
 
 It is possible to use the event dispatcher with the [service
-container](https://github.com/seleneapp/dependency-injection).
+container][1].
 
 ```php
 <?php
 
-use Selene\Component\Events\Dispatche;
+use Selene\Component\Events\Dispatcher;
 use Selene\Component\DI\Container;
 
 $container = new Container;
@@ -104,15 +146,13 @@ $events->setContainer($container);
 
 
 ```
-There're two ways to attach a service as an eventhandler. By default, the
-dispatcher assumes that your service has a handler method called `handleEvent`.
-I this case, attaching the service id will suffice.
-
-Note: the serice id must be prepended with a `$` symbol.
+You may annotate the handle method on the service id using the `@` symbol, lik
+`mysevice@mycallback`. If your service implements `EventListenerInterface`, the handle annotation may be ommitted. 
 
 ```php
 <?php
-$events->on('event_name', '$my_service'); // assuming ServiceClass::handleEvent() is available
+$events->on('event_name', 'my_listener'); // assuming SeviceListener implements
+`EventListenerInterface`
 ```
 
 If you want to target a different handler method append `@` followed my the
@@ -120,26 +160,56 @@ method name to the service id
 
 ```php
 <?php
-$events->on('event_name', '$my_service@eventCallbackMethod'); 
+$events->on('event_name', 'my_service@eventCallbackMethod'); 
 ```
 ---------
 
-### Broadcasting an event
+#### Dispatching events
+
+The dispatch method takes three arguments `$event_name`, `$event`, and
+`$stopOnFirstResult`. The second an third arguments are optional. If no event is passed in as a second argument, the dispatcher will create
 
 ```php
 <?php
 
-$parameters = ['foo', 'bar'];
-$events->dispatch('event_name', $parameters); // returns an array containing the results returned by the attached handlers.
+use \Selene\Components\Event\Event;
+
+$event = new Event;
+$events->dispatch('event_name', $event); // returns an array containing the results returned by the attached handlers.
 
 // will stop broadcasting the event as  soon as the first result is being returned:
-$events->dispatch('event_name', $parameters, true); 
-// or
-$events->until('event_name', $parameters); 
+$events->dispatch('event_name', $event, true); 
+// same as
+$events->until('event_name', $event); 
 ```
+
+After being dispatched, the event object will always have a name property
+equally to the the event name. Also, the dispatcher instance will be avaliable
+calling `Event::getDispatcher()`.
+
+##### Custom events
+
+Of course you can create your onw custom event objects.
+
+```php
+<?php
+
+namespace Acme\Eventing
+
+use \Selene\Components\Events\Event.
+
+class AcmeEvent extends Event
+{
+	public function __construct(…)
+	{
+		// do your setup
+	}
+}
+```
+
 ---------
 
-### Get all attached handlers
+#### Get all attached handlers
 
 ```php
 <?php
@@ -153,7 +223,7 @@ $events->getEventHandlers('my_event');
 
 ---------
 
-### Event Subscribers
+#### Event Subscribers
 
 Event Subscribers are utility classes that can subscibe to multiple events
 attaching one or more eventhandlers per event at once. 
@@ -165,7 +235,8 @@ An Event Subscriber must implement the [`Selene\Components\Event\SubscriberInter
 
 namespace Acme\Foo;
 
-use Selene\Components\Events\SubscriberInterface;
+use \Selene\Components\Events\EventInterface;
+use \Selene\Components\Events\SubscriberInterface;
 
 class EventSubscriber implements SubscriberInterface
 {
@@ -183,27 +254,29 @@ class EventSubscriber implements SubscriberInterface
         ];
     }
 
-    public function onFooEventPre()
+    public function onFooEventPre(EventInterface $event)
     {
-        return 'foo.pre';
+        return $event->getEventName() . '.pre';   // 'foo_event.pre'
     }
 
-    public function onFooEventMid()
+    public function onFooEventMid(EventInterface $event)
     {
-        return 'foo.mid';
+        return $event->getEventName() . '.mid';   // 'foo_event.mid' 
     }
 
-    public function onFooEventAfter()
+    public function onFooEventAfter(EventInterface $event)
     {
-        return 'foo.after';
+        return $event->getEventName() . '.after'; // 'foo_event.after'
     }
 
-    public function onBarEvent()
+    public function onBarEvent(EventInterface $event)
     {
-        return 'bar';
+        return $event->getEventName();            // 'bar_event'
     }
 }
 ```
+
+Now add the subscriber to the event dispatcher.
 
 ```php
 <?php
@@ -211,9 +284,51 @@ class EventSubscriber implements SubscriberInterface
 $subscriber = new Acme\Foo\EventSubscriber;
 $events->addSubscriber($subscriber);
 
-$events->dispatch('foo_event');  // => ['foo.pre', 'foo.mid', 'foo.after']
-$events->dispatch('bar_event');  // => ['bar']
+$events->dispatch('foo_event');  // => ['foo_event.pre', 'foo_event.mid', 'foo_event.after']
+$events->dispatch('bar_event');  // => ['bar_event']
 
-// if you need to remove a subscriber, call:
+```
+
+Removing a subscriber
+
+```php
+<?php
 $events->removeSubscriber($subscriber);
 ```
+
+### The Event Queue Dispatcher
+
+The `EventQueueDispatcher` can register eventlisteners and dispatch a array of
+events directly. By default, and if the event object inherits from `Selene\Components\Events\Event`, the event name will match your event class name, where the camelcase notation is divided by a dot (e.g. `FooEvent` becomes `foo.event`). 
+
+Otherwhise be shure to set the event name on your event object before dispatching it throut the `EventQueueDispatcher`.
+
+```php
+<?php
+
+use \Acme\Eventing\Event;
+use \Acme\Eventing\EmergencyEvent;
+use \Acme\Eventing\Listeners\EventListener;
+use \Acme\Eventing\Listeners\EmergencyListener;
+use \Selene\Components\Events\EventQueueDispatcher;
+
+
+$dispatcher = new EventQueueDispatcher;
+
+$eventListener = new EventListener;
+$emergencyListener = new EmergencyListener;
+$event = new QueueListener;
+
+$dispatcher->addListener('event', $eventListener, 100); 
+$dispatcher->addListener('emergency.event', $emergencyListener, 100); 
+
+$events = [
+	new Event,
+	mew EmergencyEvent
+];
+
+$dispatcher->dispatch($events);
+
+```
+
+[1]: https://github.com/seleneapp/di
