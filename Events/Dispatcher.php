@@ -51,7 +51,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     private static $handler = 'eventHandler';
 
     /**
-     * Create a new event dispatcher instance.
+     * Constructor.
      *
      * @param ContainerInterace $container
      */
@@ -63,10 +63,16 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     }
 
     /**
-     * Attach an eventhandler
+     * Attach an eventhandler.
+     *
+     * Eventhandlers can be any valid callable objects, including Objects
+     * implementing `EventListenerInterface`. If you use the dispatcher with a
+     * DIC, attaching services as handler is also possible. e.g.
+     * `myservice@handleStuff` or just `myservice` if the services implements
+     * `EventListenerInterface`.
      *
      * @param string|array $events       the event name
-     * @param mixed        $eventHandler a callable or string `$service@method`
+     * @param mixed        $eventHandler a callable or string `service@method`
      * @param int          $priority     the priority with the handler being called
      * (handlers with higher values will be called first)
      *
@@ -77,20 +83,6 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         foreach ((array)$events as $event) {
             $this->registerEvent($event, $eventHandler, $priority);
         }
-    }
-
-    /**
-     * addListener
-     *
-     * @param string $event
-     * @param EventListenerInterface $listener
-     * @param void $priority
-     *
-     * @return void
-     */
-    public function addListener($event, EventListenerInterface $listener, $priority = 0)
-    {
-        $this->bindEvent($event, $listener, $priority);
     }
 
     /**
@@ -112,10 +104,29 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     }
 
     /**
-     * Detach an eventhandler from an event
+     * Attach a event listener. The Listener must implement
+     * `EventListenerInterface`. This is just like `DispatcherInterface::on()` but more explicit.
+     *
+     * @param string $event                    the event name as string.
+     * @param EventListenerInterface $listener the event listener.
+     * @param void $priority                   the dispatch priority.
+     *
+     * @return void
+     */
+    public function addListener($event, EventListenerInterface $listener, $priority = 0)
+    {
+        $this->bindEvent($event, $listener, $priority);
+    }
+
+    /**
+     * Detach an eventhandler from an event.
+     *
+     * If no event handler is given, all events that are registered under the
+     * given event name will be cancled.
      *
      * @param array|string $events       the event name
-     * @param mixed        $eventHanlder the eventhandler
+     * @param mixed        $eventHanlder the eventhandler previously attached
+     * the the event.
      *
      * @return void
      */
@@ -132,9 +143,11 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     }
 
     /**
-     * addObserver
+     * Registers an event subscriber object.
      *
-     * @param SubscriberInterface $subscriber
+     * Also see `Selene\Components\Events\SubscriberInterface`
+     *
+     * @param SubscriberInterface $subscriber the subscriber object.
      *
      * @return void
      */
@@ -148,9 +161,9 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     }
 
     /**
-     * removeSubscriber
+     * Detaches an event subscriber object.
      *
-     * @param SubscriberInterface $subscriber
+     * @param SubscriberInterface $subscriber the event subscriber.
      *
      * @return void
      */
@@ -170,26 +183,28 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      * @param string $event      the event name
      * @param mixed  $parameters data to be send along with the event,
      * typically an EventInteface instance
-     * @param bool $stopOnFirstResult stop fireing if first result was found
+     * @param bool $stopOnFirstResult stop firing if first result was found
      *
      * @return array the event results;
      */
-    public function dispatch($event, $parameters = null, $stopOnFirstResult = false)
+    public function dispatch($eventName, EventInterface $event = null, $stopOnFirstResult = false)
     {
-        if (!isset($this->handlers[$event])) {
+        if (!isset($this->handlers[$eventName])) {
             return;
         }
 
         $results = [];
 
-        if ($isEvent = ($parameters instanceof EventInterface)) {
-            $parameters->setEventDispatcher($this);
-            $parameters->setEventName($event);
+        if (null === $event) {
+            $event = new Event;
         }
 
-        foreach ($this->getSorted($event) as $i => $handlers) {
+        $event->setEventDispatcher($this);
+        $event->setEventName($eventName);
 
-            if (!$this->doDispatch($handlers, $parameters, $isEvent, $results, $stopOnFirstResult)) {
+        foreach ($this->getSorted($eventName) as $i => $handlers) {
+
+            if (!$this->doDispatch($handlers, $event, $results, $stopOnFirstResult)) {
                 return $results;
             }
         }
@@ -204,9 +219,9 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      *
      * @return array
      */
-    public function until($event, $parameters = [])
+    public function until($eventName, EventInterface $event = null)
     {
-        return $this->dispatch($event, $parameters, true);
+        return $this->dispatch($eventName, $event, true);
     }
 
     /**
@@ -423,15 +438,15 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      *
      * @return boolean
      */
-    private function doDispatch(array $handlers, $params, $isEvent, &$results = [], $stopOnFirstResult = false)
+    private function doDispatch(array $handlers, EventInterface $event, &$results = [], $stopOnFirstResult = false)
     {
         foreach ($handlers as $index => $handler) {
 
-            if ($isEvent && $params->isPropagationStopped()) {
+            if ($event->isPropagationStopped()) {
                 break;
             }
 
-            $res = $this->callListener($handler, $params);
+            $res = $this->callListener($handler, $event);
 
             if (null !== $res) {
                 $results[] = $res;
@@ -454,14 +469,15 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      *
      * @return mixed
      */
-    private function callListener($eventHandler, $parameters)
+    private function callListener($eventHandler, EventInterface $event)
     {
         $eventHandler = $this->resolveHandler($eventHandler);
 
         if ($eventHandler instanceof EventListenerInterface) {
-            return $eventHandler->handleEvent($parameters);
+            return $eventHandler->handleEvent($event);
         } else {
-            return call_user_func_array($eventHandler, !is_array($parameters) ? [$parameters] : $parameters);
+            //return call_user_func_array($eventHandler, !is_array($parameters) ? [$parameters] : $parameters);
+            return call_user_func_array($eventHandler, [$event]);
         }
     }
 

@@ -75,7 +75,7 @@ interface DispatcherInterface extends SubscriberAwareInterface
      *
      * @return array
      */
-    public function dispatch($event, $parameter = []);
+    public function dispatch($eventName, EventInterface $event = null, $stopOnFirstResult = false);
 
     /**
      * until
@@ -85,7 +85,7 @@ interface DispatcherInterface extends SubscriberAwareInterface
      *
      * @return mixed
      */
-    public function until($event, $parameter = []);
+    public function until($eventName, EventInterface $event = null);
 
     /**
      * getEventHandlers
