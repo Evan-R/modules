@@ -112,6 +112,21 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $called);
 
         $this->assertSame([], $dispatcher->getEventHandlers());
+
+        $called = 0;
+
+        $handler = function () use (&$called) {
+            $called++;
+        };
+
+        $dispatcher->on('bar', $handler);
+        $dispatcher->on('bar', $handler);
+
+        $dispatcher->off('bar', $handler);
+
+        $dispatcher->dispatch('bar');
+
+        $this->assertSame(0, $called);
     }
 
     /** @test */

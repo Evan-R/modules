@@ -498,7 +498,6 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 
                 if ($eventHandler === $handler) {
                     unset($this->handlers[$event][$priority][$index]);
-                    break;
                 }
             }
         }
