@@ -324,7 +324,7 @@ $dispatcher->addListener('emergency.event', $emergencyListener, 100);
 
 $events = [
 	new Event,
-	mew EmergencyEvent
+	new EmergencyEvent
 ];
 
 $dispatcher->dispatch($events);
