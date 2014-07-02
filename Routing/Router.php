@@ -111,6 +111,30 @@ class Router implements RouterInterface
     }
 
     /**
+     * Calls a route by its name.
+     *
+     * @param mixed $route
+     * @param array $context
+     *
+     * @access public
+     * @return mixed
+     */
+    public function call($route, array $context = [], Request $request = null)
+    {
+        if (!$this->routes->has($route)) {
+            throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', $route));
+        }
+
+        $context = new MatcherContext($this->routes->get($route), $context);
+
+        $request = $request ?: Request::create();
+
+        $context->setRequest($request);
+
+        return $this->dispatchRoute($context);
+    }
+
+    /**
      * Dispatch events on the route retreival.
      *
      * @param Route $route the matched route.

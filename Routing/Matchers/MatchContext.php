@@ -12,6 +12,7 @@
 namespace Selene\Components\Routing\Matchers;
 
 use \Selene\Components\Routing\Route;
+use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * @class MatchContext
@@ -20,25 +21,67 @@ use \Selene\Components\Routing\Route;
  */
 class MatchContext
 {
+    /**
+     * route
+     *
+     * @var Route
+     */
     private $route;
+
+    /**
+     * params
+     *
+     * @var array
+     */
     private $params;
 
-    public function __construct(Route $route, array $params = [])
+    /**
+     * request
+     *
+     * @var Request
+     */
+    private $request;
+
+    /**
+     * Constructor.
+     *
+     * @param Route $route
+     * @param array $params
+     */
+    public function __construct(Route $route, array $params = [], Request $request = null)
     {
-        $this->route  = $route;
-        $this->params = $params;
+        $this->route   = $route;
+        $this->params  = $params;
+        $this->request = $request;
     }
 
-    public function setRequest($request)
+    /**
+     * setRequest
+     *
+     * @param Request $request
+     *
+     * @return void
+     */
+    public function setRequest(Request $request)
     {
         $this->request = $request;
     }
 
+    /**
+     * getRequest
+     *
+     * @return Request
+     */
     public function getRequest()
     {
         return $this->request;
     }
 
+    /**
+     * getParameters
+     *
+     * @return array
+     */
     public function getParameters()
     {
         $params = array_merge($this->route->getDefaults(), $this->params);
@@ -46,11 +89,22 @@ class MatchContext
         return array_intersect_key($params, array_flip($this->route->getVars()));
     }
 
+    /**
+     * getHostParameters
+     *
+     * @return array
+     */
     public function getHostParameters()
     {
         return array_intersect_key($this->params, array_flip($this->route->getHostVars()));
     }
 
+    /**
+     * getRoute
+     *
+     * @access public
+     * @return Route
+     */
     public function getRoute()
     {
         return $this->route;
