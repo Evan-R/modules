@@ -468,7 +468,7 @@ class Parser implements ParserInterface
     {
         $value = static::getPhpValue($child, null, $this);
 
-        if ($this->isListKey($name, $prefix) || $this->isEqualOrPluralOf($pName, $oname)) {
+        if ($this->isListKey($name, $prefix) || $this->isEqualOrPluralOf($this->normalizeKey($pName), $oname)) {
             return $result[] = $value;
         }
 
@@ -520,7 +520,7 @@ class Parser implements ParserInterface
      */
     private function isEqualOrPluralOf($name, $singular)
     {
-        return $name === $singular || $name === $this->pluralize($singular);
+        return 0 === strnatcmp($name, $singular) || 0 === strnatcmp($name, $this->pluralize($singular));
     }
 
     /**
