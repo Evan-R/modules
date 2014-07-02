@@ -202,7 +202,9 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         $event->setEventDispatcher($this);
         $event->setEventName($eventName);
 
-        foreach ($this->getSorted($eventName) as &$handlers) {
+        $handlers = $this->getSorted($eventName);
+
+        foreach ($handlers as &$handlers) {
 
             if (!$this->doDispatch($handlers, $event, $results, $stopOnFirstResult)) {
                 return $results;
@@ -486,7 +488,6 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         if ($eventHandler instanceof EventListenerInterface) {
             return $eventHandler->handleEvent($event);
         } else {
-            //return call_user_func_array($eventHandler, !is_array($parameters) ? [$parameters] : $parameters);
             return call_user_func_array($eventHandler, [$event]);
         }
     }
@@ -496,7 +497,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      *
      * @return array
      */
-    private function getSorted($event)
+    private function &getSorted($event)
     {
         if (!isset($this->sorted[$event])) {
             krsort($this->handlers[$event]);
