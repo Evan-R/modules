@@ -37,19 +37,12 @@ class Template implements TemplateInterface
     protected $engine;
 
     /**
-     * path
-     *
-     * @var string
-     */
-    protected $path;
-
-    /**
      * @param string $name
      * @param string $engine
      *
      * @access public
      */
-    public function __construct($name, $engine)
+    public function __construct($name = null, $engine = null)
     {
         $this->name = $name;
         $this->engine = $engine;
@@ -96,7 +89,7 @@ class Template implements TemplateInterface
      */
     public function setPath($path)
     {
-        $this->path = $path;
+        $this->name = $path;
     }
 
     /**
@@ -107,6 +100,6 @@ class Template implements TemplateInterface
      */
     public function getPath()
     {
-        return $this->path;
+        return $this->name;
     }
 }

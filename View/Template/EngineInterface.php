@@ -22,4 +22,8 @@ namespace Selene\Components\View\Template;
 interface EngineInterface
 {
     public function render($template, array $context = []);
+
+    public function exists($name);
+
+    public function supports($name);
 }
