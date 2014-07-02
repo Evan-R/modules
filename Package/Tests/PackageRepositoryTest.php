@@ -140,7 +140,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceof('\Selene\Components\DI\ContainerInterface', $container);
         });
 
-        $builder->shouldReceive('getExtensionConfig')->andReturn([]);
+        $builder->shouldReceive('getPackageConfig')->andReturn([]);
 
         $config->shouldReceive('load')->andReturnUsing(function ($cbuilder) use ($builder) {
             $this->assertInstanceof('\Selene\Components\DI\BuilderInterface', $cbuilder);

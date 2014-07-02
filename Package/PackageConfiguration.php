@@ -46,9 +46,72 @@ abstract class PackageConfiguration extends Configuration
      */
     private $packagePath;
 
+    private $parameters;
+
     public function __construct($packagePath)
     {
         $this->packagePath = $packagePath;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function load(BuilderInterface $builder, array $values)
+    {
+        $this->parameters = $builder->getContainer()->getParameters();
+
+        $this->setup($builder, $values);
+
+        $this->parameters = null;
+    }
+
+    /**
+     * Like Configuration::load().
+     *
+     * Unlike load(), in setup() you have direct access to the containers
+     * parameters using getParameter($name, $default = null, $resolved).
+     *
+     * @param BuilderInterface $builder
+     * @param array $values
+     *
+     * @return void
+     */
+    public function setup(BuilderInterface $builder, array $values)
+    {
+    }
+
+    /**
+     * getParameter
+     *
+     * @param mixed $param
+     * @param mixed $default
+     * @param mixed $resolved
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function getParameter($param, $default = null, $resolved = false)
+    {
+        if ($this->parameters && $this->parameters->has($param)) {
+            $value = $this->parameters->get($param);
+
+            return $resolved ? $this->parameters->resolveParam($value) : $value;
+        }
+
+        return $resolved && $this->parameters ? $this->parameters->resolveParam($default) : $default;
+    }
+
+    protected function setParameter($param, $value = null)
+    {
+        if ($this->parameters) {
+            $this->parameters->set($param, $value);
+
+            return;
+        }
+
+        throw new \LogicException(
+            'Cannot set parameters. You can only use "setParameters()" only within the "setup()" method.'
+        );
     }
 
     /**

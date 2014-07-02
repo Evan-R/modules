@@ -180,7 +180,7 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
 
         $builder->replaceContainer($packageContainer);
 
-        $config->load($builder, $builder->getExtensionConfig($package->getAlias()));
+        $config->load($builder, $builder->getPackageConfig($package->getAlias()));
 
         $container->merge($packageContainer);
 
