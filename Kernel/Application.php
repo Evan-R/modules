@@ -22,7 +22,9 @@ use \Selene\Components\Config\Resource\DelegatingLoader;
 use \Selene\Components\Config\Cache as ConfigCache;
 use \Selene\Components\Routing\RouterInterface;
 use \Selene\Components\DI\Builder;
+use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\Processor\Processor;
+use \Selene\Components\DI\Processor\Configuration;
 use \Selene\Components\DI\Dumper\PhpDumper;
 use \Selene\Components\DI\Dumper\ContainerDumper;
 use \Selene\Components\DI\Parameters;
@@ -448,11 +450,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         $this->container->setParameter('app.root', $this->getApplicationRoot());
         $this->container->inject($this->getContainerServiceId(), $container);
 
-        $builder = new Builder($container, new Processor);
-
-        foreach ($this->packageResources as $file) {
-            $builder->addFileResource($file);
-        }
 
         $configPaths = $this->getPackageConfig();
 
@@ -461,6 +458,12 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         $locator->setRootPath(
             $this->getApplicationRoot().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'packages'
         );
+
+        $builder = $this->getContainerBuilder($container);
+
+        foreach ($this->packageResources as $file) {
+            $builder->addFileResource($file);
+        }
 
         $resolver = new LoaderResolver([
             new XmlLoader($builder, $locator),
@@ -474,13 +477,23 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $loader->load('config_'.strtolower($this->getEnvironment()).'.xml', true);
 
-        $builder->configure();
-
         $this->packages->build($builder);
 
         $builder->build();
 
         return $builder;
+    }
+
+    /**
+     * getContainerBuilder
+     *
+     * @param ContainerInterface $container
+     *
+     * @return BuilderInterface
+     */
+    protected function getContainerBuilder(ContainerInterface $container)
+    {
+        return new Builder($container, new Processor(new Configuration));
     }
 
     /**
@@ -511,7 +524,8 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
             'app.root'          => $this->getApplicationRoot(),
             'app.packages'      => $packages,
             'app.package_paths' => $packagePaths,
-            'app.env'           => $this->getEnvironment()
+            'app.env'           => $this->getEnvironment(),
+            'app.debugging'     => null !== $this->debugger,
         ];
     }
 
