@@ -202,7 +202,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         $event->setEventDispatcher($this);
         $event->setEventName($eventName);
 
-        foreach ($this->getSorted($eventName) as $handlers) {
+        foreach ($this->getSorted($eventName) as &$handlers) {
 
             if (!$this->doDispatch($handlers, $event, $results, $stopOnFirstResult)) {
                 return $results;
@@ -263,6 +263,19 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         }
 
         if (!is_string($eventHandler) || 1 < substr_count($eventHandler, static::EVTHANDLER_SEPARATOR)) {
+
+
+            if (is_array($eventHandler) && is_object(current($eventHandler))) {
+
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Invalid event handler "%s::%s()".',
+                        get_class($eventHandler[0]),
+                        isset($eventHandler[1]) ? $eventHandler[1] : null
+                    )
+                );
+            }
+
             throw new \InvalidArgumentException(
                 sprintf(
                     'Invalid event handler "%s".',
@@ -326,19 +339,16 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     private function listSubscriptions($subscriber, $event, array $eventSubscriptions, array &$list = [])
     {
-        if (is_array(current($eventSubscriptions))) {
+        if (is_string(current($eventSubscriptions))) {
+            list ($method, $priority) = array_pad($eventSubscriptions, 2, 10);
+
+            $list[] = [$event, [$subscriber, $method], $priority];
+
+        } else {
             foreach ($eventSubscriptions as $subscription) {
                 $this->listSubscriptions($subscriber, $event, $subscription, $list);
             }
-
-            return $list;
         }
-
-        list($method, $priority) = array_pad($eventSubscriptions, 2, 10);
-
-        $eventHandler = [$subscriber, $method];
-
-        $list[] = [$event, [$subscriber, $method], $priority];
 
         return $list;
     }
@@ -440,7 +450,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      */
     private function doDispatch(array $handlers, EventInterface $event, &$results = [], $stopOnFirstResult = false)
     {
-        foreach ($handlers as $index => $handler) {
+        foreach ($handlers as $index => &$handler) {
 
             if ($event->isPropagationStopped()) {
                 break;
@@ -509,7 +519,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     {
         $eventHandler = $this->extractEventHandler($eventHandler);
 
-        foreach ($this->handlers[$event] as $priority => $handlers) {
+        foreach ($this->handlers[$event] as $priority => &$handlers) {
             foreach ($handlers as $index => &$handler) {
 
                 if ($eventHandler === $handler) {
