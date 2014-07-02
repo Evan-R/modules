@@ -24,7 +24,12 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\DI\Builder', new Builder($this->getContainerMock()));
+        $this->assertInstanceof(
+            'Selene\Components\DI\Builder',
+            new Builder(
+                $this->getContainerMock()
+            )
+        );
     }
 
     /** @test */
@@ -54,7 +59,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
             $processor = m::mock('\Selene\Components\DI\Processor\ProcessorInterface')
         );
 
-        $this->assertSame($processor, $builder->getProcessor());
+        $this->assertInstanceof('\Selene\Components\DI\Processor\ProcessorDecorator', $builder->getProcessor());
     }
 
     /** @test */
@@ -93,18 +98,10 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder($container = $this->getContainerMock());
 
+        $container->shouldReceive('getAliases')->andReturn([]);
         $this->prepareContainerToBuild($container);
 
         $this->assertNull($builder->build());
-    }
-
-    /** @test */
-    public function itShouldBeConfiGurable()
-    {
-        $builder = new Builder($container = $this->getContainerMock());
-
-        $this->assertTrue($builder->configure());
-        $this->assertFalse($builder->configure());
     }
 
     /** @test */
@@ -164,6 +161,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     protected function getContainerMock()
     {
         return m::mock('\Selene\Components\DI\ContainerInterface');
+    }
+
+    protected function getProcessorConfigMock()
+    {
+        return m::mock('\Selene\Components\DI\Processor\ConfigInterface');
     }
 
     protected function tearDown()

@@ -97,7 +97,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader->load('services.2.xml');
 
-        $this->assertSame([['foo' => 'bar']], $builder->getExtensionConfig('acme'));
+        $this->assertSame([['foo' => 'bar']], $builder->getPackageConfig('acme'));
     }
 
     /** @test */
@@ -123,11 +123,11 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader->load('services.2.xml');
 
-        $this->assertSame([['foo' => 'bar']], $builder->getExtensionConfig('acme'));
+        $this->assertSame([['foo' => 'bar']], $builder->getPackageConfig('acme'));
 
         $loader->load('services.2.1.xml');
 
-        $this->assertSame([], $builder->getExtensionConfig(''));
+        $this->assertSame([], $builder->getPackageConfig(''));
     }
 
     /** @test */

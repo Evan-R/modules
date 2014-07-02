@@ -41,20 +41,26 @@ class Processor implements ProcessorInterface
      */
     protected $container;
 
+    protected $config;
+
     /**
-     * @access public
+     * Constructor.
+     *
+     * @param ConfigInterface $config
      */
-    public function __construct()
+    public function __construct(ConfigInterface $config)
     {
         $this->processes = [];
         $this->processed = [];
+
+        $config->configure($this);
     }
 
     /**
      * process
      *
      * @param ContainerInterface $container
-     * @access public
+     *
      * @return boolean false if allready processed
      */
     public function process(ContainerInterface $container)
@@ -82,7 +88,6 @@ class Processor implements ProcessorInterface
      * @param ProcessInterface $process
      * @param mixed $priority
      *
-     * @access public
      * @return \Selene\Components\DI\Processor\ProcessorInterface
      */
     public function add(ProcessInterface $process, $priority = ProcessorInterface::BEFORE_OPTIMIZE)
@@ -97,7 +102,6 @@ class Processor implements ProcessorInterface
      *
      * @param array $group
      *
-     * @access protected
      * @return void
      */
     protected function processGroup(array $group)
@@ -112,7 +116,6 @@ class Processor implements ProcessorInterface
      *
      * @param ContainerInterface $container
      *
-     * @access protected
      * @return boolean
      */
     protected function isProcessed(ContainerInterface $container)
@@ -125,7 +128,6 @@ class Processor implements ProcessorInterface
      *
      * @param ContainerInterface $container
      *
-     * @access protected
      * @return void
      */
     protected function setProcessed(ContainerInterface $container)
@@ -137,7 +139,6 @@ class Processor implements ProcessorInterface
      * sort
      *
      *
-     * @access private
      * @return void
      */
     private function sort()

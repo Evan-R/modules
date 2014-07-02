@@ -430,6 +430,19 @@ class Container implements ContainerInterface
     }
 
     /**
+     * getAliases
+     *
+     * @param Aliases $aliases
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getAliases()
+    {
+        return $this->aliases ? $this->aliases : $this->aliases = new Aliases;
+    }
+
+    /**
      * getAlias
      *
      * @param string $alias

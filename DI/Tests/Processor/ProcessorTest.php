@@ -22,14 +22,37 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\DI\Processor\ProcessorInterface', new Processor);
+        $conf = $this->mockConfig();
+        $conf->shouldReceive('configure');
+        $this->assertInstanceof('Selene\Components\DI\Processor\ProcessorInterface', new Processor($conf));
+    }
+
+    /** @test */
+    public function itShouldBeConfiguredAtConstruction()
+    {
+
+        $proc = null;
+
+        $conf = $this->mockConfig();
+
+        $conf->shouldReceive('configure')->andReturnUsing(function ($p) use (&$proc) {
+            $proc = $p;
+        });
+
+        $processor = new Processor($conf);
+
+        $this->assertSame($proc, $processor);
     }
 
     /** @test */
     public function processesShouldBeExecutedInOrder()
     {
         $orders = [];
-        $processor = new Processor;
+
+        $conf = $this->mockConfig();
+        $conf->shouldReceive('configure');
+
+        $processor = new Processor($conf);
         $container = $this->getContainerMock();
 
         foreach ([
@@ -54,7 +77,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldReportFalseWhenAlreadyProcessed()
     {
-        $processor = new Processor;
+        $conf = $this->mockConfig();
+        $conf->shouldReceive('configure');
+
+        $processor = new Processor($conf);
         $container = $this->getContainerMock();
 
         $this->assertTrue($processor->process($container));
@@ -95,6 +121,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             });
 
         return $process;
+    }
+
+    protected function mockConfig()
+    {
+        return m::mock('\Selene\Components\DI\Processor\ConfigInterface');
     }
 
     protected function tearDown()

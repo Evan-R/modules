@@ -93,7 +93,7 @@ class XmlLoader extends Loader
 
             foreach ($package->xpath("*[local-name() != 'import']") as $item) {
                 $key = Parser::fixNodeName($item->nodeName);
-                $this->builder->addExtensionConfig(
+                $this->builder->addPackageConfig(
                     $alias,
                     [$key => $this->getParser()->parseDomElement($item)]
                 );
@@ -205,12 +205,12 @@ class XmlLoader extends Loader
             $dataAttrs = [];
 
             foreach ($tagNode->xpath("./@*[name() != 'name' and name() != 'data']") as $attribute) {
-                $attrs[] = [$attrName = $attribute->nodeName => $this->getAttributeValue($tagNode, $attrName)];
+                $attrs[] = [Parser::fixNodeName($attrName = $attribute->nodeName) => $this->getAttributeValue($tagNode, $attrName)];
             }
 
             foreach ($tagNode->xpath("data/@*[name() != 'name']") as $attribute) {
                 $dataAttrs[] = [
-                    $attrName = $attribute->nodeName => $this->getAttributeValue($attribute->parentNode, $attrName)
+                    Parser::fixNodeName($attrName = $attribute->nodeName) => $this->getAttributeValue($attribute->parentNode, $attrName)
                 ];
             }
 

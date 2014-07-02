@@ -18,7 +18,7 @@ use \Selene\Components\Common\Traits\Getter;
  * @package Selene\Components\DI
  * @version $Id$
  */
-class Aliases implements \ArrayAccess
+class Aliases implements \ArrayAccess, \IteratorAggregate
 {
     use Getter;
 
@@ -155,5 +155,15 @@ class Aliases implements \ArrayAccess
     public function offsetUnset($alias)
     {
         unset($this->aliases[$alias]);
+    }
+
+    /**
+     * getIterator
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->aliases);
     }
 }

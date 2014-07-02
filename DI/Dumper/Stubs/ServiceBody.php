@@ -16,6 +16,7 @@ use \Selene\Components\DI\Container;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
+use \Selene\Components\DI\Definition\CallerDefinition;
 
 /**
  * @class ServiceBody extends Stub
@@ -111,7 +112,6 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      */
     protected function getCallers($instance, $definition, &$content)
     {
-
         foreach ($definition->getSetters() as $setters) {
 
             $method    = key($setters);
@@ -288,6 +288,8 @@ class ServiceBody extends Stub implements ContainerAwareInterface
             }
             if ($argument instanceof Reference) {
                 $args[$key] = $this->extractRefenceInstantiator($argument);
+            } elseif ($argument instanceof CallerDefinition) {
+                $args[$key] = $this->extractCallerDefinition($argument);
             } elseif (null !== $argument && !is_scalar($argument)) {
                 $args[$key] = $this->extractParams($argument, 16);
             } elseif ($this->container->hasParameter($argument)) {
@@ -298,6 +300,25 @@ class ServiceBody extends Stub implements ContainerAwareInterface
         }
 
         return $args;
+    }
+
+    /**
+     * extractCallerDefinition
+     *
+     * @param CallerDefinition $caller
+     *
+     * @return string
+     */
+    protected function extractCallerDefinition(CallerDefinition $caller)
+    {
+        $service = $this->extractRefenceInstantiator($caller->getService());
+
+        return sprintf(
+            '%s->%s(%s)',
+            $service,
+            $caller->getMethod(),
+            implode(', ', $this->getArguments($caller->getArguments()))
+        );
     }
 
     protected function replaceReferenceInArgsArray(array $arguments)

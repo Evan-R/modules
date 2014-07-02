@@ -34,6 +34,11 @@ class Alias
         $this->setInternal($internal);
     }
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
     /**
      * setInternal
      *

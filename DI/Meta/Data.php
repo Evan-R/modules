@@ -33,10 +33,10 @@ class Data implements MetaDataInterface
     protected $parameters;
 
     /**
-     * @param mixed $name
-     * @param array $arguments
+     * Constructor.
      *
-     * @access public
+     * @param string $name
+     * @param array $arguments
      */
     public function __construct($name, array $parameters = [])
     {
@@ -46,7 +46,6 @@ class Data implements MetaDataInterface
     /**
      * getName
      *
-     * @access public
      * @return string
      */
     public function getName()
@@ -60,7 +59,6 @@ class Data implements MetaDataInterface
      * @param mixed $argument
      * @param mixed $default
      *
-     * @access public
      * @return mixed
      */
     public function get($parameter, $default = null)
@@ -88,7 +86,6 @@ class Data implements MetaDataInterface
     /**
      * getParameters
      *
-     * @access public
      * @return array
      */
     public function getParameters()
@@ -97,7 +94,6 @@ class Data implements MetaDataInterface
     }
 
     /**
-     * @access public
      * @return string
      */
     public function __toString()
@@ -111,7 +107,6 @@ class Data implements MetaDataInterface
      * @param mixed $name
      * @param array $arguments
      *
-     * @access protected
      * @return void
      */
     protected function setParameters($name, array $parameters)
