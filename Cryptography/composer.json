@@ -1,6 +1,7 @@
 {
   "name": "selene/cryptography",
   "description": "Cryptography Library",
+  "license": "MIT",
   "authors": [
     {
       "name": "Thomas Appel",
@@ -13,8 +14,7 @@
     "selene/common":"dev-development"
   },
   "require-dev": {
-    "selene/testsuite": "dev-development",
-    "phpunit/phpunit": "~4.0"
+    "selene/testsuite": "dev-development"
   },
   "autoload": {
     "psr-4": {
