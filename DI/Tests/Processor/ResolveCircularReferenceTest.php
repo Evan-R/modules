@@ -65,14 +65,20 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itSelfReferencingOnSettersShouldBeOk()
+    public function selfReferencingOnSettersShouldNotBeOk()
     {
         $container = new Container;
 
         $container->define('foo', 'FooClass')->addSetter('setSelf', [new Reference('foo')]);
 
-        $this->assertNull((new ResolveCircularReference)->process($container));
+        try {
+            (new ResolveCircularReference)->process($container);
+        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+            $this->assertSame('Service \'foo\' has circular reference on \'foo\'', $e->getMessage());
+            return;
+        }
 
+        $this->fail('test slipped');
     }
 
     /** @test */
