@@ -101,6 +101,9 @@ class KernelTest extends TestCase
 
         $this->events->shouldReceive('dispatch')
             ->once()
+            ->with(Events::ABORT_REQUEST, m::any());
+        $this->events->shouldReceive('dispatch')
+            ->once()
             ->with(Events::FILTER_RESPONSE, m::any())
             ->andReturnUsing(function ($eventName, $event) {
                 $filtered = true;

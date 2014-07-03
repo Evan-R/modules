@@ -20,8 +20,10 @@ use \Selene\Components\Config\Resource\Locator;
 use \Selene\Components\Config\Resource\LoaderResolver;
 use \Selene\Components\Config\Resource\DelegatingLoader;
 use \Selene\Components\Config\Cache as ConfigCache;
+use \Selene\Components\Config\CacheInterface;
 use \Selene\Components\Routing\RouterInterface;
 use \Selene\Components\DI\Builder;
+use \Selene\Components\DI\BuilderInterface;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\Processor\Processor;
 use \Selene\Components\DI\Processor\Configuration;
@@ -129,6 +131,20 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     protected static $prodEnv = 'production';
 
     /**
+     * appServiceId
+     *
+     * @var string
+     */
+    protected static $appServiceId = 'app';
+
+    /**
+     * kernelServiceId
+     *
+     * @var string
+     */
+    protected static $kernelServiceId = 'kernel';
+
+    /**
      * Constructor.
      *
      * @param string $environment
@@ -145,6 +161,16 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $this->packageResources = [];
         $this->packageProviders = [];
+    }
+
+    /**
+     * version
+     *
+     * @return mixed
+     */
+    public static function version()
+    {
+        return static::$version;
     }
 
     /**
@@ -210,9 +236,51 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         $this->booted = true;
     }
 
-    protected function injectServices()
+    /**
+     * Terminates the application
+     *
+     * @param Request $request
+     * @param Response $response
+     *
+     * @return void
+     */
+    public function terminate(Request $request, Response $response)
     {
-        $this->getContainer()->inject('app.package_repository', $this->packages);
+        $this->getKernelStack()->terminate($request, $response);
+
+        if ($this->debugger) {
+            $this->debugger->stop();
+        }
+    }
+
+    /**
+     * Get the application kernel.
+     *
+     * @return \Symfony\Component\HttpFoundation\HttpKernelInterface
+     */
+    public function getKernel()
+    {
+        return $this->getContainer()->get(static::$kernelServiceId);
+    }
+
+    /**
+     * Get the current application envirnonment.
+     *
+     * @return string
+     */
+    public function getEnvironment()
+    {
+        return $this->env;
+    }
+
+    /**
+     * getApplicationServiceId
+     *
+     * @return string
+     */
+    public function getApplicationServiceId()
+    {
+        return static::$appServiceId;
     }
 
     /**
@@ -222,7 +290,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      */
     public function getContainerServiceId()
     {
-        return 'app_container';
+        return static::$appServiceId.'.container';
     }
 
     /**
@@ -230,7 +298,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @param mixed $path
      *
-     * @return voi
+     * @return void
      */
     public function setApplicationRoot($path)
     {
@@ -238,24 +306,23 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
-     * Get the application directory.
+     * Get the application root directory.
      *
      * @return string
      */
     public function getApplicationRoot()
     {
         if (null === $this->applicationRoot) {
-            $reflection = new \ReflectionObject($this);
-            $this->applicationRoot = dirname($reflection->getFileName());
+            $this->applicationRoot = $this->guessApplicationPath();
         }
 
         return $this->applicationRoot;
     }
 
     /**
-     * setContainerCachePath
+     * Set the path to the container cache.
      *
-     * @param mixed $path
+     * @param string $path
      *
      * @return void
      */
@@ -265,7 +332,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
-     * getContainerCachePath
+     * Get the path to the container cache.
      *
      * @return string
      */
@@ -275,7 +342,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
-     * getLoadedPackages
+     * Get the package repository.
      *
      * @return PackageRepository
      */
@@ -284,38 +351,35 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         return $this->packages;
     }
 
-    public function addPackageProvider($path, $extension = 'php', $default = [])
+    /**
+     * Add a file path from which a package provider schold be loaded.
+     *
+     * @param string $path the path to the php file that returns an array of
+     * package provides.
+     * @param string $extension the file extension.
+     *
+     * @return void
+     */
+    public function addPackageProvider($path, $extension = '.php')
     {
-        if (file_exists($file = $path . '.' . $extension)) {
-            $this->packageResources[] = $file;
-            $this->packageProviders[] = include $file;
+        if (!file_exists($file = dirname($path).DIRECTORY_SEPARATOR.basename($path, $extension).$extension)) {
             return;
         }
+
+        $this->packageResources[] = $file;
+        $this->packageProviders[] = include $file;
     }
 
     /**
-     * terminate
+     * guessApplicationPath
      *
-     * @param Request $request
-     * @param Response $response
-     *
-     * @return mixed
+     * @return string
      */
-    public function terminate(Request $request, Response $response)
+    protected function guessApplicationPath()
     {
-        if ($this->debugger) {
-            $this->debugger->stop();
-        }
-    }
+        $reflection = new \ReflectionObject($this);
 
-    /**
-     * getKernel
-     *
-     * @return \Symfony\Component\HttpFoundation\HttpKernelInterface
-     */
-    public function getKernel()
-    {
-        return $this->getContainer()->get('app_kernel');
+        return dirname($reflection->getFileName());
     }
 
     /**
@@ -325,7 +389,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      */
     public function getKernelStack()
     {
-        return $this->getContainer()->get('kernel_stack');
+        return $this->getContainer()->get(static::$kernelServiceId.'.stack');
     }
 
     /**
@@ -381,16 +445,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
-     * loadConfig
-     *
-     * @return mixed
-     */
-    protected function loadConfig()
-    {
-
-    }
-
-    /**
      * getContainerClass
      *
      * @return string
@@ -401,33 +455,120 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
+     * Inject services to the container.
+     *
+     * @return void
+     */
+    protected function injectServices()
+    {
+        $this->getContainer()->inject(static::$appServiceId, $this);
+        $this->getContainer()->inject(static::$appServiceId.'.package_repository', $this->packages);
+    }
+
+    /**
      * initializeContainer
      *
      * @return void
      */
     protected function initializeContainer()
     {
-        $ns = 'Selene\ClassCache';
-        $className = 'Container'.ucfirst($this->getEnvironment());
+        $cache = $this->getConfigCache();
 
-        $cache = new ConfigCache(
-            $file = $this->getContainerCachePath() . DIRECTORY_SEPARATOR . $className.'.php',
-            $this->isDebugging()
-        );
-
-        $class = $ns . '\\' . $className;
-
-        //if (true) {
         if (!$cache->isValid()) {
-
-            $builder = $this->buildContainer($cache, $class, $file);
-            $dumper = new PhpDumper($this->container, $ns, $className, $this->getContainerServiceId());
-
-            $cache->write($dumper->dump(), $builder->getResources());
-
+            $this->doBuildContainer($cache);
         }
 
-        return $this->loadContainerCache($class, $file);
+        $this->loadContainerCache($cache);
+    }
+
+    /**
+     * getConfigCache
+     *
+     * @return ConfigCache
+     */
+    protected function getConfigCache()
+    {
+        return new ConfigCache(
+            $this->getCachedContainerFileName(),
+            $this->isDebugging()
+        );
+    }
+
+    /**
+     * doBuildContainer
+     *
+     * @param ConfigCache $cache
+     *
+     * @return void
+     */
+    protected function doBuildContainer(CacheInterface $cache)
+    {
+        $builder = $this->buildContainer(
+            $cache,
+            $class = $this->getCachedContainerClassName(),
+            $file  = $this->getCachedContainerFileName()
+        );
+
+        $dumper = $this->getContainerDumper(
+            $builder->getContainer(),
+            $this->getCachedContainerNamespace(),
+            $this->getCachedContainerBaseName(),
+            $this->getContainerServiceId()
+        );
+
+        $cache->write($dumper->dump(), $builder->getResources());
+    }
+
+    /**
+     * getCachedContainerClassName
+     *
+     * @return string
+     */
+    protected function getCachedContainerClassName()
+    {
+        return sprintf(
+            '%s\%s',
+            $this->getCachedContainerNameSpace(),
+            $this->getCachedContainerBaseName()
+        );
+    }
+
+    /**
+     * getCachedContainerFileName
+     *
+     * @return string
+     */
+    protected function getCachedContainerFileName()
+    {
+        return sprintf(
+            '%s%s%s.php',
+            $this->getContainerCachePath(),
+            DIRECTORY_SEPARATOR,
+            $this->getCachedContainerBaseName()
+        );
+    }
+
+
+    /**
+     * getCachedContainerBaseName
+     *
+     * @return string
+     */
+    protected function getCachedContainerBaseName()
+    {
+        return 'Container'.ucfirst($this->getEnvironment());
+    }
+
+    /**
+     * getCachedContainerNameSpace
+     *
+     * @return string
+     */
+    protected function getCachedContainerNameSpace()
+    {
+        list($rootNs,) = explode('\\', __NAMESPACE__);
+
+        return $rootNs.'\ClassCache';
     }
 
     /**
@@ -435,29 +576,19 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @param ConfigCache $cache
      *
-     * @return void
+     * @return BuilderInterface
      */
-    protected function buildContainer(ConfigCache $cache, $containerClass, $containerFile)
+    protected function buildContainer(CacheInterface $cache, $containerClass, $containerFile)
     {
-
         $class = $this->getContainerClass();
         $container = new $class(new Parameters($this->getDefaultParameters()));
 
         $this->setContainer($container);
 
-        $this->container->setParameter('app_container.class', $containerClass);
-        $this->container->setParameter('app_container.file', $containerFile);
-        $this->container->setParameter('app.root', $this->getApplicationRoot());
+        $this->container->setParameter(static::$appServiceId.'.container.class', $containerClass);
+        $this->container->setParameter(static::$appServiceId.'.container.file', $containerFile);
+
         $this->container->inject($this->getContainerServiceId(), $container);
-
-
-        $configPaths = $this->getPackageConfig();
-
-        $locator = new Locator($configPaths);
-
-        $locator->setRootPath(
-            $this->getApplicationRoot().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'packages'
-        );
 
         $builder = $this->getContainerBuilder($container);
 
@@ -465,16 +596,12 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
             $builder->addFileResource($file);
         }
 
-        $resolver = new LoaderResolver([
-            new XmlLoader($builder, $locator),
-            new PhpLoader($builder, $locator),
-            new CallableLoader($builder, $locator)
-        ]);
-
-        $loader = new DelegatingLoader($resolver);
+        $loader = $this->getConfigLoader(
+            $builder,
+            $this->getApplicationRoot().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'packages'
+        );
 
         $loader->load('config.xml', true);
-
         $loader->load('config_'.strtolower($this->getEnvironment()).'.xml', true);
 
         $this->packages->build($builder);
@@ -482,6 +609,27 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         $builder->build();
 
         return $builder;
+    }
+
+    /**
+     * getConfigLoader
+     *
+     * @param BuilderInterface $builder
+     * @param string $rootPath
+     *
+     * @return Slene\Components\Config\Resource\LoaderInterface
+     */
+    protected function getConfigLoader(BuilderInterface $builder, $rootPath)
+    {
+        $locator = new Locator($this->getPackageConfig(), $rootPath);
+
+        $resolver = new LoaderResolver([
+            new XmlLoader($builder, $locator),
+            new PhpLoader($builder, $locator),
+            new CallableLoader($builder, $locator)
+        ]);
+
+        return new DelegatingLoader($resolver);
     }
 
     /**
@@ -497,14 +645,30 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     }
 
     /**
+     * getContainerDumper
+     *
+     * @param ContainerInterface $container
+     * @param string $namespace
+     * @param string $className
+     * @param string $id
+     *
+     * @return PhpDumper
+     */
+    protected function getContainerDumper(ContainerInterface $container, $namespace, $className, $id)
+    {
+        return new PhpDumper($container, $namespace, $className, $id);
+    }
+
+    /**
      * loadContainerCache
      *
      * @return void
      */
-    protected function loadContainerCache($class, $file)
+    protected function loadContainerCache(CacheInterface $cache)
     {
-        include $file;
+        include $cache->getFile();
 
+        $class = $this->getCachedContainerClassName();
         $container = new $class;
 
         $this->setContainer($container);
@@ -519,21 +683,24 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     {
         list($packages, $packagePaths) = $this->getPackageInfo();
 
+        $appid = static::$appServiceId;
+        $kerid = static::$kernelServiceId;
+
         return [
-            'app_kernel.root'   => $this->getApplicationRoot(),
-            'app.root'          => $this->getApplicationRoot(),
-            'app.packages'      => $packages,
-            'app.package_paths' => $packagePaths,
-            'app.env'           => $this->getEnvironment(),
-            'app.debugging'     => null !== $this->debugger,
+            $kerid.'.root'   => $this->getApplicationRoot(),
+            $appid.'.root'          => $this->getApplicationRoot(),
+            $appid.'.packages'      => $packages,
+            $appid.'.package_paths' => $packagePaths,
+            $appid.'.env'           => $this->getEnvironment(),
+            $appid.'.debugging'     => null !== $this->debugger,
         ];
     }
 
-    public function getEnvironment()
-    {
-        return $this->env;
-    }
-
+    /**
+     * getPackageInfo
+     *
+     * @return array
+     */
     protected function getPackageInfo()
     {
         $info = [];
@@ -554,8 +721,8 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      */
     protected function bootKernelStack()
     {
-        $builder = $this->getContainer()->get('kernel_stackbuilder');
-        $this->container->inject('kernel_stack', $stack = $builder->make());
+        $builder = $this->getContainer()->get(static::$kernelServiceId.'.stackbuilder');
+        $this->container->inject(static::$kernelServiceId.'.stack', $stack = $builder->make());
     }
 
     /**
@@ -629,15 +796,5 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         $paths = ListHelper::arrayFlatten($this->packageProviders);
 
         return $paths;
-    }
-
-    /**
-     * version
-     *
-     * @return mixed
-     */
-    public static function version()
-    {
-        return static::$version;
     }
 }
