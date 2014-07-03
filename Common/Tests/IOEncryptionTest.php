@@ -24,6 +24,15 @@ class IOEncryptionTest extends IOProxyTest
 
     protected $crypter;
 
+    protected function setUp()
+    {
+        if (!class_exists('Selene\Components\Cryptography\Crypter')) {
+            $this->markTestIncomplete();
+        }
+
+        return parent::setUpt();
+    }
+
     protected function getIO()
     {
         $this->crypter = new Crypter;
