@@ -11,11 +11,10 @@
 
 namespace Selene\Components\Events;
 
+use \Selene\Components\Common\Traits\Getter;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
-use \Selene\Components\Common\Helper\ListHelper;
-use \Selene\Components\Common\Traits\Getter;
 
 /**
  * @class Dispatcher implements DispatcherInterface
@@ -265,10 +264,9 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         }
 
         if (!is_string($eventHandler) || 1 < substr_count($eventHandler, static::EVTHANDLER_SEPARATOR)) {
-
-
+            // when adding a subscriber, prepare the exception message if the
+            // method is not callable:
             if (is_array($eventHandler) && is_object(current($eventHandler))) {
-
                 throw new \InvalidArgumentException(
                     sprintf(
                         'Invalid event handler "%s::%s()".',
@@ -278,6 +276,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
                 );
             }
 
+            // Otherwise prepare a less specific exception message:
             throw new \InvalidArgumentException(
                 sprintf(
                     'Invalid event handler "%s".',

@@ -7,6 +7,7 @@
 [![HHVM Status](http://hhvm.h4cc.de/badge/selene/events.png)](http://hhvm.h4cc.de/package/selene/events)
 
 [![Coverage Status](https://coveralls.io/repos/seleneapp/events/badge.png?branch=development)](https://coveralls.io/r/seleneapp/events?branch=development)
+[![Code Climate](https://codeclimate.com/github/seleneapp/events.png)](https://codeclimate.com/github/seleneapp/events)
 
 ## Installation
 
@@ -25,7 +26,15 @@ Add `selene/events` as requirement to your `composer.json` file.
 Run `composer install` or `composer update`
 
 ```bash
-$ composer install
+$ composer install --dev
+```
+
+## Testing
+
+Run tests with: 
+
+```bash
+$ vendor/bin/phpunit
 ```
 
 ## Setup

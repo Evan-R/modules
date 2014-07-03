@@ -17,6 +17,7 @@ use \Selene\Components\Events\Event;
 use \Selene\Components\Events\Dispatcher;
 use \Selene\Components\Events\Tests\Stubs\EventStub;
 use \Selene\Components\Events\Tests\Stubs\EventSubscriberStub;
+use \Selene\Components\Events\Tests\Stubs\InvalidSubscriber;
 use \Selene\Components\DI\ContainerInterface;
 
 /**
@@ -341,6 +342,9 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $container = m::mock('Selene\Components\DI\ContainerInterface');
         $container->shouldReceive('has')->with('bar')->andReturn(true);
         $container->shouldReceive('get')->with('bar')->andReturn(new \stdClass);
+
+        //$container->shouldReceive('has')->with('baz')->andReturn(true);
+        //$container->shouldReceive('get')->with('baz')->andReturn(new \StdClass);
 
         $dispatcher->setContainer($container);
 
@@ -690,6 +694,19 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $result = $dispatcher->dispatch('bar.event');
         $this->assertSame(['bar'], $result);
+    }
+
+    /** @test */
+    public function itShouldFilterOutInvalidSubscriptions()
+    {
+        $dispatcher = $this->createDispatcher();
+        $subs = new InvalidSubscriber;
+
+        try {
+            $dispatcher->addSubscriber($subs);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Invalid event handler "'.get_class($subs).'::invalidMethodCall()".', $e->getMessage());
+        }
     }
 
     /**
