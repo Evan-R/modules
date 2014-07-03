@@ -11,7 +11,7 @@
 
 namespace Selene\Components\DI\Processor;
 
-use \Selene\Components\DI\Definition;
+use \Selene\Components\DI\Definition\CallerDefinition;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\Definition\DefinitionInterface;
 use \Selene\Components\DI\Exception\CircularReferenceException;
@@ -62,7 +62,7 @@ class ResolveCircularReference implements ProcessInterface
      */
     private function checkDefininition(DefinitionInterface $definition, $current, $self = null)
     {
-        $this->checkCircularReference($definition->getArguments(), $current);
+        $this->checkCircularReference($definition->getArguments(), $current, $self);
 
         $this->checkSetterArguments((array)$definition->getSetters(), $current, $self);
     }
@@ -89,13 +89,34 @@ class ResolveCircularReference implements ProcessInterface
                 continue;
             }
 
+            if ($attribute instanceof CallerDefinition) {
+                $this->checkCircularReference([$attribute->getService()], $current, $self);
+
+                //var_dump('$now!');
+                //var_dump($self);
+                //var_dump($attribute->getArguments());
+
+                $this->checkCircularReference($attribute->getArguments(), $current, $self);
+
+                continue;
+            }
+
             if (!$this->container->isReference($attribute)) {
                 continue;
             }
 
-            if ($self === ($id = $attribute->get()) && null !== $self) {
-                continue;
-            }
+            ////var_dump($self);
+            //var_dump($attribute->get());
+            //var_dump($self === $attribute->get());
+            ////var_dump($attribute);
+
+            //$id = $attribute->get();
+
+            //if ($self === $id) {
+
+            //}
+            //
+            $id = $attribute->get();
 
             // if the reference id matches the current resolving, a circular
             // reference occured:
@@ -109,6 +130,11 @@ class ResolveCircularReference implements ProcessInterface
             // and setters list:
             if (!$this->container->hasDefinition($id)) {
                 throw new \InvalidArgumentException(sprintf('A definition with id "%s" does not exist.', $id));
+            }
+
+            if ($self === $id && null !== $self) {
+                var_dump($id);
+                continue;
             }
 
             $this->checkDefininition($this->container->getDefinition($id), $current, $id, $self);

@@ -12,7 +12,6 @@
 namespace Selene\Components\DI;
 
 use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\DI\Dumper\ContainerDumper;
 use \Selene\Components\DI\Processor\Processor;
 use \Selene\Components\DI\Processor\Configuration;
 use \Selene\Components\DI\Processor\ProcessorDecorator;
@@ -68,20 +67,17 @@ class Builder implements BuilderInterface
      */
     protected $packages;
 
-    protected $configured;
-
     /**
      * Create a new Builder instance.
      *
-     * @param Dumper $dumper
+     * @param ContainerInterface $container the container to build.
+     * @param ProcessorInterface $proc      the processor
+     * @param array              $resources resource
      */
-    public function __construct(
-        ContainerInterface $container,
-        ProcessorInterface $processor = null,
-        array $resources = []
-    ) {
+    public function __construct(ContainerInterface $container, ProcessorInterface $proc = null, array $resources = [])
+    {
         $this->container = $container;
-        $this->processor = $processor ?: new Processor(new Configuration);
+        $this->processor = $proc ?: new Processor(new Configuration);
         $this->resources = $resources;
 
         $this->packages  = [];
@@ -129,6 +125,9 @@ class Builder implements BuilderInterface
 
     /**
      * Get the current Container Processor.
+     *
+     * Instead of returning the actual processor,
+     * return a processor decorator.
      *
      * @return \Selene\Components\DI\Processor\ProcessorInterface
      */
@@ -235,7 +234,9 @@ class Builder implements BuilderInterface
             return call_user_func_array([$this->container, $method], $arguments);
         }
 
-        throw new \BadMethodCallException(sprintf('call to undefined method %s::%s()', get_class($this), $method));
+        throw new \BadMethodCallException(
+            sprintf('call to undefined method %s::%s()', get_class($this), $method)
+        );
     }
 
     /**
