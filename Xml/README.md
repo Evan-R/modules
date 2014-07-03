@@ -7,16 +7,33 @@
 [![HHVM Status](http://hhvm.h4cc.de/badge/selene/xml.png)](http://hhvm.h4cc.de/package/selene/xml)
 
 [![Coverage Status](https://coveralls.io/repos/seleneapp/xml/badge.png?branch=development)](https://coveralls.io/r/seleneapp/xml?branch=development)
+[![Code Climate](https://codeclimate.com/github/seleneapp/xml.png)](https://codeclimate.com/github/seleneapp/xml)
 
-## Install
+## Installation
 
 In your `composer.json`: 
 
-```sh
-"require": {
-	"php": ">=5.4.0",
-	"selene/xml": "dev-development"
+```json
+{
+	"require": {
+		"php": ">=5.4.0",
+		"selene/xml": "dev-development"
+	}
 }
+```
+
+Run `composer install` or `composer update`
+
+```bash
+$ composer install --dev
+```
+
+## Testing
+
+Run tests with: 
+
+```bash
+$ vendor/bin/phpunit
 ```
 
 ## The Parser

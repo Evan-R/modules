@@ -10,7 +10,7 @@
   "require": {
     "php": ">= 5.4.0",
     "ircmaxell/password-compat":"1.0.*",
-    "selene/common": "dev-development"
+    "selene/common":"dev-development"
   },
   "require-dev": {
     "selene/testsuite": "dev-development",

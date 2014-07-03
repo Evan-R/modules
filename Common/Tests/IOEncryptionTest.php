@@ -30,7 +30,7 @@ class IOEncryptionTest extends IOProxyTest
             $this->markTestIncomplete();
         }
 
-        return parent::setUpt();
+        return parent::setUp();
     }
 
     protected function getIO()

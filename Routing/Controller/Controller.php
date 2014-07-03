@@ -46,7 +46,7 @@ abstract class Controller extends BaseController implements ContainerAwareInterf
      */
     public function getRequest()
     {
-        return $this->getContainer()->get('request.stack')->getCurrent();
+        return $this->getContainer()->get('request_stack')->getCurrent();
     }
 
     /**

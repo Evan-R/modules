@@ -84,7 +84,7 @@ class HashKey implements HashInterface
         $base = hash_hmac('md5', $value, $options['secret']);
 
         if (!function_exists('gmp_init')) {
-            return  BcConvertHelper::baseConvert($base, 16, 62);
+            return BcConvertHelper::baseConvert($base, 16, 62);
         }
 
         $init = gmp_init($base, 16);

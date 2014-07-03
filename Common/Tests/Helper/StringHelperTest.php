@@ -197,13 +197,19 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
         //$this->assertFalse(containedAndEndsWith(['foo', 'baz', 'bar'], 'BarFoo'));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @dataProvider strRandLengthProvider
+     */
     public function strRand($length)
     {
         $this->assertSame($length, strlen(StringHelper::strRand($length)));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @dataProvider strRandLengthProvider
+     */
     public function strQuickRand($length)
     {
         $this->assertSame($length, strlen(StringHelper::strQuickRand($length)));
