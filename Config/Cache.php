@@ -107,10 +107,19 @@ class Cache implements CacheInterface
     }
 
     /**
+     * getFile
+     *
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
      * forget
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function forget()
     {

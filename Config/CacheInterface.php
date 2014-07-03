@@ -21,6 +21,10 @@ namespace Selene\Components\Config;
  */
 interface CacheInterface
 {
+    public function setFile($file);
+
+    public function getFile();
+
     /**
      * isValid
      *
