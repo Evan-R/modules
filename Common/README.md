@@ -6,7 +6,38 @@
 [![License](https://poser.pugx.org/selene/common/license.png)](https://packagist.org/packages/selene/common)
 [![HHVM Status](http://hhvm.h4cc.de/badge/selene/common.png)](http://hhvm.h4cc.de/package/selene/common)
 
+[![Coverage Status](https://coveralls.io/repos/seleneapp/common/badge.png)](https://coveralls.io/r/seleneapp/common)
+[![Code Climate](https://codeclimate.com/github/seleneapp/common.png)](https://codeclimate.com/github/seleneapp/common)
+
 The Common component is shared across almost ever other selene component.
+
+## Installation
+
+Installation is done via [composer](https://getcomposer.org).
+
+Add `selene/events` as requirement to your `composer.json` file.
+
+```json
+{
+	"require": {
+		"selene/common":"dev-development"
+	}
+}
+```
+
+Run `composer install` or `composer update`
+
+```bash
+$ composer install --dev
+```
+
+## Testing
+
+Run tests with: 
+
+```bash
+$ vendor/bin/phpunit
+```
 
 ## Data Structures
 
