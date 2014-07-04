@@ -43,6 +43,10 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      */
     protected $packages;
 
+    protected $built;
+
+    protected $sorted;
+
     /**
      * @param array $packages
      *
@@ -51,8 +55,12 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      */
     public function __construct(array $packages = [])
     {
+        $this->sorted = false;
         $this->aliases = [];
         $this->packages = [];
+        $this->built = [];
+
+        $this->dependecies = new DependencyManager($this);
 
         $this->addPackages($packages);
     }
@@ -67,6 +75,8 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      */
     public function add(PackageInterface $package)
     {
+        $this->sorted = false;
+
         $this->aliases[$package->getName()] = $package->getAlias();
         $this->packages[$package->getAlias()] = $package;
     }
@@ -138,7 +148,7 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      */
     public function all()
     {
-        return $this->packages;
+        return $this->getSorted();
     }
 
     /**
@@ -146,14 +156,65 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      * Load package config and start package bulding.
      *
      * @access public
-     * @return mixed
+     * @return void
      */
     public function build(ContainerBuilderInterface $builder)
     {
-        foreach ($this->packages as $package) {
+        $packages = $this->getSorted();
+
+        foreach ($packages as &$package) {
+
+            if (in_array($alias = $package->getAlias(), $this->built)) {
+                continue;
+            }
+
             $this->loadPackageConfig($builder, $package);
             $this->buildPackage($builder, $package);
+
+            $this->built[] = $alias;
         }
+    }
+
+    protected function packageHasDependecies(PackageInterface $package)
+    {
+        return (bool)$package->requires();
+    }
+
+    /**
+     * bootPackages
+     *
+     * @access public
+     * @return mixed
+     */
+    public function boot()
+    {
+        foreach ($this->packages as $package) {
+            $package->boot();
+        }
+    }
+
+    /**
+     * shutDown
+     *
+     * @access public
+     * @return void
+     */
+    public function shutDown()
+    {
+        foreach ($this->packages as $package) {
+            $package->shutDown();
+        }
+    }
+
+    /**
+     * getIterator
+     *
+     * @access public
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->packages);
     }
 
     /**
@@ -204,39 +265,17 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
     }
 
     /**
-     * bootPackages
+     * getSorted
      *
-     * @access public
-     * @return mixed
+     * @return array
      */
-    public function boot()
+    protected function getSorted()
     {
-        foreach ($this->packages as $package) {
-            $package->boot();
+        if (!$this->sorted) {
+            $this->sorted = true;
+            $this->packages = $this->dependecies->getSorted();
         }
-    }
 
-    /**
-     * shutDown
-     *
-     * @access public
-     * @return void
-     */
-    public function shutDown()
-    {
-        foreach ($this->packages as $package) {
-            $package->shutDown();
-        }
-    }
-
-    /**
-     * getIterator
-     *
-     * @access public
-     * @return \ArrayIterator
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->packages);
+        return $this->packages;
     }
 }

@@ -42,19 +42,30 @@ abstract class PackageConfiguration extends Configuration
     /**
      * package
      *
-     * @var mixed
+     * @var string
      */
     private $packagePath;
 
+    /**
+     * parameters
+     *
+     * @var \Selene\Components\DI\ParameterInterface
+     */
     private $parameters;
 
+    /**
+     * Constructor.
+     *
+     * @param string $packagePath
+     */
     public function __construct($packagePath)
     {
         $this->packagePath = $packagePath;
     }
 
     /**
-     * @inheritdoc
+     * @api
+     * {@inheritdoc}
      */
     public function load(BuilderInterface $builder, array $values)
     {
@@ -74,6 +85,7 @@ abstract class PackageConfiguration extends Configuration
      * @param BuilderInterface $builder
      * @param array $values
      *
+     * @api
      * @return void
      */
     public function setup(BuilderInterface $builder, array $values)
@@ -87,7 +99,6 @@ abstract class PackageConfiguration extends Configuration
      * @param mixed $default
      * @param mixed $resolved
      *
-     * @access protected
      * @return mixed
      */
     protected function getParameter($param, $default = null, $resolved = false)
@@ -101,6 +112,14 @@ abstract class PackageConfiguration extends Configuration
         return $resolved && $this->parameters ? $this->parameters->resolveParam($default) : $default;
     }
 
+    /**
+     * setParameter
+     *
+     * @param string $param
+     * @param mixed  $value
+     *
+     * @return void
+     */
     protected function setParameter($param, $value = null)
     {
         if ($this->parameters) {
@@ -119,7 +138,6 @@ abstract class PackageConfiguration extends Configuration
      *
      * @param mixed $param
      *
-     * @access protected
      * @return LoaderInterface
      */
     protected function getRoutingLoader(BuilderInterface $builder, LocatorInterface $locator = null)
@@ -139,7 +157,6 @@ abstract class PackageConfiguration extends Configuration
      * @param BuilderInterface $builder
      * @param LocatorInterface $locator
      *
-     * @access protected
      * @return LoaderInterface
      */
     protected function getConfigLoader(BuilderInterface $builder, LocatorInterface $locator = null)
@@ -156,7 +173,6 @@ abstract class PackageConfiguration extends Configuration
     /**
      * getResourcePath
      *
-     * @access protected
      * @return string
      */
     protected function getResourcePath()
@@ -167,7 +183,6 @@ abstract class PackageConfiguration extends Configuration
     /**
      * getPackage
      *
-     * @access protected
      * @return string
      */
     protected function getPackagePath()
@@ -175,6 +190,13 @@ abstract class PackageConfiguration extends Configuration
         return $this->packagePath;
     }
 
+    /**
+     * Default merger for package config values.
+     *
+     * @param array $values
+     *
+     * @return array
+     */
     protected function mergeValues(array $values)
     {
         $config = [];

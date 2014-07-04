@@ -34,7 +34,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldadds()
     {
-        $package = m::mock('\Selene\Components\Package\PackageInterface');
+        $package = $this->mockPackage();
 
         $package->shouldReceive('getName')->andReturn('AcmePackage');
         $package->shouldReceive('getAlias')->andReturn('acme');
@@ -48,7 +48,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldGetAPackageByName()
     {
-        $package = m::mock('\Selene\Components\Package\PackageInterface');
+        $package = $this->mockPackage();
 
         $package->shouldReceive('getName')->andReturn('AcmePackage');
         $package->shouldReceive('getAlias')->andReturn('acme');
@@ -62,7 +62,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldGetAPackageByAlias()
     {
-        $package = m::mock('\Selene\Components\Package\PackageInterface');
+        $package = $this->mockPackage();
 
         $package->shouldReceive('getName')->andReturn('AcmePackage');
         $package->shouldReceive('getAlias')->andReturn('acme');
@@ -76,15 +76,25 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldGetAllPackages()
     {
-        $package = m::mock('\Selene\Components\Package\PackageInterface');
+        $repo = new PackageRepository;
+
+        $package = $this->mockPackage();
 
         $package->shouldReceive('getName')->andReturn('AcmePackage');
         $package->shouldReceive('getAlias')->andReturn('acme');
 
-        $repo = new PackageRepository;
         $repo->add($package);
 
         $this->assertEquals(['acme' => $package], $repo->all());
+
+        $packageB = $this->mockPackage();
+
+        $packageB->shouldReceive('getName')->andReturn('FooPackage');
+        $packageB->shouldReceive('getAlias')->andReturn('foo');
+
+        $repo->add($packageB);
+
+        $this->assertEquals(['acme' => $package, 'foo' => $packageB], $repo->all());
     }
 
     /** @test */
@@ -97,7 +107,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
         $container = new Container;
         $builder->shouldReceive('getContainer')->andReturn($container);
 
-        $package = m::mock('\Selene\Components\Package\PackageInterface');
+        $package = $this->mockPackage();
 
         $package->shouldReceive('getMeta')->andReturn('package.xml');
         $package->shouldReceive('getName')->andReturn('AcmePackage');
@@ -147,7 +157,7 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
             $this->assertSame($builder, $cbuilder);
         });
 
-        $package = m::mock('\Selene\Components\Package\PackageInterface');
+        $package = $this->mockPackage();
 
         $package->shouldReceive('getMeta')->andReturn('package.xml');
         $package->shouldReceive('getName')->andReturn('AcmePackage');
@@ -166,6 +176,54 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
         if (!$pass) {
             $this->fail();
         }
+    }
+
+    /** @test */
+    public function itShouldGetPackagesInOrderOfTheirDependencies()
+    {
+        $p10 = m::mock('Selene\Components\Package\PackageInterface');
+        $p10->shouldReceive('getName')->andReturn('p10Package')
+           ->shouldReceive('getAlias')->andReturn('p10')
+           ->shouldReceive('requires')->andReturn([]);
+
+        $p1 = m::mock('Selene\Components\Package\PackageInterface');
+        $p1->shouldReceive('getName')->andReturn('p1Package')
+           ->shouldReceive('getAlias')->andReturn('p1')
+           ->shouldReceive('requires')->andReturn(['p10']);
+
+        $p2 = m::mock('Selene\Components\Package\PackageInterface');
+        $p2->shouldReceive('getName')->andReturn('p2Package')
+           ->shouldReceive('getAlias')->andReturn('p2')
+           ->shouldReceive('requires')->andReturn(['p1', 'p4']);
+
+        $p3 = m::mock('Selene\Components\Package\PackageInterface');
+        $p3->shouldReceive('getName')->andReturn('p3Package')
+           ->shouldReceive('getAlias')->andReturn('p3')
+           ->shouldReceive('requires')->andReturn(['p1']);
+
+        $p4 = m::mock('Selene\Components\Package\PackageInterface');
+        $p4->shouldReceive('getName')->andReturn('p4Package')
+           ->shouldReceive('getAlias')->andReturn('p4')
+           ->shouldReceive('requires')->andReturn(['p1', 'p5']);
+
+        $p5 = m::mock('Selene\Components\Package\PackageInterface');
+        $p5->shouldReceive('getName')->andReturn('p5Package')
+           ->shouldReceive('getAlias')->andReturn('p5')
+           ->shouldReceive('requires')->andReturn(['p1', 'p3']);
+
+        $repo = new PackageRepository([
+            $p1, $p2, $p3, $p4, $p5, $p10
+        ]);
+
+        $this->assertEquals(['p10', 'p1', 'p3', 'p5', 'p4', 'p2'], array_keys($repo->all()));
+    }
+
+    protected function mockPackage($requirement = [])
+    {
+        $package = m::mock('\Selene\Components\Package\PackageInterface');
+        $package->shouldReceive('requires')->andReturn($requirement);
+
+        return $package;
     }
 
     public function getConfigInterface()

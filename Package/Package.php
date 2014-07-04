@@ -164,6 +164,15 @@ abstract class Package implements PackageInterface
     }
 
     /**
+     * Define an array of packages that are required by this package.
+     *
+     * @return null|array
+     */
+    public function requires()
+    {
+    }
+
+    /**
      * Shutdown ops on this package.
      *
      * @access public
