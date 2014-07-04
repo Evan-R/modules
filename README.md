@@ -1,5 +1,7 @@
 #Status
 
+[![Code Climate](https://codeclimate.com/github/seleneapp/components.png)](https://codeclimate.com/github/seleneapp/components)
+
 ## Components
 
 ### Cache
