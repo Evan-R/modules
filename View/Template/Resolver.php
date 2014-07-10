@@ -50,6 +50,7 @@ class Resolver implements ResolverInterface
         if (0 === substr_count($template, '.')) {
             return new Template($template);
         }
+
         try {
             list ($name, $engine) = array_pad(StringHelper::strrposSplit($template, '.'), 2, null);
 

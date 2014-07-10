@@ -167,7 +167,7 @@ class Application extends ConsoleApplication
     {
         $app->boot();
 
-        foreach ($app->getLoadedPackages() as $package) {
+        foreach ($app->getPackages() as $package) {
             $package->registerCommands($this);
         }
     }
