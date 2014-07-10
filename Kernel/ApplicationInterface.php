@@ -39,7 +39,7 @@ interface ApplicationInterface
      *
      * @return array
      */
-    public function getLoadedPackages();
+    public function getPackages();
 
     /**
      * Get application version.

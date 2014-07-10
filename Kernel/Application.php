@@ -28,6 +28,7 @@ use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\Processor\Processor;
 use \Selene\Components\DI\Processor\Configuration;
 use \Selene\Components\DI\Dumper\PhpDumper;
+use \Selene\Components\DI\Dumper\ContainerGenerator;
 use \Selene\Components\DI\Dumper\ContainerDumper;
 use \Selene\Components\DI\Parameters;
 use \Selene\Components\DI\ContainerAwareInterface;
@@ -346,7 +347,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @return PackageRepository
      */
-    public function getLoadedPackages()
+    public function getPackages()
     {
         return $this->packages;
     }
@@ -516,7 +517,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
             $this->getContainerServiceId()
         );
 
-        $cache->write($dumper->dump(), $builder->getResources());
+        $cache->write($dumper->generate(), $builder->getResources());
     }
 
     /**
@@ -656,7 +657,10 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      */
     protected function getContainerDumper(ContainerInterface $container, $namespace, $className, $id)
     {
-        return new PhpDumper($container, $namespace, $className, $id);
+        return new ContainerGenerator($container, $namespace, $className, $id);
+        //file_put_contents('/Users/malcolm/container.php.dist', $gen->generate());
+        //die;
+        //return new PhpDumper($container, $namespace, $className, $id);
     }
 
     /**
@@ -677,23 +681,22 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getDefaultParameters
      *
-     * @return mixed
+     * @return array
      */
     protected function getDefaultParameters()
     {
-        list($packages, $packagePaths) = $this->getPackageInfo();
-
         $appid = static::$appServiceId;
         $kerid = static::$kernelServiceId;
 
-        return [
-            $kerid.'.root'   => $this->getApplicationRoot(),
-            $appid.'.root'          => $this->getApplicationRoot(),
-            $appid.'.packages'      => $packages,
-            $appid.'.package_paths' => $packagePaths,
-            $appid.'.env'           => $this->getEnvironment(),
-            $appid.'.debugging'     => null !== $this->debugger,
-        ];
+        return array_merge(
+            $this->getPackageInfo($appid),
+            [
+                $kerid.'.root'          => $this->getApplicationRoot(),
+                $appid.'.root'          => $this->getApplicationRoot(),
+                $appid.'.env'           => $this->getEnvironment(),
+                $appid.'.debugging'     => null !== $this->debugger,
+            ]
+        );
     }
 
     /**
@@ -701,17 +704,20 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @return array
      */
-    protected function getPackageInfo()
+    protected function getPackageInfo($key)
     {
         $info = [];
         $path = [];
 
-        foreach ($this->getLoadedPackages() as $alias => $package) {
+        foreach ($this->getPackages() as $alias => $package) {
             $info[$alias] = $package->getNamespace();
             $path[$alias] = $package->getPath();
         }
 
-        return [$info, $path];
+        return [
+            $key.'.packages' => $info,
+            $key.'.package_paths' => $path
+        ];
     }
 
     /**
@@ -722,6 +728,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     protected function bootKernelStack()
     {
         $builder = $this->getContainer()->get(static::$kernelServiceId.'.stackbuilder');
+
         $this->container->inject(static::$kernelServiceId.'.stack', $stack = $builder->make());
     }
 
