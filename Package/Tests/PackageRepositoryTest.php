@@ -16,8 +16,9 @@ use \Selene\Components\DI\Container;
 use \Selene\Components\DI\Parameters;
 use \Selene\Components\Package\PackageInterface;
 use \Selene\Components\Package\PackageRepository;
+use \Selene\Components\TestSuite\TestCase;
 
-class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
+class PackageRepositoryTest extends TestCase
 {
     protected function tearDown()
     {
@@ -181,6 +182,8 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldGetPackagesInOrderOfTheirDependencies()
     {
+        //$this->markTestIncomplete('feature Probably won\'t make it.');
+
         $p10 = m::mock('Selene\Components\Package\PackageInterface');
         $p10->shouldReceive('getName')->andReturn('p10Package')
            ->shouldReceive('getAlias')->andReturn('p10')
@@ -215,7 +218,10 @@ class PackageRepositoryTest extends \PHPUnit_Framework_TestCase
             $p1, $p2, $p3, $p4, $p5, $p10
         ]);
 
-        $this->assertEquals(['p10', 'p1', 'p3', 'p5', 'p4', 'p2'], array_keys($repo->all()));
+        $this->assertEquals(
+            ['p10', 'p1', 'p3', 'p5', 'p4', 'p2'],
+            array_keys($this->invokeObjectMethod('getSorted', $repo))
+        );
     }
 
     protected function mockPackage($requirement = [])
