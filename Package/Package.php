@@ -27,7 +27,6 @@ use \Selene\Components\Console\Application as Console;
  * @package Selene\Components\Package
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 abstract class Package implements PackageInterface
 {
@@ -72,18 +71,6 @@ abstract class Package implements PackageInterface
      * @var string
      */
     protected $alias;
-
-    /**
-     * Return a package alias that is required by this package.
-     *
-     * @access public
-     * @return string|boolean the parent package alias as string,
-     *  otherwise boolean `false`
-     */
-    public function getRequirement()
-    {
-        return false;
-    }
 
     /**
      * Provides a PackageConfiguration instance.
@@ -205,6 +192,7 @@ abstract class Package implements PackageInterface
         if (null === $this->namespace) {
             $this->namespace = $this->getPackageReflection()->getNamespaceName();
         }
+
         return $this->namespace;
     }
 

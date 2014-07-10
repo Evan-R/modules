@@ -38,15 +38,13 @@ interface PackageInterface
      * @param \Selene\Components\DI\BuilderInterface $builder
      * @internal param \Selene\Components\Package\ContainerInterface $container
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function build(BuilderInterface $builder);
 
     /**
      * boot up the package
      *
-     * @access public
      * @param \Selene\Components\Kernel\ApplicationInterface $app
      * @return void
      */
@@ -57,7 +55,6 @@ interface PackageInterface
      *
      * This is the place to put the shutdown Callbacks.
      *
-     * @access public
      * @return void
      */
     public function shutdown();
@@ -65,16 +62,28 @@ interface PackageInterface
     /**
      * registerCommands
      *
-     * @access public
      * @param \Selene\Components\Console\Application $console
-     * @return mixed
+     * @return void
      */
     public function registerCommands(Console $console);
 
     /**
+     * getConfiguration
+     *
+     * @return null|\Selene\Components\Config\ContainerInterface
+     */
+    public function getConfiguration();
+
+    /**
+     * getResourcePath
+     *
+     * @return string
+     */
+    public function getResourcePath();
+
+    /**
      * getNamespace
      *
-     * @access public
      * @return string
      */
     public function getPath();
@@ -82,7 +91,6 @@ interface PackageInterface
     /**
      * getName
      *
-     * @access public
      * @return string
      */
     public function getName();
@@ -90,24 +98,21 @@ interface PackageInterface
     /**
      * getAlias
      *
-     * @access public
      * @return string
      */
     public function getAlias();
 
     /**
-     * getRequirement
-     *
-     * @access public
-     * @return string|boolean
-     */
-    public function getRequirement();
-
-    /**
      * getNamespace
      *
-     * @access public
-     * @return mixed
+     * @return string
      */
     public function getNamespace();
+
+    /**
+     * requires
+     *
+     * @return array
+     */
+    public function requires();
 }

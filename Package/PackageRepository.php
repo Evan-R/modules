@@ -148,7 +148,7 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      */
     public function all()
     {
-        return $this->getSorted();
+        return $this->packages;
     }
 
     /**
