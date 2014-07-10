@@ -246,7 +246,6 @@ class Container implements ContainerInterface
      *
      * @param string $id the service id.
      *
-     * @access public
      * @return ServiceDefinition
      */
     public function getDefinition($id)

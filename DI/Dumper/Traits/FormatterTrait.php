@@ -40,14 +40,30 @@ trait FormatterTrait
      * @access protected
      * @return string
      */
-    public function extractParams(array $params, $indent = 12)
+    public function extractParams(array $params, $indent = 0)
+    {
+        $indent = $indent + 4;
+        $result = $this->doExctractParams($params, $indent);
+
+        return $this->indent(max($indent - 4, 0)) . $result;
+    }
+
+    /**
+     * doExctractParams
+     *
+     * @param array $params
+     * @param int $indend
+     *
+     * @return string
+     */
+    protected function doExctractParams(array $params, $indent = 0)
     {
         $array = [];
 
         foreach ($params as $param => $value) {
 
             if (is_array($value)) {
-                $value = $this->extractParams($value, $indent + 4);
+                $value = $this->doExctractParams($value, $indent + 4);
             } elseif (is_string($value) && 0 === strpos($value, '$this')) {
                 $value = $value;
             } else {
@@ -55,7 +71,6 @@ trait FormatterTrait
             }
 
             $array[] = sprintf('%s%s => %s,', $this->indent($indent), $this->exportVar($param), $value);
-
         }
 
         return empty($array) ?
@@ -63,7 +78,7 @@ trait FormatterTrait
             preg_replace(
                 '#\d+ \=\>\s?#i',
                 '',
-                sprintf("[\n%s\n%s]", implode("\n", $array), $this->indent($indent - 4))
+                sprintf("[\n%s\n%s]", implode("\n", $array), $this->indent(max($indent - 4, 0)))
             );
     }
 

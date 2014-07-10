@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Dumper\Stubs package
+ * This File is part of the Selene\Components\DI\Dumper\Object package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,49 +9,74 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Dumper\Stubs;
+namespace Selene\Components\DI\Dumper\Object;
 
+use \Selene\Writer\Writer;
+use \Selene\Writer\Generator\Object\Method;
+use \Selene\Writer\Generator\GeneratorInterface;
 use \Selene\Components\DI\Reference;
 use \Selene\Components\DI\Container;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
+use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
+use \Selene\Components\DI\Dumper\ImportResolver;
 use \Selene\Components\DI\Definition\CallerDefinition;
+use \Selene\Components\DI\Definition\DefinitionInterface;
 
 /**
- * @class ServiceBody extends Stub
- * @see Stub
- *
- * @package Selene\Components\DI
+ * @class ServiceMethod
+ * @package Selene\Components\DI\Dumper\Object
  * @version $Id$
- * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
-class ServiceBody extends Stub implements ContainerAwareInterface
+class ServiceMethodBody implements GeneratorInterface
 {
-    use ContainerAwareTrait;
+    use FormatterTrait;
 
-    public function __construct(ContainerInterface $container, $serviceId)
+    private $writer;
+    private $serviceId;
+    private $arguments;
+    private $container;
+    private $classNameResolver;
+
+    /**
+     * Constructor.
+     *
+     * @param ContainerInterface $container
+     * @param string $id
+     * @param string $name
+     */
+    public function __construct(ContainerInterface $container, $id, ImportResolver $classNameResolver = null)
     {
-        $this->serviceId = $serviceId;
-        $this->setContainer($container);
+        $this->serviceId = $id;
+        $this->container = $container;
+
+        $this->writer = new Writer;
+
+        $this->classNameResolver = $classNameResolver;
     }
 
     /**
-     * dump
-     *
-     * @access public
      * @return string
      */
-    public function dump()
+    public function __toString()
     {
-        return $this->getMethodBody();
+        return $this->generate();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generate($raw = false)
+    {
+        $this->getServiceInstance();
+
+        return $raw ? $this->writer : $this->writer->dump();
     }
 
     /**
      * getMethodBody
      *
-     * @access private
      * @return string
      */
     private function getMethodBody()
@@ -62,19 +87,16 @@ class ServiceBody extends Stub implements ContainerAwareInterface
     /**
      * getServiceInstance
      *
-     * @access private
-     * @return mixed
+     * @return void
      */
     private function getServiceInstance()
     {
         $definition = $this->container->getDefinition($this->serviceId);
 
-        $content = [];
-
         $returnConstructor = true;
 
         if ($definition->requiresFile()) {
-            $content[] = sprintf('require_once %s;', $definition->getFile());
+            $this->writer->writeln(sprintf('require_once %s;', $definition->getFile()));
         }
 
         $parent = $definition->hasParent() ? $this->container->getDefinition($definition->getParent()) : null;
@@ -90,16 +112,14 @@ class ServiceBody extends Stub implements ContainerAwareInterface
 
         if (((bool)$parent && $parent->hasSetters()) || $definition->hasSetters()) {
             $returnConstructor = false;
-            $content[] = sprintf('$instance = %s;', $instance);
+            $this->writer->writeln(sprintf('$instance = %s;', $instance));
 
             $definition = null !== $parent ? $parent : $definition;
 
-            $this->getCallers('$instance', $definition, $content);
+            $this->getCallers('$instance', $definition);
         }
 
-        $content[] = $this->getReturnStatement($returnConstructor ? $instance : '$instance');
-
-        return implode("\n".$this->indent(8), $content);
+        $this->writer->writeln($this->getReturnStatement($returnConstructor ? $instance : '$instance'));
     }
 
     /**
@@ -107,20 +127,17 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      *
      * @param mixed $definition
      *
-     * @access protected
-     * @return string
+     * @return void
      */
-    protected function getCallers($instance, $definition, &$content)
+    protected function getCallers($instance, $definition)
     {
         foreach ($definition->getSetters() as $setters) {
 
+            $synced    = [];
             $method    = key($setters);
             $argsList  = $setters[$method];
 
-            $synced  = [];
-
             foreach ($argsList as $argument) {
-
                 if ($argument instanceof Reference && $this->container->getDefinition($argument)->isInjected()) {
                     $synced[(string)$argument] = true;
                 }
@@ -128,12 +145,13 @@ class ServiceBody extends Stub implements ContainerAwareInterface
 
             $args = $this->getArguments($argsList);
 
-
             if ((bool)$synced) {
-                $content[] = $this->createSynCallcack($synced, $method, $args);
+                $this->createSynCallcack($synced, $method, $args);
             } else {
-                $content[] = $this->setServiceArgs($args, $instance.'->'.$method).';';
+                $this->writer->writeln($this->setServiceArgs($args, $instance.'->'.$method).';');
             }
+
+            $this->writer->newline();
         }
     }
 
@@ -143,43 +161,37 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      * @param array $synced
      * @param mixed $args
      *
-     * @access protected
-     * @return string
+     * @return void
      */
     protected function createSynCallcack(array $synced, $method, array $arguments)
     {
-        $lines = (new Lines())
-            ->add('$synced = ' . $this->extractParams($synced) . ';')
-            ->add('$callback = function ($id = null) use (&$synced, $instance) {')
+        $this->writer
+            ->writeln('$synced = ' . $this->extractParams($synced, 0) . ';')
+            ->writeln('$callback = function ($id = null) use (&$synced, $instance) {')
+            ->indent()
+                ->writeln('unset($synced[$id]);')
+                ->newline()
+                ->writeln('if (!empty($synced)) {')
                 ->indent()
-                ->add('unset($synced[$id]);')
-                ->emptyLine()
-                ->add('if (!empty($synced)) {')
-                    ->indent()
-                    ->add('return;')
-                    ->end()
-                ->add('}')
-                ->emptyLine()
-            ->add($this->setServiceArgs($arguments, '$instance->'.$method, 4).';')
-            ->end()
-            ->add('};')
-            ->emptyLine()
-            ->add('$this->checkSynced($synced);')
-            ->emptyLine()
-            ->add('if (empty($synced)) {')
+                    ->writeln('return;')
+                ->outdent()
+                ->writeln('}')
+                ->newline()
+            ->writeln($this->setServiceArgs($arguments, '$instance->'.$method, 0).';')
+            ->outdent()
+            ->writeln('};')
+            ->newline()
+            ->writeln('$this->checkSynced($synced);')
+            ->newline()
+            ->writeln('if (empty($synced)) {')
+            ->indent()
+                ->writeln('call_user_func($callback);')
+            ->outdent()
+            ->writeln('} else {')
                 ->indent()
-                ->add('call_user_func($callback);')
-                ->end()
-            ->add('} else {')
-                ->indent()
-                ->add('$this->pushSyncedCallers($synced, $callback);')
-            ->end()
-            ->add('}')
-            ->emptyLine();
-
-        $lines->setOutputIndentation(8);
-
-        return $lines->dump();
+                ->writeln('$this->pushSyncedCallers($synced, $callback);')
+            ->outdent()
+            ->writeln('}');
     }
 
     /**
@@ -188,18 +200,26 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      * @param mixed $definition
      * @param mixed $parent
      *
-     * @access protected
      * @return string
      */
     protected function getServiceBody($definition, $parent = null)
     {
         if ($parent && !$parent->hasArguments() || !$definition->hasArguments()) {
-            return 'new \\' . ltrim($definition->getClass(), '\\');
+            return 'new '.$this->getDefinitionClass($definition);
         }
 
         $args = $this->getServiceArgs($parent ?: $definition);
 
-        return $this->setServiceArgs($args, 'new \\' . ltrim($definition->getClass(), '\\'));
+        return $this->setServiceArgs($args, 'new ' . $this->getDefinitionClass($definition));
+    }
+
+    protected function getDefinitionClass(DefinitionInterface $definition)
+    {
+        if (null !== $this->classNameResolver) {
+            return $this->classNameResolver->getAlias($definition->getClass());
+        }
+
+        return '\\'.ltrim($definition->getClass(), '\\');
     }
 
     /**
@@ -207,7 +227,6 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      *
      * @param mixed $definition
      *
-     * @access protected
      * @return string
      */
     protected function getFactoryBody($definition, $parent = null)
@@ -244,18 +263,28 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      * @param array $args
      * @param mixed $classCall
      *
-     * @access protected
      * @return string
      */
     protected function setServiceArgs(array $args, $classCall, $indent = 0)
     {
-        if (count($args) > 0) {
-            $i1 = $this->indent(12 + $indent);
-            $i2 = $this->indent(8 + $indent);
-            return $classCall . "(\n" . $i1 . implode(",\n".$i1, $args). "\n$i2)";
+        $writer = new Writer;
 
+        $writer->writeln($classCall . '(');
+
+        if (empty($args)) {
+            $writer->appendln(')');
+
+            return $writer->dump();
         }
-        return $classCall . '(' . implode(', ', $args). ')';
+
+        $writer->indent();
+        $writer->writeln(implode(",\n", $args));
+        $writer->outdent();
+        $writer->writeln(')');
+
+        return $writer->dump();
+
+        //return $classCall . '(' . implode(', ', $args). ')';
     }
 
     /**
@@ -263,7 +292,6 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      *
      * @param mixed $definition
      *
-     * @access protected
      * @return array
      */
     protected function getServiceArgs($definition)
@@ -291,7 +319,7 @@ class ServiceBody extends Stub implements ContainerAwareInterface
             } elseif ($argument instanceof CallerDefinition) {
                 $args[$key] = $this->extractCallerDefinition($argument);
             } elseif (null !== $argument && !is_scalar($argument)) {
-                $args[$key] = $this->extractParams($argument, 16);
+                $args[$key] = $this->extractParams($argument, 0);
             } elseif ($this->container->hasParameter($argument)) {
                 $args[$key] = '$this->getParameter('.$argument.')';
             } else {
@@ -348,7 +376,6 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      *
      * @param mixed $reference
      *
-     * @access protected
      * @return string
      */
     protected function extractRefenceInstantiator($reference)
@@ -365,7 +392,7 @@ class ServiceBody extends Stub implements ContainerAwareInterface
         }
 
         if (!$arguments && !$setters && !$definition->scopeIsContainer()) {
-            return 'new '. $definition->getClass();
+            return 'new '. $this->getDefinitionClass($definition);
         }
 
         $getter = $definition->isInternal() ? 'getInternal' : 'get';
@@ -378,7 +405,6 @@ class ServiceBody extends Stub implements ContainerAwareInterface
      *
      * @param mixed $content
      *
-     * @access private
      * @return string
      */
     private function getReturnStatement($content = null)

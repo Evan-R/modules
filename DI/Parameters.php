@@ -54,6 +54,10 @@ class Parameters implements ParameterInterface
      */
     private $resolvedParams;
 
+    public static $rightDelim = '%';
+
+    public static $leftDelim  = '%';
+
     /**
      * Initialize parameter collection with data.
      *
@@ -297,6 +301,7 @@ class Parameters implements ParameterInterface
         }
 
         $keys = explode(',', StringHelper::strWrap(implode('%,%', array_keys($this->parameters)), '%'));
+
         $this->checkReferenceViolation($string, $this->resolving);
 
         if (in_array($string, $keys)) {

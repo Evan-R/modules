@@ -11,7 +11,8 @@
   ],
   "require": {
     "php":">=5.4.0",
-    "selene/common":"dev-development"
+    "selene/common":"dev-development",
+    "selene/writer":"dev-master"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0",
