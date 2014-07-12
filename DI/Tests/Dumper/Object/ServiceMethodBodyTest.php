@@ -24,7 +24,7 @@ use \Selene\Components\DI\Dumper\Object\ServiceMethodBody;
 class ServiceMethodBodyTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
-    public function itIsExpectedThat()
+    public function itShouldGenerateABody()
     {
         $container = new Container;
 

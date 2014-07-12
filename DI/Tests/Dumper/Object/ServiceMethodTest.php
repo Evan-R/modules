@@ -34,6 +34,18 @@ class ServiceMethodTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldAutoSetItsName()
+    {
+        $container = new Container;
+
+        $container->define('foo', 'stdClass')->setInternal(true);
+
+        $sm = new ServiceMethod($container, 'foo');
+
+        $this->assertSame(file_get_contents(__DIR__.'/../Fixures/servicemethod.0.1'), $sm->generate().PHP_EOL);
+    }
+
+    /** @test */
     public function itShouldLookEquallyWhenDumped()
     {
         $container = new Container;
