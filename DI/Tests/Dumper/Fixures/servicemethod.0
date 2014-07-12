@@ -1,10 +1,9 @@
     /**
      * Service: foo
      *
-     * @visibility protected
-     * @return \Foo
+     * @return \stdClass
      */
     protected function getServiceFoo()
     {
-        return $this->services['foo'] = new \Foo;
+        return null;
     }

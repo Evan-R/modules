@@ -1,0 +1,25 @@
+$instance = new FooAlias;
+$synced = [
+    'bar' => true,
+];
+$callback = function ($id = null) use (&$synced, $instance) {
+    unset($synced[$id]);
+
+    if (!empty($synced)) {
+        return;
+    }
+
+    $instance->setBar(
+        $this->get('bar')
+    );
+};
+
+$this->checkSynced($synced);
+
+if (empty($synced)) {
+    call_user_func($callback);
+} else {
+    $this->pushSyncedCallers($synced, $callback);
+}
+
+return $this->services['foo'] = $instance;

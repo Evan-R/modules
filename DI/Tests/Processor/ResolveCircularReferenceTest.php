@@ -13,6 +13,7 @@ namespace Selene\Components\DI\Tests\Processor;
 
 use \Selene\Components\DI\Container;
 use \Selene\Components\DI\Reference;
+use \Selene\Components\DI\Definition\CallerDefinition;
 use \Selene\Components\DI\Processor\ResolveCircularReference;
 
 class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
@@ -139,6 +140,31 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
             'setFoo',
             ['a' => ['foo' => new Reference('foo')], 'b' => [], new Reference('test')]
         );
+
+        $process = new ResolveCircularReference;
+
+        try {
+            $process->process($container);
+        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+            $this->assertSame('Service \'foo\' has circular reference on \'foo\'', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('test splipped');
+    }
+
+    /** @test */
+    public function itShouldDetectCircularReferencesOnCallers()
+    {
+        $container = new Container;
+
+        $container->define('bar');
+
+        $container->define('foo')
+            ->addArgument(new CallerDefinition('bar', 'getStuff'))
+            ->addArgument(new CallerDefinition('foo', 'getBar'));
 
         $process = new ResolveCircularReference;
 

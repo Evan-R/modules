@@ -91,13 +91,6 @@ class ResolveCircularReference implements ProcessInterface
 
             if ($attribute instanceof CallerDefinition) {
                 $this->checkCircularReference([$attribute->getService()], $current, $self);
-
-                //var_dump('$now!');
-                //var_dump($self);
-                //var_dump($attribute->getArguments());
-
-                $this->checkCircularReference($attribute->getArguments(), $current, $self);
-
                 continue;
             }
 
@@ -105,17 +98,6 @@ class ResolveCircularReference implements ProcessInterface
                 continue;
             }
 
-            ////var_dump($self);
-            //var_dump($attribute->get());
-            //var_dump($self === $attribute->get());
-            ////var_dump($attribute);
-
-            //$id = $attribute->get();
-
-            //if ($self === $id) {
-
-            //}
-            //
             $id = $attribute->get();
 
             // if the reference id matches the current resolving, a circular
@@ -133,7 +115,6 @@ class ResolveCircularReference implements ProcessInterface
             }
 
             if ($self === $id && null !== $self) {
-                var_dump($id);
                 continue;
             }
 

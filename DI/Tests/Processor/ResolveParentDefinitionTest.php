@@ -27,7 +27,7 @@ class ResolveParentDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itIsExpectedThat()
+    public function itShouldResolveParentDefinitionsToConcreteOnes()
     {
         $container = new Container;
 
@@ -49,7 +49,7 @@ class ResolveParentDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itIsExpectedThatIs()
+    public function itShouldSetArgumentsCorrectly()
     {
         $container = new Container;
 
@@ -80,7 +80,7 @@ class ResolveParentDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itIsExpectedThatThisTestTestsSomething()
+    public function itShouldSetSettersCorreclty()
     {
         $container = new Container;
 
@@ -121,7 +121,7 @@ class ResolveParentDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itadjskldjaskjdkjsdj()
+    public function itShouldResolveParentRequirementsOnFactories()
     {
         $container = new Container;
 
@@ -143,7 +143,7 @@ class ResolveParentDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itaasds()
+    public function itShouldSetSettersOnFactories()
     {
         $container = new Container;
 

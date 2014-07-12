@@ -1,0 +1,4 @@
+$instance = new FooAlias;
+$instance->callCaller();
+
+return $this->services['foo'] = $instance;

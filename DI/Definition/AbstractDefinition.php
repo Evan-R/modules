@@ -520,9 +520,15 @@ class AbstractDefinition implements DefinitionInterface
      * @access public
      * @return mixed
      */
-    public function getSetters()
+    public function getSetters($setter = null)
     {
-        return $this->setters;
+        if (null === $setter) {
+            return $this->setters;
+        }
+
+        return array_filter($this->setters, function ($s) use ($setter) {
+            return $setter === key($s);
+        });
     }
 
     /**

@@ -51,8 +51,6 @@ class ServiceMethodBody implements GeneratorInterface
         $this->serviceId = $id;
         $this->container = $container;
 
-        $this->writer = new Writer;
-
         $this->classAlias = $alias;
     }
 
@@ -69,19 +67,11 @@ class ServiceMethodBody implements GeneratorInterface
      */
     public function generate($raw = false)
     {
+        $this->writer = new Writer;
+
         $this->getServiceInstance();
 
         return $raw ? $this->writer : $this->writer->dump();
-    }
-
-    /**
-     * getMethodBody
-     *
-     * @return string
-     */
-    private function getMethodBody()
-    {
-        return $this->getServiceInstance();
     }
 
     /**
