@@ -41,6 +41,7 @@ class ServiceMethodTest extends \PHPUnit_Framework_TestCase
         $container->define('foo', 'stdClass')->setInternal(true);
 
         $sm = new ServiceMethod($container, 'foo');
+        $sm->setBody('return null;');
 
         $this->assertSame(file_get_contents(__DIR__.'/../Fixures/servicemethod.0.1'), $sm->generate().PHP_EOL);
     }
