@@ -44,7 +44,7 @@ class ResolveParentDefinitionTest extends \PHPUnit_Framework_TestCase
         $def = $container->getDefinition('concrete');
 
 
-        $this->assertSame('Acme\Concrete', $def->getClass());
+        $this->assertSame('\Acme\Concrete', $def->getClass());
         $this->assertSame(['foo', 'bar'], $def->getArguments());
     }
 
@@ -74,7 +74,7 @@ class ResolveParentDefinitionTest extends \PHPUnit_Framework_TestCase
         $def = $container->getDefinition('concrete');
 
 
-        $this->assertSame('Acme\Concrete', $def->getClass());
+        $this->assertSame('\Acme\Concrete', $def->getClass());
         $this->assertSame(['baz', 'bar', 'baz'], $def->getArguments());
         $this->assertFalse($def->isAbstract());
     }

@@ -22,6 +22,12 @@ class AliasTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldGetTheServiceId()
+    {
+        $this->assertSame('foo', (new Alias('foo'))->getId());
+    }
+
+    /** @test */
     public function itShouldNotBeInternal()
     {
         $this->assertFalse((new Alias('foo'))->isInternal());

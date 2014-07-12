@@ -27,16 +27,17 @@ use \Selene\Components\DI\Tests\Stubs\ContainerStub;
 use \Selene\Components\DI\Tests\Stubs\ServiceFactory;
 use \Selene\Components\DI\Exception\ContainerResolveException;
 
+use \Selene\Components\TestSuite\TestCase;
+
 /**
- * @class ContainerTest extends \PHPUnit_Framework_TestCase
- * @see \PHPUnit_Framework_TestCase
+ * @class ContainerTest extends TestCase
+ * @see TestCase
  *
  * @package Selene\Components\DI\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
-class ContainerTest extends \PHPUnit_Framework_TestCase
+class ContainerTest extends TestCase
 {
 
     /** @test */
@@ -81,7 +82,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $this->fail($e->getMessage());
         }
 
-        $this->fail('test splipped');
+        $this->giveUp();
     }
 
     /** @test */
@@ -191,6 +192,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
         }
+
         $this->fail('->inject() injecting a service wirth prototype scope should throw an exception');
     }
 
@@ -215,7 +217,28 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $this->fail($e->getMessage());
             return;
         }
-        $this->fail('you loose');
+
+        $this->giveUp();
+    }
+
+    /** @test */
+    public function itHasAService()
+    {
+        $container = new Container;
+
+        $this->assertFalse($container->has('foo'));
+
+        $container->inject('foo', m::mock('Foo'));
+
+        $this->assertTrue($container->has('foo'));
+
+        $container = new Container;
+
+        $this->assertFalse($container->has('foo'));
+
+        $container->define('foo', 'stdClass');
+
+        $this->assertTrue($container->has('foo'));
     }
 
     /** @test */
@@ -443,7 +466,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         try {
             $container->get('service');
         } catch (\RuntimeException $e) {
-            $this->assertSame('Class SomeFakeClass does not exist', $e->getMessage());
+            $this->assertSame('Class \SomeFakeClass does not exist', $e->getMessage());
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
@@ -529,6 +552,25 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldThrowExceptionWhenLockedWhileSettingADefinition()
+    {
+        $def    = m::mock('Selene\Components\DI\Definition\DefinitionInterface');
+        $params = m::mock('Selene\Components\DI\StaticParameters, Selene\Components\DI\ParameterInterface');
+
+        $container = new Container($params);
+
+        try {
+            $container->setDefinition('foo', $def);
+        } catch (\BadMethodCallException $e) {
+            $this->assertSame('Cannot set a definition on a locked container.', $e->getMessage());
+
+            return;
+        }
+
+        $this->giveUp();
+    }
+
+    /** @test */
     public function aliasesShouldBeSettable()
     {
         $container = $this->createContainer();
@@ -561,12 +603,19 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $mock->shouldReceive('getServices')->once()->andReturn(['foo' => new \StdClass]);
         $mock->shouldReceive('getParameters')->once()->andReturn($params = new Parameters);
         $mock->shouldReceive('getDefinitions')->once()->andReturn([]);
+        $mock->shouldReceive('getAliases')->once()->andReturn(['bar' => 'foo']);
         $params->set('testB', 'def');
 
         $container->merge($mock);
 
         $container->hasParameter('testB');
         $this->assertInstanceof('stdClass', $container->get('foo'));
+    }
+
+    /** @test */
+    public function itShouldHaveAliases()
+    {
+        $this->assertInstanceof('Selene\Components\DI\Aliases', (new Container)->getAliases());
     }
 
     /** @test */

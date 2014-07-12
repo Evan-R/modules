@@ -20,8 +20,18 @@ use \Selene\Components\DI\ContainerInterface;
  */
 class ProcessorDecorator implements ProcessorInterface
 {
+    /**
+     * processor
+     *
+     * @var ProcessorInterface
+     */
     private $processor;
 
+    /**
+     * Constructor.
+     *
+     * @param ProcessorInterface $processor
+     */
     public function __construct(ProcessorInterface $processor)
     {
         $this->processor = $processor;
@@ -32,7 +42,7 @@ class ProcessorDecorator implements ProcessorInterface
      */
     public function process(ContainerInterface $container)
     {
-        throw new \BadMethodCallException();
+        throw new \BadMethodCallException('Calling "process()" is not allowed.');
     }
 
     /**

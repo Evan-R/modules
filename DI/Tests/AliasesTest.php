@@ -65,4 +65,19 @@ class AliasesTest extends TestCase
 
         $this->assertFalse(isset($aliases['foo']));
     }
+
+    /** @test */
+    public function itShouldBeItertable()
+    {
+        $data = ['foo' => 'foo.service', 'bar' => 'bar.service'];
+        $aliases = new Aliases($data);
+
+        $result = [];
+
+        foreach ($aliases as $alias => $id) {
+            $result[$alias] = (string)$id;
+        }
+
+        $this->assertSame($data, $result);
+    }
 }

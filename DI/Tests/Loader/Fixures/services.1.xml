@@ -2,7 +2,7 @@
 
 <container>
   <services>
-    <service id="foo_service" alias="foo_alias" class="StdClass">
+    <service id="foo_service" alias="foo_alias" class="stdClass">
     </service>
   </services>
 </container>

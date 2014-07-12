@@ -110,12 +110,14 @@ class AbstractDefinition implements DefinitionInterface
      *
      * @access public
      */
-    public function __construct($class = null, $arguments = null, $scope = ContainerInterface::SCOPE_CONTAINER)
+    public function __construct($class = null, array $arguments = [], $scope = ContainerInterface::SCOPE_CONTAINER)
     {
-        $this->class = $this->stripClassName($class);
-        $this->scope = $scope;
+        $class && $this->setClass($class);
+
+        $this->scope     = $scope;
         $this->arguments = $arguments;
-        $this->setters = [];
+        $this->setters   = [];
+        $this->meta      = [];
     }
 
     /**
@@ -128,7 +130,8 @@ class AbstractDefinition implements DefinitionInterface
      */
     public function setClass($class)
     {
-        $this->class = $this->stripClassName($class);
+        $this->class = $this->paddClassName($this->stripClassName($class));
+
         return $this;
     }
 
@@ -686,6 +689,11 @@ class AbstractDefinition implements DefinitionInterface
         }
 
         return $this;
+    }
+
+    protected function paddClassName($class)
+    {
+        return '\\'.ltrim($class, '\\');
     }
 
     /**

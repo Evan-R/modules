@@ -39,9 +39,33 @@ class ContainerGenerator implements GeneratorInterface
      * @var string
      */
     protected $serviceId;
+
+    /**
+     * container
+     *
+     * @var ContainerInterface
+     */
     protected $container;
+
+    /**
+     * imports
+     *
+     * @var array
+     */
     protected $imports;
+
+    /**
+     * traits
+     *
+     * @var array
+     */
     protected $traits;
+
+    /**
+     * processed
+     *
+     * @var boolean
+     */
     protected $processed;
 
     /**
@@ -168,10 +192,16 @@ class ContainerGenerator implements GeneratorInterface
         $method->setDocComment('Constructor.');
         $method->setBody(
             (new Writer)
-            ->writeln('parent::__construct(new StaticParameters($this->getDefaultParams()));')
+            ->writeln('$this->parameters  = new StaticParameters($this->getDefaultParams());')
+            ->writeln('$this->aliases     = new Aliases($this->getDefaultAliases());')
+            ->writeln('$this->cmap        = $this->getConstructorMap();')
+            ->writeln('$this->icmap       = $this->getInternalContructorsMap();')
             ->newline()
-            ->writeln('$this->cmap = $this->getConstructorMap();')
-            ->writeln('$this->icmap = $this->getInternalContructorsMap();')
+            ->writeln('$this->synced      = [];')
+            ->writeln('$this->services    = [];')
+            ->writeln('$this->definitions = [];')
+            ->writeln('$this->injected    = [];')
+            ->writeln('$this->building    = [];')
         );
     }
 
@@ -194,11 +224,16 @@ class ContainerGenerator implements GeneratorInterface
             if ($this->serviceId === $id) {
                 $definition->setClass($this->namespace . '\\', $this->className);
                 $method->setBody((string)(new ReturnStatement('$this->services[\''.$id.'\'] = $this', 0)));
-            } else {
-                $this->importResolver->add($class = $definition->getClass());
-                $method->setBody(new ServiceMethodBody($this->container, $id, $this->importResolver));
-                $this->cg->addUseStatement($this->importResolver->getImport($class));
+
+                continue;
             }
+
+            // Resolve the class alias according to previous imports
+            $this->importResolver->add($class = $definition->getClass());
+            // Set the method body and inject the service class alias.
+            $method->setBody(new ServiceMethodBody($this->container, $id, $this->importResolver->getAlias($class)));
+            // Set the resolved import statement on the container.
+            $this->cg->addUseStatement($this->importResolver->getImport($class));
         }
     }
 
@@ -209,8 +244,9 @@ class ContainerGenerator implements GeneratorInterface
      */
     protected function setParameterMethods()
     {
-        $names = [];
+        $names    = [];
         $internal = [];
+        $aliases  = [];
 
         $parameters = $this->container->getParameters()->all();
 
@@ -224,22 +260,31 @@ class ContainerGenerator implements GeneratorInterface
             }
         }
 
+        foreach ($this->container->getAliases() as $alias => $id) {
+            $aliases[$alias] = (string)$id;
+        }
+
         ksort($names);
         ksort($internal);
         ksort($parameters);
+        ksort($aliases);
 
         $map    = $this->extractParams($names, 0);
         $imap   = $this->extractParams($internal, 0);
         $params = $this->extractParams($parameters, 0);
+        $ids    = $this->extractParams($aliases, 0);
 
-        $this->cg->addMethod($method = new Method('getConstructorMap', Method::IS_PROTECTED));
+        $this->cg->addMethod($method = new Method('getConstructorMap', Method::IS_PRIVATE));
         $method->setBody((string)(new ReturnStatement($map)));
 
-        $this->cg->addMethod($method = new Method('getInternalContructorsMap', Method::IS_PROTECTED));
+        $this->cg->addMethod($method = new Method('getInternalContructorsMap', Method::IS_PRIVATE));
         $method->setBody((string)(new ReturnStatement($imap)));
 
-        $this->cg->addMethod($method = new Method('getDefaultParams', Method::IS_PROTECTED));
+        $this->cg->addMethod($method = new Method('getDefaultParams', Method::IS_PRIVATE));
         $method->setBody((string)(new ReturnStatement($params)));
+
+        $this->cg->addMethod($method = new Method('getDefaultAliases', Method::IS_PRIVATE));
+        $method->setBody((string)(new ReturnStatement($ids)));
     }
 
     /**
@@ -249,18 +294,18 @@ class ContainerGenerator implements GeneratorInterface
      */
     protected function setDefaultClassMethods()
     {
-        // method: ContainerInterface::getAlias():
-        $this->cg->addMethod($method = new Method('getAlias', Method::IS_PUBLIC, Method::T_STRING));
+        //// method: ContainerInterface::getAlias():
+        //$this->cg->addMethod($method = new Method('getAlias', Method::IS_PUBLIC, Method::T_STRING));
 
-        $method->addArgument(new Argument('id', Method::T_STRING));
-        $method->setBody((string)(new ReturnStatement('$id')));
+        //$method->addArgument(new Argument('id', Method::T_STRING));
+        //$method->setBody((string)(new ReturnStatement('$id')));
         //$method->setBody((string)(new ReturnStatement('$this->getDefault($this->aliases, $id, $id)')));
 
         // method: ContainerInterface::has():
         $this->cg->addMethod($method = new Method('has', Method::IS_PUBLIC, Method::T_STRING));
 
         $method->addArgument(new Argument('id', Method::T_STRING));
-        $method->setBody((string)(new ReturnStatement('array_key_exists($id, $this->cmap)')));
+        $method->setBody((string)(new ReturnStatement('array_key_exists($this->resolveId($id), $this->cmap)')));
 
         // method: ContainerInterface::get():
         $this->cg->addMethod($method = new Method('get', Method::IS_PUBLIC));
@@ -268,14 +313,13 @@ class ContainerGenerator implements GeneratorInterface
         $method->addArgument(new Argument('id', Method::T_STRING));
         $method->setBody(
             (new Writer)
+            ->writeln('$id = $this->resolveId($id);')
+            ->newline()
             ->writeln('if (isset($this->services[$id])) {')
             ->indent()
                 ->writeln('return $this->services[$id];')
             ->outdent()
             ->writeln('}')
-            ->newline()
-            ->newline()
-            ->newline()
             ->newline()
             ->writeln('if (isset($this->cmap[$id])) {')
             ->indent()
@@ -285,11 +329,11 @@ class ContainerGenerator implements GeneratorInterface
         );
 
         // method: ContainerInterface::resolveId():
-        $this->cg->addMethod($method = new Method('resolveId', Method::IS_PROTECTED, Method::T_STRING));
+        //$this->cg->addMethod($method = new Method('resolveId', Method::IS_PROTECTED, Method::T_STRING));
 
-        $method->addArgument(new Argument('id', Method::T_STRING));
-        //$method->setBody((string)(new ReturnStatement('$this->getDefault($this->aliases, $id, $id)')));
-        $method->setBody((string)(new ReturnStatement('$id')));
+        //$method->addArgument(new Argument('id', Method::T_STRING));
+        ////$method->setBody((string)(new ReturnStatement('$this->getDefault($this->aliases, $id, $id)')));
+        //$method->setBody((string)(new ReturnStatement('$id')));
 
 
         // method: ContainerInterface::getInternal():
@@ -300,7 +344,9 @@ class ContainerGenerator implements GeneratorInterface
 
         $method->setBody(
             (new Writer)
-            ->writeln('if (isset($this->internals[$id = $this->getAlias($id)])) {')->indent()
+            ->writeln('$id = $this->resolveId($id);')
+            ->newline()
+            ->writeln('if (isset($this->internals[$id])) {')->indent()
                 ->writeln('return $this->internals[$id];')->outdent()
             ->writeln('}')
             ->newline()
@@ -338,6 +384,7 @@ class ContainerGenerator implements GeneratorInterface
     protected function getImports()
     {
         return array_unique(array_merge([
+            '\Selene\Components\DI\Aliases',
             '\Selene\Components\DI\Container',
             '\Selene\Components\DI\ContainerInterface',
             '\Selene\Components\DI\ParameterInterface',

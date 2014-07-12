@@ -50,7 +50,7 @@ class ResolveDefinitionDependenciesTest extends \PHPUnit_Framework_TestCase
 
         $process->process($container);
 
-        $this->assertSame('stdClass', $def->getClass());
+        $this->assertSame('\stdClass', $def->getClass());
         $this->assertSame(__FILE__, $def->getFile());
     }
 
@@ -72,7 +72,7 @@ class ResolveDefinitionDependenciesTest extends \PHPUnit_Framework_TestCase
 
         $process->process($container);
 
-        $this->assertSame('stdClass', $def->getClass());
+        $this->assertSame('\stdClass', $def->getClass());
         $this->assertFalse($def->requiresFile());
     }
 

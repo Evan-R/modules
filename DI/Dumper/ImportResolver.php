@@ -117,16 +117,10 @@ class ImportResolver
     {
         $alias = $name.'Alias';
 
-        if (!in_array($name, $this->names)) {
-            $this->names[] = $name;
-        }
-
         // if there is no import
         if (isset($this->imports[$import])) {
             return;
         }
-
-        $aliases = array_values($this->aliases);
 
         while (in_array($alias, $this->aliases)) {
             $alias .= 'Alias';
@@ -135,6 +129,13 @@ class ImportResolver
         $this->aliases[$import] = $alias;
     }
 
+    /**
+     * getBaseName
+     *
+     * @param string $import
+     *
+     * @return string
+     */
     protected function getBaseName($import)
     {
         if (1 === substr_count($import, '\\')) {
@@ -144,6 +145,13 @@ class ImportResolver
         return substr($import, strrpos($import, '\\') + 1);
     }
 
+    /**
+     * pad
+     *
+     * @param string $import
+     *
+     * @return string
+     */
     private function pad($import)
     {
         return '\\'.ltrim($import, '\\');

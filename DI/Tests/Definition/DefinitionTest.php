@@ -120,7 +120,7 @@ abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
     public function testGetClass()
     {
         $def = $this->createDefinition('bar');
-        $this->assertSame('bar', $def->getClass());
+        $this->assertSame('\bar', $def->getClass());
     }
 
     /**
@@ -191,7 +191,7 @@ abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
         $defB->setClass('Foo');
 
         $defA->merge($defB);
-        $this->assertSame('Foo', $defA->getClass());
+        $this->assertSame('\Foo', $defA->getClass());
 
         $defA = $this->createDefinition('a');
         $defB = $this->createDefinition('b');

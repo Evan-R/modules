@@ -29,7 +29,7 @@ class ResolveDefinitionArgumentsTest extends \PHPUnit_Framework_TestCase
     {
         $container = new Container;
 
-        $container->define('foo', 'FooClass', ['$bar', 'somestring', $test = new \StdClass]);
+        $container->define('foo', 'FooClass', ['$bar', 'somestring', $test = new \stdClass]);
         $container->define('bar', 'BarClass');
         $container->define('baz', 'BazClass', [['$bar']]);
 
@@ -67,6 +67,6 @@ class ResolveDefinitionArgumentsTest extends \PHPUnit_Framework_TestCase
 
         $process->process($container);
 
-        $this->assertSame(['FooClass', 1, 2, 3], $def->getArguments());
+        $this->assertSame(['\FooClass', 1, 2, 3], $def->getArguments());
     }
 }

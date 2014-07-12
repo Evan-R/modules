@@ -75,7 +75,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->hasDefinition('foo_service'));
         $this->assertTrue($container->hasDefinition('foo_alias'));
-        $this->assertSame('StdClass', $container->getDefinition('foo_service')->getClass());
+        $this->assertSame('\stdClass', $container->getDefinition('foo_service')->getClass());
 
         $loader->load('services.1.1.xml');
 

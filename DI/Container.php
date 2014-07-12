@@ -38,13 +38,6 @@ class Container implements ContainerInterface
     protected $parameters;
 
     /**
-     * aliases
-     *
-     * @var \Selene\Components\DI\Aliases
-     */
-    protected $aliases;
-
-    /**
      * definitions
      *
      * @var array
@@ -52,25 +45,18 @@ class Container implements ContainerInterface
     protected $definitions;
 
     /**
+     * aliases
+     *
+     * @var \Selene\Components\DI\Aliases
+     */
+    protected $aliases;
+
+    /**
      * services
      *
      * @var array
      */
     protected $services;
-
-    /**
-     * classes
-     *
-     * @var array
-     */
-    protected $classes;
-
-    /**
-     * instances
-     *
-     * @var array
-     */
-    protected $instances;
 
     /**
      * building
@@ -91,25 +77,22 @@ class Container implements ContainerInterface
      *
      * @param ParameterInterace $parameters
      * @param mixed $name
-     *
-     * @access public
      */
     public function __construct(ParameterInterface $parameters = null)
     {
         $this->parameters = $parameters ?: new Parameters;
-        $this->synced = [];
-        $this->services = [];
-        $this->definitions = [];
-        $this->injected = [];
-        $this->building = [];
         $this->setAliases();
 
+        $this->synced      = [];
+        $this->services    = [];
+        $this->definitions = [];
+        $this->injected    = [];
+        $this->building    = [];
     }
 
     /**
      * isLocked
      *
-     * @access public
      * @return boolean
      */
     public function isLocked()
@@ -123,7 +106,6 @@ class Container implements ContainerInterface
      * @param string $parameter  the parameter key
      * @param mixed $value the parameter value
      *
-     * @access public
      * @return void
      */
     public function setParameter($parameter, $value)
@@ -136,7 +118,6 @@ class Container implements ContainerInterface
      *
      * @param string $parameter
      *
-     * @access public
      * @return mixed the parameter value.
      */
     public function getParameter($parameter)
@@ -149,7 +130,6 @@ class Container implements ContainerInterface
      *
      * @param string $parameter
      *
-     * @access public
      * @return boolean
      */
     public function hasParameter($parameter)
@@ -160,7 +140,6 @@ class Container implements ContainerInterface
     /**
      * Get the parameter collection of the service.
      *
-     * @access public
      * @return \Selene\Components\DI\Parameters the parameter collection object.
      */
     public function getParameters()
@@ -173,7 +152,6 @@ class Container implements ContainerInterface
      *
      * @param ParameterInterface $parameters
      *
-     * @access public
      * @return void
      */
     public function replaceParameters(ParameterInterface $parameters)
@@ -181,13 +159,13 @@ class Container implements ContainerInterface
         if ($this->isLocked()) {
             throw new \BadMethodCallException('can\'t replace parameters on a locked container');
         }
+
         $this->parameters = $parameters;
     }
 
     /**
      * getFlaggedDefinitions
      *
-     * @access public
      * @return array
      */
     public function findDefinitionsWithMetaData($name = null)
@@ -203,9 +181,8 @@ class Container implements ContainerInterface
      * @param string $id
      * @param string $class
      * @param array  $arguments
-     * @param mixed  $scope
+     * @param int    $scope
      *
-     * @access public
      * @return DefinitionInterface returns an instance of ServiceDefinition.
      */
     public function define($id, $class = null, array $arguments = [], $scope = self::SCOPE_CONTAINER)
@@ -219,11 +196,16 @@ class Container implements ContainerInterface
      * @param string $id
      * @param DefinitionInterface $service
      *
-     * @access public
+     * @throws \BadMethodCallException
+     *
      * @return DefinitionInterface returns an instance of ServiceDefinition.
      */
     public function setDefinition($id, DefinitionInterface $service)
     {
+        if ($this->isLocked()) {
+            throw new \BadMethodCallException('Cannot set a definition on a locked container.');
+        }
+
         return $this->definitions[$id] = $service;
     }
 
@@ -232,12 +214,12 @@ class Container implements ContainerInterface
      *
      * @param string $id the service id.
      *
-     * @access public
      * @return boolean
      */
     public function hasDefinition($id)
     {
         $id = $this->resolveId($id);
+
         return isset($this->definitions[$id]) || array_key_exists($id, $this->definitions);
     }
 
@@ -256,19 +238,18 @@ class Container implements ContainerInterface
     /**
      * Get all service definitions.
      *
-     * @access public
      * @return array
      */
     public function getDefinitions()
     {
         return $this->definitions;
     }
+
     /**
      * removeDefinition
      *
      * @param mixed $id
      *
-     * @access public
      * @return void
      */
     public function removeDefinition($id)
@@ -285,7 +266,7 @@ class Container implements ContainerInterface
      *
      * @throws InvalidArgumentException when the scope contains `prototype`.
      * @throws DomainException
-     * @access public
+     *
      * @return void
      */
     public function inject($id, $instance, $scope = self::SCOPE_CONTAINER)
@@ -308,13 +289,25 @@ class Container implements ContainerInterface
     }
 
     /**
+     * Check if there's a definition or service.
+     *
+     * @param string $id
+     *
+     * @return boolean
+     */
+    public function has($id)
+    {
+        return $this->hasService($id) || $this->hasDefinition($id);
+    }
+
+    /**
      * Retrieve a service by its id.
      *
      * @param string $id the service id.
      *
-     * @access public
      * @throws ContainerResolveException if the service is not resolveable.
      * @throws BadMethodCallException if a setter doesn't exist on a service.
+     *
      * @return mixed
      */
     public function get($id)
@@ -343,20 +336,9 @@ class Container implements ContainerInterface
         return $this->getDefinition($id)->scopeIsContainer() ? $this->services[$id] = $instance : $instance;
     }
 
-    public function has($id)
-    {
-        return $this->hasServiceOrDefinition($id);
-    }
-
-    protected function hasServiceOrDefinition($id)
-    {
-        return $this->hasService($id) || $this->hasDefinition($id);
-    }
-
     /**
      * getServices
      *
-     * @access public
      * @return array
      */
     public function getServices()
@@ -369,7 +351,6 @@ class Container implements ContainerInterface
      *
      * @param string $id the service id.
      *
-     * @access public
      * @return boolean
      */
     protected function hasService($id)
@@ -382,7 +363,6 @@ class Container implements ContainerInterface
      *
      * @param mixed $id
      *
-     * @access protected
      * @return Object
      */
     protected function getService($id)
@@ -396,10 +376,10 @@ class Container implements ContainerInterface
      * @param string $alias the alias
      * @param string $id the service id
      *
-     * @access public
      * @throws InvalidArgumentException if a service with given alias already
      * exists.
      * @throws InvalidArgumentException if the alias is the same as the id.
+     *
      * @return void
      */
     public function setAlias($alias, $id)
@@ -420,7 +400,6 @@ class Container implements ContainerInterface
      *
      * @param Aliases $aliases
      *
-     * @access public
      * @return void
      */
     public function setAliases(Aliases $aliases = null)
@@ -433,7 +412,6 @@ class Container implements ContainerInterface
      *
      * @param Aliases $aliases
      *
-     * @access public
      * @return mixed
      */
     public function getAliases()
@@ -446,12 +424,11 @@ class Container implements ContainerInterface
      *
      * @param string $alias
      *
-     * @access public
      * @return string
      */
     public function getAlias($alias)
     {
-        return $this->aliases->get($alias);
+        return $this->aliases[$alias];
     }
 
     /**
@@ -459,7 +436,6 @@ class Container implements ContainerInterface
      *
      * @param mixed $alias
      *
-     * @access public
      * @return void
      */
     public function removeAlias($alias)
@@ -472,7 +448,6 @@ class Container implements ContainerInterface
      *
      * @param string $reference
      *
-     * @access public
      * @return boolean
      */
     public function isReference($reference)
@@ -488,7 +463,7 @@ class Container implements ContainerInterface
      * @param ContainerInterface $container
      *
      * @throws BadMethodCallException
-     * @access public
+     *
      * @return void
      */
     public function merge(ContainerInterface $container)
@@ -501,15 +476,17 @@ class Container implements ContainerInterface
         $this->definitions = array_merge((array)$this->definitions, (array)$container->getDefinitions());
 
         $this->services = array_merge($container->getServices(), $this->services);
-    }
 
+        foreach ($container->getAliases() as $alias => $id) {
+            $this->setAlias($alias, $id);
+        }
+    }
 
     /**
      * resolveId
      *
      * @param mixed $id
      *
-     * @access protected
      * @return string
      */
     protected function resolveId($id)
@@ -523,7 +500,6 @@ class Container implements ContainerInterface
      * @param string $needle the scope to check against other scopes.
      * @param string $heystack a given scope or a scope range.
      *
-     * @access protected
      * @return boolean
      */
     public static function inScopes($needle, $heystack)
@@ -536,7 +512,6 @@ class Container implements ContainerInterface
      *
      * @param string $str
      *
-     * @access public
      * @return string
      */
     public static function camelCaseStr($str)
@@ -549,7 +524,6 @@ class Container implements ContainerInterface
      *
      * @param string|object $reference a string or an instance of Reference
      *
-     * @access protected
      * @return string
      */
     protected function getReferenceId($reference)
@@ -566,7 +540,6 @@ class Container implements ContainerInterface
      *
      * @throws \Selene\Components\DI\Exception\CircularReferenceException
      * @throws RuntimeException
-     * @access protected
      * @return object the service instance.
      */
     protected function buildService($id)
@@ -616,7 +589,6 @@ class Container implements ContainerInterface
      * @param DefinitionInterface $definition
      * @param DefinitionInterface $parent
      *
-     * @access protected
      * @return Object returns a class instance.
      */
     protected function buildFromFactory(DefinitionInterface $definition, DefinitionInterface $parent = null)
@@ -636,7 +608,7 @@ class Container implements ContainerInterface
      * @param array $arguments
      *
      * @throws InvalidArgumentException if $factory is unresolvable
-     * @access protected
+     *
      * @return mixed|object an instance of the class defined by a factory.
      */
     protected function callFactory($class, $factory, array $arguments)
@@ -651,14 +623,12 @@ class Container implements ContainerInterface
         throw new InvalidArgumentException('Factory is not callable');
     }
 
-
     /**
      * buildFromDefinition
      *
      * @param DefinitionInterface $definition
      * @param DefinitionInterface $parent
      *
-     * @access protected
      * @return Object returns a class instance.
      */
     protected function buildFromDefinition(DefinitionInterface $definition, DefinitionInterface $parent = null)
@@ -680,7 +650,6 @@ class Container implements ContainerInterface
      *
      * @param array $arguments
      *
-     * @access protected
      * @return array
      */
     protected function getServiceArguments(array $arguments)
@@ -710,7 +679,7 @@ class Container implements ContainerInterface
      * @param array  $setters  the service setters as array.
      *
      * @throws BadMethodCallException
-     * @access protected
+     *
      * @return void
      */
     protected function callSetters($instance, array $setters)
@@ -741,7 +710,7 @@ class Container implements ContainerInterface
      * @param mixed $arguments
      *
      * @throws \BadMethodCallException
-     * @access protected
+     *
      * @return void
      */
     protected function applySetter($instance, $method, $arguments)
@@ -762,7 +731,6 @@ class Container implements ContainerInterface
      *
      * @param mixed $id
      *
-     * @access protected
      * @return mixed
      */
     protected function sync($id)
@@ -780,7 +748,6 @@ class Container implements ContainerInterface
      *
      * @param mixed $arguments
      *
-     * @access protected
      * @return mixed
      */
     protected function getSyncedArguments($arguments)
@@ -807,7 +774,6 @@ class Container implements ContainerInterface
      * @param array $arguments
      * @param array $synced
      *
-     * @access protected
      * @return void
      */
     protected function createSyncCallback($instance, $method, array $arguments = [], array $synced = [])
@@ -829,7 +795,6 @@ class Container implements ContainerInterface
      * @param array $synced
      * @param Closure $callback
      *
-     * @access protected
      * @return void
      */
     protected function pushSyncedCallers(array $synced, \Closure $callback)

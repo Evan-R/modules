@@ -60,8 +60,6 @@ class Parameters implements ParameterInterface
 
     /**
      * Initialize parameter collection with data.
-     *
-     * @access public
      */
     public function __construct(array $params = [])
     {
@@ -75,7 +73,7 @@ class Parameters implements ParameterInterface
      * @param array $params
      *
      * @api
-     * @access public
+     *
      * @return void
      */
     public function replaceParams(array $params)
@@ -91,7 +89,7 @@ class Parameters implements ParameterInterface
      * @param mixed $value
      *
      * @api
-     * @access public
+     *
      * @return void
      */
     public function set($param, $value)
@@ -106,7 +104,7 @@ class Parameters implements ParameterInterface
      * @param mixed $param
      *
      * @api
-     * @access public
+     *
      * @throws \Selene\Components\DI\Exception\ParameterNotFoundException
      * @return mixed
      */
@@ -125,8 +123,8 @@ class Parameters implements ParameterInterface
     /**
      * getRaw
      * @internal
-     * @access public
-     * @return mixed
+     *
+     * @return array
      */
     public function getRaw()
     {
@@ -141,7 +139,7 @@ class Parameters implements ParameterInterface
      * @param ParameterInterface $parameters the collection to merge with.
      *
      * @api
-     * @access public
+     *
      * @throws \LogicException And exception is thrown if you try to merge this instance with itself.
      * @return void
      */
@@ -166,7 +164,7 @@ class Parameters implements ParameterInterface
      * @param mixed $param
      *
      * @api
-     * @access public
+     *
      * @return boolean
      */
     public function has($param)
@@ -180,7 +178,7 @@ class Parameters implements ParameterInterface
      * @param mixed $param
      *
      * @api
-     * @access public
+     *
      * @return void
      */
     public function remove($param)
@@ -193,7 +191,7 @@ class Parameters implements ParameterInterface
      * Returns parameters depenging on its resolved state.
      *
      * @api
-     * @access public
+     *
      * @return array
      */
     public function all()
@@ -211,28 +209,14 @@ class Parameters implements ParameterInterface
      * @param mixed $parameters
      *
      * @api
-     * @access public
+     *
      * @return void
      */
     public function resolve()
     {
-        if ($this->isResolved()) {
-            return $this;
+        if (!$this->isResolved()) {
+            $this->doResolve();
         }
-
-        $resolved = array();
-
-        foreach ($this->parameters as $key => $value) {
-
-            if (is_array($value) || is_string($value)) {
-                $resolved[$key] = $this->resolveParam($value);
-            } else {
-                $resolved[$key] = $value;
-            }
-        }
-
-        $this->resolved = true;
-        $this->resolvedParams = $resolved;
 
         return $this;
     }
@@ -240,7 +224,6 @@ class Parameters implements ParameterInterface
     /**
      * Checks if the collection is resolved.
      *
-     * @access public
      * @return boolean
      */
     public function isResolved()
@@ -254,7 +237,7 @@ class Parameters implements ParameterInterface
      * @param mixed $param
      *
      * @api
-     * @access public
+     *
      * @return mixed the resolved parameter or key (string, array, etc)
      */
     public function resolveParam($param)
@@ -290,7 +273,7 @@ class Parameters implements ParameterInterface
      * @param string $string
      *
      * @api
-     * @access public
+     *
      * @return mixed the resolved parameter or key (string, array, etc)
      */
     public function resolveString($string)
@@ -326,7 +309,7 @@ class Parameters implements ParameterInterface
      * @param mixed $value
      *
      * @api
-     * @access public
+     *
      * @return mixed
      */
     public function escape($value)
@@ -335,11 +318,12 @@ class Parameters implements ParameterInterface
             return StringHelper::strEscape($value, '%');
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof \Traversable) {
             $result = [];
             foreach ($value as $key => $val) {
                 $result[$key] = $this->escape($val);
             }
+
             return $result;
         }
 
@@ -352,7 +336,7 @@ class Parameters implements ParameterInterface
      * @param mixed $str
      *
      * @api
-     * @access public
+     *
      * @return mixed
      */
     public function unescape($value)
@@ -361,11 +345,12 @@ class Parameters implements ParameterInterface
             return StringHelper::strUnescape($value, '%');
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof \Traversable) {
             $result = [];
             foreach ($value as $key => $val) {
                 $result[$key] = $this->unescape($val);
             }
+
             return $result;
         }
 
@@ -380,7 +365,7 @@ class Parameters implements ParameterInterface
      * collection is merged with another one.
      *
      * @internal
-     * @access private
+     *
      * @return mixed
      */
     public function setUnresolved()
@@ -428,7 +413,6 @@ class Parameters implements ParameterInterface
     /**
      * Return a reference to the current used parameters.
      *
-     * @access private
      * @return array Reference to $this->resolvedParams or $this->parameters
      */
     protected function &getParameters()
@@ -446,7 +430,6 @@ class Parameters implements ParameterInterface
      * @param mixed $value
      * @throws \Selene\Components\DI\Exception\ParameterResolvingException
      *
-     * @access private
      * @return void
      */
     private function checkReferenceViolation($value, &$res = [])
@@ -462,5 +445,27 @@ class Parameters implements ParameterInterface
         }
 
         return $res;
+    }
+
+    /**
+     * doResolve
+     *
+     * @return void
+     */
+    private function doResolve()
+    {
+        $resolved = array();
+
+        foreach ($this->parameters as $key => $value) {
+
+            if (is_array($value) || is_string($value)) {
+                $resolved[$key] = $this->resolveParam($value);
+            } else {
+                $resolved[$key] = $value;
+            }
+        }
+
+        $this->resolved = true;
+        $this->resolvedParams = $resolved;
     }
 }

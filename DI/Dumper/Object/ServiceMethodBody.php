@@ -37,7 +37,7 @@ class ServiceMethodBody implements GeneratorInterface
     private $serviceId;
     private $arguments;
     private $container;
-    private $classNameResolver;
+    private $classAlias;
 
     /**
      * Constructor.
@@ -46,14 +46,14 @@ class ServiceMethodBody implements GeneratorInterface
      * @param string $id
      * @param string $name
      */
-    public function __construct(ContainerInterface $container, $id, ImportResolver $classNameResolver = null)
+    public function __construct(ContainerInterface $container, $id, $alias = null)
     {
         $this->serviceId = $id;
         $this->container = $container;
 
         $this->writer = new Writer;
 
-        $this->classNameResolver = $classNameResolver;
+        $this->classAlias = $alias;
     }
 
     /**
@@ -215,8 +215,8 @@ class ServiceMethodBody implements GeneratorInterface
 
     protected function getDefinitionClass(DefinitionInterface $definition)
     {
-        if (null !== $this->classNameResolver) {
-            return $this->classNameResolver->getAlias($definition->getClass());
+        if (null !== $this->classAlias) {
+            return $this->classAlias;
         }
 
         return '\\'.ltrim($definition->getClass(), '\\');

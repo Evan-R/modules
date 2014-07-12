@@ -17,6 +17,7 @@ use \Selene\Components\Common\Traits\Getter;
  * @class Alias
  * @package Selene\Components\DI
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
  */
 class Aliases implements \ArrayAccess, \IteratorAggregate
 {
@@ -30,16 +31,16 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
     private $aliases;
 
     /**
-     * @param array $aliases
+     * Constructor.
      *
-     * @access public
+     * @param array $aliases
      */
     public function __construct(array $aliases = [])
     {
         $this->aliases = [];
 
-        foreach ($aliases as $id => $alias) {
-            $this->set($id, $alias);
+        foreach ($aliases as $alias => $id) {
+            $this->set($alias, $id);
         }
     }
 
@@ -50,7 +51,6 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
      * @param string $service
      *
      * @api
-     * @access public
      * @return void
      */
     public function set($alias, $id)
@@ -68,13 +68,13 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
      * @param string $alias
      *
      * @api
-     * @access public
      * @return string|Alias if the alias exists, an alias object will be
      * returned, otherwise the input string gets passed through.
      */
     public function get($alias)
     {
         $alias = strtolower($alias);
+
         return $this->getDefault($this->aliases, $alias, $alias);
     }
 
@@ -84,7 +84,6 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
      * @param string $alias
      *
      * @api
-     * @access public
      * @return bool
      */
     public function has($alias)
@@ -96,7 +95,6 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
      * Get all aliases.
      *
      * @api
-     * @access public
      * @return array
      */
     public function all()
@@ -105,13 +103,7 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * offsetSet
-     *
-     * @param string $alias
-     * @param string $id
-     *
-     * @access public
-     * @return void
+     * {@inheritdoc}
      */
     public function offsetSet($alias, $id)
     {
@@ -119,11 +111,8 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * offsetGet
+     * {@inheritdoc}
      *
-     * @param string $alias
-     *
-     * @access public
      * @return Alias
      */
     public function offsetGet($alias)
@@ -132,12 +121,7 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * offsetExists
-     *
-     * @param mixed $alias
-     *
-     * @access public
-     * @return bool
+     * {@inheritdoc}
      */
     public function offsetExists($alias)
     {
@@ -145,12 +129,7 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * offsetUnset
-     *
-     * @param mixed $alias
-     *
-     * @access public
-     * @return mixed
+     * {@inheritdoc}
      */
     public function offsetUnset($alias)
     {
@@ -164,6 +143,6 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->aliases);
+        return new \ArrayIterator($this->all());
     }
 }
