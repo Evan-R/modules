@@ -30,6 +30,9 @@ use \Selene\Components\DI\Definition\DefinitionInterface;
  */
 class ResolveDefinitionArguments implements ProcessInterface
 {
+    private $current;
+    private $container;
+
     /**
      * process
      *
@@ -42,11 +45,17 @@ class ResolveDefinitionArguments implements ProcessInterface
     {
         $this->container = $container;
 
-        foreach ($container->getDefinitions() as $definition) {
-            $this->replaceDefinitionArguments($definition);
-            $this->replaceSetterArguments($definition);
-            $this->replaceFactoryArgsuments($definition);
+        foreach ($container->getDefinitions() as $id => $definition) {
+            $this->resolveDefinition($definition, $id);
         }
+    }
+
+    private function resolveDefinition(DefinitionInterface $definition, $id)
+    {
+        $this->current = $id;
+        $this->replaceDefinitionArguments($definition);
+        $this->replaceSetterArguments($definition);
+        $this->replaceFactoryArgsuments($definition);
     }
 
     /**
@@ -127,7 +136,25 @@ class ResolveDefinitionArguments implements ProcessInterface
         $args = [];
 
         foreach ($arguments as $key => $argument) {
-            $args[$key] = $this->resolveArgument($argument);
+            $arg = $this->resolveArgument($argument);
+
+            if ($arg instanceof Reference) {
+                if (!$this->container->hasDefinition($id = (string)$arg)) {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'A requeired by "%s" definition with id "%s" does no exist.',
+                            $this->current,
+                            $id
+                        )
+                    );
+                }
+
+                $current = $this->current;
+                $this->resolveDefinition($this->container->getDefinition($id), $id);
+                $this->current = $current;
+            }
+
+            $args[$key] = $arg;
         }
 
         return $args;
