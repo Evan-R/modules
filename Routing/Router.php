@@ -21,6 +21,7 @@ use \Selene\Components\Routing\Events\RouteNotFoundEvent;
 use \Selene\Components\Routing\Events\RouteFilterEvent;
 use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
 use \Selene\Components\Routing\Events\RouterEvents as Events;
+use \Selene\Components\Routing\Controller\DispatcherInterface as IControllers;
 use \Selene\Components\Routing\Controller\Dispatcher as Controllers;
 use \Selene\Components\Routing\RouteMatcherInterface as Matcher;
 
@@ -50,15 +51,28 @@ class Router implements RouterInterface
      * @param DispatcherInterface $events
      */
     public function __construct(
-        Controllers $controllers,
         RouteCollectionInterface $routes,
+        IControllers $controllers = null,
         Matcher $matcher = null,
         DispatcherInterface $events = null
     ) {
         $this->routes      = $routes;
-        $this->controllers = $controllers;
-        $this->events      = $events ?: new Dispatcher;
+        $this->controllers = $controllers ?: new Controllers;
         $this->matcher     = $matcher ?: new RouteMatcher;
+        $this->events      = $events ?: new Dispatcher;
+    }
+
+    /**
+     * Listens to an router event
+     *
+     * @param string|array $event
+     * @param mixed $handler
+     *
+     * @return void
+     */
+    public function on($event, $handler)
+    {
+        $this->events->on($event, $hanlder);
     }
 
     /**

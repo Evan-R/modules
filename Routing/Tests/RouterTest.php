@@ -37,8 +37,8 @@ class RouterTest extends TestCase
         $this->assertInstanceof(
             '\Selene\Components\Routing\RouterInterface',
             new Router(
-                m::mock('Selene\Components\Routing\Controller\Dispatcher'),
                 new RouteCollection,
+                m::mock('Selene\Components\Routing\Controller\Dispatcher'),
                 m::mock('Selene\Components\Routing\RouteMatcherInterface')
             )
         );
@@ -108,8 +108,8 @@ class RouterTest extends TestCase
         $this->events = m::mock('Selene\Components\Events\DispatcherInterface');
 
         $router = new Router(
-            $this->controllers = m::mock('Selene\Components\Routing\Controller\Dispatcher'),
             new RouteCollection,
+            $this->controllers = m::mock('Selene\Components\Routing\Controller\Dispatcher'),
             $this->matcher     = m::mock('Selene\Components\Routing\RouteMatcherInterface'),
             $this->events = m::mock('Selene\Components\Events\DispatcherInterface')
         );

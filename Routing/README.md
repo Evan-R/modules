@@ -8,30 +8,22 @@
 
 use \Selene\Components\Routing\Route;
 use \Selene\Components\Routing\Router;
+use \Selene\Components\Routing\RouteCollection;
 use \Selene\Components\Routing\Events\RouterEvents as Events;
-use \Selene\Components\Routing\RouteCollection as Routes;
-use \Selene\Components\Routing\Controller\Dispatcher as Controllers;
-use \Selene\Components\Routing\RouteMatcherInterface as Matcher;
-use \Selene\Components\Events\Dispatcher;
 
-$events = new Dispatcher;
-
-// add some event listeners
-$events->on(Events::FILTER_BEFORE.'.my_filter', function($event) {…});
-$events->on(Events::DISPATCHED, function() {…});
-$events->on(Events::FILTER_AFTER.'.my_filter', function($event) {…});
-
-$routes = new Routes;
+$routes = new RouteCollection;
 
 // add some routes
 $routes->add(new Route(…));
 
 $router = new Router(
-    new Controllers,
     $routes,
-	new Matcher,
-    $events
 );
+
+// add some event listeners
+$router->on(Events::FILTER_BEFORE.'.my_filter', function($event) {…});
+$router->on(Events::DISPATCHED, function() {…});
+$router->on(Events::FILTER_AFTER.'.my_filter', function($event) {…});
 
 
 try {
