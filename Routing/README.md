@@ -11,6 +11,7 @@ use \Selene\Components\Routing\Router;
 use \Selene\Components\Routing\Events\RouterEvents as Events;
 use \Selene\Components\Routing\RouteCollection as Routes;
 use \Selene\Components\Routing\Controller\Dispatcher as Controllers;
+use \Selene\Components\Routing\RouteMatcherInterface as Matcher;
 use \Selene\Components\Events\Dispatcher;
 
 $events = new Dispatcher;
@@ -28,6 +29,7 @@ $routes->add(new Route(…));
 $router = new Router(
     new Controllers,
     $routes,
+	new Matcher,
     $events
 );
 
