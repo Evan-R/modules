@@ -17,13 +17,14 @@ use \Selene\Components\Routing\Router;
 use \Selene\Components\Routing\RouteCollection;
 use \Selene\Components\Routing\RouteCollectionInterface;
 use \Selene\Components\Events\Dispatcher;
+use \Selene\Components\TestSuite\TestCase;
 
 /**
  * @class RouterTest
  * @package Selene\Components\Routing\Tests
  * @version $Id$
  */
-class RouterTest extends \PHPUnit_Framework_TestCase
+class RouterTest extends TestCase
 {
 
     protected $controllers;
@@ -36,8 +37,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceof(
             '\Selene\Components\Routing\RouterInterface',
             new Router(
-                m::mock('Selene\Components\Routing\RouteMatcherInterface'),
-                m::mock('Selene\Components\Routing\Controller\Dispatcher')
+                m::mock('Selene\Components\Routing\Controller\Dispatcher'),
+                new RouteCollection,
+                m::mock('Selene\Components\Routing\RouteMatcherInterface')
             )
         );
     }
@@ -48,6 +50,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $router = $this->getRouter();
         $request = $this->getRequestMock();
 
+        $this->matcher->shouldReceive('matches')->andReturn(false);
+        $this->events->shouldReceive('dispatch');
+
+        $request->shouldReceive('getPathInfo')->andReturn('/foo');
+
         try {
             $router->dispatch($request);
         } catch (\RuntimeException $e) {
@@ -55,25 +62,20 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(true);
         }
 
-        $request->shouldReceive('getPathInfo')->andReturn('/foo');
-        $router->setRoutes(new RouteCollection);
-
-        $this->matcher->shouldReceive('matches')->andReturn(false);
-
-        try {
-            $router->dispatch($request);
-        } catch (\Selene\Components\Routing\Exception\RouteNotFoundException $e) {
-            $this->assertSame('Route "/foo" not found.', $e->getMessage());
-        }
-
-        $router->setEvents($this->events);
-
         $this->events->shouldReceive('dispatch')->andReturnUsing(function ($eventName, $event) {
             $this->assertSame(Router::EVENT_ROUTE_NOT_FOUND, $eventName);
             $this->assertInstanceof('Selene\Components\Routing\Events\RouteNotFoundEvent', $event);
         });
 
-        $this->assertNull($router->dispatch($request));
+        try {
+            $router->dispatch($request);
+        } catch (\Selene\Components\Routing\Exception\RouteNotFoundException $e) {
+            $this->assertSame('Route "/foo" not found.', $e->getMessage());
+
+            return;
+        }
+
+        $this->giveUp();
     }
 
     /** @test */
@@ -84,9 +86,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $request = $this->getRequestMock();
 
         $this->matcher->shouldReceive('matches')->andReturn(false);
-
-        $router->setEvents($events = new Dispatcher);
-        $router->setRoutes(new RouteCollection);
 
         //$events->on(Router::EVENT_ON_DISPATCH, function ($event) use (&$status) {
         //    var_dump('asd');
@@ -106,12 +105,15 @@ class RouterTest extends \PHPUnit_Framework_TestCase
      */
     protected function getRouter()
     {
+        $this->events = m::mock('Selene\Components\Events\DispatcherInterface');
+
         $router = new Router(
+            $this->controllers = m::mock('Selene\Components\Routing\Controller\Dispatcher'),
+            new RouteCollection,
             $this->matcher     = m::mock('Selene\Components\Routing\RouteMatcherInterface'),
-            $this->controllers = m::mock('Selene\Components\Routing\Controller\Dispatcher')
+            $this->events = m::mock('Selene\Components\Events\DispatcherInterface')
         );
 
-        $this->events = m::mock('Selene\Components\Events\DispatcherInterface');
 
         return $router;
     }

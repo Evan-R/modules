@@ -11,7 +11,7 @@
 
 namespace Selene\Components\Routing\Tests\Controller\Stubs;
 
-use \Selene\Components\Routing\Controller\BaseController;
+use \Selene\Components\Routing\Controller\Controller;
 
 /**
  * @class ErrorAwareController extends BaseController
@@ -22,7 +22,7 @@ use \Selene\Components\Routing\Controller\BaseController;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class ErrorAwareController extends BaseController
+class ErrorAwareController extends Controller
 {
     public function indexAction()
     {

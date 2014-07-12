@@ -10,36 +10,36 @@
  */
 namespace Selene\Components\Routing\Tests\Controller;
 
-use \Selene\Components\Routing\Controller\ResolverParser;
+use \Selene\Components\Routing\Controller\Parser;
 
-class ResolverParserTest extends \PHPUnit_Framework_TestCase
+class ParserTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $parser = new ResolverParser;
-        $this->assertInstanceOf('\Selene\Components\Routing\Controller\ResolverParser', $parser);
+        $parser = new Parser;
+        $this->assertInstanceOf('\Selene\Components\Routing\Controller\Parser', $parser);
     }
 
     /** @test */
     public function itShouldReturnConcreateControllerClasses()
     {
-        $parser = new ResolverParser(['foo' => 'Foo\Bar']);
+        $parser = new Parser(['foo' => 'Foo\Bar']);
         $parts = $parser->parse('foo:index:index');
 
         $this->assertSame(['Foo\Bar\Controller\IndexController', 'indexAction'], $parts);
 
-        $parser = new ResolverParser(['foo' => 'Foo\Bar']);
+        $parser = new Parser(['foo' => 'Foo\Bar']);
         $parts = $parser->parse('foo:IndexController:index');
 
         $this->assertSame(['Foo\Bar\Controller\IndexController', 'indexAction'], $parts);
 
-        $parser = new ResolverParser(['foo' => 'Foo\Bar']);
+        $parser = new Parser(['foo' => 'Foo\Bar']);
         $parts = $parser->parse('foo:IndexController:indexAction');
 
         $this->assertSame(['Foo\Bar\Controller\IndexController', 'indexAction'], $parts);
 
-        $parser = new ResolverParser(['foo' => 'Foo\Bar']);
+        $parser = new Parser(['foo' => 'Foo\Bar']);
         $parts = $parser->parse('foo:IndexController:IndexAction');
 
         $this->assertSame(['Foo\Bar\Controller\IndexController', 'indexAction'], $parts);
@@ -48,7 +48,7 @@ class ResolverParserTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldNotSupportEmptyControllerSpace()
     {
-        $parser = new ResolverParser(['foo' => 'Foo\Bar']);
+        $parser = new Parser(['foo' => 'Foo\Bar']);
 
         $this->assertFalse($parser->supports('foo::fam'));
 

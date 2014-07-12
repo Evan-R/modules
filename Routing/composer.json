@@ -15,8 +15,7 @@
     "selene/http":"dev-development"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.0",
-    "mockery/mockery": "0.9.*@dev",
+    "selene/testsuite":"dev-development",
     "selene/http":"dev-development",
     "selene/di":"dev-development",
     "selene/config":"dev-development",

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Controller\Stubs package
+ * This File is part of the Selene\Components\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -11,23 +11,15 @@
 
 namespace Selene\Components\Routing\Tests\Controller\Stubs;
 
-use \Selene\Components\Routing\Controller\Controller as SeleneController;
-
 /**
  * @class Controller
- * @package Selene\Components\Routing\Tests\Controller\Stubs
+ * @package Selene\Components\Routing
  * @version $Id$
  */
-class Controller extends SeleneController
+class Controller
 {
-    public function actionIndex($str)
+    public function testAction()
     {
-        return $this->render($str);
-    }
-
-    public function createUser()
-    {
-        $id = $this->getRequest()->request->get('user_id');
-        return $id;
+        return 'ok';
     }
 }

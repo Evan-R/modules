@@ -11,16 +11,14 @@
 
 namespace Selene\Components\Routing\Controller;
 
+use \Selene\Components\Routing\Matchers\MatchContext;
+
 /**
- * @class ResolverInterface
+ * @interface DispatcherInterface
  * @package Selene\Components\Routing\Controller
  * @version $Id$
  */
-interface ResolverInterface
+interface DispatcherInterface
 {
-    public function find($action, $method);
-
-    public function setNamespaceAlias($alias, $namespace);
-
-    public function setNamespaceAliases(array $aliases);
+    public function dispatch(MatchContext $context);
 }

@@ -24,7 +24,7 @@ use \Selene\Components\Common\Helper\StringHelper;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class ResolverParser extends SeparatorParser
+class Parser extends SeparatorParser
 {
     use Getter;
 

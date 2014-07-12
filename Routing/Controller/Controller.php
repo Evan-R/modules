@@ -11,54 +11,44 @@
 
 namespace Selene\Components\Routing\Controller;
 
-use \Selene\Components\DI\ContainerAwareInterface;
-use \Selene\Components\DI\Traits\ContainerAwareTrait;
-
 /**
- * @class AbstractController implements ContainerAwareInterface
- * @see ContainerAwareInterface
- *
+ * @class BaseController
  * @package Selene\Components\Routing\Controller
  * @version $Id$
- * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
-abstract class Controller extends BaseController implements ContainerAwareInterface
+abstract class Controller
 {
-    use ContainerAwareTrait;
-
     /**
-     * getView
+     * callAction
      *
-     * @access public
+     * @param string $method
+     * @param array $parameters
+     *
      * @return mixed
      */
-    public function getView()
+    public function callAction($method, array $parameters = [])
     {
-        return $this->getContainer()->get('view');
+        try {
+            return call_user_func_array([$this, $method], $parameters);
+        } catch (\Exception $e) {
+
+            if (method_exists($this, $handler = $this->getErrorHandlerMethod($method))) {
+                return call_user_func_array([$this, $handler], [$e, $parameters]);
+            }
+
+            throw $e;
+        }
     }
 
     /**
-     * getRequest
+     * getErrorHandlerMethod
      *
-     * @access public
+     * @param string $method
+     *
      * @return mixed
      */
-    public function getRequest()
+    protected function getErrorHandlerMethod($method)
     {
-        return $this->getContainer()->get('request_stack')->getCurrent();
-    }
-
-    /**
-     * render
-     *
-     * @param mixed $view
-     *
-     * @access public
-     * @return mixed
-     */
-    protected function render($view, array $context = [])
-    {
-        return $this->getContainer()->get('view')->render($view, $context);
+        return sprintf('on%sError', ucfirst($method));
     }
 }
