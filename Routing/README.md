@@ -4,6 +4,8 @@
 [![Code Climate](https://codeclimate.com/github/seleneapp/routing.png)](https://codeclimate.com/github/seleneapp/routing)
 [![Coverage Status](https://coveralls.io/repos/seleneapp/routing/badge.png)](https://coveralls.io/r/seleneapp/routing)
 
+[![License](https://poser.pugx.org/selene/routing/license.png)](https://packagist.org/packages/selene/routing)
+
 ## The Router
 
 

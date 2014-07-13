@@ -59,9 +59,6 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      *
      * @param ParameterMapper $mapper
      * @param SeparatorParserInterface $parser
-     *
-     * @access public
-     * @return mixed
      */
     public function __construct(SeparatorParserInterface $parser = null, ParameterMapper $mapper = null)
     {
@@ -99,20 +96,20 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     {
         list ($controller, $action, $callAction) = $this->findController($context);
 
-        if ($this->mapParameters) {
-            if (null === ($arguments = $this->getParameters($context, $controller, $action))) {
-                throw new \RuntimeException(
-                    sprintf('Arguments mismatch for controller %s::$s()', get_class($controller), $action)
-                );
-            }
-
+        // if theres a mapper and routing arguments mismatch controller
+        // arguments, then throw an exception:
+        if ($this->mapParameters && null === ($arguments = $this->getParameters($context, $controller, $action))) {
+            throw new \RuntimeException(
+                sprintf('Arguments mismatch for controller %s::$s()', get_class($controller), $action)
+            );
         } else {
             $arguments = $context->getParameters();
         }
 
-        // If callAction is present, wrap arguments in another array.
-        // This will call callAction with a methof name of the actual
-        // controller and its arguments.
+        // If `callAction` is present (in case the controller inherits from
+        // \Selene\Components\Routing\Controller\Controller), put the actual
+        // method and arguments into an array that matches the `callAction`
+        // call.
         if (null !== $callAction) {
             $arguments = [$action, $arguments];
             $action = $callAction;
@@ -122,11 +119,11 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     }
 
     /**
-     * mapParameters
+     * Get Parameters that match the controllers arguments.
      *
      * @param MatchContext $context
-     * @param mixed $controller
-     * @param mixed $action
+     * @param string $controller
+     * @param string $action
      *
      * @return array
      */
@@ -145,10 +142,9 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     }
 
     /**
-     * getControllerAction
+     * Finds the controller.
      *
-     * @param mixed $controller
-     * @param mixed $method
+     * @param MatchContext $context
      *
      * @throws \RuntimeException controller cannot be resolved.
      *
@@ -162,8 +158,9 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 
         list ($controller, $action) = $this->extractControllerAction($action);
 
+        //@TODO: do we really deed this?
         if (null === $action) {
-            $action = $this->getControllerAction($controller, $method);
+            $action = $this->getControllerAction();
         }
 
         $instance = null;
@@ -237,9 +234,9 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      * @param mixed $controller
      * @param mixed $method
      *
-     * @return mixed
+     * @return string
      */
-    protected function getControllerAction($controller, $method)
+    protected function getControllerAction()
     {
         return 'handleMissingMethod';
     }
