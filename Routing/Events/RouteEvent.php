@@ -28,11 +28,10 @@ abstract class RouteEvent extends Event
     private $request;
 
     /**
-     * @param Route $route
-     * @param mixed $
-     * @param mixed $requtest
+     * Constructor.
      *
-     * @access public
+     * @param Route $route
+     * @param mixed $requtest
      */
     public function __construct(Route $route, Request $request)
     {
@@ -43,7 +42,6 @@ abstract class RouteEvent extends Event
     /**
      * getRoute
      *
-     * @access public
      * @return Route
      */
     public function getRoute()
@@ -54,7 +52,6 @@ abstract class RouteEvent extends Event
     /**
      * getRequest
      *
-     * @access public
      * @return Request
      */
     public function getRequest()

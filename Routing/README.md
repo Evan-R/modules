@@ -1,5 +1,9 @@
 #Selene routing component.
 
+[![Build Status](https://travis-ci.org/seleneapp/routing.svg?branch=development)](https://travis-ci.org/seleneapp/routing)
+[![Code Climate](https://codeclimate.com/github/seleneapp/routing.png)](https://codeclimate.com/github/seleneapp/routing)
+[![Coverage Status](https://coveralls.io/repos/seleneapp/routing/badge.png)](https://coveralls.io/r/seleneapp/routing)
+
 ## The Router
 
 
