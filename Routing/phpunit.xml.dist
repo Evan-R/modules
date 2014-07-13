@@ -34,7 +34,7 @@
             <string>Selene\Components\Routing</string>
           </element>
           <element key="repo_token">
-            <string>iXpvp9zJn2Vr9T97PGB1uJuB6taBqHEpw</string>
+            <string>udZHPZZi5cprKq9S4pOIx9eaWXjqddboD</string>
           </element>
           <element key="target_url">
             <string>https://coveralls.io/api/v1/jobs</string>
