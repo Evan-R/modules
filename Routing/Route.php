@@ -29,6 +29,7 @@ class Route implements Serializable
         Getter::getDefault as protected getDefaultVar;
     }
 
+    protected $collections;
     /**
      * Route name
      *
@@ -85,6 +86,7 @@ class Route implements Serializable
     protected $compiled;
 
     /**
+     * Constructor.
      *
      * @param string       $name
      * @param string       $pattern
@@ -92,12 +94,12 @@ class Route implements Serializable
      * @param string       $host
      * @param array        $requirements
      * @param array        $parameters
-     *
-     * @access public
      */
     public function __construct($name, $pattern, $methods = 'GET', array $requirements = [])
     {
-        $this->name = $name;
+        $this->setName($name);
+        $this->collections = [];
+
         $this->pattern = $pattern;
 
         $this->initRequirements($requirements);
@@ -109,30 +111,47 @@ class Route implements Serializable
         $this->setMethods((array)$methods);
     }
 
+    /**
+     * Add before filter names
+     *
+     * @param string $filter
+     *
+     * @return \Selene\Component\Routing\Route this instance
+     */
     public function filterBefore($filter)
     {
-        if (!is_string($filter)) {
-            return;
-        }
-
         $this->requirements['_before'][] = $filter;
 
         return $this;
     }
 
+    /**
+     * filterAfter
+     *
+     * @param string $filter
+     *
+     * @return \Selene\Component\Routing\Route this instance
+     */
     public function filterAfter($filter)
     {
-        if (!is_string($filter)) {
-            return;
-        }
-
         $this->requirements['_after'][] = $filter;
 
         return $this;
     }
 
+    /**
+     * check if a parmeter is optional
+     *
+     * @param string $parameter
+     *
+     * @return boolean returns always false if route is not compiled
+     */
     public function parameterIsOptional($parameter)
     {
+        if (!$this->isCompiled()) {
+            return false;
+        }
+
         $vars = (array)$this->getVars();
 
         if (!in_array($parameter, $vars)) {
@@ -149,12 +168,11 @@ class Route implements Serializable
     }
 
     /**
-     * addBeforeFilter
+     * Sets the before filters
      *
-     * @param mixed $param
+     * @param mixed|array $filters
      *
-     * @access public
-     * @return mixed
+     * @return \Selene\Component\Routing\Route this instance
      */
     public function setBeforeFilters($filters)
     {
@@ -174,9 +192,8 @@ class Route implements Serializable
     }
 
     /**
-     * getBeforeFilters
+     * Gets the before filters
      *
-     * @access public
      * @return array
      */
     public function getBeforeFilters()
@@ -185,11 +202,10 @@ class Route implements Serializable
     }
 
     /**
-     * setAfterFilters
+     * Sets the after filters
      *
-     * @param array $filters
+     * @param string|array $filters
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setAfterFilters($filters)
@@ -210,10 +226,9 @@ class Route implements Serializable
     }
 
     /**
-     * getAfterFilters
+     * Gets the after filters
      *
-     * @access public
-     * @return mixed
+     * @return array
      */
     public function getAfterFilters()
     {
@@ -221,7 +236,7 @@ class Route implements Serializable
     }
 
     /**
-     * setName
+     * Sets the route name.
      *
      * @param mixed $name
      *
@@ -230,7 +245,19 @@ class Route implements Serializable
      */
     public function setName($name)
     {
+        if ($this->isCompiled()) {
+            throw new \BadMethodCallException('Cannot changed name on a compiled route.');
+        }
+
+        if (!empty($this->collections)) {
+            foreach ($this->collections as $collection) {
+                unset($collection[$this->name]);
+                $collection->add($this);
+            }
+        }
+
         $this->name = $name;
+
         return $this;
     }
 
@@ -243,6 +270,18 @@ class Route implements Serializable
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * collection
+     *
+     * @param RouteCollectionInterface $collection
+     *
+     * @return void
+     */
+    public function collection(RouteCollectionInterface $collection)
+    {
+        $this->collections[] = &$collection;
     }
 
     /**

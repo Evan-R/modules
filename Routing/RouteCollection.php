@@ -62,12 +62,12 @@ class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Se
      * @param mixed $name
      * @param mixed $overrideName
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function add(Route $route, $name = null, $overrideName = false)
     {
         $this->routes[$name && $overrideName ? $name : $route->getName()] = $route;
+        $route->collection($this);
     }
 
     /**
@@ -118,9 +118,9 @@ class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Se
         $method = strtoupper($method);
         $collection = $this->create();
 
-        foreach ($this->routes as $route) {
+        foreach ($this->routes as $name => $route) {
             if (in_array($method, $route->getMethods())) {
-                $collection->add($route);
+                $collection->add($route, $name);
             }
         }
 
