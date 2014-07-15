@@ -24,6 +24,7 @@ use \Selene\Components\Config\Resource\DelegatingLoader;
 use \Selene\Components\Routing\Loader\PhpLoader as PhpRoutingLoader;
 use \Selene\Components\Routing\Loader\XmlLoader as XmlRoutingLoader;
 use \Selene\Components\Routing\Loader\CallableLoader as CallableRoutingLoader;
+use \Selene\Components\Routing\RouteCollectionInterface as Routes;
 
 /**
  * @abstract class PackageConfiguration extends BaseConfig
@@ -140,14 +141,14 @@ abstract class PackageConfiguration extends Configuration
      *
      * @return LoaderInterface
      */
-    protected function getRoutingLoader(BuilderInterface $builder, LocatorInterface $locator = null)
+    protected function getRoutingLoader(BuilderInterface $builder, Routes $routes, LocatorInterface $locator = null)
     {
         $locator = $locator ?: new Locator([$this->getResourcePath()]);
 
         return new DelegatingLoader(new LoaderResolver([
-            new CallableRoutingLoader($builder, $locator),
-            new PhpRoutingLoader($builder, $locator),
-            new XmlRoutingLoader($builder, $locator)
+            new CallableRoutingLoader($builder, $locator, $routes),
+            new PhpRoutingLoader($builder, $locator, $routes),
+            new XmlRoutingLoader($builder, $locator, $routes)
         ]));
     }
 
