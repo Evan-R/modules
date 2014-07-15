@@ -11,15 +11,14 @@
 
 namespace Selene\Components\Routing\Controller;
 
-use \Selene\Components\Routing\Matchers\MatchContext;
 use \Selene\Components\Routing\Events\RouteDispatchEvent;
 
 /**
- * @interface DispatcherInterface
+ * @interface EventAware
  * @package Selene\Components\Routing\Controller
  * @version $Id$
  */
-interface DispatcherInterface
+interface EventAware
 {
-    public function dispatch(MatchContext $context, RouteDispatchEvent $event = null);
+    public function setEvent(RouteDispatchEvent $event);
 }

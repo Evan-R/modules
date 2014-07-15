@@ -18,12 +18,12 @@ namespace Selene\Components\Routing\Events;
  */
 class RouterEvents
 {
-    const DISPATCH      = 'router.dispatch';
+    const DISPATCH      = 'router.route_dispatch';
     const DISPATCHED    = 'router.route_dispatched';
     const FILTER_BEFORE = 'router.route_filter_before';
     const FILTER_AFTER  = 'router.route_filter_before';
     const NOT_FOUND     = 'router.route_not_fount';
-    const ABORT         = 'router.abort';
+    const ABORT         = 'router.route_abort';
 
     private function __construct()
     {

@@ -16,6 +16,7 @@ use \Selene\Components\Routing\Route;
 use \Selene\Components\Routing\Router;
 use \Selene\Components\Routing\RouteCollection;
 use \Selene\Components\Routing\RouteCollectionInterface;
+use \Selene\Components\Routing\Events\RouterEvents as Events;
 use \Selene\Components\Events\Dispatcher;
 use \Selene\Components\TestSuite\TestCase;
 
@@ -30,6 +31,7 @@ class RouterTest extends TestCase
     protected $controllers;
     protected $matcher;
     protected $events;
+    protected $routes;
 
     /** @test */
     public function itShouldBeInstantiable()
@@ -37,9 +39,7 @@ class RouterTest extends TestCase
         $this->assertInstanceof(
             '\Selene\Components\Routing\RouterInterface',
             new Router(
-                new RouteCollection,
-                m::mock('Selene\Components\Routing\Controller\Dispatcher'),
-                m::mock('Selene\Components\Routing\RouteMatcherInterface')
+                m::mock('Selene\Components\Routing\RouteCollectionInterface')
             )
         );
     }
@@ -51,26 +51,22 @@ class RouterTest extends TestCase
         $request = $this->getRequestMock();
 
         $this->matcher->shouldReceive('matches')->andReturn(false);
-        $this->events->shouldReceive('dispatch');
 
         $request->shouldReceive('getPathInfo')->andReturn('/foo');
 
-        try {
-            $router->dispatch($request);
-        } catch (\RuntimeException $e) {
-            // no routes set;
-            $this->assertTrue(true);
-        }
+        $test = false;
 
-        $this->events->shouldReceive('dispatch')->andReturnUsing(function ($eventName, $event) {
-            $this->assertSame(Router::EVENT_ROUTE_NOT_FOUND, $eventName);
+        $this->events->shouldReceive('dispatch')->with(Events::NOT_FOUND, m::any())->andReturnUsing(function ($eventName, $event) use (&$test) {
+            $test = true;
+            $this->assertSame(Events::NOT_FOUND, $eventName);
             $this->assertInstanceof('Selene\Components\Routing\Events\RouteNotFoundEvent', $event);
         });
 
         try {
             $router->dispatch($request);
         } catch (\Selene\Components\Routing\Exception\RouteNotFoundException $e) {
-            $this->assertSame('Route "/foo" not found.', $e->getMessage());
+            // no routes set;
+            $this->assertTrue($test);
 
             return;
         }
@@ -86,15 +82,32 @@ class RouterTest extends TestCase
         $request = $this->getRequestMock();
 
         $this->matcher->shouldReceive('matches')->andReturn(false);
+    }
 
-        //$events->on(Router::EVENT_ON_DISPATCH, function ($event) use (&$status) {
-        //    var_dump('asd');
-        //    $status = $event->getResponse()->getStatus();
-        //});
 
-        //$router->dispatch($request);
+    /** @test */
+    public function itShouldFilterListenableEvents()
+    {
+        $router = $this->getRouter();
 
-        //$this->assertSame(404, $status);
+        $this->events->shouldReceive('on')->with(m::any(), m::any())->andReturnUsing(function ($event) use (&$events) {
+            if (isset($event[0])) {
+                $events[] = current($event);
+            }
+        });
+
+        $events = [];
+
+        $router->on($e1 = Events::FILTER_BEFORE.'.auth', function ($evt) {
+        });
+
+        $router->on($e2 = Events::DISPATCHED, function ($evt) {
+        });
+
+        $router->on($e3 = 'someevent', function ($evt) {
+        });
+
+        $this->assertSame([$e1, $e2], $events);
     }
 
     /**
@@ -105,13 +118,22 @@ class RouterTest extends TestCase
      */
     protected function getRouter()
     {
+        $callback;
         $this->events = m::mock('Selene\Components\Events\DispatcherInterface');
 
+        $this->events->shouldReceive('on')->with(Events::DISPATCHED, m::any())->andReturnUsing(function ($event, $fn) use (&$callback) {
+            $callback = $fn;
+        });
+
+        $this->events->shouldReceive('dispatch')->with(Events::DISPATCHED, m::any())->andReturnUsing(function ($event) use (&$callback) {
+            return $callback($event);
+        });
+
         $router = new Router(
-            new RouteCollection,
+            $this->routes      = new RouteCollection,
             $this->controllers = m::mock('Selene\Components\Routing\Controller\Dispatcher'),
             $this->matcher     = m::mock('Selene\Components\Routing\RouteMatcherInterface'),
-            $this->events = m::mock('Selene\Components\Events\DispatcherInterface')
+            $this->events
         );
 
 

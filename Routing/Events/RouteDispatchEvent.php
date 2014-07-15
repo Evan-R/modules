@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Routing\Events;
 
+use \Selene\Components\Routing\Matchers\MatchContext;
+
 /**
  * @class RouteDispatchEvent
  * @package Selene\Components\Routing\Events
@@ -19,6 +21,26 @@ namespace Selene\Components\Routing\Events;
 class RouteDispatchEvent extends RouteEvent
 {
     private $response;
+
+    private $context;
+
+    public function __construct(MatchContext $context)
+    {
+        $this->context = $context;
+
+        parent::__construct($context->getRoute(), $context->getRequest());
+    }
+
+    /**
+     * getContext
+     *
+     *
+     * @return MatchContext
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
 
     /**
      * setResponse

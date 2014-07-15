@@ -52,6 +52,7 @@ class GroupDefinition
     public function __construct($prefix, array $requirements, GroupDefinition $parent = null)
     {
         $this->parent = $parent;
+
         $this->setPrefix($prefix);
         $this->setRequirements($requirements);
     }
@@ -98,10 +99,13 @@ class GroupDefinition
      */
     protected function setPrefix($prefix)
     {
-        $prefix = '/'.trim($prefix, '/');
-        $prefix = $this->hasParent() ? trim($this->parent->getPrefix(). '/') . '/' . ltrim($prefix, '/') : $prefix;
+        if (0 === strlen($prefix)) {
+            throw new \InvalidArgumentException('Group prefix may not be empty.');
+        }
 
-        $this->prefix = '/' . ltrim($prefix, '/');
+        $prefix = '/'.trim($prefix, '/');
+
+        $this->prefix = $this->hasParent() ? $this->parent->getPrefix() . $prefix : $prefix;
     }
 
     /**

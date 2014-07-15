@@ -20,7 +20,6 @@ use \Selene\Components\Routing\Route;
  */
 class RegexPathMatcher extends AbstractMatcher
 {
-
     /**
      * matches
      *

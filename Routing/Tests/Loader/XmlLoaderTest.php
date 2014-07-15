@@ -14,6 +14,7 @@ namespace Selene\Components\Routing\Tests\Loader;
 use \Mockery as m;
 use \Selene\Components\DI\Container;
 use \Selene\Components\Routing\Loader\XmlLoader;
+use \Selene\Components\Routing\RouteCollection;
 
 /**
  * @class XmlLoaderTest
@@ -22,6 +23,11 @@ use \Selene\Components\Routing\Loader\XmlLoader;
  */
 class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    private $locator;
+    private $builder;
+    private $container;
+    private $routes;
+
     /** @test */
     public function itShouldBeInstantiable()
     {
@@ -29,7 +35,8 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
             '\Selene\Components\Routing\Loader\XmlLoader',
             new XmlLoader(
                 $this->builder,
-                $this->locator
+                $this->locator,
+                $this->routes
             )
         );
     }
@@ -57,7 +64,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($loaded);
 
-        $this->assertTrue($this->container->get('routes')->has('index'));
+        $this->assertTrue($this->routes->has('index'));
 
         //$this->assertTrue($routes->has('index'));
         //$this->assertTrue($routes->has('index.create'));
@@ -107,7 +114,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader->load($fnameA);
 
-        $this->assertTrue($this->container->get('routes')->has('index'));
+        $this->assertTrue($this->routes->has('index'));
     }
 
     /** @test */
@@ -120,7 +127,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader->load($fname);
 
-        $routes = $this->container->get('routes');
+        $routes = $this->routes;
         $this->assertTrue($routes->has('any'));
 
         $anyMethods = [
@@ -144,7 +151,8 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader->load($fname);
 
-        $routes = $this->container->get('routes');
+        $routes = $this->routes;
+
         $this->assertTrue($routes->has('index.bar'));
 
         $this->assertSame('/foo/bar', $routes->get('index.bar')->getPattern());
@@ -160,7 +168,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader->load($fname);
 
-        $routes = $this->container->get('routes');
+        $routes = $this->routes;
 
         //var_dump($routes);
         $this->assertTrue($routes->has('user_photo.index'));
@@ -183,7 +191,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader->load($fname);
 
-        $routes = $this->container->get('routes');
+        $routes = $this->routes;
 
         $this->assertTrue($routes->has('user'));
 
@@ -324,6 +332,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $this->locator = m::mock('Selene\Components\Config\Resource\LocatorInterface');
 
         $this->builder->shouldReceive('getContainer')->andReturn($this->container = new Container);
+        $this->routes = new RouteCollection;
     }
 
     protected function prepareLoader($fname)
@@ -335,8 +344,8 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $this->builder->shouldReceive('addFileResource');
     }
 
-    protected function newLoader($builder = null, $locator = null)
+    protected function newLoader($builder = null, $locator = null, $routes = null)
     {
-        return new XmlLoader($builder ?: $this->builder, $locator ?: $this->locator, 'routes');
+        return new XmlLoader($builder ?: $this->builder, $locator ?: $this->locator, $routes ?: $this->routes);
     }
 }

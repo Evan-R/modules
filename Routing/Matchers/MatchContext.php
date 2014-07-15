@@ -96,7 +96,9 @@ class MatchContext
      */
     public function getHostParameters()
     {
-        return array_intersect_key($this->params, array_flip($this->route->getHostVars()));
+        $params = array_merge($this->route->getHostDefaults(), $this->params);
+
+        return array_intersect_key($params, array_flip($this->route->getHostVars()));
     }
 
     /**

@@ -42,10 +42,9 @@ class RouteBuilder
     protected $actionMap;
 
     /**
-     * @param RouteCollectionInterface $routes
+     * Constructor.
      *
-     * @access public
-     * @return mixed
+     * @param RouteCollectionInterface $routes
      */
     public function __construct(RouteCollectionInterface $routes = null)
     {
@@ -61,7 +60,6 @@ class RouteBuilder
      * @param mixed $pattern
      * @param array $requirements
      *
-     * @access public
      * @return Route
      */
     public function define($method, $name, $pattern, $controller, array $requirements = [])
@@ -134,7 +132,6 @@ class RouteBuilder
      *
      * @param RouteCollectionInterface $routes
      *
-     * @access public
      * @return RoutBuilder
      */
     public function addRoutes(RouteCollectionInterface $routes)
@@ -146,7 +143,6 @@ class RouteBuilder
     /**
      * Get the route collection.
      *
-     * @access public
      * @return RouteCollectionInterface
      */
     public function getRoutes()
@@ -304,7 +300,6 @@ class RouteBuilder
      * @param mixed $controller
      * @param mixed $requirements
      *
-     * @access protected
      * @return array
      */
     protected function extractShortcutArgs($controller, $requirements = [])
@@ -323,7 +318,6 @@ class RouteBuilder
      *
      * @param mixed $pattern
      *
-     * @access protected
      * @return string
      */
     protected function prefixPattern($pattern)
@@ -342,7 +336,6 @@ class RouteBuilder
      *
      * @param mixed $requirements
      *
-     * @access protected
      * @return array
      */
     protected function extendRequirements($requirements)
@@ -360,7 +353,6 @@ class RouteBuilder
      * @param mixed $path
      * @param mixed $action
      *
-     * @access protected
      * @return array
      */
     protected function getResourcePaths($path, $action)
@@ -385,7 +377,6 @@ class RouteBuilder
     /**
      * getDefaultMethods
      *
-     * @access protected
      * @return array
      */
     protected function getDefaultActions()
@@ -396,7 +387,6 @@ class RouteBuilder
     /**
      * getResourceActionMap
      *
-     * @access protected
      * @return array
      */
     protected function getResourceActionMap()
@@ -419,7 +409,6 @@ class RouteBuilder
     /**
      * getResourceActionMap
      *
-     * @access protected
      * @return string
      */
     protected function getResourceActionVerb($action)
@@ -432,7 +421,6 @@ class RouteBuilder
      *
      * @param mixed $method
      *
-     * @access protected
      * @return array
      */
     protected function getMethods($method)
@@ -459,7 +447,6 @@ class RouteBuilder
      *
      * @param array $requirements
      *
-     * @access protected
      * @return array
      */
     protected function fixRequirements(array $requirements)
@@ -475,7 +462,6 @@ class RouteBuilder
      * enterGroup
      *
      *
-     * @access protected
      * @return RouteBuilder
      */
     protected function enterGroup($prefix, array $requirements)
@@ -489,8 +475,6 @@ class RouteBuilder
     /**
      * getParentGroup
      *
-     *
-     * @access protected
      * @return null|GroupDefinition
      */
     protected function getParentGroup()
@@ -503,16 +487,18 @@ class RouteBuilder
     /**
      * leaveGroup
      *
-     * @access protected
      * @return RouteBuilder
      */
     protected function leaveGroup()
     {
+        if ($this->hasGroups()) {
+            $this->popGroup();
+        }
+
         return $this;
     }
 
     /**
-     * @access protected
      * @return mixed
      */
     protected function initGroups()
@@ -525,7 +511,6 @@ class RouteBuilder
      *
      * @param array $group
      *
-     * @access protected
      * @return void
      */
     protected function pushGroup(GroupDefinition $group)
@@ -536,7 +521,6 @@ class RouteBuilder
     /**
      * popGroup
      *
-     * @access protected
      * @return array
      */
     protected function popGroup()
@@ -547,7 +531,6 @@ class RouteBuilder
     /**
      * getCurrentGroup
      *
-     * @access protected
      * @return mixed
      */
     protected function getCurrentGroup()
@@ -558,7 +541,6 @@ class RouteBuilder
     /**
      * hasGroups
      *
-     * @access protected
      * @return boolean
      */
     protected function hasGroups()

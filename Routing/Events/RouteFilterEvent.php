@@ -26,9 +26,10 @@ class RouteFilterEvent extends RouteEvent
 
     public function setResponse($result)
     {
-        $this->stopPropagation();
-
-        $this->response = $result;
+        if (null !== $result) {
+            $this->stopPropagation();
+            $this->response = $result;
+        }
     }
 
     /**

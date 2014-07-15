@@ -84,7 +84,7 @@ class UrlBuilderTest extends \PHPUnit_Framework_TestCase
 
         $stack->shouldReceive('getCurrent')->andReturn($req);
 
-        $this->assertSame('', $builder->getPath('index'));
+        $this->assertSame('/', $builder->getPath('index'));
         $this->assertSame('http://localhost', $builder->getPath('index', [], null, UrlBuilder::ABSOLUTE_PATH));
     }
 

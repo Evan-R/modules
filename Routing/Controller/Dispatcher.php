@@ -18,6 +18,7 @@ use \Selene\Components\DI\Traits\ContainerAwareTrait;
 use \Selene\Components\Common\SeparatorParserInterface;
 use \Selene\Components\Routing\Mapper\ParameterMapper;
 use \Selene\Components\Routing\Matchers\MatchContext;
+use \Selene\Components\Routing\Events\RouteDispatchEvent;
 
 /**
  * @class Resolver implements ResolverInterface, ContainerAwareInterface
@@ -92,16 +93,18 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
      *
      * @return mixed the result of the controller action.
      */
-    public function dispatch(MatchContext $context)
+    public function dispatch(MatchContext $context, RouteDispatchEvent $event = null)
     {
         list ($controller, $action, $callAction) = $this->findController($context);
 
         // if theres a mapper and routing arguments mismatch controller
         // arguments, then throw an exception:
-        if ($this->mapParameters && null === ($arguments = $this->getParameters($context, $controller, $action))) {
-            throw new \RuntimeException(
-                sprintf('Arguments mismatch for controller %s::$s()', get_class($controller), $action)
-            );
+        if ($this->mapParameters) {
+            if (null === ($arguments = $this->getParameters($context, $controller, $action))) {
+                throw new \RuntimeException(
+                    sprintf('Arguments mismatch for controller %s::$s()', get_class($controller), $action)
+                );
+            }
         } else {
             $arguments = $context->getParameters();
         }
@@ -113,6 +116,11 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         if (null !== $callAction) {
             $arguments = [$action, $arguments];
             $action = $callAction;
+        }
+
+        // set the routing event on the controller
+        if ($controller instanceof EventAware && null !== $event) {
+            $controller->setEvent($event);
         }
 
         return call_user_func_array([$controller, $action], $arguments);

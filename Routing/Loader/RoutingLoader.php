@@ -15,6 +15,7 @@ use \Selene\Components\Routing\RouteBuilder;
 use \Selene\Components\DI\BuilderInterface;
 use \Selene\Components\Config\Resource\Loader;
 use \Selene\Components\Config\Resource\LocatorInterface;
+use \Selene\Components\Routing\RouteCollectionInterface;
 
 /**
  * @class RoutingLoader
@@ -49,19 +50,21 @@ abstract class RoutingLoader extends Loader
      */
     protected $routesId;
 
+    protected $loaded;
+
     /**
      * @param BuilderInterface $builder
      * @param LocaltorInterface $locator
      *
      * @access public
      */
-    public function __construct(BuilderInterface $builder, LocatorInterface $locator, $routesId = 'routes')
+    public function __construct(BuilderInterface $builder, LocatorInterface $locator, RouteCollectionInterface $routes)
     {
-        $this->routesId = $routesId;
-
         $this->container = $builder->getContainer();
         $this->builder = $builder;
-        $this->routes = new RouteBuilder;
+        $this->routes = new RouteBuilder($routes);
+
+        $this->loaded = [];
 
         parent::__construct($locator);
     }
@@ -77,8 +80,13 @@ abstract class RoutingLoader extends Loader
     public function load($resource, $any = false)
     {
         foreach ($this->locator->locate($resource, true) as $file) {
+            if (in_array($rpath = realpath($file), $this->loaded)) {
+                continue;
+            }
+
             $this->doLoad($file);
             $this->builder->addFileResource($file);
+            $this->loaded[] = $rpath;
         }
 
         $this->prepareContainer();
@@ -93,13 +101,14 @@ abstract class RoutingLoader extends Loader
      */
     protected function prepareContainer()
     {
-        if (!$this->container->hasDefinition($this->routesId)) {
-            $this->container->define($this->routesId, $this->getRouteCollectionClass());
-        }
+        //if (!$this->container->hasDefinition($this->routesId)) {
+            //$this->container->define($this->routesId, $this->getRouteCollectionClass());
+        //}
 
-        $routes = $this->container->get($this->routesId);
+        //$routes = $this->container->get($this->routesId);
 
-        $this->container->get($this->routesId)->merge($this->routes->getRoutes());
+        //$this->container->get($this->routesId)->merge($this->routes->getRoutes());
+        //$this->givenRoutes->merge($this->routes->getRoutes());
     }
 
     /**

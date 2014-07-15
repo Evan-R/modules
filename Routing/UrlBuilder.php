@@ -74,6 +74,11 @@ class UrlBuilder
         $this->stack = $stack;
     }
 
+    /**
+     * getRequest
+     *
+     * @return Request
+     */
     public function getRequest()
     {
         return $this->stack->getCurrent();
@@ -88,15 +93,15 @@ class UrlBuilder
      */
     public function currentUrl($type = self::RELATIVE_PATH)
     {
-        $r = $this->getRequest();
+        $req = $this->getRequest();
 
         if ($type === self::RELATIVE_PATH) {
-            $qs = $r->getQueryString() ?  '?'.$r->getQueryString() : '';
+            $qs = $req->getQueryString() ?  '?'.$req->getQueryString() : '';
 
-            return $r->getBaseUrl().$r->getPathInfo().$qs;
+            return $req->getBaseUrl().$req->getPathInfo().$qs;
         }
 
-        return $type === self::ABSOLUTE_PATH ? $this->getRequest()->getUri() : null;
+        return $type === self::ABSOLUTE_PATH ? $req->getUri() : null;
     }
 
     /**
@@ -108,13 +113,13 @@ class UrlBuilder
      */
     public function currentPath($type = self::RELATIVE_PATH)
     {
-        $r = $this->getRequest();
+        $req = $this->getRequest();
 
         if ($type === self::RELATIVE_PATH) {
-            return $r->getBaseUrl().$r->getPathInfo();
+            return $req->getBaseUrl().$req->getPathInfo();
         }
 
-        return $type === self::ABSOLUTE_PATH ? $r->getSchemeAndHttpHost().$r->getBaseUrl().$r->getPathInfo() :
+        return $type === self::ABSOLUTE_PATH ? $req->getSchemeAndHttpHost().$req->getBaseUrl().$req->getPathInfo() :
             null;
     }
 
@@ -162,7 +167,9 @@ class UrlBuilder
         }
 
         if (!(bool)$route->getVars()) {
-            return rtrim($prefix.$route->getPattern(), '/');
+            $url = $prefix.$route->getPattern();
+
+            return 1 === strlen($url) ? $url : rtrim($url, '/');
         }
 
         $defaults = $route->getDefaults();
@@ -231,7 +238,6 @@ class UrlBuilder
      * @param array $parameters
      * @param mixed $host
      *
-     * @access private
      * @return mixed
      */
     private function getPathPrefix(Route $route, array $parameters, $host)

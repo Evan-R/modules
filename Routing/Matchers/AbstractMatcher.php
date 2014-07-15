@@ -48,6 +48,7 @@ abstract class AbstractMatcher implements MatcherInterface
     {
         if (null !== ($matches = $this->matchCondition($route, $requirement))) {
             $this->callCallback($route, $matches);
+
             return true;
         }
 
