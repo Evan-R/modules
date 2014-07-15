@@ -136,7 +136,6 @@ class XmlLoader extends RoutingLoader
         $this->parseConstraints($route, $node);
 
         $this->routes->add($route);
-
     }
 
     /**
@@ -317,6 +316,9 @@ class XmlLoader extends RoutingLoader
                     break;
                 case 'method':
                     $requirements['methods'] = explode('|', $this->getPhpValue($node));
+                    break;
+                case 'schemes':
+                    $requirements['schemes'] = explode('|', $this->getPhpValue($node));
                     break;
             }
         }

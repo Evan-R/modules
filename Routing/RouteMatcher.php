@@ -56,7 +56,7 @@ class RouteMatcher implements RouteMatcherInterface
      * @param Request $request
      * @param RouteCollectionInterface $routes
      *
-     * @return mixed
+     * @return MatchContext
      */
     public function matches(Request $request, RouteCollectionInterface $routes)
     {
