@@ -17,6 +17,7 @@ use \Selene\Components\Routing\Matchers\HostMatcher;
 use \Selene\Components\Routing\Matchers\RegexPathMatcher;
 use \Selene\Components\Routing\Matchers\StaticPathMatcher;
 use \Selene\Components\Routing\Matchers\DirectPathMatcher;
+use \Selene\Components\Routing\Matchers\SchemeMatcher;
 use \Selene\Components\Routing\Matchers\MatchContext;
 
 /**
@@ -74,8 +75,8 @@ class RouteMatcher implements RouteMatcherInterface
             $noVars = false;
             $matchesHost = false;
 
-            // if the static path does not match return immediately.
-            if (!$this->matchStaticPath($route, $request)) {
+            // if the static path and scheme does not match return immediately.
+            if (!$this->matchStaticPath($route, $request) || !$this->matchScheme($route, $request)) {
                 continue;
             // if the route has no vars and matches the statuc path, we have
             // a direct match.
@@ -156,6 +157,19 @@ class RouteMatcher implements RouteMatcherInterface
      *
      * @return mixed
      */
+    protected function matchScheme(Route $route, Request $request)
+    {
+        return $this->getSchemeMatcher()->matches($route, $request->getScheme());
+    }
+
+    /**
+     * matchPathRegexp
+     *
+     * @param Route $route
+     * @param Request $request
+     *
+     * @return mixed
+     */
     protected function matchPathRegexp(Route $route, Request $request)
     {
         return $this->getRegexpPathMatcher()->matches($route, $request->getRequestUri());
@@ -186,6 +200,20 @@ class RouteMatcher implements RouteMatcherInterface
         }
 
         return $this->matchers['static_path'];
+    }
+
+    /**
+     * getSchemeMatcher
+     *
+     * @return MatcherInterface
+     */
+    protected function getSchemeMatcher()
+    {
+        if (!isset($this->matchers['scheme'])) {
+            $this->matchers['scheme'] = new SchemeMatcher;
+        }
+
+        return $this->matchers['scheme'];
     }
 
     /**

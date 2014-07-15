@@ -14,22 +14,22 @@ namespace Selene\Components\Routing\Matchers;
 use \Selene\Components\Routing\Route;
 
 /**
- * @class RegexPathMatcher
+ * @class SchemeMatcher
  * @package Selene\Components\Routing\Matchers
  * @version $Id$
  */
-class RegexPathMatcher extends AbstractMatcher
+class SchemeMatcher extends AbstractMatcher
 {
     /**
      * matches
      *
      * @param Route  $route
-     * @param string $staticPath
+     * @param string $scheme
      *
-     * @return boolean|null
+     * @return bool|null
      */
-    protected function matchCondition(Route $route, $path)
+    protected function matchCondition(Route $route, $scheme)
     {
-        return ((bool)preg_match($route->getRegexp(), $path, $matches)) ? $matches : null;
+        return in_array($scheme, $route->getSchemes()) ?: null;
     }
 }

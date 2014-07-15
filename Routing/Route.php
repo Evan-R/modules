@@ -508,6 +508,7 @@ class Route implements Serializable
     public function setSchemes(array $schemes)
     {
         $this->requirements['_schemes'] = $schemes;
+
         return $this;
     }
 
@@ -995,6 +996,7 @@ class Route implements Serializable
 
         $this->requirements = array_merge(
             [
+                '_schemes' => ['http'],
                 '_host' => null,
                 '_before' => [],
                 '_after' => [],
