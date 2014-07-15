@@ -31,6 +31,11 @@ class KernelEvents
     /**
      *
      */
+    const RESPONSE = 'kernel.response';
+
+    /**
+     *
+     */
     const FILTER_RESPONSE = 'kernel.filter_response';
 
     /**
@@ -52,7 +57,6 @@ class KernelEvents
      *
      */
     const ABORT_REQUEST   = 'kernel.abort_request';
-
 
     private function __construct()
     {

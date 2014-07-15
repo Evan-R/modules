@@ -31,6 +31,7 @@ use \Selene\Components\Kernel\Events\HandleExceptionEvent;
 use \Selene\Components\Kernel\Events\AbortRequestEvent;
 use \Selene\Components\Kernel\Events\HandleShutDownEvent;
 use \Selene\Components\Kernel\Events\HandleRequestEndEvent;
+use \Selene\Components\Kernel\Events\ResponseEvent;
 use \Selene\Components\Kernel\Events\KernelEvents as Events;
 use \Selene\Components\Kernel\Subscriber\KernelSubscriber;
 
@@ -167,6 +168,15 @@ class Kernel implements KernelInterface
      */
     protected function handleRequest(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
+        $this->events->dispatch(
+            Events::RESPONSE,
+            $event = new ResponseEvent($this, $request, $type)
+        );
+
+        if ($response = $event->getResponse()) {
+            return $this->filterResponse($request, $response, $type);
+        }
+
         //Fire the first kernel event in order to retreive an response. If no
         //response is set on the event, return a 404 response.
         $this->events->dispatch(

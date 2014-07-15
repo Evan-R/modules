@@ -19,7 +19,7 @@ use \Symfony\Component\HttpFoundation\Response;
  * @version $Id$
  */
 
-abstract class ResponseEvent extends KernelEvent
+class ResponseEvent extends KernelEvent
 {
     private $response;
 
