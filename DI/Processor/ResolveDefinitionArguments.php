@@ -142,9 +142,9 @@ class ResolveDefinitionArguments implements ProcessInterface
                 if (!$this->container->hasDefinition($id = (string)$arg)) {
                     throw new \InvalidArgumentException(
                         sprintf(
-                            'A requeired by "%s" definition with id "%s" does no exist.',
-                            $this->current,
-                            $id
+                            'A service "%s" requeired by "%s" does no exist.',
+                            $id,
+                            $this->current
                         )
                     );
                 }
