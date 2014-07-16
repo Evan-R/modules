@@ -11,6 +11,8 @@
 
 namespace Selene\Components\DI\Dumper\Traits;
 
+use \Selene\Components\Common\Helper\ListHelper;
+
 /**
  * @class FormatterTrait
  * @package Selene\Components\DI\Dumper\Traits
@@ -56,7 +58,7 @@ trait FormatterTrait
      *
      * @return string
      */
-    protected function doExctractParams(array $params, $indent = 0)
+    private function doExctractParams(array $params, $indent = 0)
     {
         $array = [];
 
@@ -70,16 +72,21 @@ trait FormatterTrait
                 $value = $this->exportVar($value);
             }
 
-            $array[] = sprintf('%s%s => %s,', $this->indent($indent), $this->exportVar($param), $value);
+            $key = $this->exportVar($param);
+            $array[$key] = sprintf('%s%s => %s,', $this->indent($indent), $key, $value);
         }
 
-        return empty($array) ?
-            '[]' :
-            preg_replace(
-                '#\d+ \=\>\s?#i',
-                '',
-                sprintf("[\n%s\n%s]", implode("\n", $array), $this->indent(max($indent - 4, 0)))
-            );
+        if (empty($array)) {
+            return '[]';
+        }
+
+        $flat = sprintf("[\n%s\n%s]", implode("\n", $array), $this->indent(max($indent - 4, 0)));
+
+        if ($this->isOrderedList($array)) {
+            return preg_replace('#\d+ \=\>\s?#i', '', $flat);
+        }
+
+        return $flat;
     }
 
     /**
@@ -93,5 +100,30 @@ trait FormatterTrait
     public function exportVar($param)
     {
         return preg_replace(['~NULL~', '~FALSE~', '~TRUE~'], ['null', 'false', 'true'], var_export($param, true));
+    }
+
+    /**
+     * isOrderedList
+     *
+     * @param array $array
+     *
+     * @return boolean
+     */
+    private function isOrderedList(array $array)
+    {
+        if (!ListHelper::arrayIsList($array)) {
+            return false;
+        }
+
+        $i = 0;
+
+        foreach ($array as $key => $value) {
+            if ($key !== $i) {
+                return false;
+            }
+            $i++;
+        }
+
+        return true;
     }
 }
