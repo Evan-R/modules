@@ -90,6 +90,25 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($route->isSecure());
     }
 
+    /** @test */
+    public function itShouldThrowExceptionAfterNameChangeWhenCompiled()
+    {
+        $route = new Route('index', '/', 'GET', ['_schemes' => ['https']]);
+        $route->setAction('action');
+
+        $route->compile();
+
+        try {
+            $route->setName('bar');
+        } catch (\BadMethodCallException $e) {
+            $this->assertSame('Cannot changed name on a compiled route.', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail();
+    }
+
     /**
      * @test
      */

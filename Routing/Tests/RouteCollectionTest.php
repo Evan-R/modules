@@ -33,10 +33,11 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function routesSouldBeAddable()
+    public function routesShouldBeAddable()
     {
         $route = m::mock('\Selene\Components\Routing\Route');
         $route->shouldReceive('getName')->andReturn('app.index');
+        $route->shouldReceive('collection')->with($this->collection);
 
         $this->collection->add($route);
 
@@ -58,6 +59,10 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $routeB->shouldReceive('getMethods')->andReturn(['PUT', 'PATCH']);
         $routeC->shouldReceive('getMethods')->andReturn(['GET', 'HEAD']);
 
+        $routeA->shouldReceive('collection');
+        $routeB->shouldReceive('collection');
+        $routeC->shouldReceive('collection');
+
         $this->collection->add($routeA);
         $this->collection->add($routeB);
         $this->collection->add($routeC);
@@ -74,6 +79,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeIteratable()
     {
         $route = m::mock('\Selene\Components\Routing\Route');
+        $route->shouldReceive('collection');
         $route->shouldReceive('getName')->andReturn('app.index');
         $this->collection->add($route);
 

@@ -17,13 +17,29 @@ use \Selene\Components\Routing\Matchers\MatchContext;
  * @class RouteDispatchEvent
  * @package Selene\Components\Routing\Events
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
  */
 class RouteDispatchEvent extends RouteEvent
 {
-    private $response;
-
+    /**
+     * context
+     *
+     * @var \Selene\Components\Routing\Matchers\MatchContext
+     */
     private $context;
 
+    /**
+     * response
+     *
+     * @var mixed
+     */
+    private $response;
+
+    /**
+     * Contructor.
+     *
+     * @param MatchContext $context
+     */
     public function __construct(MatchContext $context)
     {
         $this->context = $context;
@@ -43,23 +59,22 @@ class RouteDispatchEvent extends RouteEvent
     }
 
     /**
-     * setResponse
+     * Set the response
      *
      * @param mixed $response
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function setResponse($response)
     {
-        $this->response = $response;
+        if (!$this->isPropagationStopped()) {
+            $this->response = $response;
+        }
     }
 
     /**
-     * getResponse
+     * Get the response
      *
-     *
-     * @access public
      * @return mixed
      */
     public function getResponse()
