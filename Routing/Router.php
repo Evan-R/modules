@@ -157,7 +157,6 @@ class Router implements RouterInterface
         $this->events->on(Events::DISPATCHED, function (EventInterface $event) {
             if ($result = $this->controllers->dispatch($event->getContext(), $event)) {
                 $event->setResponse($result);
-                $event->stopPropagation();
             }
         });
     }

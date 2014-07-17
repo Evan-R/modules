@@ -67,9 +67,8 @@ class RouteDispatchEvent extends RouteEvent
      */
     public function setResponse($response)
     {
-        if (!$this->isPropagationStopped()) {
-            $this->response = $response;
-        }
+        $this->stopPropagation();
+        $this->response = $response;
     }
 
     /**

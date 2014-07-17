@@ -21,7 +21,6 @@ use \Selene\Components\Common\Traits\Getter;
  * @package Selene\Components\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class Route implements Serializable
 {
@@ -238,9 +237,8 @@ class Route implements Serializable
     /**
      * Sets the route name.
      *
-     * @param mixed $name
+     * @param string $name
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setName($name)
@@ -264,7 +262,6 @@ class Route implements Serializable
     /**
      * getName
      *
-     * @access public
      * @return string
      */
     public function getName()
@@ -289,7 +286,6 @@ class Route implements Serializable
      *
      * @param array $methods
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setMethods(array $methods)
@@ -302,7 +298,6 @@ class Route implements Serializable
      * getMethods
      *
      *
-     * @access public
      * @return array
      */
     public function getMethods()
@@ -313,9 +308,8 @@ class Route implements Serializable
     /**
      * setAction
      *
-     * @param mixed $action
+     * @param string $action
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setAction($action)
@@ -328,7 +322,6 @@ class Route implements Serializable
     /**
      * getAction
      *
-     * @access public
      * @return string
      */
     public function getAction()
@@ -341,7 +334,6 @@ class Route implements Serializable
      *
      * @param array $params
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setHostParameters(array $params)
@@ -359,7 +351,6 @@ class Route implements Serializable
      *
      * @param array $params
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setParameters(array $params)
@@ -376,7 +367,6 @@ class Route implements Serializable
     /**
      * getParameters
      *
-     * @access public
      * @return array
      */
     public function getParameters()
@@ -387,7 +377,6 @@ class Route implements Serializable
     /**
      * getParameters
      *
-     * @access public
      * @return array
      */
     public function getHostParameters()
@@ -400,7 +389,6 @@ class Route implements Serializable
      *
      * @param array $defaults
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setDefaults(array $defaults)
@@ -413,10 +401,9 @@ class Route implements Serializable
     /**
      * setDefault
      *
-     * @param mixed $var
+     * @param string $var
      * @param mixed $value
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setDefault($var, $value)
@@ -431,7 +418,6 @@ class Route implements Serializable
      *
      * @param array $defaults
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setHostDefaults(array $defaults)
@@ -444,10 +430,9 @@ class Route implements Serializable
     /**
      * setHostDefault
      *
-     * @param mixed $var
+     * @param string $var
      * @param mixed $value
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setHostDefault($var, $value)
@@ -458,9 +443,32 @@ class Route implements Serializable
     }
 
     /**
+     * hasDefault
+     *
+     * @param string $key
+     *
+     * @return boolean
+     */
+    public function hasDefault($key)
+    {
+        return array_key_exists($key, $this->defaults['route']);
+    }
+
+    /**
+     * hasHostDefault
+     *
+     * @param string $key
+     *
+     * @return boolean
+     */
+    public function hasHostDefault($key)
+    {
+        return array_key_exists($key, $this->defaults['host']);
+    }
+
+    /**
      * getDefaults
      *
-     * @access public
      * @return array
      */
     public function getDefaults()
@@ -468,11 +476,23 @@ class Route implements Serializable
         return $this->defaults['route'];
     }
 
+    /**
+     * getHostDefaults
+     *
+     * @return array
+     */
     public function getHostDefaults()
     {
         return $this->defaults['host'];
     }
 
+    /**
+     * getHostDefault
+     *
+     * @param string $var
+     *
+     * @return mixed
+     */
     public function getHostDefault($var)
     {
         return $this->getDefaultVar($this->defaults['host'], $var);
@@ -481,9 +501,8 @@ class Route implements Serializable
     /**
      * getDefault
      *
-     * @param mixed $var
+     * @param string $var
      *
-     * @access public
      * @return mixed
      */
     public function getDefault($var)
@@ -494,10 +513,9 @@ class Route implements Serializable
     /**
      * setRequirement
      *
-     * @param mixed $requirement
+     * @param string $requirement
      * @param mixed $value
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setRequirement($requirement, $value)
@@ -512,9 +530,8 @@ class Route implements Serializable
     /**
      * getRequirement
      *
-     * @param mixed $requirement
+     * @param string $requirement
      *
-     * @access public
      * @return mixed
      */
     public function getRequirement($requirement)
@@ -528,7 +545,6 @@ class Route implements Serializable
      * getSchemes
      *
      *
-     * @access public
      * @return array
      */
     public function getSchemes()
@@ -541,7 +557,6 @@ class Route implements Serializable
      *
      * @param array $schemes
      *
-     * @access public
      * @return Route
      */
     public function setSchemes(array $schemes)
@@ -554,7 +569,6 @@ class Route implements Serializable
     /**
      * isSecure
      *
-     * @access public
      * @return mixed
      */
     public function isSecure()
@@ -573,10 +587,9 @@ class Route implements Serializable
     /**
      * setConstraint
      *
-     * @param mixed $param
+     * @param string $param
      * @param mixed $regexp
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setConstraint($param, $regexp)
@@ -587,11 +600,10 @@ class Route implements Serializable
     /**
      * getConstraint
      *
-     * @param mixed $param
-     * @param mixed $regexp
+     * @param string $param
+     * @param string $regexp
      *
-     * @access public
-     * @return mixed
+     * @return string
      */
     public function getConstraint($param)
     {
@@ -601,10 +613,9 @@ class Route implements Serializable
     /**
      * setHostConstraint
      *
-     * @param mixed $param
-     * @param mixed $regexp
+     * @param string $param
+     * @param string $regexp
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setHostConstraint($param, $regexp)
@@ -617,9 +628,8 @@ class Route implements Serializable
     /**
      * setParent
      *
-     * @param mixed $parent
+     * @param string $parent
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setParent($parent)
@@ -632,9 +642,8 @@ class Route implements Serializable
     /**
      * setHost
      *
-     * @param mixed $host
+     * @param string $host
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setHost($host = null)
@@ -647,10 +656,9 @@ class Route implements Serializable
     /**
      * setParamConstraint
      *
-     * @param mixed $param
-     * @param mixed $regexp
+     * @param string $param
+     * @param string $regexp
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setParamConstraint($param, $regexp)
@@ -663,8 +671,7 @@ class Route implements Serializable
     /**
      * getPattern
      *
-     * @access public
-     * @return mixed
+     * @return string
      */
     public function getPattern()
     {
@@ -674,7 +681,6 @@ class Route implements Serializable
     /**
      * getRequirements
      *
-     * @access public
      * @return array
      */
     public function getRequirements()
@@ -685,9 +691,8 @@ class Route implements Serializable
     /**
      * getParamConstraint
      *
-     * @param mixed $param
+     * @param string $param
      *
-     * @access public
      * @return string
      */
     public function getParamConstraint($param)
@@ -698,10 +703,9 @@ class Route implements Serializable
     /**
      * getHostConstraint
      *
-     * @param mixed $param
+     * @param string $param
      *
-     * @access public
-     * @return mixed
+     * @return string
      */
     public function getHostConstraint($param)
     {
@@ -712,7 +716,6 @@ class Route implements Serializable
      * getParent
      *
      *
-     * @access public
      * @return string
      */
     public function getParent()
@@ -724,7 +727,6 @@ class Route implements Serializable
      * getHost
      *
      *
-     * @access public
      * @return string
      */
     public function getHost()
@@ -736,7 +738,6 @@ class Route implements Serializable
      * hasHost
      *
      *
-     * @access public
      * @return boolean
      */
     public function hasHost()
@@ -747,9 +748,8 @@ class Route implements Serializable
     /**
      * hasMethod
      *
-     * @param mixed $method
+     * @param string $method
      *
-     * @access public
      * @return boolean
      */
     public function hasMethod($method)
@@ -761,7 +761,6 @@ class Route implements Serializable
      * isCompiled
      *
      *
-     * @access public
      * @return boolean
      */
     public function isCompiled()
@@ -772,7 +771,6 @@ class Route implements Serializable
     /**
      * compile
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function compile()
@@ -796,7 +794,6 @@ class Route implements Serializable
      *
      * @param array $results
      *
-     * @access private
      * @return void
      */
     private function setCompiledResults(array $results)
@@ -804,6 +801,11 @@ class Route implements Serializable
         $this->compiledArgs = $results;
     }
 
+    /**
+     * getTokens
+     *
+     * @return array
+     */
     public function getTokens()
     {
         if (!$this->isCompiled()) {
@@ -816,7 +818,6 @@ class Route implements Serializable
     /**
      * getVars
      *
-     * @access public
      * @return string
      */
     public function getVars()
@@ -828,7 +829,6 @@ class Route implements Serializable
      * getHostVars
      *
      *
-     * @access public
      * @return array
      */
     public function getHostVars()
@@ -841,7 +841,6 @@ class Route implements Serializable
      *
      * @param array $params
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setParams(array $params)
@@ -858,7 +857,6 @@ class Route implements Serializable
      *
      * @param array $params
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function setHostParams(array $params)
@@ -873,20 +871,19 @@ class Route implements Serializable
     /**
      * getParams
      *
-     * @access public
-     * @return mixed
+     * @return string
      */
     public function getParams()
     {
         $defaults = $this->getDefaults();
+
         return array_merge($defaults, $this->getDefaultVar($this->parameters, 'route', []));
     }
 
     /**
      * getHostParams
      *
-     * @access public
-     * @return mixed
+     * @return array
      */
     public function getHostParams()
     {
@@ -896,7 +893,6 @@ class Route implements Serializable
     /**
      * getHostRegexp
      *
-     * @access public
      * @return string
      */
     public function getHostRegexp()
@@ -907,7 +903,6 @@ class Route implements Serializable
     /**
      * getRegexp
      *
-     * @access public
      * @return string
      */
     public function getRegexp()
@@ -919,7 +914,6 @@ class Route implements Serializable
      * getStaticPath
      *
      *
-     * @access public
      * @return string
      */
     public function getStaticPath()
@@ -930,7 +924,6 @@ class Route implements Serializable
     /**
      * getCompileMethod
      *
-     * @access public
      * @return string
      */
     public function getCompileMethod()
@@ -941,7 +934,6 @@ class Route implements Serializable
     /**
      * __clone
      *
-     * @access public
      * @return void
      */
     public function __clone()
@@ -952,7 +944,6 @@ class Route implements Serializable
     /**
      * serialize
      *
-     * @access public
      * @return string
      */
     public function serialize()
@@ -979,7 +970,6 @@ class Route implements Serializable
      *
      * @param array $data
      *
-     * @access public
      * @return \Selene\Component\Routing\Route this instance
      */
     public function unserialize($data)
@@ -1000,29 +990,8 @@ class Route implements Serializable
     }
 
     /**
-     * methodDict
-     *
-     * @param mixed $method
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected static function methodDict($method)
-    {
-        return [
-            'GET'    => ['GET', 'HEAD'],
-            'HEAD'   => ['GET', 'HEAD'],
-            'POST'   => ['POST'],
-            'PUT'    => ['PUT', 'PATCH'],
-            'PATCH'  => ['PUT', 'PATCH'],
-            'DELETE' => ['DELETE']
-        ];
-    }
-
-    /**
      * initRequirements
      *
-     * @access protected
      * @return void
      */
     protected function initRequirements(array $requirements = [])
