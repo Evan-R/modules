@@ -277,7 +277,7 @@ class RouteCompiler
         }
 
         //$optional = $route->isOptional($paramName) ? true : isset($match[2]);
-        $optional = isset($match[2]);
+        $optional = isset($match[2]) || (!$host && $route->hasDefault($paramName));
 
         if ($host && $optional) {
             throw new \DomainException(
