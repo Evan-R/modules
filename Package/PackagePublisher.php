@@ -300,7 +300,7 @@ class PackagePublisher
     protected function publishDefault(IPackage $package, $target = null, $override = false, $force = false)
     {
         if (!$force) {
-            return static::NO_PUBLISH;
+            return static::NOT_PUBLISHED;
         }
 
         $this->notifyPublish($package);

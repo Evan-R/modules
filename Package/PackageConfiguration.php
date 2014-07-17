@@ -146,7 +146,7 @@ abstract class PackageConfiguration extends Configuration
         $locator = $locator ?: new Locator([$this->getResourcePath()]);
 
         return new DelegatingLoader(new LoaderResolver([
-            new CallableRoutingLoader($builder, $locator, $routes),
+            new CallableRoutingLoader($builder, $routes),
             new PhpRoutingLoader($builder, $locator, $routes),
             new XmlRoutingLoader($builder, $locator, $routes)
         ]));

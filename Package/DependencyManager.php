@@ -73,8 +73,8 @@ class DependencyManager
      *
      * If $includeSelf is true, the package will be included as last member.
      *
-     * @param PackageInterface $package
-     * @param boolean $includeSelf
+     * @param PackageInterface $package     the package
+     * @param boolean          $includeSelf include the current package observed
      *
      * @throws \InvalidArgumentException if a required package does not exists.
      * @throws \InvalidArgumentException if there's a circular reference.
@@ -97,13 +97,11 @@ class DependencyManager
     }
 
     /**
-     * doGetRequirements
+     * Get the package requirements
      *
      * @param PackageInterface $package
-     * @param array $requirements
-     *
-     * @access protected
-     * @return void
+     * @param array $res
+     * @return array
      */
     protected function doGetRequirements(PackageInterface $package, &$res = [])
     {
