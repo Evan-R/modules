@@ -11,6 +11,9 @@
 
 namespace Selene\Components\Routing\Loader;
 
+use \Selene\Components\Routing\RouteBuilder;
+use \Selene\Components\DI\BuilderInterface;
+use \Selene\Components\Routing\RouteCollectionInterface;
 use \Selene\Components\Config\Traits\CallableLoaderHelperTrait;
 
 /**
@@ -25,6 +28,13 @@ use \Selene\Components\Config\Traits\CallableLoaderHelperTrait;
 class CallableLoader extends RoutingLoader
 {
     use CallableLoaderHelperTrait;
+
+    public function __construct(BuilderInterface $builder, RouteCollectionInterface $routes)
+    {
+        $this->container = $builder->getContainer();
+        $this->builder = $builder;
+        $this->routes = new RouteBuilder($routes);
+    }
 
     /**
      * {@inheritdoc}
