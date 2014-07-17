@@ -38,9 +38,8 @@ class AliasesTest extends TestCase
     {
         $alias = new Aliases(['bar' => 'foo']);
 
-        $this->assertInstanceof('Selene\Components\DI\Alias', $alias->get('bar'));
-        $this->assertEquals('foo', (string)$alias->get('foo'));
-        $this->assertEquals('foo', (string)$alias->get('bar'));
+        $this->assertEquals('foo', $alias->get('foo'));
+        $this->assertEquals('foo', $alias->get('bar'));
     }
 
     /** @test */

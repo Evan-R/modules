@@ -581,8 +581,6 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceof('stdClass', $service = $container->get('bar'));
 
-        $this->assertInstanceof('Selene\Components\DI\Alias', $container->getAlias('bar'));
-
         $container->removeAlias('bar');
 
         try {
