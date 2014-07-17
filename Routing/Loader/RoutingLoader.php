@@ -101,14 +101,6 @@ abstract class RoutingLoader extends Loader
      */
     protected function prepareContainer()
     {
-        //if (!$this->container->hasDefinition($this->routesId)) {
-            //$this->container->define($this->routesId, $this->getRouteCollectionClass());
-        //}
-
-        //$routes = $this->container->get($this->routesId);
-
-        //$this->container->get($this->routesId)->merge($this->routes->getRoutes());
-        //$this->givenRoutes->merge($this->routes->getRoutes());
     }
 
     /**
