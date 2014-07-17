@@ -3,9 +3,9 @@
   "description": "Selene Package Component",
   "authors": [
     {
-    "name": "Thomas Appel",
-    "email": "mail@thomas-appel.com"
-  }
+      "name": "Thomas Appel",
+      "email": "mail@thomas-appel.com"
+    }
   ],
   "license": "MIT",
   "require": {

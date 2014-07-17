@@ -588,6 +588,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $this->container->setParameter(static::$appServiceId.'.container.class', $containerClass);
         $this->container->setParameter(static::$appServiceId.'.container.file', $containerFile);
+        $this->container->setParameter(static::$appServiceId.'.package.sources', $this->packageResources);
 
         $this->container->inject($this->getContainerServiceId(), $container);
 
