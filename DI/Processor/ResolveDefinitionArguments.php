@@ -33,6 +33,8 @@ class ResolveDefinitionArguments implements ProcessInterface
     private $current;
     private $container;
 
+    private $building;
+
     /**
      * process
      *
@@ -43,6 +45,7 @@ class ResolveDefinitionArguments implements ProcessInterface
      */
     public function process(ContainerInterface $container)
     {
+        $this->resolved = [];
         $this->container = $container;
 
         foreach ($container->getDefinitions() as $id => $definition) {
@@ -52,7 +55,14 @@ class ResolveDefinitionArguments implements ProcessInterface
 
     private function resolveDefinition(DefinitionInterface $definition, $id)
     {
-        $this->current = $id;
+        if (in_array($id, $this->resolved)) {
+            return;
+        }
+
+        $this->current = $id = $this->container->getAlias($id);
+
+        $this->resolved[] = $id;
+
         $this->replaceDefinitionArguments($definition);
         $this->replaceSetterArguments($definition);
         $this->replaceFactoryArgsuments($definition);
@@ -122,7 +132,6 @@ class ResolveDefinitionArguments implements ProcessInterface
         $definition->setArguments($arguments);
     }
 
-
     /**
      * resolveArguments
      *
@@ -134,30 +143,34 @@ class ResolveDefinitionArguments implements ProcessInterface
     private function resolveArguments(array $arguments)
     {
         $args = [];
+        $params = $this->container->getParameters();
 
         foreach ($arguments as $key => $argument) {
-            $arg = $this->resolveArgument($argument);
-
-            if ($arg instanceof Reference) {
-                if (!$this->container->hasDefinition($id = (string)$arg)) {
-                    throw new \InvalidArgumentException(
-                        sprintf(
-                            'A service "%s" requeired by "%s" does no exist.',
-                            $id,
-                            $this->current
-                        )
-                    );
-                }
-
-                $current = $this->current;
-                $this->resolveDefinition($this->container->getDefinition($id), $id);
-                $this->current = $current;
-            }
-
-            $args[$key] = $arg;
+            $this->checkArgument($arg = $this->resolveArgument($argument));
+            $args[$params->resolveParam($key)] = $arg;
         }
 
         return $args;
+    }
+
+    /**
+     * checkArgument
+     *
+     * @return void
+     */
+    private function checkArgument($arg)
+    {
+        if (!($arg instanceof Reference) || $this->container->hasDefinition((string)$arg)) {
+            return;
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf(
+                'A service "%s" requeired by "%s" does no exist.',
+                $this->container->getAlias((string)$arg),
+                $this->current
+            )
+        );
     }
 
     /**
@@ -165,7 +178,6 @@ class ResolveDefinitionArguments implements ProcessInterface
      *
      * @param mixed $argument
      *
-     * @access private
      * @return mixed
      */
     private function resolveArgument($argument)

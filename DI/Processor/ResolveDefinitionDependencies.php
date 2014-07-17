@@ -31,7 +31,6 @@ class ResolveDefinitionDependencies implements ProcessInterface
      *
      * @param ContainerInterface $container
      *
-     * @access public
      * @return void
      */
     public function process(ContainerInterface $container)
@@ -50,7 +49,6 @@ class ResolveDefinitionDependencies implements ProcessInterface
      * @param DefinitionInterface $definition
      *
      * @throws \InvalidArgumentException if the class does not exist.
-     * @access private
      * @return void
      */
     private function checkClassIntegrity(DefinitionInterface $definition, ParameterInterface $parameters, $id)
@@ -76,7 +74,6 @@ class ResolveDefinitionDependencies implements ProcessInterface
      * @param DefinitionInterface $definition
      *
      * @throws \InvalidArgumentException if the class does not exist.
-     * @access private
      * @return void
      */
     private function checkServiceFactory(DefinitionInterface $definition, ParameterInterface $parameters, $id)
@@ -103,7 +100,6 @@ class ResolveDefinitionDependencies implements ProcessInterface
      *
      * @param mixed $factory
      *
-     * @access private
      * @return array
      */
     private function getFactoryCallback($factory)
@@ -120,7 +116,6 @@ class ResolveDefinitionDependencies implements ProcessInterface
      * @param mixed $class
      * @param mixed $id
      *
-     * @access private
      * @return \InvalidArgumentException
      */
     private function getClassException($class, $id)
@@ -136,7 +131,7 @@ class ResolveDefinitionDependencies implements ProcessInterface
      * @param DefinitionInterface $definition
      *
      * @throws \InvalidArgumentException if the file does not exist
-     * @access private
+     *
      * @return void
      */
     private function checkFileIntegrity(DefinitionInterface $definition, ParameterInterface $parameters, $id)

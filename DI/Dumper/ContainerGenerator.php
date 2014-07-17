@@ -250,8 +250,6 @@ class ContainerGenerator implements GeneratorInterface
 
         $parameters = $this->container->getParameters()->all();
 
-        $params = $this->extractParams($this->container->getParameters()->all());
-
         foreach ($this->container->getDefinitions() as $id => $definition) {
             if ($definition->isInternal()) {
                 $internal[$id] = ServiceMethod::getServiceGetterName($id, $definition->isInjected(), true);
@@ -364,7 +362,9 @@ class ContainerGenerator implements GeneratorInterface
 
         $method->setDocComment($comment);
 
-        $method->addArgument(new Argument('synced', Method::T_ARRAY));
+        $method->addArgument($arg = new Argument('synced', Method::T_ARRAY));
+
+        $arg->isReference(true);
 
         $method->setBody(
             (new Writer)

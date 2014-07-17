@@ -12,6 +12,7 @@
 namespace Selene\Components\DI\Tests\Processor;
 
 use \Mockery as m;
+use \Selene\Components\DI\Reference;
 use \Selene\Components\DI\Container;
 use \Selene\Components\DI\Processor\RemoveAbstractDefinition;
 use \Selene\Components\DI\Processor\ResolveDefinitionArguments;
@@ -68,5 +69,19 @@ class ResolveDefinitionArgumentsTest extends \PHPUnit_Framework_TestCase
         $process->process($container);
 
         $this->assertSame(['\FooClass', 1, 2, 3], $def->getArguments());
+    }
+    /** @test */
+    public function itIsExpectedThat()
+    {
+        $container = new Container;
+
+        $container->define('bar', 'BarClass');
+        $container->define('baz', 'BazClass');
+        $def = $container->define('foo', 'FooClass');
+
+        $def->setArguments([[new Reference('bar'), new Reference('baz')]]);
+
+        $process = new ResolveDefinitionArguments;
+        $process->process($container);
     }
 }

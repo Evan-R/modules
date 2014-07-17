@@ -75,7 +75,11 @@ class Aliases implements \ArrayAccess, \IteratorAggregate
     {
         $alias = strtolower($alias);
 
-        return $this->getDefault($this->aliases, $alias, $alias);
+        if ($this->has($alias)) {
+            return (string)$this->aliases[$alias];
+        }
+
+        return $alias;
     }
 
     /**

@@ -33,6 +33,8 @@ class ResolveCircularReference implements ProcessInterface
      */
     private $container;
 
+    private $current;
+
     /**
      * Resolve circular references among service definitions.
      *
@@ -44,6 +46,8 @@ class ResolveCircularReference implements ProcessInterface
     public function process(ContainerInterface $container)
     {
         $this->container = $container;
+
+        $aliases = $this->container->getAliases();
 
         foreach ($container->getDefinitions() as $id => $definition) {
             // requiring the service in a setter argument is fine:
@@ -82,6 +86,9 @@ class ResolveCircularReference implements ProcessInterface
      */
     protected function checkCircularReference(array $attributes, $current, $self = null)
     {
+        $current = $this->container->getAlias($current);
+        $self    = $self ? $this->container->getAlias($self) : null;
+
         foreach ($attributes as $attribute) {
 
             if (is_array($attribute)) {
@@ -98,27 +105,25 @@ class ResolveCircularReference implements ProcessInterface
                 continue;
             }
 
-            $id = $attribute->get();
+            // if all tests passes, continue to check the definitions arguments
+            // and setters list:
+            if (!$this->container->hasDefinition($id = $this->container->getAlias($attribute->get()))) {
+                throw new \InvalidArgumentException(sprintf('A definition with id "%s" does not exist.', $id));
+            }
 
             // if the reference id matches the current resolving, a circular
             // reference occured:
-            if ($current === $id) {
+            if ($current === $id || $self === $id) {
                 throw new CircularReferenceException(
-                    sprintf('Service \'%s\' has circular reference on \'%s\'', $current, $id)
+                    sprintf('Service \'%s\' has circular reference on \'%s\'', $id, $current === $id ? $self : $current)
                 );
-            }
-
-            // if all tests passes, continue to check the definitions arguments
-            // and setters list:
-            if (!$this->container->hasDefinition($id)) {
-                throw new \InvalidArgumentException(sprintf('A definition with id "%s" does not exist.', $id));
             }
 
             if ($self === $id && null !== $self) {
                 continue;
             }
 
-            $this->checkDefininition($this->container->getDefinition($id), $current, $id, $self);
+            $this->checkDefininition($this->container->getDefinition($id), $id, $current);
         }
     }
 

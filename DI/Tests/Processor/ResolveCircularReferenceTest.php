@@ -41,6 +41,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
         }
+
         $this->fail('test splipped');
     }
 
@@ -96,7 +97,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
         try {
             $process->process($container);
         } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
-            $this->assertSame('Service \'foo\' has circular reference on \'foo\'', $e->getMessage());
+            $this->assertSame('Service \'foo\' has circular reference on \'bar\'', $e->getMessage());
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
@@ -119,7 +120,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
         try {
             $process->process($container);
         } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
-            $this->assertSame('Service \'foo\' has circular reference on \'foo\'', $e->getMessage());
+            $this->assertSame('Service \'foo\' has circular reference on \'bar\'', $e->getMessage());
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
@@ -146,7 +147,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
         try {
             $process->process($container);
         } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
-            $this->assertSame('Service \'foo\' has circular reference on \'foo\'', $e->getMessage());
+            $this->assertSame('Service \'foo\' has circular reference on \'bar\'', $e->getMessage());
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
@@ -172,6 +173,45 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
             $process->process($container);
         } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
             $this->assertSame('Service \'foo\' has circular reference on \'foo\'', $e->getMessage());
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        $this->fail('test splipped');
+    }
+
+    /** @test */
+    public function itShouldDetectNestedReferences()
+    {
+        $container = new Container;
+
+        // A needs D
+        $A = $container->define('a');
+
+        // A needs D
+        $B = $container->define('b');
+
+        // C needs D
+        $C= $container->define('c');
+
+        // D needs C
+        $D = $container->define('d');
+
+        $container->setAlias('_d', 'd');
+        $container->setAlias('_c', 'c');
+
+        $A->addArgument(new Reference('_d'));
+        $B->addArgument(new Reference('_d'));
+        $C->addArgument(new Reference('_d'));
+        $D->addArgument(new Reference('_c'));
+
+        $process = new ResolveCircularReference;
+
+        try {
+            $process->process($container);
+        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+            $this->assertSame('Service \'d\' has circular reference on \'c\'', $e->getMessage());
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
