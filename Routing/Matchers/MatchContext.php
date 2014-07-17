@@ -86,7 +86,10 @@ class MatchContext
     {
         $params = array_merge($this->route->getDefaults(), $this->params);
 
-        return array_intersect_key($params, array_flip($this->route->getVars()));
+        return array_intersect_key(
+            $params,
+            array_merge(array_flip($this->route->getVars()), $this->route->getParameters())
+        );
     }
 
     /**
@@ -98,7 +101,10 @@ class MatchContext
     {
         $params = array_merge($this->route->getHostDefaults(), $this->params);
 
-        return array_intersect_key($params, array_flip($this->route->getHostVars()));
+        return array_intersect_key(
+            $params,
+            array_merge(array_flip($this->route->getHostVars(), $this->route->getHostDefaults()))
+        );
     }
 
     /**
