@@ -54,9 +54,7 @@ class DependencyManager
         $req = [];
 
         foreach ($this->repository->all() as $key => $package) {
-
             foreach ($this->getRequirements($package, true) as $pkg) {
-
                 if (array_key_exists($alias = $pkg->getAlias(), $req)) {
                     continue;
                 }
@@ -110,7 +108,13 @@ class DependencyManager
 
         foreach ($requirements as $req) {
 
+            $optional = $this->isOptional($req);
+            $req = rtrim($req, '?');
+
             if (!$this->repository->has($req)) {
+                if ($optional) {
+                    continue;
+                }
                 $this->handlePackageNotFound($alias, $req);
             }
 
@@ -124,6 +128,11 @@ class DependencyManager
         }
 
         return $res;
+    }
+
+    private function isOptional($package)
+    {
+        return '?' === $package[strlen($package) - 1];
     }
 
     /**

@@ -53,7 +53,7 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
         $p5 = m::mock('Selene\Components\Package\PackageInterface');
         $p5->shouldReceive('getName')->andReturn('p5Package')
            ->shouldReceive('getAlias')->andReturn('p5')
-           ->shouldReceive('requires')->andReturn(['p1', 'p3']);
+           ->shouldReceive('requires')->andReturn(['p1', 'p3', 'optional?']);
 
         $rep = new PackageRepository();
         $rep->add($p4);
