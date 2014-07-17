@@ -30,23 +30,28 @@ namespace {
         };
     }
 
-    /**
-     * nulls a given value in case it's an empty string
-     *
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    function clearValue($value)
-    {
-        return is_string($value) && 0 === strlen(trim($value)) ? null : $value;
+    if (!function_exists('clearValue')) {
+        /**
+         * nulls a given value in case it's an empty string
+         *
+         * @param mixed $value
+         *
+         * @return mixed
+         */
+        function clearValue($value)
+        {
+            return is_string($value) && 0 === strlen(trim($value)) ? null : $value;
+        }
     }
 
-    /**
-     * @see clearValue
-     */
-    function clear_value($value)
-    {
-        return clearValue($value);
+    if (!function_exists('clear_value')) {
+
+        /**
+         * @see clearValue
+         */
+        function clear_value($value)
+        {
+            return clearValue($value);
+        }
     }
 }
