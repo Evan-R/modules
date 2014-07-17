@@ -102,7 +102,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         if ($this->mapParameters) {
             if (null === ($arguments = $this->getParameters($context, $controller, $action))) {
                 throw new \RuntimeException(
-                    sprintf('Arguments mismatch for controller %s::$s()', get_class($controller), $action)
+                    sprintf('Arguments mismatch for controller %s::%s()', get_class($controller), $action)
                 );
             }
         } else {
@@ -193,9 +193,9 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
             $instance->setContainer($this->container);
         }
 
-        if (!method_exists($controller, $action)) {
+        if (!method_exists($instance, $action)) {
             throw new \RuntimeException(
-                sprintf('%s has no method %s', get_class($controller), $action)
+                sprintf('%s has no method %s', get_class($instance), $action)
             );
         }
 
