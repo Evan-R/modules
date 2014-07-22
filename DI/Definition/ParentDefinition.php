@@ -32,8 +32,10 @@ class ParentDefinition extends AbstractDefinition
      */
     public function __construct($parent)
     {
-        $this->parent = $parent;
+        parent::__construct();
+
         $this->obsoleteMetaData = [];
+        $this->parent = $parent;
     }
 
     /**
@@ -51,7 +53,6 @@ class ParentDefinition extends AbstractDefinition
             throw new \InvalidArgumentException();
         }
         $this->arguments['index_'  .(string)(int)$index] = $argument;
-        //var_dump($this->arguments);
     }
 
     /**

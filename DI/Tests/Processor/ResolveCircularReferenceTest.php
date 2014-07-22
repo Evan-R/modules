@@ -13,7 +13,7 @@ namespace Selene\Components\DI\Tests\Processor;
 
 use \Selene\Components\DI\Container;
 use \Selene\Components\DI\Reference;
-use \Selene\Components\DI\Definition\CallerDefinition;
+use \Selene\Components\DI\CallerReference;
 use \Selene\Components\DI\Processor\ResolveCircularReference;
 
 class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
@@ -164,8 +164,8 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
         $container->define('bar');
 
         $container->define('foo')
-            ->addArgument(new CallerDefinition('bar', 'getStuff'))
-            ->addArgument(new CallerDefinition('foo', 'getBar'));
+            ->addArgument(new CallerReference('bar', 'getStuff'))
+            ->addArgument(new CallerReference('foo', 'getBar'));
 
         $process = new ResolveCircularReference;
 

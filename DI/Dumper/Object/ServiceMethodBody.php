@@ -21,7 +21,7 @@ use \Selene\Components\DI\ContainerAwareInterface;
 use \Selene\Components\DI\Traits\ContainerAwareTrait;
 use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
 use \Selene\Components\DI\Dumper\ImportResolver;
-use \Selene\Components\DI\Definition\CallerDefinition;
+use \Selene\Components\DI\CallerReference;
 use \Selene\Components\DI\Definition\DefinitionInterface;
 
 /**
@@ -306,7 +306,7 @@ class ServiceMethodBody implements GeneratorInterface
             }
             if ($argument instanceof Reference) {
                 $args[$key] = $this->extractRefenceInstantiator($argument);
-            } elseif ($argument instanceof CallerDefinition) {
+            } elseif ($argument instanceof CallerReference) {
                 $args[$key] = $this->extractCallerDefinition($argument);
             } elseif (null !== $argument && !is_scalar($argument)) {
                 $args[$key] = $this->extractParams($argument, 0);
@@ -323,11 +323,11 @@ class ServiceMethodBody implements GeneratorInterface
     /**
      * extractCallerDefinition
      *
-     * @param CallerDefinition $caller
+     * @param CallerReference $caller
      *
      * @return string
      */
-    protected function extractCallerDefinition(CallerDefinition $caller)
+    protected function extractCallerDefinition(CallerReference $caller)
     {
         $service = $this->extractRefenceInstantiator($caller->getService());
 

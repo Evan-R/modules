@@ -111,6 +111,7 @@ class Configuration implements ConfigInterface
     protected function getDefaultConfig()
     {
         return [
+            [new ResolveParameters, ProcessorInterface::RESOLVE],
             [new ResolveParentDefinition, ProcessorInterface::OPTIMIZE],
             [new ResolveDefinitionDependencies, ProcessorInterface::OPTIMIZE],
             [new ResolveDefinitionArguments, ProcessorInterface::OPTIMIZE],

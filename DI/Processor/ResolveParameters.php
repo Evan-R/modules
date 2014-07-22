@@ -14,25 +14,14 @@ namespace Selene\Components\DI\Processor;
 use \Selene\Components\DI\ContainerInterface;
 
 /**
- * @interface ProcessorInterface
+ * @class ResolveParameters
  * @package Selene\Components\DI\Processor
  * @version $Id$
  */
-interface ProcessorInterface
+class ResolveParameters implements ProcessInterface
 {
-    const BEFORE_OPTIMIZE = 0;
-
-    const OPTIMIZE = 1;
-
-    const BEFORE_REMOVE = 2;
-
-    const RESOLVE = 3;
-
-    const REMOVE = 5;
-
-    const AFTER_REMOVE = 6;
-
-    public function process(ContainerInterface $container);
-
-    public function add(ProcessInterface $process, $priority = ProcessorInterface::BEFORE_OPTIMIZE);
+    public function process(ContainerInterface $container)
+    {
+        $container->getParameters()->resolve();
+    }
 }

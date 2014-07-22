@@ -22,7 +22,5 @@ interface ProcessInterface
 {
     const BEFORE_RESOLVE = 1;
 
-    const AFTER_RESOLVE = 2;
-
     public function process(ContainerInterface $container);
 }

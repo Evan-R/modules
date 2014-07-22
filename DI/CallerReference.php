@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Definition;
+namespace Selene\Components\DI;
 
 use \Selene\Components\DI\Reference;
 
@@ -18,7 +18,7 @@ use \Selene\Components\DI\Reference;
  * @package Selene\Components\DI
  * @version $Id$
  */
-class CallerDefinition
+class CallerReference
 {
     /**
      * Constructor.
@@ -33,6 +33,53 @@ class CallerDefinition
 
         $this->method    = $method;
         $this->arguments = $arguments;
+    }
+
+    /**
+     * fromString
+     *
+     * @param string $reference
+     *
+     * @return CallerReference
+     */
+    public static function fromString($reference)
+    {
+        if (!static::isReferenceString($reference)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a suitable reference string.'));
+        }
+
+        $service = substr($reference, 0, $pos = strpos($reference, '->'));
+
+        $method = substr($reference, $pos + 2);
+
+        if (0 === substr_count($method, '(')) {
+            return new self($service, $method);
+        }
+
+        $arguments = [];
+
+        if (preg_match('~\((.*)\)~', $method, $matches)) {
+            if (isset($matches[1])) {
+                $arguments = preg_split('~,\s+?~', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
+            }
+        }
+
+        $method = substr($method, 0, strpos($method, '('));
+
+        return new self($service, $method, $arguments);
+    }
+
+    /**
+     * isReferenceString
+     *
+     * @param string $string
+     *
+     * @return boolean
+     */
+    public static function isReferenceString($string)
+    {
+        return 0 === strpos($string, ContainerInterface::SERVICE_REF_INDICATOR)
+            && 1 === substr_count($string, '->');
     }
 
     /**

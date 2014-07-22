@@ -13,7 +13,7 @@ namespace Selene\Components\DI\Tests\Dumper\Object;
 
 use \Selene\Components\DI\Container;
 use \Selene\Components\DI\Reference;
-use \Selene\Components\DI\Definition\CallerDefinition;
+use \Selene\Components\DI\CallerReference;
 use \Selene\Components\DI\Dumper\Object\ServiceMethodBody;
 
 /**
@@ -101,7 +101,7 @@ class ServiceMethodBodyTest extends \PHPUnit_Framework_TestCase
         $container->define('bar', 'Acme\Bar');
 
         $container->define('foo', 'Acme\Foo')
-            ->addArgument(new CallerDefinition('bar', 'getStuff'));
+            ->addArgument(new CallerReference('bar', 'getStuff'));
 
         $smb = new ServiceMethodBody($container, 'foo', 'FooAlias');
 

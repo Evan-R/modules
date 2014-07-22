@@ -93,6 +93,8 @@ class ResolveDefinitionDependencies implements ProcessInterface
                 sprintf('Service factory for service "%s" requires a valid callback', $id)
             );
         }
+
+        $definition->setFactory($class, $method);
     }
 
     /**

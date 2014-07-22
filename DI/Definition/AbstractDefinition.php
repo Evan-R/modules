@@ -589,6 +589,7 @@ class AbstractDefinition implements DefinitionInterface
     {
         if (is_array($factory) || is_string($factory)) {
             $this->factory = $factory;
+
             return $this;
         }
 

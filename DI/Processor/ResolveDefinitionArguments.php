@@ -12,6 +12,7 @@
 namespace Selene\Components\DI\Processor;
 
 use \Selene\Components\DI\Reference;
+use \Selene\Components\DI\CallerReference;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 use \Selene\Components\DI\Definition\DefinitionInterface;
@@ -184,6 +185,10 @@ class ResolveDefinitionArguments implements ProcessInterface
     {
         if (is_array($argument)) {
             return $this->resolveArguments($argument);
+        }
+
+        if (is_string($argument) && CallerReference::isReferenceString($argument)) {
+            return CallerReference::fromString($argument);
         }
 
         if ($this->isDefinitionString($argument)) {

@@ -11,7 +11,7 @@
 
 namespace Selene\Components\DI\Processor;
 
-use \Selene\Components\DI\Definition\CallerDefinition;
+use \Selene\Components\DI\CallerReference;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\Definition\DefinitionInterface;
 use \Selene\Components\DI\Exception\CircularReferenceException;
@@ -96,7 +96,7 @@ class ResolveCircularReference implements ProcessInterface
                 continue;
             }
 
-            if ($attribute instanceof CallerDefinition) {
+            if ($attribute instanceof CallerReference) {
                 $this->checkCircularReference([$attribute->getService()], $current, $self);
                 continue;
             }
