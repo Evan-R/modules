@@ -24,6 +24,13 @@ use \Selene\Components\DI\ContainerInterface;
  */
 class ClassDefinition extends ServiceDefinition
 {
+    /**
+     * Constructor.
+     *
+     * @param string $class
+     * @param array  $arguments
+     * @param int    $scope
+     */
     public function __construct($class, array $arguments = [], $scope = ContainerInterface::SCOPE_PROTOTYPE)
     {
         $this->setClass($class);
@@ -38,7 +45,7 @@ class ClassDefinition extends ServiceDefinition
     public function setInjected($injected)
     {
         if ((bool)$injected && false === $this->scopeIsContainer()) {
-            throw new \LogicException('Cannot inject a class that has not container scope');
+            throw new \LogicException('Cannot inject a class that has not container scope.');
         }
 
         return call_user_func([$this, __NAMESPACE__.'\\AbstractDefinition::setInjected'], $injected);
@@ -50,8 +57,9 @@ class ClassDefinition extends ServiceDefinition
     public function setScope($scope)
     {
         if ($this->isInjected() && ContainerInterface::SCOPE_PROTOTYPE === $scope) {
-            throw new \LogicException('Cannot set prototype scope on an injected class');
+            throw new \LogicException('Cannot set prototype scope on an injected class.');
         }
+
         return call_user_func([$this, __NAMESPACE__.'\\AbstractDefinition::setScope'], $scope);
     }
 

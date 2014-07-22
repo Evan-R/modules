@@ -22,4 +22,12 @@ namespace Selene\Components\DI\Exception;
  */
 class ContainerResolveException extends \ErrorException
 {
+    public static function setterMethodNotExistent($instance, $method)
+    {
+        $class = $instance instanceof Definition ?
+            $instance->getClass() :
+            (is_object($instance) ? get_class($instance) : $instance);
+
+        return new self(sprintf('Method %s::%s() does not exist', $class, $method));
+    }
 }

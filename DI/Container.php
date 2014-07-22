@@ -11,12 +11,12 @@
 
 namespace Selene\Components\DI;
 
-use \DomainException;
 use \BadMethodCallException;
 use \InvalidArgumentException;
 use \Selene\Components\Common\Helper\StringHelper;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 use \Selene\Components\DI\Definition\DefinitionInterface;
+use \Selene\Components\DI\Exception\ContainerLockedException;
 use \Selene\Components\DI\Exception\ContainerResolveException;
 use \Selene\Components\DI\Exception\CircularReferenceException;
 
@@ -157,7 +157,7 @@ class Container implements ContainerInterface
     public function replaceParameters(ParameterInterface $parameters)
     {
         if ($this->isLocked()) {
-            throw new \BadMethodCallException('can\'t replace parameters on a locked container');
+            throw ContainerLockedException::replaceParameterException();
         }
 
         $this->parameters = $parameters;
@@ -203,7 +203,7 @@ class Container implements ContainerInterface
     public function setDefinition($id, DefinitionInterface $service)
     {
         if ($this->isLocked()) {
-            throw new \BadMethodCallException('Cannot set a definition on a locked container.');
+            throw ContainerLockedException::setDefinitionException($id);
         }
 
         return $this->definitions[$id] = $service;
@@ -265,7 +265,6 @@ class Container implements ContainerInterface
      * @param string $scope the service scope.
      *
      * @throws InvalidArgumentException when the scope contains `prototype`.
-     * @throws DomainException
      *
      * @return void
      */
@@ -376,20 +375,20 @@ class Container implements ContainerInterface
      * @param string $alias the alias
      * @param string $id the service id
      *
-     * @throws InvalidArgumentException if a service with given alias already
+     * @throws \LogicException if a service with given alias already
      * exists.
-     * @throws InvalidArgumentException if the alias is the same as the id.
+     * @throws \LogicException if the alias is the same as the id.
      *
      * @return void
      */
     public function setAlias($alias, $id)
     {
         if (isset($this->definitions[$alias = strtolower($alias)])) {
-            throw new InvalidArgumentException(sprintf('A service with id %s is already defined', $alias));
+            throw new \LogicException(sprintf('A service with id %s is already defined', $alias));
         }
 
         if (0 === strcasecmp($alias, $id)) {
-            throw new InvalidArgumentException(sprintf('Alias \'%s\' and id \'%s\' can\'t be the same.', $alias, $id));
+            throw new \LogicException(sprintf('Alias \'%s\' and id \'%s\' can\'t be the same.', $alias, $id));
         }
 
         $this->aliases->set($alias, strtolower($id));
@@ -469,7 +468,7 @@ class Container implements ContainerInterface
     public function merge(ContainerInterface $container)
     {
         if ($this->isLocked() || $container->isLocked()) {
-            throw new BadMethodCallException('cannot merge a locked container');
+            throw ContainerLockedException::mergeException();
         }
 
         $this->parameters->merge($container->getParameters());
@@ -678,7 +677,7 @@ class Container implements ContainerInterface
      * @param object $instance the service instance
      * @param array  $setters  the service setters as array.
      *
-     * @throws BadMethodCallException
+     * @throws ContainerResolveException
      *
      * @return void
      */
@@ -705,9 +704,9 @@ class Container implements ContainerInterface
     /**
      * applySetter
      *
-     * @param mixed $instance
-     * @param mixed $method
-     * @param mixed $arguments
+     * @param object $instance
+     * @param string $method
+     * @param array  $arguments
      *
      * @throws \BadMethodCallException
      *
@@ -716,9 +715,7 @@ class Container implements ContainerInterface
     protected function applySetter($instance, $method, $arguments)
     {
         if (!method_exists($instance, $method)) {
-            throw new BadMethodCallException(
-                sprintf('method %s::%s() does not exist', get_class($instance), $method)
-            );
+            throw ContainerResolveException::setterMethodNotExistent($instance, $method);
         }
 
         $arguments = $this->getServiceArguments($arguments);
@@ -727,11 +724,11 @@ class Container implements ContainerInterface
     }
 
     /**
-     * sync
+     * Call sync callbacks.
      *
-     * @param mixed $id
+     * @param string $id
      *
-     * @return mixed
+     * @return void
      */
     protected function sync($id)
     {

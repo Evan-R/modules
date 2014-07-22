@@ -26,6 +26,7 @@ use \Selene\Components\DI\Tests\Stubs\ParentService;
 use \Selene\Components\DI\Tests\Stubs\ContainerStub;
 use \Selene\Components\DI\Tests\Stubs\ServiceFactory;
 use \Selene\Components\DI\Exception\ContainerResolveException;
+use \Selene\Components\DI\Exception\ContainerLockedException;
 
 use \Selene\Components\TestSuite\TestCase;
 
@@ -75,8 +76,8 @@ class ContainerTest extends TestCase
 
         try {
             $container->replaceParameters(m::mock('Selene\Components\DI\ParameterInterface'));
-        } catch (\BadMethodCallException $e) {
-            $this->assertSame('can\'t replace parameters on a locked container', $e->getMessage());
+        } catch (ContainerLockedException $e) {
+            $this->assertSame('Can\'t replace parameters on a locked container.', $e->getMessage());
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
@@ -355,20 +356,19 @@ class ContainerTest extends TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
+     * @expectedException \LogicException
      */
     public function itShouldThrowExceptionIfAliasAndServiceNameExists()
     {
         $container = $this->createContainer();
 
         $container->define('foo');
-
         $container->setAlias('foo', 'bar');
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
+     * @expectedException \LogicException
      */
     public function itShouldThrowExceptionIfAliasAndServiceNameMatch()
     {
@@ -562,7 +562,7 @@ class ContainerTest extends TestCase
         try {
             $container->setDefinition('foo', $def);
         } catch (\BadMethodCallException $e) {
-            $this->assertSame('Cannot set a definition on a locked container.', $e->getMessage());
+            $this->assertSame('Cannot set definition "foo" on a locked container.', $e->getMessage());
 
             return;
         }
@@ -668,8 +668,8 @@ class ContainerTest extends TestCase
 
         try {
             $container->merge($mock);
-        } catch (\BadMethodCallException $e) {
-            $this->assertSame('cannot merge a locked container', $e->getMessage());
+        } catch (ContainerLockedException $e) {
+            $this->assertSame('Cannot merge a locked container.', $e->getMessage());
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
@@ -680,8 +680,8 @@ class ContainerTest extends TestCase
         $container = new Container(m::mock('Selene\Components\DI\StaticParameters'));
         try {
             $container->merge($mock);
-        } catch (\BadMethodCallException $e) {
-            $this->assertSame('cannot merge a locked container', $e->getMessage());
+        } catch (ContainerLockedException $e) {
+            $this->assertSame('Cannot merge a locked container.', $e->getMessage());
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());

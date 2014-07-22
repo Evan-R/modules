@@ -18,8 +18,21 @@ namespace Selene\Components\DI\Exception;
  * @package Selene\Components\DI\Exception
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class ContainerLockedException extends \BadMethodCallException
 {
+    public static function replaceParameterException()
+    {
+        return new self('Can\'t replace parameters on a locked container.');
+    }
+
+    public static function setDefinitionException($id)
+    {
+        return new self(sprintf('Cannot set definition "%s" on a locked container.', $id));
+    }
+
+    public static function mergeException()
+    {
+        return new self('Cannot merge a locked container.');
+    }
 }

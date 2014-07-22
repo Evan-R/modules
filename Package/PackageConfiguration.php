@@ -72,7 +72,7 @@ abstract class PackageConfiguration extends Configuration
     {
         $this->parameters = $builder->getContainer()->getParameters();
 
-        $this->setup($builder, $values);
+        $this->setup($builder, $this->mergeValues($values));
 
         $this->parameters = null;
     }
