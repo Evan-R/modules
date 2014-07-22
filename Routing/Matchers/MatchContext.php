@@ -103,7 +103,7 @@ class MatchContext
 
         return array_intersect_key(
             $params,
-            array_merge(array_flip($this->route->getHostVars(), $this->route->getHostDefaults()))
+            array_merge(array_flip($this->route->getHostVars()), $this->route->getHostDefaults())
         );
     }
 

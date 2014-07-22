@@ -133,9 +133,9 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider patternResolverProvider
      */
-    public function itShouldCompileToValidRegexp($pattern, $regexp, $path, $host = false, $requirement = null)
+    public function itShouldCompileToValidRegexp($pattern, $regexp, $path, $host = false, $requirement = null, $defaults = [])
     {
-        $route = $this->newRoute('index', $pattern, 'GET');
+        $route = $this->newRoute('index', $pattern, 'GET', [], $defaults);
 
         if ($host) {
             $route->setHost($host['pattern']);
@@ -196,6 +196,14 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 false
             ],
             [
+                '/foo/fii/{opt1?}',
+                '#^/foo/fii(?:/(?P<opt1>[^/]++))?$#s',
+                ['/foo/fii', '/foo/fii/bar'],
+                false,
+                null,
+                ['opt1' => true]
+            ],
+            [
                 '/foo/bam/{opt1}/{opt2?}',
                 '#^/foo/bam/(?P<opt1>[^/]++)(?:/(?P<opt2>[^/]++))?$#s',
                 ['/foo/bam/boo', '/foo/bam/boo/baz'],
@@ -251,7 +259,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    protected function newRoute($name, $path, $method = 'GET', array $requirements = [])
+    protected function newRoute($name, $path, $method = 'GET', array $requirements = [], $defaults = [])
     {
         $host = isset($requirements['_host']) ? $requirements['_host'] : null;
 
@@ -291,6 +299,10 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
         $route->shouldReceive('setHostConstraint')->andReturnUsing(function ($param, $attr) use ($route) {
             $route->constraints['host'][$param] = $attr;
             return $route;
+        });
+
+        $route->shouldReceive('hasDefault')->andReturnUsing(function ($key) use ($defaults) {
+            return array_key_exists($key, $defaults);
         });
 
         return $route;
