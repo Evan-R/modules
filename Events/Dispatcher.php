@@ -12,9 +12,6 @@
 namespace Selene\Components\Events;
 
 use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\ContainerAwareInterface;
-use \Selene\Components\DI\Traits\ContainerAwareTrait;
 
 /**
  * @class Dispatcher implements DispatcherInterface
@@ -24,9 +21,9 @@ use \Selene\Components\DI\Traits\ContainerAwareTrait;
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
-class Dispatcher implements DispatcherInterface, ContainerAwareInterface
+class Dispatcher implements DispatcherInterface
 {
-    use Getter, ContainerAwareTrait;
+    use Getter;
 
     /**
      * events
@@ -51,14 +48,11 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 
     /**
      * Constructor.
-     *
-     * @param ContainerInterace $container
      */
-    public function __construct(ContainerInterface $container = null)
+    public function __construct()
     {
         $this->sorted = [];
         $this->handlers = [];
-        $this->container = $container;
     }
 
     /**
@@ -288,17 +282,23 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 
         list($service, $method) = array_pad(explode(static::EVTHANDLER_SEPARATOR, $eventHandler), 2, null);
 
-        if (null === $this->container) {
-            throw new \InvalidArgumentException(
-                sprintf('Cannot set a service "%s" as handler, no service container is set.', $service)
-            );
-        }
-
-        if (!$this->container->has($service)) {
-            throw new \InvalidArgumentException(sprintf('A service with id "%s" is not defined.', $service));
-        }
+        $this->handleContainerException($service);
 
         return [$service, $method];
+    }
+
+    /**
+     * handleContainerException
+     *
+     * @param string $service
+     *
+     * @return void
+     */
+    protected function handleContainerException($service)
+    {
+        if (!$this->hasService($service)) {
+            throw new \InvalidArgumentException(sprintf('A service with id "%s" is not defined.', $service));
+        }
     }
 
     /**
@@ -316,7 +316,7 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 
         list ($service, $method) = $handler;
 
-        $object = $this->container->get($service);
+        $object = $this->getService($service);
 
         if ($object instanceof EventListenerInterface && null === $method) {
             return $object;
@@ -327,6 +327,29 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         }
 
         return [$object, $method];
+    }
+
+    /**
+     * hasService
+     *
+     * @param string $id
+     *
+     * @return boolean
+     */
+    protected function hasService($id)
+    {
+        return false;
+    }
+
+    /**
+     * getService
+     *
+     * @param string $id
+     *
+     * @return mixed
+     */
+    protected function getService($id)
+    {
     }
 
     /**
@@ -441,11 +464,10 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
     /**
      * doDispatch
      *
-     * @param array $handlers
-     * @param mixed $params
-     * @param mixed $isEvent
-     * @param mixed $results
-     * @param mixed $stopOnFirstResult
+     * @param array           $handlers
+     * @param EventInterface  $event
+     * @param array           $results
+     * @param boolean         $stopOnFirstResult
      *
      * @return boolean
      */

@@ -29,14 +29,14 @@ use \Selene\Components\DI\ContainerInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class DispatcherTest extends \PHPUnit_Framework_TestCase
+class DispatcherTest extends TestCase
 {
     /**
      * @test
      */
     public function testBindEvent()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $dispatcher->on('foo', function () {
             return 'bar';
@@ -56,7 +56,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $called = 0;
 
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $dispatcher->on(['foo', 'bar'], function () use (&$called) {
             $called++;
@@ -73,7 +73,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $called = 0;
 
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $dispatcher->once(['foo', 'bar'], function () use (&$called) {
             $called++;
@@ -96,7 +96,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $called = 0;
 
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $dispatcher->on('foo', function () use (&$called) {
             $called++;
@@ -133,10 +133,10 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldAlwaysReturnAnArrayWhenGettingHandlers()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
         $this->assertSame([], $dispatcher->getEventHandlers());
 
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
         $this->assertSame([], $dispatcher->getEventHandlers('foo'));
     }
 
@@ -145,7 +145,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $called = false;
 
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $listener = m::mock('Selene\Components\Events\EventListenerInterface');
         $listener->shouldReceive('handleEvent')->andReturnUsing(function () use (&$called) {
@@ -171,7 +171,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $called = 0;
 
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $listener = m::mock('Selene\Components\Events\EventListenerInterface');
 
@@ -201,7 +201,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $called = 0;
 
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $listenerA = m::mock('Selene\Components\Events\EventListenerInterface');
 
@@ -241,7 +241,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldReturnAllListenersForAEvent()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $dispatcher->on('foo', $a = function () {
         });
@@ -254,7 +254,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldReturnAllListenersForAEventSorted()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $dispatcher->on('foo', $a = function () {
         }, 10);
@@ -266,53 +266,10 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itShouldThrowOnInvalidHandlers()
-    {
-        $dispatcher = $this->createDispatcher();
-
-        try {
-            $dispatcher->on('foo', 'bar');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertSame(
-                'Cannot set a service "bar" as handler, no service container is set.',
-                $e->getMessage()
-            );
-        }
-
-        $container = m::mock('Selene\Components\DI\ContainerInterface');
-        $container->shouldReceive('has')->with('bar')->andReturn(false);
-
-        $dispatcher->setContainer($container);
-
-        try {
-            $dispatcher->once('foo', 'bar');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertSame('A service with id "bar" is not defined.', $e->getMessage());
-        }
-
-        try {
-            $dispatcher->once('foo', $handler = 'bar@baz@bam');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertSame('Invalid event handler "'.$handler.'".', $e->getMessage());
-
-        }
-
-        try {
-            $dispatcher->once('foo', new \stdClass);
-        } catch (\InvalidArgumentException $e) {
-            $this->assertSame('Invalid event handler "stdClass".', $e->getMessage());
-
-            return;
-        }
-
-        $this->fail('test failed');
-    }
-
-    /** @test */
     public function itShouldSetItsselfToAnEvent()
     {
         $dispatcherSet = false;
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $event = m::mock('Selene\Components\Events\\EventInterface');
 
@@ -337,7 +294,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldThrowOnInvalidServiceMethod()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $container = m::mock('Selene\Components\DI\ContainerInterface');
         $container->shouldReceive('has')->with('bar')->andReturn(true);
@@ -358,13 +315,13 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             return;
         }
 
-        $this->fail('test failed');
+        $this->giveUp();
     }
 
     /** @test */
     public function itShouldDispatchEventsDependingOnTheirPriority()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $dispatcher->on('foo', function () {
             return 'foo';
@@ -389,7 +346,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $called = false;
 
         $event = new Event;
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('doHandleEvent')
@@ -422,7 +379,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $container->shouldReceive('has')->with('some_service')->andReturn(true);
 
 
-        $dispatcher = $this->createDispatcher($container);
+        $dispatcher = $this->newDispatcher($container);
 
         $dispatcher->on('foo', 'some_service@handleEvent');
 
@@ -451,7 +408,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $container->shouldReceive('get')->with('some_service')->andReturn($class);
         $container->shouldReceive('has')->with('some_service')->andReturn(true);
 
-        $dispatcher = $this->createDispatcher($container);
+        $dispatcher = $this->newDispatcher($container);
 
         $dispatcher->on('foo', 'some_service');
 
@@ -478,13 +435,13 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $container->shouldReceive('get')->with('some_service')->andReturn($class);
         $container->shouldReceive('has')->with('some_service')->andReturn(true);
 
-        $dispatcher = $this->createDispatcher($container);
+        $dispatcher = $this->newDispatcher($container);
 
         $dispatcher->on('foo', 'some_service@doHandle');
         $result = $dispatcher->dispatch('foo');
 
         if (empty($result)) {
-            $this->fail();
+            $this->giveUp();
         }
     }
 
@@ -492,7 +449,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     public function testBindOnce()
     {
         $counter = 0;
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $dispatcher->once(
             'foo',
@@ -515,7 +472,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testStopEventPropagation()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
         $dispatcher->on(
             'foo',
             function ($event) {
@@ -548,7 +505,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     public function testDispatchUntil()
     {
 
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $dispatcher->on('foo', function () {
             return;
@@ -576,7 +533,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testDetachEvent()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
         $dispatcher->on(
             'foo',
             $foo = function () {
@@ -602,7 +559,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testDetachEventWithBoundCallable()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
 
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('handleEvent')->andReturnUsing(
@@ -627,41 +584,6 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([true], $result);
     }
 
-    /**
-     * @test
-     */
-    public function testDetachEventWithBoundCallableClass()
-    {
-        $class = m::mock('HandleAwareClass');
-        $class
-            ->shouldReceive('handleEvent')->andReturnUsing(
-                function () {
-                    $this->fail('event callback `handleEvent` should not be called');
-                    return true;
-                }
-            )
-            ->shouldReceive('respond')->andReturnUsing(
-                function () {
-                    return true;
-                }
-            );
-
-        $container = m::mock('Selene\Components\DI\ContainerInterface');
-        $container->shouldReceive('get')->with('some_service')->andReturn($class);
-        $container->shouldReceive('has')->with('some_service')->andReturn(true);
-
-        $dispatcher = $this->createDispatcher($container);
-
-        $dispatcher->on('foo', 'some_service');
-        $dispatcher->on('foo', 'some_service@respond');
-
-        $dispatcher->off('foo', 'some_service');
-
-        $result = $dispatcher->dispatch('foo');
-
-        $this->assertSame([true], $result);
-    }
-
     public function testGetAllHandlers()
     {
         $foo = function () {
@@ -671,7 +593,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $baz = function () {
         };
 
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
         $dispatcher->on('foo', $foo);
         $dispatcher->on('bar', $bar);
         $dispatcher->on('baz', $baz);
@@ -686,7 +608,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddSubscriber()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
         $dispatcher->addSubscriber(new EventSubscriberStub);
         $result = $dispatcher->dispatch('foo.event');
 
@@ -699,7 +621,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldFilterOutInvalidSubscriptions()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
         $subs = new InvalidSubscriber;
 
         try {
@@ -714,7 +636,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveObserver()
     {
-        $dispatcher = $this->createDispatcher();
+        $dispatcher = $this->newDispatcher();
         $dispatcher->addSubscriber($observer = new EventSubscriberStub);
         $result = $dispatcher->dispatch('foo.event');
 
@@ -724,22 +646,6 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $result = $dispatcher->dispatch('bar.event');
         $this->assertSame([], $result);
-    }
-
-    /**
-     * createDispatcher
-     *
-     * @param ContainerInterface $container
-     *
-     * @access protected
-     * @return Dispatcher
-     */
-    protected function createDispatcher(ContainerInterface $container = null)
-    {
-        if (null === $container) {
-            return new Dispatcher();
-        }
-        return new Dispatcher($container);
     }
 
     protected function tearDown()

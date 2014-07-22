@@ -26,13 +26,13 @@ class DispatcherTest extends TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\Routing\Controller\Dispatcher', new Dispatcher);
+        $this->assertInstanceof('Selene\Components\Routing\Controller\Dispatcher', $this->newDispatcher());
     }
 
     /** @test */
     public function itShouldFindAndDispatchAController()
     {
-        $resolver = new Dispatcher;
+        $resolver = $this->newDispatcher();
 
         $this->assertSame('ok', $resolver->dispatch($this->getContext()));
     }
@@ -40,7 +40,7 @@ class DispatcherTest extends TestCase
     /** @test */
     public function itShouldThrowAnExceptionIfControllerDosntExist()
     {
-        $resolver = new Dispatcher;
+        $resolver = $this->newDispatcher();
 
         $route = $this->mockRoute();
         $route->shouldReceive('getAction')->andReturn('Controller@action');
@@ -100,5 +100,10 @@ class DispatcherTest extends TestCase
     protected function mockContainer()
     {
         return m::mock('Selene\Components\DI\ContainerInterface');
+    }
+
+    protected function newDispatcher()
+    {
+        return new Dispatcher;
     }
 }

@@ -11,29 +11,21 @@
 
 namespace Selene\Components\Routing\Controller;
 
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\ContainerAwareInterface;
-use \Selene\Components\DI\Exception\ContainerResolveException;
-use \Selene\Components\DI\Traits\ContainerAwareTrait;
 use \Selene\Components\Common\SeparatorParserInterface;
 use \Selene\Components\Routing\Mapper\ParameterMapper;
 use \Selene\Components\Routing\Matchers\MatchContext;
 use \Selene\Components\Routing\Events\RouteDispatchEvent;
 
 /**
- * @class Resolver implements ResolverInterface, ContainerAwareInterface
+ * @class Resolver implements ResolverInterface
  * @see ResolverInterface
- * @see ContainerAwareInterface
  *
  * @package Selene\Components\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
-class Dispatcher implements DispatcherInterface, ContainerAwareInterface
+class Dispatcher implements DispatcherInterface
 {
-    use ContainerAwareTrait;
-
     /**
      * parser
      *
@@ -175,22 +167,16 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
 
         if (class_exists($controller)) {
             $instance = new $controller;
-        } elseif (null !== $this->getContainer()) {
+        } elseif ($this->hasService($controller)) {
 
             try {
-                $instance = $this->container->get($controller);
-            } catch (\ContainerResolveException $e) {
-                throw new \RuntimeException(sprintf('controller for id %s could not be resolved', $controller));
+                $instance = $this->getService($controller);
             } catch (\Exception $e) {
-                throw $e;
+                throw new \RuntimeException(sprintf('controller for id %s could not be resolved', $controller));
             }
 
         } else {
             throw new \RuntimeException(sprintf('Controller "%s" could not be found.', $controller));
-        }
-
-        if ($this->container && $instance instanceof ContainerAwareInterface) {
-            $instance->setContainer($this->container);
         }
 
         if (!method_exists($instance, $action)) {
@@ -200,6 +186,16 @@ class Dispatcher implements DispatcherInterface, ContainerAwareInterface
         }
 
         return [$instance, $action, $instance instanceof Controller ? 'callAction' : null];
+    }
+
+    protected function hasService($id)
+    {
+        return false;
+    }
+
+    protected function getService($id)
+    {
+        return null;
     }
 
     /**
