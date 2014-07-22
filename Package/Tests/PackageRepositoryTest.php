@@ -139,6 +139,7 @@ class PackageRepositoryTest extends TestCase
 
         $params    = m::mock('\Selene\Components\DI\ParameterInterface');
         $params->shouldReceive('getRaw')->andReturn([]);
+        $params->shouldReceive('all')->andReturn([]);
         $params->shouldReceive('merge');
 
         $container = new Container($params);
