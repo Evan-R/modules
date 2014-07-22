@@ -38,7 +38,7 @@ class ClassDefinitionTest extends DefinitionTest
         try {
             $def->setInjected(true);
         } catch (\LogicException $e) {
-            $this->assertEquals($e->getMessage(), 'Cannot inject a class that has not container scope');
+            $this->assertEquals($e->getMessage(), 'Cannot inject a class that has not container scope.');
         } catch (\Exception $e) {
             $this->fail();
         }
@@ -57,7 +57,7 @@ class ClassDefinitionTest extends DefinitionTest
         try {
             $def->setScope(ContainerInterface::SCOPE_PROTOTYPE);
         } catch (\LogicException $e) {
-            $this->assertEquals($e->getMessage(), 'Cannot set prototype scope on an injected class');
+            $this->assertEquals($e->getMessage(), 'Cannot set prototype scope on an injected class.');
         } catch (\Exception $e) {
             $this->fail();
         }

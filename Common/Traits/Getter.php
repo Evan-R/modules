@@ -41,6 +41,7 @@ trait Getter
         if (isset($resource[$attribute])) {
             return $resource[$attribute];
         }
+
         return $default;
     }
 
@@ -58,10 +59,11 @@ trait Getter
      */
     protected function getDefaultUsing(array $resource, $attribute, callable $use)
     {
-        if (!$value = $this->getDefault($resource, $attribute, false)) {
-            $value = call_user_func_array($use, [$resource, $attribute]);
+        if (!isset($resource[$attribute])) {
+            return call_user_func_array($use, [$resource, $attribute]);
         }
-        return $value;
+
+        return $resource[$attribute];
     }
 
     /**

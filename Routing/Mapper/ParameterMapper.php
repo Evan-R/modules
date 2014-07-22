@@ -60,6 +60,8 @@ class ParameterMapper
             return false;
         }
 
+        $args = [];
+
         foreach ($rm->getParameters() as $argument) {
             $name = $argument->getName();
 

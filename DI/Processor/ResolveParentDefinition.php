@@ -104,6 +104,10 @@ class ResolveParentDefinition implements ProcessInterface
             $def->setClass($class);
         }
 
+        if (null === $class) {
+            $def->setClass($parent->getClass());
+        }
+
         if (null !== ($scope = $definition->getScope())) {
             $def->setScope($scope);
         }

@@ -84,7 +84,7 @@ abstract class Package implements PackageInterface
     public function getConfiguration()
     {
         $class = $this->getNamespace() . '\\Config\\Config';
-        return new $class($this->getPath());
+        return new $class($this);
     }
 
     /**

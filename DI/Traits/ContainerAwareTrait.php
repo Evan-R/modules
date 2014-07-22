@@ -54,4 +54,36 @@ trait ContainerAwareTrait
     {
         return $this->container;
     }
+
+    /**
+     * hasService
+     *
+     * @param string $id
+     *
+     * @return boolean
+     */
+    protected function hasService($id)
+    {
+        if (null !== $this->container) {
+            return $this->container->has($id);
+        }
+
+        return false;
+    }
+
+    /**
+     * getService
+     *
+     * @param mixed $id
+     *
+     * @return object
+     */
+    protected function getService($id)
+    {
+        if (null === $this->container) {
+            throw new \BadMethodCallException('No container set.');
+        }
+
+        return $this->container->get($id);
+    }
 }

@@ -130,7 +130,11 @@ class AbstractDefinition implements DefinitionInterface
      */
     public function setClass($class)
     {
-        $this->class = $this->paddClassName($this->stripClassName($class));
+        if (null !== $class) {
+            $this->class = $this->paddClassName($this->stripClassName($class));
+        } else {
+            $this->class = $class;
+        }
 
         return $this;
     }
@@ -143,7 +147,7 @@ class AbstractDefinition implements DefinitionInterface
      */
     public function getClass()
     {
-        return $this->class;
+        return $this->class ?: null;
     }
 
     /**

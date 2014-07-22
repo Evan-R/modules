@@ -375,4 +375,24 @@ class ResolveParentDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->getDefinition('concrete')->hasMetaData('tagged'));
         $this->assertTrue($container->getDefinition('concrete')->hasMetaData('tagged_b'));
     }
+
+    /** @test */
+    public function concreteDefinitionsShouldInheritParentClass()
+    {
+        $container = new Container;
+
+        $parent = $container->define('abstract_parent', $class = '\Acme\AbstractParent')
+            ->setAbstract(true);
+
+        $container->setDefinition(
+            'concrete',
+            (new ParentDefinition('abstract_parent'))
+        );
+
+        $process = new ResolveParentDefinition;
+
+        $process->process($container);
+
+        $this->assertSame($class, $container->getDefinition('concrete')->getClass());
+    }
 }

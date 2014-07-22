@@ -60,27 +60,6 @@ interface ContainerInterface
     public function getParameters();
 
     /**
-     * setAlias
-     *
-     * @param mixed $alias
-     * @param mixed $id
-     *
-     * @access public
-     * @return void
-     */
-    public function setAlias($alias, $id);
-
-    /**
-     * getAlias
-     *
-     * @param mixed $alias
-     *
-     * @access public
-     * @return string
-     */
-    public function getAlias($alias);
-
-    /**
      * Define a service
      *
      * @param mixed $service
@@ -94,16 +73,6 @@ interface ContainerInterface
     public function define($service, $class = null, array $arguments = [], $scope = self::SCOPE_CONTAINER);
 
     /**
-     * Resolve a service instance
-     *
-     * @param mixed $id
-     *
-     * @access public
-     * @return Object
-     */
-    public function get($id);
-
-    /**
      * inject a service instance
      *
      * @param mixed $id
@@ -115,6 +84,24 @@ interface ContainerInterface
      */
     public function inject($id, $instance, $scope = self::SCOPE_CONTAINER);
 
+    /**
+     * Resolve a service instance
+     *
+     * @param mixed $id
+     *
+     * @return Object
+     */
+    public function get($id);
+
+    /**
+     * setDefinition
+     *
+     * @param mixed $id
+     * @param DefinitionInterface $definition
+     *
+     * @access public
+     * @return mixed
+     */
     public function setDefinition($id, DefinitionInterface $definition);
 
     /**
@@ -126,6 +113,7 @@ interface ContainerInterface
      * @return DefinitionInterface
      */
     public function getDefinition($id);
+
 
     /**
      * getDefinitions
@@ -154,6 +142,36 @@ interface ContainerInterface
      * @return void
      */
     public function removeDefinition($id);
+
+    /**
+     * findDefinitionsWithMetaData
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function findDefinitionsWithMetaData($name = null);
+
+    /**
+     * setAlias
+     *
+     * @param mixed $alias
+     * @param mixed $id
+     *
+     * @access public
+     * @return void
+     */
+    public function setAlias($alias, $id);
+
+    /**
+     * getAlias
+     *
+     * @param mixed $alias
+     *
+     * @access public
+     * @return string
+     */
+    public function getAlias($alias);
 
     /**
      * Merge two containers.

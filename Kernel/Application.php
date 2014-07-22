@@ -462,7 +462,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      */
     protected function injectServices()
     {
-        $this->getContainer()->inject(static::$appServiceId, $this);
         $this->getContainer()->inject(static::$appServiceId.'.package_repository', $this->packages);
     }
 
@@ -586,11 +585,13 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $this->setContainer($container);
 
-        $this->container->setParameter(static::$appServiceId.'.container.class', $containerClass);
-        $this->container->setParameter(static::$appServiceId.'.container.file', $containerFile);
-        $this->container->setParameter(static::$appServiceId.'.package.sources', $this->packageResources);
+        $container->setParameter(static::$appServiceId.'.class', get_class($this));
+        $container->setParameter(static::$appServiceId.'.container.class', $containerClass);
+        $container->setParameter(static::$appServiceId.'.container.file', $containerFile);
+        $container->setParameter(static::$appServiceId.'.package.sources', $this->packageResources);
 
-        $this->container->inject($this->getContainerServiceId(), $container);
+        $container->inject(static::$appServiceId, $this);
+        $container->inject($this->getContainerServiceId(), $container);
 
         $builder = $this->getContainerBuilder($container);
 

@@ -47,6 +47,8 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
 
     protected $sorted;
 
+    protected $configLoader;
+
     /**
      * @param array $packages
      *
@@ -63,6 +65,7 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
         $this->dependecies = new DependencyManager($this);
 
         $this->addPackages($packages);
+        $this->configLoader = new ConfigLoader;
     }
 
     /**
@@ -168,11 +171,14 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
                 continue;
             }
 
-            $this->loadPackageConfig($builder, $package);
+            //$this->loadPackageConfig($builder, $package);
+            $this->configLoader->load($builder, $package);
             $this->buildPackage($builder, $package);
 
             $this->built[] = $alias;
         }
+
+        $this->configLoader->unload();
     }
 
     protected function packageHasDependecies(PackageInterface $package)
@@ -228,11 +234,11 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      */
     protected function loadPackageConfig(ContainerBuilderInterface $builder, PackageInterface $package)
     {
-        $container = $builder->getContainer();
-
         if (!($config = $package->getConfiguration()) instanceof ConfigurationInterface) {
             return;
         }
+
+        $container = $builder->getContainer();
 
         $parameters = $container->getParameters();
         $containerClass = (new \ReflectionObject($container))->getName();
@@ -247,6 +253,7 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
 
         $builder->replaceContainer($container);
         $builder->addObjectResource($config);
+        $builder->addObjectResource($package);
     }
 
     /**

@@ -144,6 +144,8 @@ class Builder implements BuilderInterface
      */
     public function build()
     {
+        $this->container->getParameters()->resolve()->all();
+
         $this->processor->process($this->container);
 
         $this->container->getParameters()->resolve()->all();

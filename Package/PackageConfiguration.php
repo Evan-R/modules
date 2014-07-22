@@ -48,6 +48,13 @@ abstract class PackageConfiguration extends Configuration
     private $packagePath;
 
     /**
+     * packageAlias
+     *
+     * @var string
+     */
+    private $packageAlias;
+
+    /**
      * parameters
      *
      * @var \Selene\Components\DI\ParameterInterface
@@ -59,9 +66,10 @@ abstract class PackageConfiguration extends Configuration
      *
      * @param string $packagePath
      */
-    public function __construct($packagePath)
+    public function __construct(PackageInterface $package)
     {
-        $this->packagePath = $packagePath;
+        $this->packagePath  = $package->getPath();
+        $this->packageAlias = $package->getAlias();
     }
 
     /**
@@ -189,6 +197,18 @@ abstract class PackageConfiguration extends Configuration
     protected function getPackagePath()
     {
         return $this->packagePath;
+    }
+
+    /**
+     * getPackageAlias
+     *
+     *
+     * @access protected
+     * @return mixed
+     */
+    protected function getPackageAlias()
+    {
+        return $this->packageAlias;
     }
 
     /**

@@ -17,6 +17,7 @@ namespace Selene\Components\DI;
  * @package Selene\Components\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
+ * @license MIT
  */
 interface BuilderInterface
 {
