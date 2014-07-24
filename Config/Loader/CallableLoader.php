@@ -33,7 +33,7 @@ abstract class CallableLoader extends AbstractLoader
     public function load($resource, $any = self::LOAD_ONE)
     {
         $this->doLoad($resource);
-        $this->addResource($this->findResourceOrigin($resource));
+        $this->notify($this->findResourceOrigin($resource));
     }
 
     /**
