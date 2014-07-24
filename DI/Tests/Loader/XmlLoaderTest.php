@@ -105,14 +105,14 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
 
-        $loader->load('services.2.xml');
+        $loader->load('services.2.xml', true);
 
         $resources = $builder->getResources();
 
         $this->assertSame(2, count($resources));
 
-        $this->assertSame($dir.DIRECTORY_SEPARATOR.'services.2.xml', (string)$resources[0]);
-        $this->assertSame($dir.DIRECTORY_SEPARATOR.'imported.0.xml', (string)$resources[1]);
+        $this->assertTrue(in_array($dir.DIRECTORY_SEPARATOR.'services.2.xml', $resources));
+        $this->assertTrue(in_array($dir.DIRECTORY_SEPARATOR.'imported.0.xml', $resources));
     }
 
 

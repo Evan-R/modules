@@ -21,9 +21,9 @@ use \Selene\Components\Config\Resource\Locator;
 use \Selene\Components\Config\Loader\Resolver as LoaderResolver;
 use \Selene\Components\Config\Loader\DelegatingLoader;
 use \Selene\Components\Config\Resource\LocatorInterface;
-use \Selene\Components\Routing\DI\Loader\PhpLoader as PhpRoutingLoader;
-use \Selene\Components\Routing\DI\Loader\XmlLoader as XmlRoutingLoader;
-use \Selene\Components\Routing\DI\Loader\CallableLoader as CallableRoutingLoader;
+use \Selene\Components\Routing\Loader\DI\PhpLoader as PhpRoutingLoader;
+use \Selene\Components\Routing\Loader\DI\XmlLoader as XmlRoutingLoader;
+use \Selene\Components\Routing\Loader\DI\CallableLoader as CallableRoutingLoader;
 use \Selene\Components\Routing\RouteCollectionInterface as Routes;
 
 /**

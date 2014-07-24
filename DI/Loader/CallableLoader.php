@@ -43,7 +43,7 @@ class CallableLoader extends BaseCallableLoader
     /**
      * {@inheritdoc}
      */
-    protected function doLoad($file)
+    protected function doLoad($callable)
     {
         call_user_func($callable, $this->builder);
     }

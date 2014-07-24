@@ -44,4 +44,15 @@ class PhpLoader extends PhpFileLoader
         $this->container = $builder->getContainer();
         $this->setBuilder($builder);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doLoad($file)
+    {
+        $builder   = $this->builder;
+        $container = $this->container;
+
+        include $file;
+    }
 }
