@@ -18,12 +18,12 @@ use \Selene\Components\DI\Loader\XmlLoader;
 use \Selene\Components\DI\Loader\CallableLoader;
 use \Selene\Components\Config\Configuration;
 use \Selene\Components\Config\Resource\Locator;
-use \Selene\Components\Config\Resource\LoaderResolver;
+use \Selene\Components\Config\Loader\Resolver as LoaderResolver;
+use \Selene\Components\Config\Loader\DelegatingLoader;
 use \Selene\Components\Config\Resource\LocatorInterface;
-use \Selene\Components\Config\Resource\DelegatingLoader;
-use \Selene\Components\Routing\Loader\PhpLoader as PhpRoutingLoader;
-use \Selene\Components\Routing\Loader\XmlLoader as XmlRoutingLoader;
-use \Selene\Components\Routing\Loader\CallableLoader as CallableRoutingLoader;
+use \Selene\Components\Routing\DI\Loader\PhpLoader as PhpRoutingLoader;
+use \Selene\Components\Routing\DI\Loader\XmlLoader as XmlRoutingLoader;
+use \Selene\Components\Routing\DI\Loader\CallableLoader as CallableRoutingLoader;
 use \Selene\Components\Routing\RouteCollectionInterface as Routes;
 
 /**
@@ -155,8 +155,8 @@ abstract class PackageConfiguration extends Configuration
 
         return new DelegatingLoader(new LoaderResolver([
             new CallableRoutingLoader($builder, $routes),
-            new PhpRoutingLoader($builder, $locator, $routes),
-            new XmlRoutingLoader($builder, $locator, $routes)
+            new PhpRoutingLoader($builder, $routes, $locator),
+            new XmlRoutingLoader($builder, $routes, $locator)
         ]));
     }
 

@@ -11,6 +11,8 @@
 
 namespace Selene\Components\DI;
 
+use \Selene\Components\Config\Loader\LoaderListener;
+
 /**
  * @interface BuilderInterface
  *
@@ -67,7 +69,7 @@ interface BuilderInterface
     /**
      * Get the current container.
      *
-     * @return ContainerInterface
+     * @return \Selene\Components\DI\ContainerInterface
      */
     public function getContainer();
 

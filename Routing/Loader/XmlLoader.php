@@ -11,11 +11,14 @@
 
 namespace Selene\Components\Routing\Loader;
 
-use \Selene\Components\Xml\Parser;
 use \Selene\Components\Routing\Route;
+use \Selene\Components\Routing\RouteCollectionInterface;
+use \Selene\Components\Routing\Traits\RoutingLoaderTrait;
+use \Selene\Components\Xml\Parser;
 use \Selene\Components\Xml\Dom\DOMElement;
 use \Selene\Components\Xml\Dom\DOMDocument;
-use \Selene\Components\Config\Traits\XmlLoaderHelperTrait;
+use \Selene\Components\Config\Loader\XmlFileLoader;
+use \Selene\Components\Config\Resource\LocatorInterface;
 
 /**
  * @class XmlLoader extends RoutingLoader XmlLoader
@@ -25,11 +28,22 @@ use \Selene\Components\Config\Traits\XmlLoaderHelperTrait;
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
-class XmlLoader extends RoutingLoader
+class XmlLoader extends XmlFileLoader
 {
-    use XmlLoaderHelperTrait;
+    use RoutingLoaderTrait;
 
     protected static $methods = ['get', 'post', 'put', 'delete'];
+
+    /**
+     * Constructor.
+     *
+     * @param RouteCollectionInterface $routes
+     */
+    public function __construct(RouteCollectionInterface $routes, LocatorInterface $locator)
+    {
+        $this->newBuilder($routes);
+        parent::__construct($locator);
+    }
 
     /**
      * load
@@ -130,12 +144,14 @@ class XmlLoader extends RoutingLoader
         //$routeClass = static::getRouteClass();
         //$route = new $routeClass($name, $path, $methods, $requirements);
 
-        $route = $this->routes->define($methods, $name, $path, $controller, $requirements);
+        $route = $this->getRoutes()
+            ->define($methods, $name, $path, $controller, $requirements);
 
         $this->parseDefaults($route, $node);
         $this->parseConstraints($route, $node);
 
-        $this->routes->add($route);
+        $this->getRoutes()
+            ->add($route);
     }
 
     /**
@@ -164,7 +180,7 @@ class XmlLoader extends RoutingLoader
 
         // import subroutes:
         if (0 < strlen($import = $node->getAttribute('import'))) {
-            $this->routes->group($prefix, $requirements, function () use ($import) {
+            $this->getRoutes()->group($prefix, $requirements, function () use ($import) {
                 $this->import($import);
             });
 
@@ -172,7 +188,7 @@ class XmlLoader extends RoutingLoader
         }
 
         // parse groups:
-        $this->routes->group($prefix, $requirements, function () use ($node) {
+        $this->getRoutes()->group($prefix, $requirements, function () use ($node) {
             foreach ($node->xpath('./*') as $routeNode) {
                 $this->parseRoute($routeNode, static::$methods);
             }
@@ -204,7 +220,8 @@ class XmlLoader extends RoutingLoader
         $actions     = isset($requirements['actions']) ? $requirements['actions'] : null;
         $constraints = isset($requirements['constraints']) ? $requirements['constraints'] : null;
 
-        $this->routes->resource($requirements['path'], $requirements['controller'], $actions, $constraints);
+        $this->getRoutes()
+            ->resource($requirements['path'], $requirements['controller'], $actions, $constraints);
     }
 
     /**
@@ -326,6 +343,21 @@ class XmlLoader extends RoutingLoader
         return $requirements;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function notifyResource($resource)
+    {
+    }
+
+    /**
+     * Get the appropriate php value.
+     *
+     * @param \DOMNode $parameter
+     * @param mixed $default
+     *
+     * @return mixed
+     */
     private function getPhpValue(\DOMNode $parameter, $default = null)
     {
         return Parser::getPhpValue((string)$parameter->nodeValue, $default, $this->getParser());

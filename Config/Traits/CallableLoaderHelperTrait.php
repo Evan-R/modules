@@ -26,7 +26,6 @@ trait CallableLoaderHelperTrait
      *
      * @param callable $callable
      *
-     * @access private
      * @return string
      */
     private function findResourceOrigin(callable $callable)
@@ -39,11 +38,15 @@ trait CallableLoaderHelperTrait
     }
 
     /**
-     * {@inheritdoc}
-     * @param callable $format
+     * Checks the resource being a callable.
+     *
+     * @param mixed $resource
+     *
+     * @return boolean
      */
     public function supports($resource)
     {
         return is_callable($resource);
     }
+
 }

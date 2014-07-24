@@ -20,9 +20,9 @@ use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\DI\Definition\ParentDefinition;
 use \Selene\Components\DI\Definition\ServiceDefinition;
 use \Selene\Components\DI\Definition\DefinitionInterface;
-use \Selene\Components\Config\Resource\Loader;
 use \Selene\Components\Config\Resource\LocatorInterface;
-use \Selene\Components\Config\Traits\XmlLoaderHelperTrait;
+use \Selene\Components\Config\Loader\XmlFileLoader;
+use \Selene\Components\Config\Traits\ContainerBuilderAwareLoaderTrait;
 use \Selene\Components\Common\Helper\ListHelper;
 
 /**
@@ -33,12 +33,14 @@ use \Selene\Components\Common\Helper\ListHelper;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class XmlLoader extends Loader
+class XmlLoader extends XmlFileLoader
 {
-    use XmlLoaderHelperTrait;
+    use ContainerBuilderAwareLoaderTrait;
 
     /**
+     * Constructor.
      *
+     * @param BuilderInterface $builder
      * @param LocatorInterface $locator
      *
      * @access public
@@ -46,28 +48,35 @@ class XmlLoader extends Loader
     public function __construct(BuilderInterface $builder, LocatorInterface $locator)
     {
         parent::__construct($locator);
+
         $this->container = $builder->getContainer();
-        $this->builder = $builder;
+        $this->setBuilder($builder);
     }
 
     protected function doLoad($file)
     {
-
-        $this->builder->addFileResource($file);
-
         $xml = $this->loadXml($file);
-
         // parse the imported xml files
         $this->parseImports($xml, $file);
-
         // parse the container parareters
         $this->parseParameters($xml);
-
         // parse the container services
         $this->parseServices($xml);
 
-        // parse parameters that are marked as package nodes.
+        $this->prepareParsePackageConfig($xml);
+    }
+
+    /**
+     * prepareParsePackageConfig
+     *
+     * @param DOMDocument $xml
+     *
+     * @return void
+     */
+    protected function prepareParsePackageConfig(DOMDocument $xml)
+    {
         $key = $this->getParser()->getIndexKey();
+
         $this->getParser()->setIndexKey('item');
         $this->parsePackageConfig($xml);
         $this->getParser()->setIndexKey($key);
@@ -112,7 +121,7 @@ class XmlLoader extends Loader
      */
     protected function parseImports(DOMDocument $xml, $file)
     {
-        $this->setResourcePath(dirname($file));
+        //$this->setResourcePath(dirname($file));
 
         foreach ($xml->xpath('//imports/import') as $import) {
             $path = Parser::getElementText($import);

@@ -12,9 +12,9 @@
 namespace Selene\Components\DI\Loader;
 
 use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Config\Resource\Loader;
-use \Selene\Components\Config\Resource\LocatorInterface;
-use \Selene\Components\Config\Traits\CallableLoaderHelperTrait;
+use \Selene\Components\Config\Traits\ContainerBuilderAwareLoaderTrait;
+use \Selene\Components\Config\Loader\LoaderAwareListener;
+use \Selene\Components\Config\Loader\CallableLoader as BaseCallableLoader;
 
 /**
  * @class CallableLoader extends Loader
@@ -25,41 +25,26 @@ use \Selene\Components\Config\Traits\CallableLoaderHelperTrait;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class CallableLoader extends Loader
+class CallableLoader extends BaseCallableLoader
 {
-    use CallableLoaderHelperTrait;
+    use ContainerBuilderAwareLoaderTrait;
 
     /**
+     * Constructor.
+     *
      * @param BuilderInterface $builder
      * @param LocatorInterface $locator
-     *
-     * @access public
      */
-    public function __construct(BuilderInterface $builder, LocatorInterface $locator)
+    public function __construct(BuilderInterface $builder)
     {
-        $this->container = $builder->getContainer();
-        $this->builder = $builder;
-
-        parent::__construct($locator);
+        $this->setBuilder($builder);
     }
 
     /**
-     * Load a callable entity resuorce.
-     *
-     * @param callable $resource
-     *
-     * @access public
-     * @return void
+     * {@inheritdoc}
      */
-    public function load($callable, $any = false)
-    {
-        $resource = $this->findResourceOrigin($callable);
-
-        call_user_func($callable, $this->builder);
-        $this->builder->addFileResource($resource);
-    }
-
     protected function doLoad($file)
     {
+        call_user_func($callable, $this->builder);
     }
 }

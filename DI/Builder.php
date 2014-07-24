@@ -18,6 +18,7 @@ use \Selene\Components\DI\Processor\ProcessorDecorator;
 use \Selene\Components\DI\Processor\ProcessorInterface;
 use \Selene\Components\Config\Resource\FileResource;
 use \Selene\Components\Config\Resource\ObjectResource;
+use \Selene\Components\Config\Loader\LoaderInterface;
 
 /**
  * @class Builder implements BuilderInterface

@@ -11,7 +11,10 @@
 
 namespace Selene\Components\Routing\Loader;
 
-use \Selene\Components\Routing\RouteBuilder;
+use \Selene\Components\Config\Loader\PhpFileLoader;
+use \Selene\Components\Config\Resource\LocatorInterface;
+use \Selene\Components\Routing\RouteCollectionInterface;
+use \Selene\Components\Routing\Traits\RoutingLoaderTrait;
 
 /**
  * @class PhpLoader extends ConfigLoader
@@ -22,8 +25,20 @@ use \Selene\Components\Routing\RouteBuilder;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class PhpLoader extends RoutingLoader
+class PhpLoader extends PhpFileLoader
 {
+    use RoutingLoaderTrait;
+
+    /**
+     * Constructor.
+     *
+     * @param RouteCollectionInterface $routes
+     */
+    public function __construct(RouteCollectionInterface $routes, LocatorInterface $locator)
+    {
+        $this->newBuilder($routes);
+        parent::__construct($locator);
+    }
 
     /**
      * load
@@ -35,9 +50,9 @@ class PhpLoader extends RoutingLoader
      */
     protected function doLoad($file)
     {
-        $routes = $this->routes;
+        $routes = $this->getRoutes();
 
-        include $file;
+        parent::doLoad($file);
     }
 
     /**
@@ -51,5 +66,12 @@ class PhpLoader extends RoutingLoader
     public function supports($resource)
     {
         return is_string($resource) && 'php' ===  pathinfo(strtolower($resource), PATHINFO_EXTENSION);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function notifyResource($resource)
+    {
     }
 }

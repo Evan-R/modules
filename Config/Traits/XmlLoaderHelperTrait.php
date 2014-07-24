@@ -40,16 +40,6 @@ trait XmlLoaderHelperTrait
     protected $xmlLoader;
 
     /**
-     * {@inheritdoc}
-     * @param string $format
-     * @return boolean
-     */
-    public function supports($resource)
-    {
-        return is_string($resource) && 'xml' ===  pathinfo(strtolower($resource), PATHINFO_EXTENSION);
-    }
-
-    /**
      * Loads an xml file into a DOMDocument.
      *
      * @param string $xml filepath to an xml file

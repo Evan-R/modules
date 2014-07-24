@@ -45,9 +45,9 @@ abstract class Loader implements LoaderInterface
     protected $resourcePath;
 
     /**
-     * @param LocatorInterface $locator
+     * Constructor.
      *
-     * @access public
+     * @param LocatorInterface $locator
      */
     public function __construct(LocatorInterface $locator)
     {
@@ -59,7 +59,6 @@ abstract class Loader implements LoaderInterface
      *
      * @param LoaderResolverInterface $resolver
      *
-     * @access public
      * @return void
      */
     public function setResolver(LoaderResolverInterface $resolver)
@@ -70,7 +69,6 @@ abstract class Loader implements LoaderInterface
     /**
      * getResolver
      *
-     * @access public
      * @return LoaderResolverInterface
      */
     public function getResolver()
@@ -81,7 +79,6 @@ abstract class Loader implements LoaderInterface
     /**
      * getResourcePath
      *
-     * @access public
      * @return string
      */
     public function getResourcePath()
@@ -94,7 +91,6 @@ abstract class Loader implements LoaderInterface
      *
      * @param string $path
      *
-     * @access public
      * @return void
      */
     public function setResourcePath($path)
@@ -107,7 +103,6 @@ abstract class Loader implements LoaderInterface
      *
      * @param mixed $resource
      *
-     * @access public
      * @return void
      */
     public function import($resource)
@@ -116,24 +111,58 @@ abstract class Loader implements LoaderInterface
             return $this->load($resource);
         }
 
-
         if ($resolver = $this->getResolver() && $loader = $this->getResolver()->resolve($resource)) {
             $loader->load($resource);
         }
     }
 
+    /**
+     * load
+     *
+     * @param mixed   $resource
+     * @param boolean $any
+     *
+     * @return void
+     */
     public function load($resource, $any = false)
     {
+        $resources = [];
+
         if ($any) {
             foreach ($this->locator->locate($resource, true) as $file) {
                 $this->doLoad($file);
             }
         } else {
-            $this->doLoad($this->locator->locate($resource));
+            $this->loadResource($this->locator->locate($resource));
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     abstract public function supports($resource);
 
-    abstract protected function doLoad($file);
+    /**
+     * doLoad
+     *
+     * @param mixed $resource
+     *
+     * @return void
+     */
+    abstract protected function doLoad($resource);
+
+    /**
+     * notifyResource
+     *
+     * @param mixed $resource
+     *
+     * @return void
+     */
+    abstract protected function notifyResource($resource);
+
+    private function loadResource($resource)
+    {
+        $this->notifyResource($resource);
+        $this->doLoad($resource);
+    }
 }

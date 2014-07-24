@@ -80,6 +80,7 @@ abstract class RoutingLoader extends Loader
     public function load($resource, $any = false)
     {
         foreach ($this->locator->locate($resource, true) as $file) {
+
             if (in_array($rpath = realpath($file), $this->loaded)) {
                 continue;
             }
@@ -88,29 +89,5 @@ abstract class RoutingLoader extends Loader
             $this->builder->addFileResource($file);
             $this->loaded[] = $rpath;
         }
-
-        $this->prepareContainer();
-    }
-
-    /**
-     * prepareContainer
-     *
-     *
-     * @access protected
-     * @return void
-     */
-    protected function prepareContainer()
-    {
-    }
-
-    /**
-     * getRouteCollectionClass
-     *
-     * @access protected
-     * @return string
-     */
-    protected function getRouteCollectionClass()
-    {
-        return '\Selene\Components\Routing\RouteCollection';
     }
 }

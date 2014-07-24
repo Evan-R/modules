@@ -12,8 +12,8 @@
 namespace Selene\Components\Config\Tests\Resource;
 
 use \Mockery as m;
-use \Selene\Components\Config\Resource\LoaderResolver;
-use \Selene\Components\Config\Resource\LoaderInterface;
+use \Selene\Components\Config\Loader\Resolver;
+use \Selene\Components\Config\Loader\LoaderInterface;
 use \Selene\Components\Config\Resource\LoaderResolverInterface;
 
 /**
@@ -21,7 +21,7 @@ use \Selene\Components\Config\Resource\LoaderResolverInterface;
  * @package Selene\Components\Config\Tests\Resource
  * @version $Id$
  */
-class LoaderResolverTest extends \PHPUnit_Framework_TestCase
+class ResolverTest extends \PHPUnit_Framework_TestCase
 {
     protected function tearDown()
     {
@@ -31,8 +31,8 @@ class LoaderResolverTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $resolver = new LoaderResolver;
-        $this->assertInstanceof('\Selene\Components\Config\Resource\LoaderResolverInterface', $resolver);
+        $resolver = new Resolver;
+        $this->assertInstanceof('\Selene\Components\Config\Loader\ResolverInterface', $resolver);
     }
 
     /** @test */
@@ -40,7 +40,7 @@ class LoaderResolverTest extends \PHPUnit_Framework_TestCase
     {
         $file = 'somefile';
 
-        $resolver = new LoaderResolver;
+        $resolver = new Resolver;
 
         $loaders = [
             $a = $this->mockLoader($resolver),
@@ -75,7 +75,7 @@ class LoaderResolverTest extends \PHPUnit_Framework_TestCase
      */
     protected function mockLoader($resolver)
     {
-        $loader  = m::mock('\Selene\Components\Config\Resource\LoaderInterface');
+        $loader  = m::mock('\Selene\Components\Config\Loader\LoaderInterface');
         $loader->shouldReceive('setResolver')->with($resolver);
 
         return $loader;

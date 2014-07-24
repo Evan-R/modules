@@ -12,8 +12,9 @@
 namespace Selene\Components\DI\Loader;
 
 use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Config\Resource\Loader;
+use \Selene\Components\Config\Loader\PhpFileLoader;
 use \Selene\Components\Config\Resource\LocatorInterface;
+use \Selene\Components\Config\Traits\ContainerBuilderAwareLoaderTrait;
 
 /**
  * @class PhpLoader extends ConfigLoader
@@ -24,9 +25,13 @@ use \Selene\Components\Config\Resource\LocatorInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class PhpLoader extends Loader
+class PhpLoader extends PhpFileLoader
 {
+    use ContainerBuilderAwareLoaderTrait;
+
     /**
+     * Constructor.
+     *
      * @param BuilderInterface $builder
      * @param LocatorInterface $locator
      *
@@ -35,26 +40,8 @@ class PhpLoader extends Loader
     public function __construct(BuilderInterface $builder, LocatorInterface $locator)
     {
         parent::__construct($locator);
+
         $this->container = $builder->getContainer();
-        $this->builder = $builder;
-    }
-
-    protected function doLoad($file)
-    {
-        $builder = $this->builder;
-        $container = $this->container;
-
-        include $file;
-
-        $builder->addFileResource($file);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @param string $format
-     */
-    public function supports($resource)
-    {
-        return is_string($resource) && 'php' ===  pathinfo(strtolower($resource), PATHINFO_EXTENSION);
+        $this->setBuilder($builder);
     }
 }

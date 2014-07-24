@@ -16,11 +16,11 @@ use \Symfony\Component\HttpFoundation\Response;
 use \Symfony\Component\HttpKernel\HttpKernelInterface;
 use \Symfony\Component\HttpKernel\TerminableInterface;
 use \Selene\Components\Common\Helper\ListHelper;
-use \Selene\Components\Config\Resource\Locator;
-use \Selene\Components\Config\Resource\LoaderResolver;
-use \Selene\Components\Config\Resource\DelegatingLoader;
-use \Selene\Components\Config\Cache as ConfigCache;
 use \Selene\Components\Config\CacheInterface;
+use \Selene\Components\Config\Loader\DelegatingLoader;
+use \Selene\Components\Config\Loader\Resolver as LoaderResolver;
+use \Selene\Components\Config\Resource\Locator;
+use \Selene\Components\Config\Cache as ConfigCache;
 use \Selene\Components\Routing\RouterInterface;
 use \Selene\Components\DI\Builder;
 use \Selene\Components\DI\BuilderInterface;
@@ -627,9 +627,9 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
         $locator = new Locator($this->getPackageConfig(), $rootPath);
 
         $resolver = new LoaderResolver([
-            new XmlLoader($builder, $locator),
-            new PhpLoader($builder, $locator),
-            new CallableLoader($builder, $locator)
+          new XmlLoader($builder, $locator),
+          new PhpLoader($builder, $locator),
+          new CallableLoader($builder)
         ]);
 
         return new DelegatingLoader($resolver);

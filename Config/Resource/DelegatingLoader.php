@@ -73,6 +73,9 @@ class DelegatingLoader extends Loader
 
     protected function doLoad($file)
     {
-        return null;
+    }
+
+    protected function notifyResource($resource)
+    {
     }
 }

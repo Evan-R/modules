@@ -11,10 +11,9 @@
 
 namespace Selene\Components\Routing\Loader;
 
-use \Selene\Components\Routing\RouteBuilder;
-use \Selene\Components\DI\BuilderInterface;
 use \Selene\Components\Routing\RouteCollectionInterface;
-use \Selene\Components\Config\Traits\CallableLoaderHelperTrait;
+use \Selene\Components\Routing\Traits\RoutingLoaderTrait;
+use \Selene\Components\Config\Loader\CallableLoader as BaseCallableLoader;
 
 /**
  * @class CallableLoader extends RoutingLoader
@@ -25,38 +24,32 @@ use \Selene\Components\Config\Traits\CallableLoaderHelperTrait;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class CallableLoader extends RoutingLoader
+class CallableLoader extends BaseCallableLoader
 {
-    use CallableLoaderHelperTrait;
+    use RoutingLoaderTrait;
 
-    public function __construct(BuilderInterface $builder, RouteCollectionInterface $routes)
+    /**
+     * Constrictor.
+     *
+     * @param RouteCollectionInterface $routes
+     */
+    public function __construct(RouteCollectionInterface $routes)
     {
-        $this->container = $builder->getContainer();
-        $this->builder = $builder;
-        $this->routes = new RouteBuilder($routes);
+        $this->newBuilder($routes);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $any = false)
+    public function doLoad($resource, $any = false)
     {
-        call_user_func($resource, $this->routes);
-
-        $this->builder->addFileResource($this->findResourceOrigin($resource));
-        $this->prepareContainer();
+        call_user_func($resource, $this->getRoutes());
     }
 
     /**
-     * doLoad
-     *
-     * @param mixed $file
-     *
-     * @access protected
-     * @return mixed
+     * {@inheritdoc}
      */
-    protected function doLoad($file)
+    protected function notifyResource($resource)
     {
-        return;
     }
 }
