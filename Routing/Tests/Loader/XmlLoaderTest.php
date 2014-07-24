@@ -23,10 +23,9 @@ use \Selene\Components\Routing\RouteCollection;
  */
 class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    private $locator;
-    private $builder;
-    private $container;
-    private $routes;
+    protected $container;
+
+    use LoaderTestHelper;
 
     /** @test */
     public function itShouldBeInstantiable()
@@ -34,9 +33,8 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceof(
             '\Selene\Components\Routing\Loader\XmlLoader',
             new XmlLoader(
-                $this->builder,
-                $this->locator,
-                $this->routes
+                $this->routes,
+                $this->locator
             )
         );
     }
@@ -52,30 +50,19 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
             ->with($fname, true)
             ->andReturn([$file = __DIR__ . '/Fixures/routes.0.xml']);
 
-        $this->builder->shouldReceive('addFileResource')
-            ->once()
-            ->with($file)
-            ->andReturnUsing(function ($f) use ($file, &$loaded) {
-                $loaded = true;
-                $this->assertSame($file, $f);
-            });
+        //$this->builder->shouldReceive('addFileResource')
+        //    ->once()
+        //    ->with($file)
+        //    ->andReturnUsing(function ($f) use ($file, &$loaded) {
+        //        $loaded = true;
+        //        $this->assertSame($file, $f);
+        //    });
 
-        $loader->load($fname);
+        $loader->load($fname, true);
 
-        $this->assertTrue($loaded);
+        //$this->assertTrue($loaded);
 
         $this->assertTrue($this->routes->has('index'));
-
-        //$this->assertTrue($routes->has('index'));
-        //$this->assertTrue($routes->has('index.create'));
-        //$this->assertTrue($routes->has('index.edit'));
-        //$this->assertTrue($routes->has('index.delete'));
-
-        //$this->assertTrue($routes->has('baz'));
-        //$this->assertTrue($routes->has('baz.show'));
-
-        //$this->assertTrue($routes->has('foo'));
-        //$this->assertTrue($routes->has('foo.bar'));
     }
 
     /** @test */
@@ -92,27 +79,27 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
             ->andReturn([$fileA = __DIR__ . '/Fixures/routes.1.xml']);
 
         $this->locator->shouldReceive('locate')
-            ->with($fnameB, true)
+            ->with($fnameB, false)
             ->andReturn([$fileB = __DIR__ . '/Fixures/routes.0.xml']);
 
-        $this->builder->shouldReceive('addFileResource')
-            ->once()
-            ->with($fileA)
-            ->andReturnUsing(function ($f) use ($fileA, &$loadedA) {
-                $loadedA = true;
-                $this->assertSame($fileA, $f);
-            });
+        //$this->builder->shouldReceive('addFileResource')
+        //    ->once()
+        //    ->with($fileA)
+        //    ->andReturnUsing(function ($f) use ($fileA, &$loadedA) {
+        //        $loadedA = true;
+        //        $this->assertSame($fileA, $f);
+        //    });
 
-        $this->builder->shouldReceive('addFileResource')
-            ->once()
-            ->with($fileB)
-            ->andReturnUsing(function ($f) use ($fileB, &$loadedB) {
-                $loadedB = true;
-                $this->assertSame($fileB, $f);
-            });
+        //$this->builder->shouldReceive('addFileResource')
+        //    ->once()
+        //    ->with($fileB)
+        //    ->andReturnUsing(function ($f) use ($fileB, &$loadedB) {
+        //        $loadedB = true;
+        //        $this->assertSame($fileB, $f);
+        //    });
 
 
-        $loader->load($fnameA);
+        $loader->load($fnameA, true);
 
         $this->assertTrue($this->routes->has('index'));
     }
@@ -125,7 +112,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $loader->load($fname);
+        $loader->load($fname, true);
 
         $routes = $this->routes;
         $this->assertTrue($routes->has('any'));
@@ -149,7 +136,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $loader->load($fname);
+        $loader->load($fname, true);
 
         $routes = $this->routes;
 
@@ -166,7 +153,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $loader->load($fname);
+        $loader->load($fname, true);
 
         $routes = $this->routes;
 
@@ -189,7 +176,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $loader->load($fname);
+        $loader->load($fname, true);
 
         $routes = $this->routes;
 
@@ -215,10 +202,10 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $this->builder->shouldReceive('addFileResource');
+        //$this->builder->shouldReceive('addFileResource');
 
         try {
-            $loader->load($fname);
+            $loader->load($fname, true);
         } catch (\InvalidArgumentException $e) {
             $this->assertSame('Route requires an action.', $e->getMessage());
         }
@@ -232,10 +219,10 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $this->builder->shouldReceive('addFileResource');
+        //$this->builder->shouldReceive('addFileResource');
 
         try {
-            $loader->load($fname);
+            $loader->load($fname, true);
         } catch (\InvalidArgumentException $e) {
             $this->assertSame('Route requires a path.', $e->getMessage());
         }
@@ -249,10 +236,10 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $this->builder->shouldReceive('addFileResource');
+        //$this->builder->shouldReceive('addFileResource');
 
         try {
-            $loader->load($fname);
+            $loader->load($fname, true);
         } catch (\InvalidArgumentException $e) {
             $this->assertSame('Route requires a name.', $e->getMessage());
         }
@@ -266,10 +253,10 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $this->builder->shouldReceive('addFileResource');
+        //$this->builder->shouldReceive('addFileResource');
 
         try {
-            $loader->load($fname);
+            $loader->load($fname, true);
         } catch (\InvalidArgumentException $e) {
             $this->assertSame('Route requires at least one method.', $e->getMessage());
         }
@@ -283,10 +270,10 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $this->builder->shouldReceive('addFileResource');
+        //$this->builder->shouldReceive('addFileResource');
 
         try {
-            $loader->load($fname);
+            $loader->load($fname, true);
         } catch (\InvalidArgumentException $e) {
             $this->assertSame('A routing group requires a prefix.', $e->getMessage());
         }
@@ -300,10 +287,10 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $this->builder->shouldReceive('addFileResource');
+        //$this->builder->shouldReceive('addFileResource');
 
         try {
-            $loader->load($fname);
+            $loader->load($fname, true);
         } catch (\InvalidArgumentException $e) {
             $this->assertSame('Resource requires a controller.', $e->getMessage());
         }
@@ -317,10 +304,10 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareLoader($fname);
 
-        $this->builder->shouldReceive('addFileResource');
+        //$this->builder->shouldReceive('addFileResource');
 
         try {
-            $loader->load($fname);
+            $loader->load($fname, true);
         } catch (\InvalidArgumentException $e) {
             $this->assertSame('Resource requires a path.', $e->getMessage());
         }
@@ -328,10 +315,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->builder = m::mock('Selene\Components\DI\BuilderInterface');
-        $this->locator = m::mock('Selene\Components\Config\Resource\LocatorInterface');
-
-        $this->builder->shouldReceive('getContainer')->andReturn($this->container = new Container);
+        $this->locator = $this->mockLocator();
         $this->routes = new RouteCollection;
     }
 
@@ -341,11 +325,11 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
             ->with($fname, true)
             ->andReturn([$file = __DIR__ . '/Fixures/'.$fname]);
 
-        $this->builder->shouldReceive('addFileResource');
+        //$this->builder->shouldReceive('addFileResource');
     }
 
     protected function newLoader($builder = null, $locator = null, $routes = null)
     {
-        return new XmlLoader($builder ?: $this->builder, $locator ?: $this->locator, $routes ?: $this->routes);
+        return new XmlLoader($routes ?: $this->routes, $locator ?: $this->locator);
     }
 }

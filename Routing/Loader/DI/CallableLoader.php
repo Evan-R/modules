@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\DI\Loader;
+namespace Selene\Components\Routing\Loader\DI;
 
 use \Selene\Components\DI\BuilderInterface;
 use \Selene\Components\Routing\RouteCollectionInterface;
@@ -34,7 +34,6 @@ class CallableLoader extends BaseCallableLoader
     public function __construct(BuilderInterface $builder, RouteCollectionInterface $routes)
     {
         parent::__construct($routes);
-
         $this->setBuilder($builder);
     }
 }

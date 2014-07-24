@@ -52,7 +52,7 @@ class PhpLoader extends PhpFileLoader
     {
         $routes = $this->getRoutes();
 
-        parent::doLoad($file);
+        include $file;
     }
 
     /**
