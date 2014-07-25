@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Resource package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -15,10 +15,9 @@ namespace Selene\Components\Config\Resource;
  * @class AbstractResource implements ResourceInterface
  * @see ResourceInterface
  *
- * @package Selene\Components\Config\Resource
+ * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 abstract class AbstractResource implements ResourceInterface
 {
@@ -30,10 +29,9 @@ abstract class AbstractResource implements ResourceInterface
     protected $resource;
 
     /**
-     * @param mixed $file
-     * @param \Selene\Components\Filesystem\Filesystem $files
+     * Constructor.
      *
-     * @access public
+     * @param string $resource
      */
     public function __construct($resource)
     {
@@ -41,13 +39,7 @@ abstract class AbstractResource implements ResourceInterface
     }
 
     /**
-     * isValid
-     *
-     * @param mixed $timestamp
-     *
-     * @access public
-     * @abstract
-     * @return boolean
+     * {@inheritdoc}
      */
     public function isValid($timestamp)
     {
@@ -55,10 +47,9 @@ abstract class AbstractResource implements ResourceInterface
     }
 
     /**
-     * getResource
+     * Get the resource.
      *
-     * @access public
-     * @return mixed
+     * @return string
      */
     public function getResource()
     {
@@ -66,10 +57,9 @@ abstract class AbstractResource implements ResourceInterface
     }
 
     /**
-     * getPath
+     * Get the resource path.
      *
-     * @access public
-     * @return mixed
+     * @return sring
      */
     public function getPath()
     {
@@ -79,8 +69,6 @@ abstract class AbstractResource implements ResourceInterface
     /**
      * __toString
      *
-     *
-     * @access public
      * @return string
      */
     public function __toString()

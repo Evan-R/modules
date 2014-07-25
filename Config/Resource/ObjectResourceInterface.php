@@ -12,9 +12,12 @@
 namespace Selene\Components\Config\Resource;
 
 /**
- * @interface ObjectResourceInterface
+ * @interface ObjectResourceInterface extends ResourceInterface
+ * @see ResourceInterface
+ *
  * @package Selene\Components\Config\Resource
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
  */
 interface ObjectResourceInterface extends ResourceInterface
 {

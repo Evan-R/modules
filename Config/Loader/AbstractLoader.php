@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Resource package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -11,29 +11,32 @@
 
 namespace Selene\Components\Config\Loader;
 
+use \Selene\Components\Config\Exception\LoaderException;
+
 /**
- * @abstract class Loader implements LoaderInterface
+ * The AbstractLoader class is a base class for all config loaders.
+ *
+ * @abstract class AbstractLoader implements LoaderInterface
  * @see LoaderInterface
  * @abstract
  *
- * @package \Users\malcolm\www\selene_source\src\Selene\Components\Config\Resource
+ * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 abstract class AbstractLoader implements LoaderInterface
 {
     /**
      * observers
      *
-     * @var \SplObjectStorage
+     * @var \SplObjectStorage|null
      */
     private $listeners;
 
     /**
      * resolver
      *
-     * @var LoaderResolverInterface
+     * @var ResolverInterface|null
      */
     protected $resolver;
 
@@ -65,6 +68,7 @@ abstract class AbstractLoader implements LoaderInterface
 
     /**
      * {@inheritdoc}
+     * @throws LoaderException
      */
     public function import($resource)
     {
@@ -72,8 +76,10 @@ abstract class AbstractLoader implements LoaderInterface
             return $this->load($resource);
         }
 
-        if ($resolver = $this->getResolver() && $loader = $this->getResolver()->resolve($resource)) {
-            $loader->load($resource);
+        try {
+            $loader = $this->getResolver()->resolve($resource);
+        } catch (\Exception $e) {
+            throw LoaderException::missingLoader();
         }
     }
 

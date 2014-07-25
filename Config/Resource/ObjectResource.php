@@ -18,12 +18,21 @@ namespace Selene\Components\Config\Resource;
  * @package Selene\Components\Config\Resource
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class ObjectResource extends FileResource implements ObjectResourceInterface
 {
+    /**
+     * reflection
+     *
+     * @var \ReflectionObject|null
+     */
     protected $reflection;
 
+    /**
+     * Constructor.
+     *
+     * @param object $resource
+     */
     public function __construct($resource)
     {
         if (!is_object($resource) || $resource instanceof \Closure) {
@@ -34,9 +43,8 @@ class ObjectResource extends FileResource implements ObjectResourceInterface
     }
 
     /**
-     * getPath
+     * Get the file path of the object.
      *
-     * @access public
      * @return string
      */
     public function getPath()
@@ -45,9 +53,8 @@ class ObjectResource extends FileResource implements ObjectResourceInterface
     }
 
     /**
-     * getObjectReflection
+     * Get the reflection of the object.
      *
-     * @access protected
      * @return \ReflectionObject
      */
     public function getObjectReflection()

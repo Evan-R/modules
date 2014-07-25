@@ -18,19 +18,14 @@ namespace Selene\Components\Config\Resource;
  * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class FileResource extends AbstractResource
 {
     /**
-     * exists
-     *
-     *
-     * @access public
-     * @return boolean
+     * {@inheritdoc}
      */
     public function exists()
     {
-        return is_file($this->getPath());
+        return is_file($file = $this->getPath()) && stream_is_local($file);
     }
 }

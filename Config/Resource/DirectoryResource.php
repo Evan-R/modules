@@ -18,17 +18,11 @@ namespace Selene\Components\Config\Resource;
  * @package Selene\Components\Config\Resource
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class DirectoryResource extends AbstractResource
 {
     /**
-     * isValid
-     *
-     * @param integer $timestamp
-     *
-     * @access public
-     * @return mixed
+     * {@inheritdoc}
      */
     public function exists()
     {

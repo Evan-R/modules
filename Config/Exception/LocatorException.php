@@ -20,6 +20,6 @@ namespace Selene\Components\Config\Exception;
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT
  */
-class FileLocatorLocateException extends \InvalidArgumentException
+class LocatorException extends \InvalidArgumentException
 {
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Resource package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -12,26 +12,26 @@
 namespace Selene\Components\Config\Resource;
 
 /**
- * @interface ResourceInterface ResourceInterface
+ * @interface ResourceInterface
  *
- * @package Selene\Components\Config
+ * @package Selene\Components\Config\Resource
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 interface ResourceInterface
 {
     /**
-     * isValid
+     * Checks the validity of a resource agains a timestamp.
+     *
+     * @param int $timestamp a unix timestamp
      *
      * @return boolean
      */
     public function isValid($timestamp);
 
     /**
-     * exists
+     * Checks if the resource exists.
      *
-     * @access public
      * @return boolean
      */
     public function exists();

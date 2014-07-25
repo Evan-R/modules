@@ -21,21 +21,20 @@ use \Selene\Components\Xml\Loader\Loader as XmlFileLoader;
  * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 trait XmlLoaderHelperTrait
 {
     /**
      * parser
      *
-     * @var \Selene\Components\Xml\Parser
+     * @var \Selene\Components\Xml\Parser|null
      */
     protected $parser;
 
     /**
      * xmlLoader
      *
-     * @var \Selene\Components\Xml\Loader\LoaderInterface
+     * @var \Selene\Components\Xml\Loader\LoaderInterface|null
      */
     protected $xmlLoader;
 
@@ -44,7 +43,6 @@ trait XmlLoaderHelperTrait
      *
      * @param string $xml filepath to an xml file
      *
-     * @access public
      * @return \Selene\Components\Xml\Dom\DOMDocument
      */
     public function loadXml($xml)
@@ -55,7 +53,6 @@ trait XmlLoaderHelperTrait
     /**
      * Get the XmlLoader instance.
      *
-     * @access protected
      * @return \Selene\Components\Xml\Loader\LoaderInterface
      */
     protected function getXmlLoader()
@@ -72,7 +69,6 @@ trait XmlLoaderHelperTrait
     /**
      * Get the XmlParser instance.
      *
-     * @access protected
      * @return \Selene\Components\Xml\Parser
      */
     protected function getParser()

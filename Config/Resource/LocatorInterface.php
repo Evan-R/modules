@@ -17,7 +17,6 @@ namespace Selene\Components\Config\Resource;
  * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 interface LocatorInterface
 {
@@ -28,7 +27,6 @@ interface LocatorInterface
      * @param boolean $collect weather to collection all files within the given
      * paths or return the first match.
      *
-     * @access public
      * @return string|array
      */
     public function locate($file, $collect = false);
@@ -38,7 +36,6 @@ interface LocatorInterface
      *
      * @param string $path a resource path.
      *
-     * @access public
      * @return void
      */
     public function addPath($path);
@@ -48,8 +45,25 @@ interface LocatorInterface
      *
      * @param array $paths a collection of resource paths.
      *
-     * @access public
      * @return void
      */
     public function addPaths(array $paths);
+
+    /**
+     * Set resource paths
+     *
+     * @param array $paths a collection of resource paths.
+     *
+     * @return void
+     */
+    public function setPaths(array $paths);
+
+    /**
+     * Set the location root path.
+     *
+     * @param string $root
+     *
+     * @return void
+     */
+    public function setRootPath($root);
 }

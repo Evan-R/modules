@@ -22,8 +22,18 @@ use \Selene\Components\Config\Resource\LocatorInterface;
  */
 class LocatorTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * root
+     *
+     * @var mixed
+     */
     protected $root;
 
+    /**
+     * path
+     *
+     * @var string
+     */
     protected $path;
 
     protected function setUp()
@@ -58,6 +68,11 @@ class LocatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($paths[0], $resource);
     }
 
+    /**
+     * Provides a directory/file map.
+     *
+     * @return array
+     */
     public function locationProvider()
     {
         return [

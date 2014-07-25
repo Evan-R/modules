@@ -11,6 +11,7 @@
 
 namespace Selene\Components\Config\Resource;
 
+use \Selene\Components\Config\Loader\LoaderInterface;
 use \Selene\Components\Filesystem\Traits\PathHelperTrait;
 
 /**
@@ -20,16 +21,30 @@ use \Selene\Components\Filesystem\Traits\PathHelperTrait;
  * @package Selene\Components\Config\Resource
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class Locator implements LocatorInterface
 {
     use PathHelperTrait;
 
     /**
-     * @param array $paths
+     * paths
      *
-     * @access public
+     * @var array
+     */
+    protected $paths;
+
+    /**
+     * cwd
+     *
+     * @var string
+     */
+    protected $cwd;
+
+    /**
+     * Constructor.
+     *
+     * @param array  $paths
+     * @param string $cwd
      */
     public function __construct(array $paths = [], $cwd = null)
     {
@@ -40,17 +55,17 @@ class Locator implements LocatorInterface
     /**
      * {@inheritdoc}
      */
-    public function locate($file, $collection = false)
+    public function locate($file, $collection = LoaderInterface::LOAD_ONE)
     {
         $files = [];
 
         foreach ($this->paths as $path) {
 
-            if (!($resource = $this->locateResource($path, $file, $collection, $files))) {
+            if (!$resource = $this->locateResource($path, $file, $collection, $files)) {
                 continue;
             }
 
-            if (true !== $collection) {
+            if (LoaderInterface::LOAD_ONE === $collection) {
                 return $resource;
             }
         }
@@ -59,18 +74,14 @@ class Locator implements LocatorInterface
     }
 
     /**
-     * setRootPath
-     *
-     * @param mixed $root
-     *
-     * @access public
-     * @return void
+     * {@inheritdoc}
      */
     public function setRootPath($root)
     {
         if (!is_dir($root)) {
             throw new \InvalidArgumentException(sprintf('%s is not a directory', $root));
         }
+
         $this->cwd = $root;
     }
 
@@ -97,16 +108,28 @@ class Locator implements LocatorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setPaths(array $paths)
+    {
+        $this->paths = [];
+
+        foreach ($paths as $path) {
+            $this->addPath($path);
+        }
+    }
+
+    /**
      * locateResource
      *
-     * @param mixed $path
-     * @param mixed $collect
-     * @param array $collection
+     * @param string  $path
+     * @param string  $file
+     * @param boolean $collect
+     * @param array   $collection
      *
-     * @access protected
-     * @return mixed
+     * @return void
      */
-    protected function locateResource($path, $file, $collect = false, array &$collection = [])
+    protected function locateResource($path, $file, $collect = LoaderInterface::LOAD_ONE, array &$collection = [])
     {
         $dir = $this->getFullPath($path);
 
@@ -116,7 +139,7 @@ class Locator implements LocatorInterface
 
         if (file_exists($resource = $dir . DIRECTORY_SEPARATOR . $file)) {
 
-            if (!$collect) {
+            if (LoaderInterface::LOAD_ONE === $collect) {
                 return $resource;
             }
 
