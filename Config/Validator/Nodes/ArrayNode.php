@@ -21,7 +21,6 @@ namespace Selene\Components\Config\Validator\Nodes;
  * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 abstract class ArrayNode extends Node implements ParentableInterface
 {
@@ -33,14 +32,39 @@ abstract class ArrayNode extends Node implements ParentableInterface
     protected $children;
 
     /**
+     * Constructor.
+     *
+     * @param NodeInterface $node
+     */
+    public function __construct(NodeInterface $node = null)
+    {
+        $this->children = [];
+        parent::__construct($node);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __clone()
+    {
+        parent::__clone();
+
+        $children = $this->getChildren();
+        $this->children = [];
+
+        foreach ($children as $child) {
+            $this->addChild(clone($child));
+        }
+    }
+
+    /**
      * Get all child nodes
      *
-     * @access public
      * @return array
      */
     public function getChildren()
     {
-        return $this->children ?: [];
+        return $this->children;
     }
 
     /**
@@ -102,7 +126,6 @@ abstract class ArrayNode extends Node implements ParentableInterface
      *
      * @param \Selene\Components\Config\Validator\Nodes\NodeInterface $node
      *
-     * @access public
      * @return NodeInterface this instance
      */
     public function addChild(NodeInterface $node)
@@ -111,7 +134,25 @@ abstract class ArrayNode extends Node implements ParentableInterface
             return $node->setParent($this);
         }
 
-        $this->children[] = $node;
+        $this->children[] = &$node;
+
+        return $this;
+    }
+
+    /**
+     * removeChild
+     *
+     * @param NodeInterface $node
+     *
+     * @return NodeInterface
+     */
+    public function removeChild(NodeInterface $node)
+    {
+        if (false !== ($index = array_search($node, $this->children, true))) {
+            $node->removeParent();
+            unset($this->children[$index]);
+            reset($this->children);
+        }
 
         return $this;
     }
@@ -138,7 +179,6 @@ abstract class ArrayNode extends Node implements ParentableInterface
      *
      * @param mixed $key
      *
-     * @access public
      * @return mixed
      */
     public function getChildByKey($key)
@@ -150,14 +190,68 @@ abstract class ArrayNode extends Node implements ParentableInterface
         return (bool)$children ? current($children) : null;
     }
 
+    public function validate()
+    {
+        parent::validate();
+
+        $results = [];
+        $values = $this->getValue();
+
+        $this->validateChildren($values);
+    }
+
     /**
-     * checkExceedingKeys
+     * validateChildren
      *
-     * @param array $value
+     * @param array $values
+     * @param array $results
      *
-     * @access protected
-     * @abstract
      * @return void
      */
-    abstract protected function checkExceedingKeys(array $value);
+    protected function validateChildren(array $values, array &$results = [])
+    {
+        foreach ($this->getChildren() as $child) {
+            $value = array_key_exists($child->getKey(), $values) ? $values[$child->getKey()] : new MissingValue($child);
+
+            $child->finalize($value);
+            $child->validate();
+
+            $results[$child->getKey()] = $child->getValue();
+        }
+
+        $this->value = $this->mergeValues($values, $results);
+    }
+
+    /**
+     * mergeValue
+     *
+     * @param mixed $value
+     *
+     * @return array
+     */
+    public function mergeValue($value)
+    {
+        return array_merge($this->value, (array)$value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType()
+    {
+        return 'array';
+    }
+
+    /**
+     * mergeValues
+     *
+     * @param array $values
+     * @param array $results
+     *
+     * @return array
+     */
+    protected function mergeValues(array $values, array $results)
+    {
+        return array_merge($values, $results);
+    }
 }

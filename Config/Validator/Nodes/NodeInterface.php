@@ -11,42 +11,90 @@
 
 namespace Selene\Components\Config\Validator\Nodes;
 
+use \Selene\Components\Config\Validator\Builder;
+
 /**
  * @interface NodeInterface
  *
  * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 interface NodeInterface
 {
-    public function setBuilder($builder);
+    /**
+     * Set the validation builder.
+     *
+     * @param Builder $builder
+     *
+     * @return NodeInterface
+     */
+    public function setBuilder(Builder $builder);
 
     /**
-     * setParent
+     * Set the parent node.
      *
-     * @param \Selene\Components\Config\Validator\Nodes\NodeInterface $node
+     * @param NodeInterface $node the parent node
      *
-     * @access public
-     * @return void
+     * @return NodeInterface
      */
     public function setParent(NodeInterface $node);
 
     /**
-     * getParent
+     * Get the parent node.
      *
-     * @access public
-     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface
+     * @return NodeInterface
      */
     public function getParent();
 
     /**
-     * hasParent
+     * Check if the node as a parent.
      *
-     *
-     * @access public
      * @return boolean
      */
     public function hasParent();
+
+    /**
+     * getType
+     *
+     * @return string
+     */
+    public function getType();
+
+    /**
+     * Start a if/then condition block on the node.
+     *
+     * @return NodeInterface
+     */
+    public function condition();
+
+    /**
+     * Mark the node optional.
+     *
+     * @return NodeInterface
+     */
+    public function optional();
+
+    /**
+     * Mark the node not to be empty.
+     *
+     * @return NodeInterface
+     */
+    public function notEmpty();
+
+    /**
+     * Validate the node.
+     *
+     * @return boolean
+     */
+    public function validate();
+
+    /**
+     * finalize
+     *
+     * @param mixed $value
+     *
+     * @return NodeInterface
+     */
+    public function finalize($value = null);
 }

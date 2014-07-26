@@ -45,6 +45,8 @@ interface ParentableInterface
      */
     public function addChild(NodeInterface $node);
 
+    public function removeChild(NodeInterface $node);
+
     /**
      * getChildren
      *

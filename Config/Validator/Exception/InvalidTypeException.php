@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Config\Validator\Exception;
 
+use \Selene\Components\Config\Validator\Nodes\NodeInterface;
+
 /**
  * @class InvalidTypeException
  * @package Selene\Components\Config\Validator\Exception
@@ -18,4 +20,15 @@ namespace Selene\Components\Config\Validator\Exception;
  */
 class InvalidTypeException extends ValidationException
 {
+    public static function invalidType(NodeInterface $node, $value)
+    {
+        return new self(
+            sprintf(
+                '%s needs to be type of %s, instead saw %s.',
+                $node->getFormattedKey(),
+                $node->getType(),
+                gettype($value)
+            )
+        );
+    }
 }

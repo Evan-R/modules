@@ -12,19 +12,10 @@
 namespace Selene\Components\Config\Validator\Exception;
 
 /**
- * @class ValidationException
+ * @class ValueUnsetException
  * @package Selene\Components\Config\Validator\Exception
  * @version $Id$
  */
-class ValidationException extends \InvalidArgumentException
+class ValueUnsetException extends \Exception
 {
-    public static function invalidValue($value)
-    {
-        return new self(sprintf('Invalid value %s', is_scalar($value) ? (string)$value : gettype($value)));
-    }
-
-    public static function notEmpty($key)
-    {
-        return new self(sprintf('%s may not ne empty.', $key));
-    }
 }

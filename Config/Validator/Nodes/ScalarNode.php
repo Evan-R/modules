@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator\Nodes package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -12,23 +12,46 @@
 namespace Selene\Components\Config\Validator\Nodes;
 
 /**
- * @class Scalar
- * @package Selene\Components\Config\Validator\Nodes
+ * @abstract class ScalarNode extends Node
+ * @see Node
+ * @abstract
+ *
+ * @package Selene\Components\Config
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
  */
 abstract class ScalarNode extends Node
 {
+    const T_BOOL    = 'boolean';
+    const T_FLOAT   = 'float';
+    const T_INTEGER = 'integer';
+    const T_STRING  = 'string';
+
+    /**
+     * type
+     *
+     * @var string
+     */
     protected $type;
 
     /**
-     * @param NodeInterface $parent
+     * Constructor.
      *
-     * @access public
-     * @return mixed
+     * @param string $type
      */
     public function __construct($type = null)
     {
-        $this->type = $type;
-        $this->required = true;
+        if (null !== $type) {
+            $this->type = $type;
+        }
+
+        $this->setRequired(true);
+
+        parent::__construct();
+    }
+
+    public function getType()
+    {
+        return $this->type;
     }
 }

@@ -16,6 +16,7 @@ use \Selene\Components\Config\Validator\Nodes\DictNode;
 use \Selene\Components\Config\Validator\Nodes\ListNode;
 use \Selene\Components\Config\Validator\Nodes\ArrayNode;
 use \Selene\Components\Config\Validator\Nodes\ScalarNode;
+use \Selene\Components\Config\Validator\Nodes\BooleanNode;
 use \Selene\Components\Config\Validator\Nodes\RootNodeInterface;
 
 /**
@@ -67,6 +68,7 @@ class Validator implements TreeValidatorInterface
     public function load(array $config)
     {
         $this->config = array_merge($this->config, $config);
+
         return $this;
     }
 
@@ -89,7 +91,10 @@ class Validator implements TreeValidatorInterface
      */
     public function validate()
     {
-        return $this->doValidate($this->config, $this->root);
+        $this->root->finalize($this->config);
+        $this->root->validate();
+
+        return $this->root->getValue();
     }
 
     /**
@@ -106,19 +111,23 @@ class Validator implements TreeValidatorInterface
     {
         foreach ($nodes as $key => $node) {
 
-            $val = $this->getDefault($values, $key, $node->isOptional() ? $node->getDefault() : null);
+            $node->finalize($this->getDefault($values, $key));
+
+            $val = $this->getDefault($values, $key, $node->isOptional() ? $node->getDefault() : $node->getValue());
+
             $results[$key] = [];
 
             $node->validate($val);
 
             if ($node instanceof ArrayNode) {
+
                 $this->doValidate($val, $node, $results[$key]);
 
                 if ($node instanceof ListNode) {
                     $results[$key] = $node->mergeValue($results[$key]);
+                    continue;
                 }
 
-                continue;
             }
 
             $results[$key] = $node->mergeValue($val);

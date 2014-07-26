@@ -62,9 +62,11 @@ class EnumNode extends ScalarNode
      * @access public
      * @return boolean
      */
-    public function validate($value = null)
+    public function validate()
     {
-        parent::validate($value);
+        parent::validate();
+
+        $value = $this->getValue();
 
         if (!in_array($value, $def = (array)$this->defaultValues)) {
             throw new ValidationException(

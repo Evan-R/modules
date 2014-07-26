@@ -18,4 +18,20 @@ namespace Selene\Components\Config\Validator\Exception;
  */
 class MissingValueException extends ValidationException
 {
+    public static function missingValue($key)
+    {
+        return new self(sprintf('%s is required but missing.', $key));
+    }
+
+    public static function emptyValue($key)
+    {
+        return new self(sprintf('%s is required but empty.', $key));
+    }
+
+    public static function missingDefault($key)
+    {
+        return new self(
+            sprintf('optional key %s with empty value must have a default value', $key)
+        );
+    }
 }

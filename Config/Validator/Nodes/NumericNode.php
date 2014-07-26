@@ -11,6 +11,9 @@
 
 namespace Selene\Components\Config\Validator\Nodes;
 
+use \Selene\Components\Config\Validator\Exception\RangeException;
+use \Selene\Components\Config\Validator\Exception\LengthException;
+
 /**
  * @class NumericNode extends ScalarNode
  * @see ScalarNode
@@ -18,31 +21,54 @@ namespace Selene\Components\Config\Validator\Nodes;
  * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 abstract class NumericNode extends ScalarNode
 {
+    /**
+     * min
+     *
+     * @var mixed
+     */
     protected $min;
 
+    /**
+     * max
+     *
+     * @var mixed
+     */
     protected $max;
 
-    abstract public function min($value);
-
-    abstract public function max($value);
+    /**
+     * Set a minimum value.
+     *
+     * @param mixed $value a numeric value
+     *
+     * @return ScalarNode
+     */
+    public function min($value)
+    {
+        $this->min = $value;
+    }
 
     /**
-     * validate
+     * Set a maximum value.
      *
-     * @param mixed $value
+     * @param mixed $value a numeric value
      *
-     * @access public
-     * @return boolean
+     * @return ScalarNode
      */
-    public function validate($value = null)
+    public function max($value)
     {
-        parent::validate($value);
+        $this->max = $value;
+    }
 
-        $this->validateRange($value);
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        parent::validate();
+        $this->validateRange($this->getValue());
 
         return true;
     }
@@ -50,33 +76,33 @@ abstract class NumericNode extends ScalarNode
     /**
      * validateRange
      *
-     * @param mixed $value
+     * @param mixed $value a numeric value
      *
-     * @throws \OutOfRangeException if both max and min length constraints do not match
-     * @throws \LengthException if max or min length constraints do not match
-     * @access protected
+     * @throws RangeException if both max and min length constraints do not match
+     * @throws LengthException if max or min length constraints do not match
+     *
      * @return void
      */
     protected function validateRange($value)
     {
-        if ($this->min && $this->max) {
-            if ($value < $this->min || $value > $this->max) {
-                throw new \OutOfRangeException(
-                    sprintf('value must be within the range of %s and %s', (string)$this->min, (string)$this->max)
-                );
+        if (null !== $this->min && null !== $this->max) {
+            if ($this->min > $value || $this->max < $value) {
+                throw RangeException::outOfRange($this->min, $this->max);
             }
-        } elseif ($this->min) {
-            if ($value < $this->min) {
-                throw new \LengthException(
-                    sprintf('value must not deceed %s', (string)$this->min)
-                );
-            }
-        } elseif ($this->max) {
-            if ($value > $this->max) {
-                throw new \LengthException(
-                    sprintf('value must not exceed %s', (string)$this->max)
-                );
-            }
+        } elseif (null !== $this->min && $value < $this->min) {
+            throw LengthException::deceedsLength($this->min);
+        } elseif (null !== $this->max && $value > $this->max) {
+            throw LengthException::exceedsLength($this->max);
         }
+    }
+
+    /**
+     * Only let null be treat as empty value.
+     *
+     * {@inheritdoc}
+     */
+    protected function isEmptyValue($value = null)
+    {
+        return null === $value;
     }
 }

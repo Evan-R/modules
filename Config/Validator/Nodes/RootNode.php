@@ -58,4 +58,33 @@ class RootNode extends DictNode implements RootNodeInterface
             sprintf('root node %s has no parent', $this->getKey())
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finalize($value = null)
+    {
+        $this->value = (array)$value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        $results = [];
+        $values  = $this->getValue();
+
+        foreach ($this->getChildren() as $child) {
+
+            $key = $child->getKey();
+
+            $child->finalize(array_key_exists($key, $values) ? $values[$key] : null);
+            $child->validate();
+
+            $results[$key] = $child->getValue();
+        }
+
+        $this->value = $results;
+    }
 }

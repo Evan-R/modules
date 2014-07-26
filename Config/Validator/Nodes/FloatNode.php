@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator\Nodes package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -15,42 +15,13 @@ namespace Selene\Components\Config\Validator\Nodes;
  * @class FloatNode extends NumericNode
  * @see NumericNode
  *
- * @package Selene\Components\Config\Validator\Nodes
+ * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class FloatNode extends NumericNode
 {
-    /**
-     * Sets a minimum value
-     *
-     * @param float $value
-     *
-     * @access public
-     * @return FloatNode
-     */
-    public function min($value)
-    {
-        $this->min = (float)$value;
-
-        return $this;
-    }
-
-    /**
-     * Sets a maximum value
-     *
-     * @param float $value
-     *
-     * @access public
-     * @return FloatNode
-     */
-    public function max($value)
-    {
-        $this->max = (float)$value;
-
-        return $this;
-    }
+    protected $type = self::T_FLOAT;
 
     /**
      * {@inheritdoc}
@@ -58,13 +29,5 @@ class FloatNode extends NumericNode
     public function validateType($value)
     {
         return is_float($value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getInvalidTypeMessage($value = null)
-    {
-        return sprintf('%s needs to be type of double, instead saw %s', $this->getKey(), gettype($value));
     }
 }

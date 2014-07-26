@@ -14,6 +14,8 @@ namespace Selene\Components\Config\Tests\Validator\Nodes;
 use \Selene\Components\Config\Validator\Nodes\FloatNode;
 use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
 use \Selene\Components\Config\Validator\Exception\ValidationException;
+use \Selene\Components\Config\Validator\Exception\RangeException;
+use \Selene\Components\Config\Validator\Exception\LengthException;
 
 /**
  * @class FloatNodeTest extends \PHPUnit_Framework_TestCase
@@ -24,7 +26,7 @@ use \Selene\Components\Config\Validator\Exception\ValidationException;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class FloatNodeTest extends \PHPUnit_Framework_TestCase
+class FloatNodeTest extends RangeableNodeTest
 {
     /** @test */
     public function itShouldBeInstantiable()
@@ -33,76 +35,69 @@ class FloatNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Selene\Components\Config\Validator\Nodes\NodeInterface', $node);
     }
 
-    /** @test */
-    public function itShouldValidateItsType()
+    /**
+     * invalidTypesProvider
+     *
+     * @return array
+     */
+    public function validTypeProvider()
     {
-        $node = new FloatNode;
-        $node->setKey('Node');
-
-        $this->assertTrue($node->validate(8.1));
-
-        try {
-            $node->validate(8);
-        } catch (InvalidTypeException $e) {
-            $this->assertSame('Node needs to be type of double, instead saw integer', $e->getMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
-        }
+        return [
+            [0.1],
+            [127.55]
+        ];
     }
 
-    /** @test */
-    public function itShouldValidateAgainstMinimum()
+    /**
+     * invalidTypesProvider
+     *
+     * @return array
+     */
+    public function invalidTypesProvider()
     {
-        $node = new FloatNode;
-        $node->min(5.0);
-
-        $this->assertTrue($node->validate(8.0));
-
-        try {
-            $node->validate(2.0);
-        } catch (\LengthException $e) {
-            $this->assertSame('value must not deceed 5', $e->getMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
-        }
+        return [
+            [[]],
+            [''],
+            ['1.2'],
+            [0xfff],
+            [12],
+            [true],
+            [false]
+        ];
     }
 
-    /** @test */
-    public function itShouldValidateAgainstMaximum()
+    public function minValueProvider()
     {
-        $node = new FloatNode;
-        $node->max(5.0);
-
-        $this->assertTrue($node->validate(4.9));
-
-        try {
-            $node->validate(6.1788);
-        } catch (\LengthException $e) {
-            $this->assertSame('value must not exceed 5', $e->getMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
-        }
+        return [
+            [2.0, 2.01, 1.99],
+            [4.0, 4.01, 3.99],
+        ];
     }
 
-    /** @test */
-    public function itShouldValidateAgainstRanges()
+    public function maxValueProvider()
     {
-        $node = new FloatNode;
-        $node->min(4.9);
-        $node->max(11.6);
+        return [
+            [100.0, 99.999, 100.1],
+            [4.0, 3.9, 4.01],
+        ];
+    }
 
-        $this->assertTrue($node->validate(8.0));
+    public function rangeValueProvider()
+    {
+        return [
+            [[0.0, 5.0], 5.0, 6.0]
+        ];
+    }
 
-        try {
-            $node->validate(11.7);
-        } catch (\OutOfRangeException $e) {
-            $this->assertSame('value must be within the range of 4.9 and 11.6', $e->getMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
-        }
+    public function nodeDefaultValueProvier()
+    {
+        return [
+            [1.0]
+        ];
+    }
+
+    protected function getNodeClass()
+    {
+        return 'Selene\Components\Config\Validator\Nodes\FloatNode';
     }
 }

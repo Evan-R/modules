@@ -25,6 +25,9 @@ use \Selene\Components\Config\Validator\Exception\ValidationException;
  */
 class DictNode extends ArrayNode implements \Iterator
 {
+    const KEYS_STRICT    = true;
+    const KEYS_NONSTRICT = false;
+
     /**
      * key
      *
@@ -64,8 +67,10 @@ class DictNode extends ArrayNode implements \Iterator
      * Create a new DictNode object.
      * @access public
      */
-    public function __construct()
+    public function __construct($mode = self::KEYS_NONSTRICT)
     {
+        $this->mode = $mode;
+
         $this->current = 0;
         $this->requiredKeys = [];
         parent::__construct();
@@ -103,10 +108,15 @@ class DictNode extends ArrayNode implements \Iterator
      */
     public function validate($value = null)
     {
-        $valid = parent::validate($value);
+        $valid = parent::validate();
 
-        $this->checkExceedingKeys($value);
-        $this->validateLeastKeys($value);
+        $value = $this->getValue();
+
+        if (self::KEYS_STRICT === $this->mode) {
+            $this->checkExceedingKeys($value);
+        }
+
+        $this->validateLeastKeys((array)$value);
 
         return $valid;
     }
@@ -179,6 +189,18 @@ class DictNode extends ArrayNode implements \Iterator
     public function rewind()
     {
         $this->current = 0;
+    }
+
+    /**
+     * mergeValue
+     *
+     * @param mixed $value
+     *
+     * @return void
+     */
+    public function mergeValue($value)
+    {
+        return array_merge($this->value, (array)$value);
     }
 
     /**

@@ -12,6 +12,7 @@
 namespace Selene\Components\Config\Tests\Resource;
 
 use \org\bovigo\vfs\vfsStream;
+use \Selene\Components\TestSuite\TestCase;
 use \Selene\Components\Config\Resource\Locator;
 use \Selene\Components\Config\Resource\LocatorInterface;
 
@@ -20,7 +21,7 @@ use \Selene\Components\Config\Resource\LocatorInterface;
  * @package Selene\Components\Config\Tests\Resource
  * @version $Id$
  */
-class LocatorTest extends \PHPUnit_Framework_TestCase
+class LocatorTest extends TestCase
 {
     /**
      * root
@@ -55,16 +56,72 @@ class LocatorTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldLocateFiles(array $locations, $file)
     {
-        $paths = $this->setUpLocations($locations, $file);
-
         $locator = new Locator($locations, $this->path);
 
-        $files = $locator->locate($file, true);
+        $this->assertLocate($locator, $locations, $file);
+    }
 
+
+    /**
+     * @test
+     * @dataProvider locationProvider
+     */
+    public function pathsShouldBeSettable(array $locations, $file)
+    {
+        $locator = new Locator;
+
+        $locator->setRootPath($this->path);
+        $locator->setPaths($locations);
+
+        $this->assertLocate($locator, $locations, $file);
+    }
+
+    /**
+     * @test
+     * @dataProvider locationProvider
+     */
+    public function pathsShouldBeAddable(array $locations, $file)
+    {
+        $locator = new Locator([], $this->path);
+
+        $locator->addPaths($locations);
+        $locator->addPath('invalidpath'); //should be ignored
+
+        $this->assertLocate($locator, $locations, $file);
+    }
+
+    /** @test */
+    public function itShouldFilterDouplicatePaths()
+    {
+        $locator = new Locator(['a'], $this->path);
+
+        $locator->addPath('a');
+        $locator->addPath('b');
+
+        $paths = $this->getObjectPropertyValue('paths', $locator);
+
+        $this->assertSame(2, count($paths));
+    }
+
+    /**
+     * @test
+     * @expectedException \InvalidArgumentException
+     */
+    public function itShouldThrowExceptionOnInvalidPath()
+    {
+        $locator = new Locator(['a'], $this->path);
+
+        $locator->setRootPath('root');
+    }
+
+    protected function assertLocate($locator, array $locations, $file)
+    {
+        $paths = $this->setUpLocations($locations, $file);
+
+        $files = $locator->locate($file, true);
         $this->assertSame(count($locations), count($files));
 
         $resource = $locator->locate($file, false);
-
         $this->assertSame($paths[0], $resource);
     }
 

@@ -20,175 +20,83 @@ use \Selene\Components\Config\Validator\Exception\ValidationException;
  */
 class ListNode extends ArrayNode implements \IteratorAggregate
 {
-    protected $validatorValue;
+    /**
+     * validating
+     *
+     * @var bool|null
+     */
+    protected $validating;
 
-    protected $validatorValues;
-
-    protected $filterError;
-
-    protected $filteredValues;
 
     /**
-     * @param NodeInterface $parent
-     *
-     * @access public
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function __construct(NodeInterface $parent = null)
-    {
-        $this->default = [];
-        $this->filteredValues = [];
-        parent::__construct($parent);
-    }
-
     public function validateType($value)
     {
-        return is_array($value) && ctype_digit(implode('', array_keys($value)));
-    }
+        if (!is_array($value)) {
+            return false;
+        }
 
-    public function filterError($message)
-    {
-        $this->filterError = $message;
-        return $this;
+        return !empty($value) ? ctype_digit(implode('', array_keys($value))) : true;
     }
 
     /**
-     * addChild
+     * {@inheritdoc}
      *
-     * @param NodeInterface $node
-     *
-     * @access public
-     * @return NodeInterface this instance
+     * @return ListNode
      */
     public function addChild(NodeInterface $node)
     {
-        $node->setKey(count($this->getChildren()));
+        if (!$this->validating && 0 !== count($this->getChildren())) {
+            throw new \Exception(sprintf('ListNode %s already as a node declaration.', $this->getFullKey()));
+        }
+
+        $node->setKey(count($this->children));
+
         return parent::addChild($node);
     }
 
     /**
-     * item
-     *
-     * @access public
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function item()
+    public function validate()
     {
-        return $this;
-    }
+        $this->validating = true;
 
-    /**
-     * contains
-     *
-     * @param callable $validate
-     *
-     * @access public
-     * @return NodeInterface
-     */
-    //public function filterItems(callable $validate)
-    //{
-        //$this->validatorValue = $validate;
-        //return $this;
-    //}
+        if ($child = $this->getFirstChild()) {
 
-    /**
-     * filter
-     *
-     * @param callable $validate
-     *
-     * @access public
-     * @return ListNode
-     */
-    public function filter(callable $validate)
-    {
-        $this->validatorValue = $validate;
-        return $this;
-    }
+            $this->children = [];
 
-    /**
-     * validate
-     *
-     * @param mixed $value
-     *
-     * @access public
-     * @return mixed
-     */
-    public function validate($value = null)
-    {
-        $valid = parent::validate($value);
-
-        if ($this->hasChildren()) {
-            $this->checkExceedingKeys((array)$value);
-            $count = count($this->children);
-
-            $value = (array)$value;
-            array_splice($value, 0, $count);
+            foreach ($value = $this->getValue() as $i => $val) {
+                $this->addChild(clone($child));
+            }
         }
 
-        $this->applyFilters((array)$value);
+        $valid = parent::validate();
+
+        $this->validating = false;
 
         return $valid;
     }
 
     /**
-     * mergeValue
-     *
-     * @param mixed $value
-     *
-     * @access public
-     * @return array
+     * {@inheritdoc}
      */
-    public function mergeValue($value)
+    public function getIterator()
     {
-        return array_merge((array)$value, $this->filteredValues);
+        return new \ArrayIterator($this->getChildren());
     }
 
     /**
-     * applyFilters
-     *
-     * @param array $values
-     *
-     * @access protected
-     * @return mixed
+     * {@inheritdoc}
      */
-    protected function applyFilters(array $values)
+    protected function mergeValues(array $values, array $results)
     {
-        if (!is_callable($this->validatorValue)) {
-            return;
+        foreach ($values as $i => $val) {
+            $values[$i] = $results[$i];
         }
 
-        foreach ($values as $key => $val) {
-            if (true !== call_user_func_array($this->validatorValue, [$val, $key, $this])) {
-                $msg = $this->filterError ?: sprintf('invalid list value for key %s', $this->getKey());
-                throw new ValidationException($msg);
-            }
-
-            $this->filteredValues[$key] = $val;
-        }
-    }
-
-    /**
-     * checkExceedingKeys
-     *
-     * @param array $values
-     *
-     * @access protected
-     * @return void
-     */
-    protected function checkExceedingKeys(array $values)
-    {
-        if (is_callable($this->validatorValue)) {
-            return;
-        }
-
-        foreach ($values as $key => $val) {
-            if (isset($this->children[$key])) {
-                continue;
-            }
-            throw new ValidationException(
-                sprintf('invalid key %s in %s', $key, $this->getKey())
-            );
-        }
+        return $values;
     }
 
     /**
@@ -196,7 +104,6 @@ class ListNode extends ArrayNode implements \IteratorAggregate
      *
      * @param mixed $value
      *
-     * @access protected
      * @return string
      */
     protected function getInvalidTypeMessage($value = null)
@@ -204,10 +111,32 @@ class ListNode extends ArrayNode implements \IteratorAggregate
         if (is_array($value)) {
             $keys = $this->getInvalidKeys($value);
             $string = implode('", "', $keys);
+
             return sprintf('invalid key%s "%s" in %s', count($keys) < 2 ? '' : 's', $string, $this->getKey());
         }
 
         return parent::getInvalidTypeMessage($value);
+    }
+
+    /**
+     * handleTypeError
+     *
+     * @param mixed $value
+     *
+     * @return void
+     */
+    protected function handleTypeError($value)
+    {
+        if (!is_array($value)) {
+            parent::handleTypeError($value);
+        }
+
+        $keys = $this->getInvalidKeys($value);
+        $string = implode('", "', $keys);
+
+        throw new InvalidTypeException(
+            sprintf('invalid key%s "%s" in %s', count($keys) < 2 ? '' : 's', $string, $this->getKey())
+        );
     }
 
     /**
@@ -229,15 +158,4 @@ class ListNode extends ArrayNode implements \IteratorAggregate
         return $strings;
     }
 
-    /**
-     * getIterator
-     *
-     *
-     * @access public
-     * @return \ArrayIterator
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->getChildren());
-    }
 }

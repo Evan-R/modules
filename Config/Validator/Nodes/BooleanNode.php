@@ -22,14 +22,15 @@ namespace Selene\Components\Config\Validator\Nodes;
  */
 class BooleanNode extends ScalarNode
 {
+    const C_TRUE = 'true';
+    const C_FALSE = 'false';
+
     /**
-     * Create a new boolean node.
-     * @access public
+     * type
+     *
+     * @var string
      */
-    public function __construct()
-    {
-        parent::__construct('boolean');
-    }
+    protected $type = self::T_BOOL;
 
     /**
      * {@inheritdoc}
@@ -52,7 +53,6 @@ class BooleanNode extends ScalarNode
      *
      * @param mixed $value
      *
-     * @access protected
      * @return boolean
      */
     protected function isEmptyValue($value = null)

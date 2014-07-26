@@ -22,9 +22,8 @@ use \Selene\Components\Config\Validator\Exception\ValidationException;
  * @package Selene\Components\Config\Tests\Validator\Nodes
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
-class IntegerNodeTest extends \PHPUnit_Framework_TestCase
+class IntegerNodeTest extends RangeableNodeTest
 {
     /** @test */
     public function itShouldBeInstantiable()
@@ -34,75 +33,94 @@ class IntegerNodeTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itShouldValidateItsType()
+    public function itShouldUseItsDefaultValueIfNull()
     {
-        $node = new IntegerNode;
+        $node = $this->newNode();
+        $node->defaultValue(12);
         $node->setKey('Node');
 
-        $this->assertTrue($node->validate(8));
-
-        try {
-            $node->validate(8.1);
-        } catch (InvalidTypeException $e) {
-            $this->assertSame('Node needs to be type of integer, instead saw double', $e->getMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
-        }
+        $node->finalize();
+        $this->assertTrue($node->validate());
     }
 
-    /** @test */
-    public function itShouldValidateAgainstMinimum()
+    /**
+     * invalidTypesProvider
+     *
+     * @return array
+     */
+    public function validTypeProvider()
     {
-        $node = new IntegerNode;
-        $node->min(5);
-
-        $this->assertTrue($node->validate(8));
-
-        try {
-            $node->validate(2);
-        } catch (\LengthException $e) {
-            $this->assertSame('value must not deceed 5', $e->getMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
-        }
+        return [
+            [0],
+            [127],
+            [0xfff]
+        ];
     }
 
-    /** @test */
-    public function itShouldValidateAgainstMaximum()
+    /**
+     * invalidTypesProvider
+     *
+     * @return array
+     */
+    public function invalidTypesProvider()
     {
-        $node = new IntegerNode;
-        $node->max(5);
-
-        $this->assertTrue($node->validate(5));
-
-        try {
-            $node->validate(6);
-        } catch (\LengthException $e) {
-            $this->assertSame('value must not exceed 5', $e->getMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
-        }
+        return [
+            [[]],
+            [''],
+            ['12'],
+            [1.2],
+            [true],
+            [false]
+        ];
     }
 
-    /** @test */
-    public function itShouldValidateAgainstRanges()
+    /**
+     * {@inheritdoc}
+     */
+    public function minValueProvider()
     {
-        $node = new IntegerNode;
-        $node->min(5);
-        $node->max(10);
+        return [
+            [2, 3, 1],
+            [4, 1200, 3],
+        ];
+    }
 
-        $this->assertTrue($node->validate(8));
+    /**
+     * {@inheritdoc}
+     */
+    public function maxValueProvider()
+    {
+        return [
+            [100, 99, 101],
+            [4, 2, 5],
+        ];
+    }
 
-        try {
-            $node->validate(11);
-        } catch (\OutOfRangeException $e) {
-            $this->assertSame('value must be within the range of 5 and 10', $e->getMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
-        }
+    /**
+     * {@inheritdoc}
+     */
+    public function rangeValueProvider()
+    {
+        return [
+            [[0, 5], 5, -1],
+            [[-100, 100], -99, -101],
+            [[-100, 100], 99, 101]
+        ];
+    }
+
+
+    public function nodeDefaultValueProvier()
+    {
+        return [
+            [1]
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getNodeClass()
+    {
+        return 'Selene\Components\Config\Validator\Nodes\IntegerNode';
     }
 }

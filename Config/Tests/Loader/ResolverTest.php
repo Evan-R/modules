@@ -66,6 +66,41 @@ class ResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
+     * @expectedException \Selene\Components\Config\Exception\LoaderException
+     */
+    public function itShouldThrowExceptionWhenNoLoaderIsFound()
+    {
+        $file = 'somefile';
+
+        $resolver = new Resolver;
+
+        $loaders = [
+            $loader = $this->mockLoader($resolver)
+        ];
+
+        $loader->shouldReceive('supports')->with($file)->andReturn(false);
+        $resolver->setLoaders($loaders);
+
+        $resolver->resolve($file);
+    }
+
+    /** @test */
+    public function itShouldGetAllLoaders()
+    {
+        $resolver = new Resolver;
+
+        $loaders = [
+            $this->mockLoader($resolver),
+            $this->mockLoader($resolver)
+        ];
+
+        $resolver->setLoaders($loaders);
+
+        $this->assertSame($loaders, $resolver->all());
+    }
+
+    /**
      * mockLoader
      *
      * @param mixed $resolver

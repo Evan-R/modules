@@ -19,7 +19,7 @@ use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
  * @package Selene\Components\Config\Tests\Validator\Nodes
  * @version $Id$
  */
-class BooleanNodeTest extends \PHPUnit_Framework_TestCase
+class BooleanNodeTest extends NodeTest
 {
     /** @test */
     public function itShouldBeInstantiable()
@@ -28,18 +28,37 @@ class BooleanNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Selene\Components\Config\Validator\Nodes\NodeInterface', $node);
     }
 
-    /** @test */
-    public function itShouldValidateAgainstInput()
+    /**
+     * invalidTypesProvider
+     *
+     * @return array
+     */
+    public function validTypeProvider()
     {
-        $node = new BooleanNode;
+        return [
+            [true],
+            [false]
+        ];
+    }
 
-        $this->assertTrue($node->validate(true));
-        $this->assertTrue($node->validate(false));
+    /**
+     * invalidTypesProvider
+     *
+     * @return array
+     */
+    public function invalidTypesProvider()
+    {
+        return [
+            [[]],
+            [''],
+            [12],
+            [1.2],
+            [0xfff],
+        ];
+    }
 
-        try {
-            $node->validate('string');
-        } catch (\Exception $e) {
-            $this->assertInstanceof('\Selene\Components\Config\Validator\Exception\InvalidTypeException', $e);
-        }
+    protected function getNodeClass()
+    {
+        return 'Selene\Components\Config\Validator\Nodes\BooleanNode';
     }
 }

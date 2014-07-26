@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator\Nodes package
+ * This File is part of the Selene\Components\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -12,41 +12,16 @@
 namespace Selene\Components\Config\Validator\Nodes;
 
 /**
- * @class IntergerNode
- * @package Selene\Components\Config\Validator\Nodes
+ * @class IntegerNode extends NumericNode
+ * @see NumericNode
+ *
+ * @package Selene\Components\Config
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
  */
 class IntegerNode extends NumericNode
 {
-    /**
-     * Sets a minimum value
-     *
-     * @param int $value
-     *
-     * @access public
-     * @return IntergerNode
-     */
-    public function min($value)
-    {
-        $this->min = (int)$value;
-
-        return $this;
-    }
-
-    /**
-     * Sets a maximum value
-     *
-     * @param int $value
-     *
-     * @access public
-     * @return IntegerNode
-     */
-    public function max($value)
-    {
-        $this->max = (int)$value;
-
-        return $this;
-    }
+    protected $type = self::T_INTEGER;
 
     /**
      * {@inheritdoc}
@@ -54,18 +29,5 @@ class IntegerNode extends NumericNode
     public function validateType($value)
     {
         return is_int($value);
-    }
-
-    /**
-     * getInvalidTypeMessage
-     *
-     * @param mixed $value
-     *
-     * @access protected
-     * @return string
-     */
-    protected function getInvalidTypeMessage($value = null)
-    {
-        return sprintf('%s needs to be type of integer, instead saw %s', $this->getKey(), gettype($value));
     }
 }

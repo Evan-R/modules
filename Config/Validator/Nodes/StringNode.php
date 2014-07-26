@@ -18,48 +18,59 @@ namespace Selene\Components\Config\Validator\Nodes;
  */
 class StringNode extends ScalarNode
 {
+    /**
+     * type
+     *
+     * @var string
+     */
+    protected $type = self::T_STRING;
 
     /**
      * regexp
      *
-     * @var mixed
+     * @var string|null
      */
     protected $regexp;
 
+    /**
+     * minLen
+     *
+     * @var int|null
+     */
     protected $minLen;
 
+    /**
+     * maxLen
+     *
+     * @var int|null
+     */
     protected $maxLen;
-
-    public function __construct()
-    {
-        parent::__construct('string');
-    }
 
     /**
      * regexp
      *
-     * @param mixed $regexp
+     * @param string $regexp
      *
-     * @access public
-     * @return mixed
+     * @return StringNode
      */
     public function regexp($regexp)
     {
         $this->regexp = $regexp;
+
         return $this;
     }
 
     /**
      * minLength
      *
-     * @param mixed $len
+     * @param int $len
      *
-     * @access public
-     * @return mixed
+     * @return StringNode
      */
     public function minLength($len)
     {
-        $this->minLen = $len;
+        $this->minLen = (int)$len;
+
         return $this;
     }
 
@@ -68,13 +79,29 @@ class StringNode extends ScalarNode
      *
      * @param mixed $len
      *
-     * @access public
-     * @return mixed
+     * @return StringNode
      */
     public function maxLength($len)
     {
         $this->maxLen = $len;
+
         return $this;
+    }
+
+    /**
+     * lengthBetween
+     *
+     * @param int $min
+     * @param int $max
+     *
+     * @access public
+     * @return StringNode
+     */
+    public function lengthBetween($min, $max)
+    {
+        return $this
+            ->minLenth($min)
+            ->maxLenth($max);
     }
 
     /**
@@ -94,16 +121,17 @@ class StringNode extends ScalarNode
         return true;
     }
 
-    public function validate($value = null)
+    public function validate()
     {
-        parent::validate($value);
+        parent::validate();
+
+        $value = $this->getValue();
 
         $this->validateLength($value);
         $this->validateRegexp($value);
 
         return true;
     }
-
 
     /**
      * validateLength

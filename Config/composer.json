@@ -14,8 +14,7 @@
     "selene/xml":"dev-development"
   },
   "require-dev": {
-    "mockery/mockery": "0.9.*@dev",
-    "phpunit/phpunit": "~4.0",
+    "selene/testsuite":"dev-development",
     "mikey179/vfsStream": "~1.2.0"
   },
   "autoload": {

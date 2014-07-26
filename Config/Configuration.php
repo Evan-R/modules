@@ -89,6 +89,18 @@ abstract class Configuration implements ConfigurationInterface
     }
 
     /**
+     * newValidatorBuilder
+     *
+     * @param string $name
+     *
+     * @return Builder
+     */
+    protected function newValidatorBuilder($name = null)
+    {
+        return new Builder($name);
+    }
+
+    /**
      * getLoaders
      *
      * @access public
