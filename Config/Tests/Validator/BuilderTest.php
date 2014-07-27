@@ -96,8 +96,6 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $result = $validator->validate();
-
-        var_dump($result);
     }
 
     protected function getParamsSection()

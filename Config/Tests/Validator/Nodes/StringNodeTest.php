@@ -11,8 +11,6 @@
 
 namespace Selene\Components\Config\Tests\Validator\Nodes;
 
-use \Selene\Components\Config\Validator\Nodes\StringNode;
-use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
 use \Selene\Components\Config\Validator\Exception\ValidationException;
 
 /**
@@ -20,101 +18,91 @@ use \Selene\Components\Config\Validator\Exception\ValidationException;
  * @package Selene\Components\Config\Tests\Validator\Nodes
  * @version $Id$
  */
-class StringNodeTest extends \PHPUnit_Framework_TestCase
+class StringNodeTest extends RangeableNodeTest
 {
-    /** @test */
-    public function itShouldBeInstantiable()
-    {
-        $node = new StringNode;
-        $this->assertInstanceOf('Selene\Components\Config\Validator\Nodes\NodeInterface', $node);
-    }
 
     /** @test */
-    public function itShouldValidateAgainsStrings()
+    public function itShouldValidateAgainsRegexp()
     {
-        $node = new StringNode;
-        $this->assertTrue($node->validate('string'));
+        $node = $this->newNode();
+        $node->setKey('Node');
+        $node->regexp('~\d+~');
+
+        $node->finalize('test');
 
         try {
-            $node->validate(100);
-        } catch (\Exception $e) {
-            $this->assertInstanceof('\Selene\Components\Config\Validator\Exception\InvalidTypeException', $e);
-            return;
-        }
-        $this->fail();
-    }
+            $node->validate();
+        } catch (ValidationException $e) {
+            $this->assertSame('Node value "test" doesn\'t macht given pattern.', $e->getMessage());
 
-    /** @test */
-    public function itShouldValidateAgainstMinLengthConstraints()
-    {
-        $node = new StringNode;
-        $node->minLength(5);
-
-        $this->assertTrue($node->validate('somestring'));
-
-        try {
-            $node->validate('ts');
-        } catch (\LengthException $e) {
-            $this->assertSame('value must not deceed a length of 5', $e->getMessage());
-            return;
-        }
-
-        $this->fail();
-    }
-
-    /** @test */
-    public function itShouldValidateAgainstMaxLengthConstraints()
-    {
-        $node = new StringNode;
-        $node->maxLength(5);
-
-        $this->assertTrue($node->validate('12345'));
-
-        try {
-            $node->validate('123456');
-        } catch (\LengthException $e) {
-            $this->assertSame('value must not exceed a length of 5', $e->getMessage());
             return;
         }
 
         $this->fail('test slipped');
     }
 
-    /** @test */
-    public function itShouldValidateAgainstRangeConstraints()
+    /**
+     * invalidTypesProvider
+     *
+     * @return array
+     */
+    public function validTypeProvider()
     {
-        $node = new StringNode;
-
-        $node->minLength(5);
-        $node->maxLength(10);
-
-        $this->assertTrue($node->validate('abcde'));
-
-        try {
-            $node->validate('1');
-        } catch (\OutOfRangeException $e) {
-            $this->assertSame('value lenght must be within the range of 5 and 10', $e->getMessage());
-            return;
-        }
-
-        $this->fail('test slipped');
+        return [
+            ['string']
+        ];
     }
 
-    /** @test */
-    public function itShouldMatchAgaintsGivenRegexp()
+    /**
+     * invalidTypesProvider
+     *
+     * @return array
+     */
+    public function invalidTypesProvider()
     {
-        $node = new StringNode;
-        $node->regexp('~[0-9][a-z]~');
+        return [
+            [[]],
+            [1.2],
+            ['1.2'],
+            [0xfff],
+            [12],
+            [true],
+            [false]
+        ];
+    }
 
-        $this->assertTrue($node->validate('0a'));
+    public function nodeDefaultValueProvier()
+    {
+        return [
+            ['str']
+        ];
+    }
 
-        try {
-            $node->validate($p = '0A');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertSame(sprintf('value %s doesn\'t macht given pattern', $p), $e->getMessage());
-            return;
-        }
+    public function minValueProvider()
+    {
+        return [
+            [2, '  ', ' '],
+            [4, '    ', '   '],
+        ];
+    }
 
-        $this->fail('test slipped');
+    public function maxValueProvider()
+    {
+        return [
+            [4, 'oooo', 'ooooo'],
+            [4, '', 'ooooo'],
+        ];
+    }
+
+    public function rangeValueProvider()
+    {
+        return [
+            [[2, 5], 'ooo', 'oooooo']
+        ];
+    }
+
+    protected function getNodeClass()
+    {
+        return 'Selene\Components\Config\Validator\Nodes\StringNode';
     }
 }

@@ -25,36 +25,15 @@ use \Selene\Components\Config\Validator\Exception\ValidationException;
  */
 class DictNode extends ArrayNode implements \Iterator
 {
-    const KEYS_STRICT    = true;
-    const KEYS_NONSTRICT = false;
-
-    /**
-     * key
-     *
-     * @var string
-     */
-    protected $key;
-
-    /**
-     * leastKeys
-     *
-     * @var array
-     */
-    protected $hasAtLeast;
-
-    /**
-     * current
-     *
-     * @var int
-     */
-    private $current;
+    const KEYS_STRICT = true;
+    const KEYS_LOOSE  = false;
 
     /**
      * keySeparator
      *
      * @var string
      */
-    private static $keySepearator = '-::-';
+    private static $keySeparator = '-::-';
 
     /**
      * pattern
@@ -65,28 +44,15 @@ class DictNode extends ArrayNode implements \Iterator
 
     /**
      * Create a new DictNode object.
-     * @access public
+     *
+     * @param boolean $mode
      */
-    public function __construct($mode = self::KEYS_NONSTRICT)
+    public function __construct($mode = self::KEYS_LOOSE)
     {
         $this->mode = $mode;
 
-        $this->current = 0;
         $this->requiredKeys = [];
         parent::__construct();
-    }
-
-    /**
-     * The node must container at least one of the given keys.
-     *
-     * @access public
-     * @return mixed
-     */
-    public function atLeastOne()
-    {
-        $this->hasAtLeast = true;
-
-        return $this;
     }
 
     /**
@@ -98,7 +64,7 @@ class DictNode extends ArrayNode implements \Iterator
             return false;
         }
 
-        $keys = $this->concatKeys($value, static::$keySepearator);
+        $keys = $this->concatKeys($value, static::$keySeparator);
 
         return is_array($value) && !(bool)preg_match(static::$pattern, $keys);
     }
@@ -116,39 +82,7 @@ class DictNode extends ArrayNode implements \Iterator
             $this->checkExceedingKeys($value);
         }
 
-        $this->validateLeastKeys((array)$value);
-
         return $valid;
-    }
-
-    /**
-     * validateLeastKeys
-     *
-     * @param array $values
-     *
-     * @throws ValidationException
-     * @access protected
-     * @return void
-     */
-    protected function validateLeastKeys(array $values)
-    {
-        if (!$this->hasAtLeast) {
-            return;
-        }
-
-        $keys = $this->getKeys();
-
-        foreach (array_keys($values) as $key) {
-            if (!in_array($key, $keys)) {
-                throw new ValidationException(
-                    sprintf(
-                        '%s must contain at least one of these keys: "%s"',
-                        $this->getKey(),
-                        implode('", "', $keys)
-                    )
-                );
-            }
-        }
     }
 
     /**
@@ -156,7 +90,7 @@ class DictNode extends ArrayNode implements \Iterator
      */
     public function current()
     {
-        return $this->children[$this->current];
+        return $this->children->current();
     }
 
     /**
@@ -164,7 +98,7 @@ class DictNode extends ArrayNode implements \Iterator
      */
     public function key()
     {
-        return $this->children[$this->current]->getKey();
+        return $this->children->key();
     }
 
     /**
@@ -172,7 +106,7 @@ class DictNode extends ArrayNode implements \Iterator
      */
     public function valid()
     {
-        return isset($this->children[$this->current]);
+        return $this->children->valid();
     }
 
     /**
@@ -180,7 +114,7 @@ class DictNode extends ArrayNode implements \Iterator
      */
     public function next()
     {
-        $this->current++;
+        return $this->children->next();
     }
 
     /**
@@ -188,8 +122,9 @@ class DictNode extends ArrayNode implements \Iterator
      */
     public function rewind()
     {
-        $this->current = 0;
+        $this->children->rewind();
     }
+
 
     /**
      * {@inheritdoc}

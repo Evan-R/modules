@@ -13,6 +13,7 @@ namespace Selene\Components\Config\Tests\Validator\Nodes;
 
 use \Mockery as m;
 use \Selene\Components\Config\Validator\Nodes\DictNode;
+use \Selene\Components\Config\Validator\Nodes\StringNode;
 use \Selene\Components\Config\Validator\Exception\ValidationException;
 use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
 
@@ -29,6 +30,7 @@ class DictNodeTest extends ArrayNodeTest
             [['test' => 'ok']]
         ];
     }
+
     /**
      * invalidTypeProvider
      *

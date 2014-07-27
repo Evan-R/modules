@@ -13,6 +13,7 @@ namespace Selene\Components\Config\Tests\Validator\Nodes;
 
 use \Mockery as m;
 use \Selene\Components\Config\Validator\Nodes\ListNode;
+use \Selene\Components\Config\Validator\Nodes\StringNode;
 use \Selene\Components\Config\Validator\Exception\ValidationException;
 use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
 
@@ -23,6 +24,29 @@ use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
  */
 class ListNodeTest extends ArrayNodeTest
 {
+    /** @test */
+    public function itShouldGetFistAndLastChild()
+    {
+        $node  = $this->newNode();
+        $node->setKey('List');
+        $first = new StringNode;
+        $first->setKey('first');
+
+        $node->addChild($first);
+
+        $last  = new StringNode;
+        $last->setKey('last');
+
+        try {
+            $node->addChild($last);
+        } catch (\BadMethodCallException $e) {
+            $this->assertSame('ListNode List already as a node declaration.', $e->getMessage());
+        }
+
+        $this->assertSame($first, $node->getFirstChild());
+        $this->assertSame($first, $node->getLastChild());
+    }
+
     /**
      * @test
      * @dataProvider invalidTypesProvider
@@ -45,6 +69,7 @@ class ListNodeTest extends ArrayNodeTest
             } else {
                 $this->assertTrue(0 === strpos($e->getMessage(), 'Invalid key'));
             }
+
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());

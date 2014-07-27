@@ -11,6 +11,8 @@
 
 namespace Selene\Components\Config\Validator\Nodes;
 
+use \Selene\Components\Config\Validator\Exception\ValidationException;
+
 /**
  * @class StringNode
  * @package Selene\Components\Config\Validator\Nodes
@@ -18,6 +20,8 @@ namespace Selene\Components\Config\Validator\Nodes;
  */
 class StringNode extends ScalarNode
 {
+    use Rangeable;
+
     /**
      * type
      *
@@ -31,20 +35,6 @@ class StringNode extends ScalarNode
      * @var string|null
      */
     protected $regexp;
-
-    /**
-     * minLen
-     *
-     * @var int|null
-     */
-    protected $minLen;
-
-    /**
-     * maxLen
-     *
-     * @var int|null
-     */
-    protected $maxLen;
 
     /**
      * regexp
@@ -69,9 +59,7 @@ class StringNode extends ScalarNode
      */
     public function minLength($len)
     {
-        $this->minLen = (int)$len;
-
-        return $this;
+        return $this->min($len);
     }
 
     /**
@@ -83,9 +71,7 @@ class StringNode extends ScalarNode
      */
     public function maxLength($len)
     {
-        $this->maxLen = $len;
-
-        return $this;
+        return $this->max($len);
     }
 
     /**
@@ -125,9 +111,7 @@ class StringNode extends ScalarNode
     {
         parent::validate();
 
-        $value = $this->getValue();
-
-        $this->validateLength($value);
+        $this->validateLength($value = $this->getValue());
         $this->validateRegexp($value);
 
         return true;
@@ -140,32 +124,16 @@ class StringNode extends ScalarNode
      *
      * @throws \OutOfRangeException if both max and min length constraints do not match
      * @throws \LengthException if max or min length constraints do not match
-     * @access protected
      * @return void
      */
     protected function validateLength($value)
     {
+        if (!is_string($value)) {
+            return;
+        }
         $len = strlen($value);
 
-        if (is_int($this->maxLen) && is_int($this->minLen)) {
-            if (!($len >= $this->minLen && $this->maxLen >= $len)) {
-                throw new \OutOfRangeException(
-                    sprintf('value lenght must be within the range of %s and %s', $this->minLen, $this->maxLen)
-                );
-            }
-        } elseif (is_int($this->maxLen)) {
-            if (!($this->maxLen >= $len )) {
-                throw new \LengthException(
-                    sprintf('value must not exceed a length of %s', $this->maxLen)
-                );
-            }
-        } elseif (is_int($this->minLen)) {
-            if (!($len >= $this->minLen)) {
-                throw new \LengthException(
-                    sprintf('value must not deceed a length of %s', $this->minLen)
-                );
-            }
-        }
+        $this->checkRange($len);
     }
 
     /**
@@ -173,18 +141,17 @@ class StringNode extends ScalarNode
      *
      * @param mixed $string
      *
-     * @access protected
      * @return mixed
      */
     protected function validateRegexp($value)
     {
         if (null === $this->regexp) {
-            return true;
+            return;
         }
 
         if (!(boolean)preg_match($this->regexp, $value)) {
-            throw new \InvalidArgumentException(
-                sprintf('value %s doesn\'t macht given pattern', $value)
+            throw new ValidationException(
+                sprintf('%s value "%s" doesn\'t macht given pattern.', $this->getFormattedKey(), $value)
             );
         }
 

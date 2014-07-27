@@ -11,9 +11,6 @@
 
 namespace Selene\Components\Config\Validator\Nodes;
 
-use \Selene\Components\Config\Validator\Exception\RangeException;
-use \Selene\Components\Config\Validator\Exception\LengthException;
-
 /**
  * @class NumericNode extends ScalarNode
  * @see ScalarNode
@@ -24,43 +21,7 @@ use \Selene\Components\Config\Validator\Exception\LengthException;
  */
 abstract class NumericNode extends ScalarNode
 {
-    /**
-     * min
-     *
-     * @var mixed
-     */
-    protected $min;
-
-    /**
-     * max
-     *
-     * @var mixed
-     */
-    protected $max;
-
-    /**
-     * Set a minimum value.
-     *
-     * @param mixed $value a numeric value
-     *
-     * @return ScalarNode
-     */
-    public function min($value)
-    {
-        $this->min = $value;
-    }
-
-    /**
-     * Set a maximum value.
-     *
-     * @param mixed $value a numeric value
-     *
-     * @return ScalarNode
-     */
-    public function max($value)
-    {
-        $this->max = $value;
-    }
+    use Rangeable;
 
     /**
      * {@inheritdoc}
@@ -85,15 +46,7 @@ abstract class NumericNode extends ScalarNode
      */
     protected function validateRange($value)
     {
-        if (null !== $this->min && null !== $this->max) {
-            if ($this->min > $value || $this->max < $value) {
-                throw RangeException::outOfRange($this->min, $this->max);
-            }
-        } elseif (null !== $this->min && $value < $this->min) {
-            throw LengthException::deceedsLength($this->min);
-        } elseif (null !== $this->max && $value > $this->max) {
-            throw LengthException::exceedsLength($this->max);
-        }
+        $this->checkRange($value);
     }
 
     /**

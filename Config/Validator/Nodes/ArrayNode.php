@@ -27,7 +27,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
     /**
      * children
      *
-     * @var array
+     * @var SplObjectStorage
      */
     protected $children;
 
@@ -45,7 +45,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
      */
     public function __construct(NodeInterface $node = null)
     {
-        $this->children = [];
+        $this->children = new Children;
         parent::__construct($node);
     }
 
@@ -57,7 +57,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
         parent::__clone();
 
         $children = $this->getChildren();
-        $this->children = [];
+        $this->children = new Children;
 
         foreach ($children as $child) {
             $this->addChild(clone($child));
@@ -94,7 +94,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
     public function getFirstChild()
     {
         if ($this->hasChildren()) {
-            return current($this->children);
+            return $this->children->first();
         }
     }
 
@@ -107,7 +107,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
     public function getLastChild()
     {
         if ($this->hasChildren()) {
-            return end($this->children);
+            return $this->children->last();
         }
     }
 
@@ -131,7 +131,7 @@ abstract class ArrayNode extends Node implements ParentableInterface
     /**
      * Adds a childnode.
      *
-     * @param \Selene\Components\Config\Validator\Nodes\NodeInterface $node
+     * @param NodeInterface $node
      *
      * @return NodeInterface this instance
      */
@@ -141,7 +141,9 @@ abstract class ArrayNode extends Node implements ParentableInterface
             return $node->setParent($this);
         }
 
-        $this->children[] = &$node;
+        if (!$this->hasChild($node)) {
+            $this->children->attach($node);
+        }
 
         return $this;
     }
@@ -155,10 +157,9 @@ abstract class ArrayNode extends Node implements ParentableInterface
      */
     public function removeChild(NodeInterface $node)
     {
-        if (false !== ($index = array_search($node, $this->children, true))) {
+        if ($this->hasChild($node)) {
             $node->removeParent();
-            unset($this->children[$index]);
-            reset($this->children);
+            $this->children->detach($node);
         }
 
         return $this;
@@ -167,34 +168,13 @@ abstract class ArrayNode extends Node implements ParentableInterface
     /**
      * Check if a node is a child.
      *
-     * @param \Selene\Components\Config\Validator\Nodes\NodeInterface $node
+     * @param NodeInterface $node
      *
-     * @access public
-     * @return mixed
+     * @return boolean
      */
     public function hasChild(NodeInterface $child)
     {
-        $found = array_filter($this->children, function ($c) use ($child) {
-            return $c === $child;
-        });
-
-        return (bool)$found;
-    }
-
-    /**
-     * Get a child node by it's key
-     *
-     * @param mixed $key
-     *
-     * @return mixed
-     */
-    public function getChildByKey($key)
-    {
-        $children = array_filter($this->getChildren(), function ($child) use ($key) {
-            return $child->getKey() === $key;
-        });
-
-        return (bool)$children ? current($children) : null;
+        return $this->children->has($child);
     }
 
     /**

@@ -49,7 +49,7 @@ class ListNode extends ArrayNode implements \IteratorAggregate
     public function addChild(NodeInterface $node)
     {
         if (!$this->validating && 0 !== count($this->getChildren())) {
-            throw new \Exception(sprintf('ListNode %s already as a node declaration.', $this->getFullKey()));
+            throw new \BadMethodCallException(sprintf('ListNode %s already as a node declaration.', $this->getFormattedKey()));
         }
 
         $node->setKey(count($this->children));
@@ -66,10 +66,12 @@ class ListNode extends ArrayNode implements \IteratorAggregate
 
         if ($child = $this->getFirstChild()) {
 
-            $this->children = [];
+            $this->children->detachAll();
 
-            foreach ($value = $this->getValue() as $i => $val) {
-                $this->addChild(clone($child));
+            if (is_array($value = $this->getValue())) {
+                foreach ($value as $i => $val) {
+                    $this->addChild(clone($child));
+                }
             }
         }
 
@@ -85,7 +87,7 @@ class ListNode extends ArrayNode implements \IteratorAggregate
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->getChildren());
+        return new $this->getChildren();
     }
 
     /**

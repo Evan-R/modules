@@ -11,18 +11,19 @@
 
 namespace Selene\Components\Config\Tests\Validator\Nodes;
 
+use \Selene\Components\Config\Validator\Nodes\StringNode;
 use \Selene\Components\Config\Validator\Nodes\NodeInterface;
 use \Selene\Components\Config\Tests\Validator\Stubs\NodeStub;
 use \Selene\Components\Config\Tests\Validator\Stubs\ArrayNodeStub as ArrayNode;
 
 /**
- * @class ArrayNodeTest extends \PHPUnit_Framework_TestCase
- * @see \PHPUnit_Framework_TestCase
+ * @abstract class ArrayNodeTest extends NodeTest
+ * @see NodeTest
+ * @abstract
  *
  * @package Selene\Components\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 abstract class ArrayNodeTest extends NodeTest
 {
@@ -30,5 +31,34 @@ abstract class ArrayNodeTest extends NodeTest
     public function typeShouldBeArray()
     {
         $this->assertSame(NodeInterface::T_ARRAY, $this->newNode()->getType());
+    }
+
+    /** @test */
+    public function itShouldAddAndRemoveChildren()
+    {
+        $node  = $this->newNode();
+        $child = new StringNode;
+
+        $node->addChild($child);
+        $this->assertSame($node, $child->getParent());
+
+        $node->removeChild($child);
+        $this->assertFalse($node->hasChild($child));
+    }
+
+    /** @test */
+    public function itShouldGetFistAndLastChild()
+    {
+        $node  = $this->newNode();
+        $first = new StringNode;
+        $first->setKey('first');
+        $last  = new StringNode;
+        $last->setKey('last');
+
+        $node->addChild($first);
+        $node->addChild($last);
+
+        $this->assertSame($first, $node->getFirstChild());
+        $this->assertSame($last, $node->getLastChild());
     }
 }
