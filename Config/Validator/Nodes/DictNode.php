@@ -192,18 +192,6 @@ class DictNode extends ArrayNode implements \Iterator
     }
 
     /**
-     * mergeValue
-     *
-     * @param mixed $value
-     *
-     * @return void
-     */
-    public function mergeValue($value)
-    {
-        return array_merge($this->value, (array)$value);
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function getInvalidTypeMessage($value = null)

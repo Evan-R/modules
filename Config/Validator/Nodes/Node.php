@@ -404,7 +404,10 @@ abstract class Node implements NodeInterface
      *
      * @return string
      */
-    abstract public function getType();
+    public function getType()
+    {
+        return $this->type;
+    }
 
     /**
      * isEmptyValue
@@ -469,7 +472,7 @@ abstract class Node implements NodeInterface
             $value = null;
             $this->removeParent();
         } catch (ValidationException $e) {
-            throw $e;
+            throw new ValidationException(sprintf('%s: %s', $this->getFormattedKey(), $e->getMessage()));
         }
     }
 

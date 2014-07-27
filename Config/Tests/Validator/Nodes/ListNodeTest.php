@@ -21,36 +21,79 @@ use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
  * @package Selene\Components\Config\Tests\Validator\Nodes
  * @version $Id$
  */
-class ListNodeTest extends \PHPUnit_Framework_TestCase
+class ListNodeTest extends ArrayNodeTest
 {
-    /** @test */
-    public function itShouldBeInstantiable()
+    /**
+     * @test
+     * @dataProvider invalidTypesProvider
+     */
+    public function itShouldValidateItsType($value)
     {
-        $node = new ListNode;
-        $this->assertInstanceOf('Selene\Components\Config\Validator\Nodes\NodeInterface', $node);
+        $node = $this->newNode();
+
+        $node->setKey('Node');
+
+        try {
+            $node->finalize($value);
+            $node->validate();
+        } catch (InvalidTypeException $e) {
+            if (!is_array($value)) {
+                $this->assertSame(
+                    'Node needs to be type of '.$node->getType().', instead saw '.gettype($value).'.',
+                    $e->getMessage()
+                );
+            } else {
+                $this->assertTrue(0 === strpos($e->getMessage(), 'Invalid key'));
+            }
+            return;
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
     }
 
-    /** @test */
-    public function itShouldValidateIndexedArrays()
+    public function nodeDefaultValueProvier()
     {
-        $node = new ListNode;
-        $node->setKey('list');
+        return [
+            [[1, 2]]
+        ];
+    }
 
-        $this->assertTrue($node->validate([1, 2, 3, 4]));
+    /**
+     * invalidTypeProvider
+     *
+     * @return array
+     */
+    public function validTypeProvider()
+    {
+        return [
+            [[]],
+            [[], []],
+            [[1, 2, 4]]
+        ];
+    }
 
-        try {
-            $node->validate([1, 'bar' => 'string']);
-        } catch (ValidationException $e) {
-            $this->assertSame('invalid key "bar" in list', $e->getMessage());
-        }
+    /**
+     * invalidTypesProvider
+     *
+     * @return array
+     */
+    public function invalidTypesProvider()
+    {
+        return [
+            [['dict' => 'value']],
+            ['string'],
+            [1],
+            [1.0],
+            [true]
+        ];
+    }
 
-        try {
-            $node->validate([1, 'foo' => null, 'bar' => 'string']);
-        } catch (ValidationException $e) {
-            $this->assertSame('invalid keys "foo", "bar" in list', $e->getMessage());
-            return;
-        }
 
-        $this->fail('test failed');
+    /**
+     * {@inheritdoc}
+     */
+    protected function getNodeClass()
+    {
+        return 'Selene\Components\Config\Validator\Nodes\ListNode';
     }
 }

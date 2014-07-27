@@ -29,7 +29,7 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider validTypeProvider
      */
-    public function itShouldValidateAgainstBooleans($value)
+    public function itShouldValidateValidValues($value)
     {
         $node = $this->newNode();
 

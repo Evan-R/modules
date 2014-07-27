@@ -12,6 +12,7 @@
 namespace Selene\Components\Config\Validator\Nodes;
 
 use \Selene\Components\Config\Validator\Exception\ValidationException;
+use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
 
 /**
  * @class Collection
@@ -100,25 +101,6 @@ class ListNode extends ArrayNode implements \IteratorAggregate
     }
 
     /**
-     * getInvalidTypeMessage
-     *
-     * @param mixed $value
-     *
-     * @return string
-     */
-    protected function getInvalidTypeMessage($value = null)
-    {
-        if (is_array($value)) {
-            $keys = $this->getInvalidKeys($value);
-            $string = implode('", "', $keys);
-
-            return sprintf('invalid key%s "%s" in %s', count($keys) < 2 ? '' : 's', $string, $this->getKey());
-        }
-
-        return parent::getInvalidTypeMessage($value);
-    }
-
-    /**
      * handleTypeError
      *
      * @param mixed $value
@@ -135,7 +117,7 @@ class ListNode extends ArrayNode implements \IteratorAggregate
         $string = implode('", "', $keys);
 
         throw new InvalidTypeException(
-            sprintf('invalid key%s "%s" in %s', count($keys) < 2 ? '' : 's', $string, $this->getKey())
+            sprintf('Invalid key%s "%s" in %s', count($keys) < 2 ? '' : 's', $string, $this->getFormattedKey())
         );
     }
 

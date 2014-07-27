@@ -22,6 +22,12 @@ use \Selene\Components\Config\Validator\Builder;
  */
 interface NodeInterface
 {
+    const T_BOOL    = 'boolean';
+    const T_FLOAT   = 'float';
+    const T_INTEGER = 'integer';
+    const T_STRING  = 'string';
+    const T_ARRAY   = 'array';
+
     /**
      * Set the validation builder.
      *

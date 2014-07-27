@@ -76,22 +76,6 @@ class Condition
     }
 
     /**
-     * ifNoInArray
-     *
-     * @param array $values
-     *
-     * @return Condition
-     */
-    public function ifNoInArray(array $values)
-    {
-        $this->condition = function ($value) use ($values) {
-            return !in_array($value, $values);
-        };
-
-        return $this;
-    }
-
-    /**
      * ifTrue
      *
      * @return Condition
@@ -100,6 +84,38 @@ class Condition
     {
         $this->condition = function ($value) use ($callback) {
             return (boolean)call_user_func($callback, $value);
+        };
+
+        return $this;
+    }
+
+    /**
+     * ifInArray
+     *
+     * @param array $values
+     *
+     * @return Condition
+     */
+    public function ifInArray(array $values)
+    {
+        $this->condition = function ($value) use ($values) {
+            return in_array($value, $values);
+        };
+
+        return $this;
+    }
+
+    /**
+     * ifNotInArray
+     *
+     * @param array $values
+     *
+     * @return Condition
+     */
+    public function ifNotInArray(array $values)
+    {
+        $this->condition = function ($value) use ($values) {
+            return !in_array($value, $values);
         };
 
         return $this;
@@ -124,7 +140,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifNull()
+    public function ifIsNull()
     {
         $this->condition = function ($value) {
             return null === $value;
@@ -138,7 +154,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifArray()
+    public function ifIsArray()
     {
         $this->condition = function ($value) {
             return is_array($value);
@@ -166,7 +182,7 @@ class Condition
      *
      * @return Contition
      */
-    public function ifString()
+    public function ifIsString()
     {
         $this->condition = function ($value) {
             return is_string($value);

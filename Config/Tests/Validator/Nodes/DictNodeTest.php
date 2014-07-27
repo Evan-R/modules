@@ -21,63 +21,46 @@ use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
  * @package Selene\Components\Config\Tests\Validator\Nodes
  * @version $Id$
  */
-class DictNodeTest extends \PHPUnit_Framework_TestCase
+class DictNodeTest extends ArrayNodeTest
 {
-    protected function tearDown()
+    public function nodeDefaultValueProvier()
     {
-        m::close();
+        return [
+            [['test' => 'ok']]
+        ];
+    }
+    /**
+     * invalidTypeProvider
+     *
+     * @return array
+     */
+    public function validTypeProvider()
+    {
+        return [
+            [[]],
+            [['foo' => 'bar']]
+        ];
     }
 
-    /** @test */
-    public function itShouldBeInstantiable()
+    /**
+     * invalidTypesProvider
+     *
+     * @return array
+     */
+    public function invalidTypesProvider()
     {
-        $node = new DictNode;
-        $this->assertInstanceOf('Selene\Components\Config\Validator\Nodes\NodeInterface', $node);
+        return [
+            [[0, 1, 2, 4]],
+            ['string']
+        ];
     }
 
-    /** @test */
-    public function itShouldVaidateAssociativeArrays()
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getNodeClass()
     {
-        $node = new DictNode;
-        $node->setKey('dict');
-        $node->addChild($this->getNodeMock('foo', $node));
-        $this->assertTrue($node->validate(['foo' => 'bar']));
-
-        try {
-            $node->validate(['bar', 'foo' => 'bar']);
-        } catch (InvalidTypeException $e) {
-            $this->assertSame('dict may not contain numeric keys', $e->getMessage());
-            return;
-        }
-
-        $this->fail('test slipped');
-    }
-
-    /** @test */
-    public function itShouldCheckExceedingInputValues()
-    {
-        $node = new DictNode;
-        $node->setKey('dict');
-        $node->addChild($this->getNodeMock('foo', $node));
-
-        try {
-            $node->validate(['foo' => 'bar', 'bar' => 'baz']);
-        } catch (ValidationException $e) {
-            $this->assertSame('invalid key bar in dict', $e->getMessage());
-            return;
-        }
-
-        $this->fail('test slipped');
-
-    }
-
-    protected function getNodeMock($key, $parent)
-    {
-        $node = m::mock('Selene\Components\Config\Validator\Nodes\NodeInterface');
-        $node->shouldReceive('setParent')->with($parent)->andReturn($node);
-        $node->shouldReceive('getParent')->andReturn($parent);
-        $node->shouldReceive('getKey')->andReturn($key);
-
-        return $node;
+        return 'Selene\Components\Config\Validator\Nodes\DictNode';
     }
 }

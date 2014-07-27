@@ -22,10 +22,6 @@ namespace Selene\Components\Config\Validator\Nodes;
  */
 abstract class ScalarNode extends Node
 {
-    const T_BOOL    = 'boolean';
-    const T_FLOAT   = 'float';
-    const T_INTEGER = 'integer';
-    const T_STRING  = 'string';
 
     /**
      * type
@@ -48,10 +44,5 @@ abstract class ScalarNode extends Node
         $this->setRequired(true);
 
         parent::__construct();
-    }
-
-    public function getType()
-    {
-        return $this->type;
     }
 }

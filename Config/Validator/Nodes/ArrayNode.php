@@ -32,6 +32,13 @@ abstract class ArrayNode extends Node implements ParentableInterface
     protected $children;
 
     /**
+     * type
+     *
+     * @var string
+     */
+    protected $type = self::T_ARRAY;
+
+    /**
      * Constructor.
      *
      * @param NodeInterface $node
@@ -190,6 +197,9 @@ abstract class ArrayNode extends Node implements ParentableInterface
         return (bool)$children ? current($children) : null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validate()
     {
         parent::validate();
@@ -197,7 +207,11 @@ abstract class ArrayNode extends Node implements ParentableInterface
         $results = [];
         $values = $this->getValue();
 
-        $this->validateChildren($values);
+        if (0 !== count($this->children)) {
+            $this->validateChildren((array)$values);
+        }
+
+        return true;
     }
 
     /**
@@ -232,14 +246,6 @@ abstract class ArrayNode extends Node implements ParentableInterface
     public function mergeValue($value)
     {
         return array_merge($this->value, (array)$value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'array';
     }
 
     /**
