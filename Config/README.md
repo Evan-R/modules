@@ -29,7 +29,7 @@ Both, the `PhpFileLoader` and the `XmlFileLoader` extend `FileLoader` and
 require a resource locator instance. 
 
 The loading implementation is up to you. e.g. let's say you have a class
-`Config` that sores all configuration values as an associative array:
+`Config` that sores all configuration values as an associative array.
 
 ```php
 <?php
@@ -65,7 +65,7 @@ class Config
 	}
 }
 ```
-your php loader would loock something like this:
+Your php loader would loock something like this:
 
 ```php
 <?php
@@ -130,6 +130,7 @@ It is possible to load different types of configuration using the
 
 use \Acme\Config\PhpLoader;
 use \Acme\Config\JsonLoader;
+use \Selene\Components\Config\Loader\Resolver;
 use \Selene\Components\Config\Loader\DelegatingLoader;
 
 $loader = new DelegatingLoader(new Resolver(
@@ -142,6 +143,8 @@ $loader->load('config.json', PhpLoader::LOAD_ALL);
 
 ```
 ### Custom Loaders
+
+In theory, you can create all kinds of loaders, e.g. a JSON loader.
 
 ```php
 <?php
@@ -159,9 +162,9 @@ class JsonFileLoader extends FileLoader
      */
     protected function doLoad($file)
     {
-        $contents = json_decode($file);
+        $contents = json_decode(file_get_contents($file), true);
 
-		// setter logic
+		// setter logic goes here.
     }
 }
 ```
@@ -220,7 +223,10 @@ $loader->removeListener($configLoaderLogger);
 
 ## Caching
 
-Depending on the situation it may be useful to cache configuration.
+Depending on the situation it may be useful to cache configuration, e.g.
+parsing an xml file on each request is likely a huge performance hit. Instead
+you probably want to parse the configuration file once and store its contents
+as a php array. 
 
 ```php
 <?php
@@ -237,15 +243,76 @@ if ($cache->isValid()) {
 } else {
 	$config = new Config;
 	$loader = new XmlLoader($config, new Locator($paths));
-	$loader->load('system.xml');
-	$loader->load('database.xml');
-	$loader->load('cache.xml');
+	$loader->load('config.xml');
 
 	// …
 
 	$cache->write("<?php\n    return ".var_export($config->all()).';');
 }
 ```
+
+The above solution is file for loading a single file. `Cache::isValid()` will report `false` if
+the given cache file has been modified since the last request. 
+However, the actual configuration files won't be taken into account.
+
+The cache is capable of resource checking. Simply pass `true` as the second
+argument to the constructr and supply a list of resources to be tracked when
+writing the cache.
+
+This is where the event capability of the loader is coming in handy. 
+Lets modify the `Acme\Config\Config` class by implementing the `Loaderlistener`
+interface.
+
+```php
+<?php
+
+namespace Acme\Config;
+
+use \Selene\Components\Config\Loader\PhpFileLoader;
+use \Selene\Components\Config\Loader\LoaderListener;
+use \Selene\Components\Config\Resource\FileResource;
+use \Selene\Components\Config\Resource\ObjectResource;
+use \Selene\Components\Config\Resource\LocatorInterface;
+
+class PhpLoader extends PhpFileLoader implements LoaderListener
+{
+    private $resources;
+
+	//…
+
+	public function onLoaded($resource)
+	{
+		if (is_object($resource)) {
+			$this->resources[] = new ObjectResource($resource);	
+		} elseif(is_string($file)) {
+			$this->resources[] = new FileResource($resource);	
+		}
+	}
+
+	public function getResources()
+	{
+		return $this->resources;
+	}
+}
+```
+Every resource that's being loaded is now pushed to an array that we can use as
+the list of files the cache will use to track for cachnges. 
+
+```php
+<?php
+
+$cache = new Cache($file, true);
+
+// do the loading proceedure. 
+
+// write the cache file content and pass in the resources to be tracked.
+$cache->write(
+	"<?php\n    return ".var_export($config->all()).';',
+	$config->getResources()
+);
+
+```
+
 
 [composer]: https://getcomposer.org
 [repo_config]: https://github.com/seleneapp/config
