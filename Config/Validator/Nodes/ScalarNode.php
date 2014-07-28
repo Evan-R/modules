@@ -37,9 +37,7 @@ abstract class ScalarNode extends Node
      */
     public function __construct($type = null)
     {
-        if (null !== $type) {
-            $this->type = $type;
-        }
+        $this->type = null !== $type ? $type : $this->type;
 
         $this->setRequired(true);
 

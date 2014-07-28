@@ -92,6 +92,13 @@ abstract class Node implements NodeInterface
     protected $finalized;
 
     /**
+     * invalid
+     *
+     * @var void
+     */
+    private $invalid;
+
+    /**
      * Constructor.
      *
      * @param NodeInterface $parent
@@ -115,7 +122,8 @@ abstract class Node implements NodeInterface
      */
     public function __clone()
     {
-        $this->value = null;
+        $this->value     = null;
+        $this->invalid   = null;
         $this->finalized = false;
     }
 
@@ -346,12 +354,17 @@ abstract class Node implements NodeInterface
      *
      * @throws MissingValueException if value is missing or empty.
      * @throws InvalidTypeException  if value has the wrong type.
+     * @throws ValidationException   if marked invalid due to condition.
      * @return boolean
      */
     public function validate()
     {
         if (!$this->finalized) {
             throw new \BadMethodCallException('Node must be finalized before validation.');
+        }
+
+        if ($this->isMarkedInvalid()) {
+            throw new ValidationException(sprintf('%s: %s', $this->getFormattedKey(), $this->invalid->getMessage()));
         }
 
         if ($missing = (($value = $this->getValue()) instanceof MissingValue)) {
@@ -472,7 +485,7 @@ abstract class Node implements NodeInterface
             $value = null;
             $this->removeParent();
         } catch (ValidationException $e) {
-            throw new ValidationException(sprintf('%s: %s', $this->getFormattedKey(), $e->getMessage()));
+            $this->markInvalid($e);
         }
     }
 
@@ -489,15 +502,25 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * getInvalidTypeMessage
+     * markInvalid
      *
-     * @param mixed $value
+     * @param ValidationException $exception
      *
-     * @return string
+     * @return void
      */
-    protected function getInvalidTypeMessage($value = null)
+    final protected function markInvalid(ValidationException $exception)
     {
-        return sprintf('invalid value for %s', $this->getKey());
+        $this->invalid = $exception;
+    }
+
+    /**
+     * isMarkedInvalid
+     *
+     * @return boolean
+     */
+    final protected function isMarkedInvalid()
+    {
+        return $this->invalid instanceof ValidationException;
     }
 
     /**

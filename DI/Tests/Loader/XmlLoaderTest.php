@@ -25,6 +25,10 @@ use \Selene\Components\Config\Resource\Locator;
  */
 class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    protected $loader;
+    protected $builder;
+    protected $container;
+
     protected function tearDown()
     {
         m::close();
@@ -57,57 +61,55 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldParseParameters()
     {
-        $loader = new XmlLoader(new Builder($container = new Container), new Locator([__DIR__.'/Fixures']));
+        $this->newLoader();
+        $this->loader->load('services.0.xml');
 
-        $loader->load('services.0.xml');
-
-        $this->assertTrue($container->hasParameter('foo'));
-        $this->assertSame('bar', $container->getParameter('foo'));
+        $this->assertTrue($this->container->hasParameter('foo'));
+        $this->assertSame('bar', $this->container->getParameter('foo'));
     }
 
     /** @test */
     public function itShouldParseServices()
     {
+        $this->newLoader();
 
-        $loader = new XmlLoader(new Builder($container = new Container), new Locator([__DIR__.'/Fixures']));
+        $this->loader->load('services.1.xml');
 
-        $loader->load('services.1.xml');
+        $this->assertTrue($this->container->hasDefinition('foo_service'));
+        $this->assertTrue($this->container->hasDefinition('foo_alias'));
+        $this->assertSame('\stdClass', $this->container->getDefinition('foo_service')->getClass());
 
-        $this->assertTrue($container->hasDefinition('foo_service'));
-        $this->assertTrue($container->hasDefinition('foo_alias'));
-        $this->assertSame('\stdClass', $container->getDefinition('foo_service')->getClass());
+        $this->loader->load('services.1.1.xml');
 
-        $loader->load('services.1.1.xml');
+        $this->assertTrue($this->container->hasDefinition('bar_service'));
+        $this->assertTrue($this->container->getDefinition('bar_service')->isInjected());
 
-        $this->assertTrue($container->hasDefinition('bar_service'));
-        $this->assertTrue($container->getDefinition('bar_service')->isInjected());
+        $this->assertTrue($this->container->hasDefinition('bar_child'));
+        $this->assertSame('bar_service', $this->container->getDefinition('bar_child')->getParent());
 
-        $this->assertTrue($container->hasDefinition('bar_child'));
-        $this->assertSame('bar_service', $container->getDefinition('bar_child')->getParent());
-
-        $this->assertTrue($container->hasDefinition('factory_service'));
-        $this->assertTrue($container->getDefinition('factory_service')->hasFactory());
+        $this->assertTrue($this->container->hasDefinition('factory_service'));
+        $this->assertTrue($this->container->getDefinition('factory_service')->hasFactory());
     }
 
     /** @test */
     public function itShouldParseImportedFiles()
     {
+        $this->newLoader();
 
-        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([__DIR__.'/Fixures']));
+        $this->loader->load('services.2.xml');
 
-        $loader->load('services.2.xml');
-
-        $this->assertSame([['foo' => 'bar']], $builder->getPackageConfig('acme'));
+        $this->assertSame([['foo' => 'bar']], $this->builder->getPackageConfig('acme'));
     }
 
     /** @test */
     public function itShouldAddResourcesToTheBuilder()
     {
-        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+        $dir = __DIR__.'/Fixures';
+        $this->newLoader();
 
-        $loader->load('services.2.xml', true);
+        $this->loader->load('services.2.xml', true);
 
-        $resources = $builder->getResources();
+        $resources = $this->builder->getResources();
 
         $this->assertSame(2, count($resources));
 
@@ -115,19 +117,18 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(in_array($dir.DIRECTORY_SEPARATOR.'imported.0.xml', $resources));
     }
 
-
     /** @test */
     public function isShouldParseImportedPackageConfig()
     {
-        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+        $this->newLoader();
 
-        $loader->load('services.2.xml');
+        $this->loader->load('services.2.xml');
 
-        $this->assertSame([['foo' => 'bar']], $builder->getPackageConfig('acme'));
+        $this->assertSame([['foo' => 'bar']], $this->builder->getPackageConfig('acme'));
 
-        $loader->load('services.2.1.xml');
+        $this->loader->load('services.2.1.xml');
 
-        $this->assertSame([], $builder->getPackageConfig(''));
+        $this->assertSame([], $this->builder->getPackageConfig(''));
     }
 
     /** @test */
@@ -158,13 +159,13 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldParseParmetersArray()
     {
-        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+        $this->newLoader();
 
-        $loader->load('services.3.xml', false);
+        $this->loader->load('services.3.xml', false);
 
-        $this->assertTrue($container->hasParameter('nested'));
+        $this->assertTrue($this->container->hasParameter('nested'));
 
-        $params = $container->getParameter('nested');
+        $params = $this->container->getParameter('nested');
 
         $expected = [
             'a',
@@ -179,11 +180,11 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldParseMetaDataInDefinitions()
     {
-        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+        $this->newLoader();
 
-        $loader->load('services.4.xml', false);
+        $this->loader->load('services.4.xml', false);
 
-        $def = $container->getDefinition('test_listener');
+        $def = $this->container->getDefinition('test_listener');
 
         $this->assertTrue($def->hasMetaData('app_events'));
     }
@@ -191,11 +192,10 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itiShoultThrowExceptionIfClassIsMissing()
     {
-
-        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
+        $this->newLoader();
 
         try {
-            $loader->load('errored.0.xml', false);
+            $this->loader->load('errored.0.xml', false);
         } catch (\InvalidArgumentException $e) {
             $this->assertSame(
                 'Definition "foo_service" must define its class unless it has a parent definition',
@@ -212,10 +212,10 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldSetSetters()
     {
-        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
-        $loader->load('services.6.xml', false);
+        $this->newLoader();
+        $this->loader->load('services.6.xml', false);
 
-        $def = $container->getDefinition('foo_service');
+        $def = $this->container->getDefinition('foo_service');
 
         $this->assertTrue($def->hasSetters());
 
@@ -228,22 +228,22 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldConvertToParentDefinition()
     {
-        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
-        $loader->load('services.5.xml', false);
+        $this->newLoader();
+        $this->loader->load('services.5.xml', false);
 
         $this->assertInstanceof(
             'Selene\Components\DI\Definition\ParentDefinition',
-            $container->getDefinition('concrete')
+            $this->container->getDefinition('concrete')
         );
     }
 
     /** @test */
     public function itShouldReplaceParentArguments()
     {
-        $loader = new XmlLoader($builder = new Builder($container = new Container), new Locator([$dir = __DIR__.'/Fixures']));
-        $loader->load('services.5.xml', false);
+        $this->newLoader();
+        $this->loader->load('services.5.xml', false);
 
-        $def = $container->getDefinition('concrete');
+        $def = $this->container->getDefinition('concrete');
 
         $args = $def->getArguments();
 
@@ -259,5 +259,13 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $builder->shouldReceive('getContainer')->andReturn($container);
 
         return  new XmlLoader($builder, $locator);
+    }
+
+    protected function newLoader()
+    {
+        $this->loader = new XmlLoader(
+            $this->builder = new Builder($this->container = new Container),
+            new Locator([$dir = __DIR__.'/Fixures'])
+        );
     }
 }

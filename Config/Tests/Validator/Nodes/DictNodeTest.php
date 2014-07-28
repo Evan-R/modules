@@ -66,6 +66,21 @@ class DictNodeTest extends ArrayNodeTest
         $this->fail('test slipped.');
     }
 
+    /** @test */
+    public function itShouldGetChildKeys()
+    {
+        $node  = $this->newNode();
+        $first = new StringNode;
+        $first->setKey('first');
+        $last  = new StringNode;
+        $last->setKey('last');
+
+        $node->addChild($first);
+        $node->addChild($last);
+
+        $this->assertSame(['first', 'last'], $node->getKeys());
+    }
+
     public function nodeDefaultValueProvier()
     {
         return [

@@ -276,7 +276,7 @@ class Builder implements BuilderInterface
     {
         if (!$this->current->hasParent()) {
             throw new \BadMethodCallException(
-                sprintf('node %s is already root', (string)$this->current->getKey())
+                sprintf('%s::end(): Node %s is already root.', get_class($this), (string)$this->current->getKey())
             );
         }
 

@@ -32,6 +32,101 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldCreateIntegerNode()
+    {
+        $builder = new Builder;
+        $this->assertInstanceof(
+            'Selene\Components\Config\Validator\Nodes\IntegerNode',
+            $builder->root()->integer('int')
+        );
+    }
+
+    /** @test */
+    public function itShouldCreateFloatNode()
+    {
+        $builder = new Builder;
+        $this->assertInstanceof(
+            'Selene\Components\Config\Validator\Nodes\FloatNode',
+            $builder->root()->float('double')
+        );
+    }
+
+    /** @test */
+    public function itShouldCreateStringNode()
+    {
+        $builder = new Builder;
+        $this->assertInstanceof(
+            'Selene\Components\Config\Validator\Nodes\StringNode',
+            $builder->root()->string('string')
+        );
+
+    }
+
+    /** @test */
+    public function itShouldCreateBooleanNode()
+    {
+        $builder = new Builder;
+        $this->assertInstanceof(
+            'Selene\Components\Config\Validator\Nodes\BooleanNode',
+            $builder->root()->boolean('bool')
+        );
+    }
+
+    /** @test */
+    public function itShouldCreateListNode()
+    {
+        $builder = new Builder;
+        $this->assertInstanceof(
+            'Selene\Components\Config\Validator\Nodes\ListNode',
+            $builder->root()->values('array')
+        );
+    }
+
+    /** @test */
+    public function itShouldCreateDictNode()
+    {
+        $builder = new Builder;
+        $this->assertInstanceof(
+            'Selene\Components\Config\Validator\Nodes\DictNode',
+            $builder->root()->dict('array')
+        );
+    }
+
+    /** @test */
+    public function endShouldReturnBuilder()
+    {
+
+        $builder = new Builder;
+        $this->assertInstanceof(
+            'Selene\Components\Config\Validator\Builder',
+            $builder->root()->dict('array')->end(),
+            'End node should be the builder.'
+        );
+
+        $builder = new Builder;
+        $this->assertInstanceof(
+            'Selene\Components\Config\Validator\Builder',
+            $builder->root()->dict('array')->dict('nested')->end(),
+            'End node should be the builder.'
+        );
+    }
+
+    /** @test */
+    public function itShouldThrowIfEndExceedsRoottNode()
+    {
+        $builder = new Builder;
+        try {
+            $builder->root()->dict('array')->dict('nested')->end()->end()->end();
+        } catch (\BadMethodCallException $e) {
+            $this->assertSame(get_class($builder).'::end(): Node root is already root.', $e->getMessage());
+
+            return;
+        }
+
+        $this->faile('Test slipped.');
+    }
+
+    /** @test */
     public function itShouldAddNnodes()
     {
         $builder = new Builder;

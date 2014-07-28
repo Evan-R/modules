@@ -200,6 +200,35 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
+     * @dataProvider nodeDefaultValueProvier
+     */
+    public function itShouldBeInvalidated($value)
+    {
+        // should unset the value
+        $node = $this->newNode();
+        $node->setKey('node');
+        $node->condition()
+            ->when(function () {
+                return true;
+            })
+            ->thenMarkInvalid()->end();
+
+        $node->finalize($value);
+
+        try {
+            $node->validate();
+        } catch (ValidationException $e) {
+            $value = is_scalar($value) ? (string)$value : json_encode($value);
+            $this->assertSame('node: Invalid value '.$value, $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('test slipped');
+    }
+
+    /**
      * validTypeProvider
      *
      * @return array

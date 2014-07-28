@@ -20,7 +20,9 @@ class ValidationException extends \InvalidArgumentException
 {
     public static function invalidValue($value)
     {
-        return new self(sprintf('Invalid value %s', is_scalar($value) ? (string)$value : gettype($value)));
+        $value = is_scalar($value) ? (string)$value : json_encode($value);
+
+        return new self(sprintf('Invalid value %s', $value));
     }
 
     public static function notEmpty($key)

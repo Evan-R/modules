@@ -20,4 +20,34 @@
       <directory suffix=".php">./Tests</directory>
     </blacklist>
   </filter>
+  <listeners>
+    <listener class="League\PHPUnitCoverageListener\Listener">
+      <arguments>
+        <array>
+          <element key="printer">
+            <object class="League\PHPUnitCoverageListener\Printer\StdOut"/>
+          </element>
+          <element key="hook">
+            <object class="League\PHPUnitCoverageListener\Hook\Travis"/>
+          </element>
+          <element key="namespace">
+            <string>Selene\Components\Config</string>
+          </element>
+          <element key="repo_token">
+            <string>6XtPxDJOyiSfZT8fLwlIAD3TomNCSYTc7</string>
+          </element>
+          <element key="target_url">
+            <string>https://coveralls.io/api/v1/jobs</string>
+          </element>
+          <element key="coverage_dir">
+            <string>/tmp/coverage</string>
+          </element>
+        </array>
+      </arguments>
+    </listener>
+  </listeners>
+  <logging>
+    <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
+    <log type="coverage-clover" target="/tmp/coverage/coverage.xml" />
+  </logging>    
 </phpunit>
