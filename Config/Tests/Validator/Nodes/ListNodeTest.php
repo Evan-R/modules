@@ -12,6 +12,7 @@
 namespace Selene\Components\Config\Tests\Validator\Nodes;
 
 use \Mockery as m;
+use \Selene\Components\Config\Validator\Nodes\DictNode;
 use \Selene\Components\Config\Validator\Nodes\ListNode;
 use \Selene\Components\Config\Validator\Nodes\StringNode;
 use \Selene\Components\Config\Validator\Exception\ValidationException;
@@ -73,6 +74,39 @@ class ListNodeTest extends ArrayNodeTest
             return;
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
+        }
+    }
+
+    /** @test */
+    public function itShouldTreatChildNodeAsBlueprint()
+    {
+        $node = $this->newNode();
+        $node->setKey('Node');
+        $node->notEmpty();
+        $node->addChild($str = new StringNode);
+
+        $node->finalize(['', 12]);
+
+        try {
+            $node->validate();
+        } catch (ValidationException $e) {
+            $this->assertSame('Node[1] needs to be type of string, instead saw integer.', $e->getMessage());
+        }
+
+        $node = $this->newNode();
+        $node->setKey('Node');
+        $node->notEmpty();
+        $node->addChild($dict = new DictNode);
+
+        $dict->addChild($str = new StringNode);
+        $str->notEmpty()->setKey('test');
+
+        $node->finalize([['test' => '']]);
+
+        try {
+            $node->validate();
+        } catch (ValidationException $e) {
+            $this->assertSame('Node[0][test] may not be empty.', $e->getMessage());
         }
     }
 

@@ -11,7 +11,6 @@
 
 namespace Selene\Components\Config\Validator;
 
-use \Selene\Components\Config\Validator\Nodes\EnumNode;
 use \Selene\Components\Config\Validator\Nodes\RootNode;
 use \Selene\Components\Config\Validator\Nodes\ScalarNode;
 use \Selene\Components\Config\Validator\Nodes\DictNode;
@@ -264,18 +263,6 @@ class Builder implements BuilderInterface
     public function string($key = null)
     {
         return $this->addNode(new StringNode, $key);
-    }
-
-    /**
-     * Adds an enum node
-     *
-     * @param mixed $key
-     *
-     * @return EnumNode
-     */
-    public function enum($key = null)
-    {
-        return $this->addNode(new EnumNode, $key);
     }
 
     /**

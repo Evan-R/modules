@@ -106,6 +106,32 @@ class Children implements \Countable, \IteratorAggregate
     }
 
     /**
+     * find
+     *
+     * @param \Closure $callback
+     *
+     * @return NodeInterface|null
+     */
+    public function find(\Closure $callback)
+    {
+        $results = $this->filter($callback);
+
+        return $results ? current($results) : null;
+    }
+
+    /**
+     * filter
+     *
+     * @param \Closure $filter
+     *
+     * @return array
+     */
+    public function filter(\Closure $filter)
+    {
+        return array_filter($this->nodes, $filter);
+    }
+
+    /**
      * getIterator
      *
      * @return \ArrayIterator

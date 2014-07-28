@@ -23,7 +23,7 @@ use \Selene\Components\Config\Validator\Exception\ValidationException;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class DictNode extends ArrayNode implements \Iterator
+class DictNode extends ArrayNode
 {
     const KEYS_STRICT = true;
     const KEYS_LOOSE  = false;
@@ -56,6 +56,20 @@ class DictNode extends ArrayNode implements \Iterator
     }
 
     /**
+     * Finds a child node by its key.
+     *
+     * @param string $key
+     *
+     * @return NodeInterface|null
+     */
+    public function findChildByKey($key)
+    {
+        return $this->children->find(function ($node) use ($key) {
+            return $key === $node->getKey();
+        });
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function validateType($value)
@@ -79,59 +93,10 @@ class DictNode extends ArrayNode implements \Iterator
         $value = $this->getValue();
 
         if (self::KEYS_STRICT === $this->mode) {
-            $this->checkExceedingKeys($value);
+            return $this->checkExceedingKeys($value);
         }
 
         return $valid;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function current()
-    {
-        return $this->children->current();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key()
-    {
-        return $this->children->key();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid()
-    {
-        return $this->children->valid();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next()
-    {
-        return $this->children->next();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind()
-    {
-        $this->children->rewind();
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getInvalidTypeMessage($value = null)
-    {
-        return sprintf('%s may not contain numeric keys', $this->getKey());
     }
 
     /**
@@ -139,7 +104,6 @@ class DictNode extends ArrayNode implements \Iterator
      *
      * @param array $value
      *
-     * @access private
      * @return string
      */
     private function concatKeys(array $value, $separator)
@@ -158,17 +122,19 @@ class DictNode extends ArrayNode implements \Iterator
      * @param array $value
      *
      * @throws ValidationException
-     * @access protected
-     * @return void
+     * @return boolean
      */
     protected function checkExceedingKeys(array $value)
     {
         foreach ((array)$value as $key => $val) {
-            if (null === $this->getChildByKey($key)) {
+
+            if (null === $this->findChildByKey($key)) {
                 throw new ValidationException(
-                    sprintf('invalid key %s in %s', $key, $this->getKey())
+                    sprintf('Invalid key "%s" in %s.', $key, $this->getFormattedKey())
                 );
             }
         }
+
+        return true;
     }
 }

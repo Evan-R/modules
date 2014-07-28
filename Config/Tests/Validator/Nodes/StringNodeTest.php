@@ -30,6 +30,10 @@ class StringNodeTest extends RangeableNodeTest
 
         $node->finalize('test');
 
+        $clone = clone($node);
+        $clone->finalize('120');
+        $this->assertTrue($clone->validate());
+
         try {
             $node->validate();
         } catch (ValidationException $e) {
@@ -39,6 +43,19 @@ class StringNodeTest extends RangeableNodeTest
         }
 
         $this->fail('test slipped');
+    }
+
+    /** @test */
+    public function itShouldHaveRangeSetterAliases()
+    {
+        $node = $this->newNode();
+        try {
+            $node->lengthBetween(2, 10);
+
+            $this->assertTrue(true);
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
     }
 
     /**

@@ -45,6 +45,8 @@ trait Rangeable
     public function min($value)
     {
         $this->min = $value;
+
+        return $this;
     }
 
     /**
@@ -57,6 +59,8 @@ trait Rangeable
     public function max($value)
     {
         $this->max = $value;
+
+        return $this;
     }
     /**
      * validateRange

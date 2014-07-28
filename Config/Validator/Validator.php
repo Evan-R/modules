@@ -96,43 +96,4 @@ class Validator implements TreeValidatorInterface
 
         return $this->root->getValue();
     }
-
-    /**
-     * validate
-     *
-     * @param array $values
-     * @param ArrayNode $nodes
-     * @param mixed $results
-     *
-     * @access public
-     * @return array
-     */
-    protected function doValidate(array $values, ArrayNode $nodes = null, &$results = [])
-    {
-        foreach ($nodes as $key => $node) {
-
-            $node->finalize($this->getDefault($values, $key));
-
-            $val = $this->getDefault($values, $key, $node->isOptional() ? $node->getDefault() : $node->getValue());
-
-            $results[$key] = [];
-
-            $node->validate($val);
-
-            if ($node instanceof ArrayNode) {
-
-                $this->doValidate($val, $node, $results[$key]);
-
-                if ($node instanceof ListNode) {
-                    $results[$key] = $node->mergeValue($results[$key]);
-                    continue;
-                }
-
-            }
-
-            $results[$key] = $node->mergeValue($val);
-        }
-
-        return $results;
-    }
 }

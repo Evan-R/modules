@@ -19,7 +19,7 @@ use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
  * @package Selene\Components\Config\Validator\Nodes
  * @version $Id$
  */
-class ListNode extends ArrayNode implements \IteratorAggregate
+class ListNode extends ArrayNode
 {
     /**
      * validating
@@ -49,7 +49,9 @@ class ListNode extends ArrayNode implements \IteratorAggregate
     public function addChild(NodeInterface $node)
     {
         if (!$this->validating && 0 !== count($this->getChildren())) {
-            throw new \BadMethodCallException(sprintf('ListNode %s already as a node declaration.', $this->getFormattedKey()));
+            throw new \BadMethodCallException(
+                sprintf('ListNode %s already as a node declaration.', $this->getFormattedKey())
+            );
         }
 
         $node->setKey(count($this->children));
@@ -85,14 +87,6 @@ class ListNode extends ArrayNode implements \IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
-    {
-        return new $this->getChildren();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function mergeValues(array $values, array $results)
     {
         foreach ($values as $i => $val) {
@@ -112,7 +106,7 @@ class ListNode extends ArrayNode implements \IteratorAggregate
     protected function handleTypeError($value)
     {
         if (!is_array($value)) {
-            parent::handleTypeError($value);
+            return parent::handleTypeError($value);
         }
 
         $keys = $this->getInvalidKeys($value);

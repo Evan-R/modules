@@ -25,6 +25,6 @@ class ValidationException extends \InvalidArgumentException
 
     public static function notEmpty($key)
     {
-        return new self(sprintf('%s may not ne empty.', $key));
+        return new self(sprintf('%s may not be empty.', $key));
     }
 }

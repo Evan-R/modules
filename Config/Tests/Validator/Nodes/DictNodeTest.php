@@ -24,6 +24,48 @@ use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
  */
 class DictNodeTest extends ArrayNodeTest
 {
+    /** @test */
+    public function itShoulBeIteratable()
+    {
+        $node = $this->newNode();
+        $node->addChild($str = new StringNode);
+        $str->setKey('value');
+
+        $res = [];
+        foreach ($node as $c) {
+            $res[] = $c->getKey();
+        }
+
+        $this->assertSame(['value'], $res);
+    }
+
+    /** @test */
+    public function itShouldInvalidateExceedingKeysWhenStrict()
+    {
+        $node = new DictNode(DictNode::KEYS_STRICT);
+        $node->setKey('Node');
+
+        $node->addChild($str = new StringNode);
+        $str->setKey('value');
+
+        $node->finalize(['value' => 'val']);
+
+        $this->assertTrue($node->validate());
+
+        $node = clone($node);
+        $node->finalize(['value' => 'val', 'test' => 'foo']);
+
+        try {
+            $node->validate();
+        } catch (ValidationException $e) {
+            $this->assertSame('Invalid key "test" in Node.', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('test slipped.');
+    }
+
     public function nodeDefaultValueProvier()
     {
         return [

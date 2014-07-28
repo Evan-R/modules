@@ -22,7 +22,7 @@ namespace Selene\Components\Config\Validator\Nodes;
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
-abstract class ArrayNode extends Node implements ParentableInterface
+abstract class ArrayNode extends Node implements ParentableInterface, \IteratorAggregate
 {
     /**
      * children
@@ -217,15 +217,11 @@ abstract class ArrayNode extends Node implements ParentableInterface
     }
 
     /**
-     * mergeValue
-     *
-     * @param mixed $value
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    public function mergeValue($value)
+    public function getIterator()
     {
-        return array_merge($this->value, (array)$value);
+        return $this->getChildren();
     }
 
     /**

@@ -44,7 +44,60 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itIsExpectedThat()
+    public function itShouldHandleMacros()
+    {
+        $builder = new Builder;
+
+        $root = $builder->root()
+            ->macro('test', function ($node) {
+                $node
+                    ->boolean('required')
+                    ->end();
+            })
+            ->dict('node_a')->useMacro('test')
+            ->end()
+            ->dict('node_b')->useMacro('test')
+            ->end()->getRoot();
+
+        $this->assertInstanceof(
+            'Selene\Components\Config\Validator\Nodes\BooleanNode',
+            $a = $root->getFirstChild()->findChildByKey('required')
+        );
+
+        $this->assertInstanceof(
+            'Selene\Components\Config\Validator\Nodes\BooleanNode',
+            $b = $root->getLastChild()->findChildByKey('required')
+        );
+
+        $this->assertTrue($a !== $b);
+    }
+
+    /** @test */
+    public function itShouldntApplyMacrosOnScalars()
+    {
+
+        $builder = new Builder;
+
+        try {
+            $builder->root()
+                ->macro('test', function ($node) {
+                    $node
+                        ->boolean('required')
+                        ->end();
+                })
+                ->string('node_a')->useMacro('test')
+                ->end();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Can’\t use a macro on a scalar node', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('test slipped.');
+    }
+
+    /** @test */
+    public function itShouldGetValidatorAndValidate()
     {
         $builder = new Builder;
 
@@ -95,7 +148,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
 
-        $result = $validator->validate();
+        $this->assertTrue(is_array($res = $validator->validate()));
+
+        $this->assertTrue(isset($res['list']) && 'replacement' === $res['list'][2]['foo']);
     }
 
     protected function getParamsSection()

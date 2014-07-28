@@ -86,8 +86,8 @@ class StringNode extends ScalarNode
     public function lengthBetween($min, $max)
     {
         return $this
-            ->minLenth($min)
-            ->maxLenth($max);
+            ->minLength($min)
+            ->maxLength($max);
     }
 
     /**
