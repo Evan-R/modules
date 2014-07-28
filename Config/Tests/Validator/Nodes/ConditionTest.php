@@ -73,7 +73,7 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function isArray()
+    public function ifIsArray()
     {
         $cnd = $this->newCondition();
 
@@ -85,7 +85,19 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function isString()
+    public function ifNotArray()
+    {
+        $cnd = $this->newCondition();
+
+        $cnd->ifisNotArray()->then(function () {
+            throw new \BadMethodCallException('under test.');
+        });
+
+        return $this->execCallback($cnd, [1]);
+    }
+
+    /** @test */
+    public function ifIsString()
     {
         $cnd = $this->newCondition();
 
@@ -96,17 +108,28 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
         return $this->execCallback($cnd, ['str']);
     }
 
-    protected function execCallback(Condition $cnd, array $arguments = [])
+    /** @test */
+    public function ifIsNull()
     {
-        try {
-            call_user_func_array([$cnd, 'run'], $arguments);
-        } catch (\BadMethodCallException $e) {
-            $this->assertSame('under test.', $e->getMessage());
+        $cnd = $this->newCondition();
 
-            return;
-        }
+        $cnd->ifIsNull()->then(function () {
+            throw new \BadMethodCallException('under test.');
+        });
 
-        $this->fail('test slipped.');
+        return $this->execCallback($cnd, [null]);
+    }
+
+    /** @test */
+    public function itShouldReturnEmptyArray()
+    {
+        $cnd = $this->newCondition();
+
+        $cnd->when(function () {
+            return true;
+        })->thenEmptyArray();
+
+        $this->assertSame([], $cnd->run());
     }
 
     /** @test */
@@ -125,6 +148,59 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
 
             return;
         }
+    }
+
+    /** @test */
+    public function itShouldReturnNode()
+    {
+        $cnd = $this->newCondition();
+
+        $cnd->when(function () {
+            return true;
+        })->then(function () {
+        });
+
+        $this->assertSame($this->node, $cnd->end());
+    }
+
+    /** @test */
+    public function itShouldNotCloseWhenConditionIsIncomplete()
+    {
+        $cnd = $this->newCondition();
+        $this->node->shouldReceive('getFormattedKey')->andReturn('dummy');
+
+        try {
+            $cnd->end();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Condition of node "dummy" is not declared.', $e->getMessage());
+        }
+
+        $cnd = $this->newCondition();
+        $cnd->when(function () {
+        });
+
+        try {
+            $cnd->end();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Condition of node "dummy" has no result.', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('Test slipped');
+    }
+
+    protected function execCallback(Condition $cnd, array $arguments = [])
+    {
+        try {
+            call_user_func_array([$cnd, 'run'], $arguments);
+        } catch (\BadMethodCallException $e) {
+            $this->assertSame('under test.', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('test slipped.');
     }
 
     protected function newCondition()

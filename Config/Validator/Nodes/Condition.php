@@ -168,7 +168,7 @@ class Condition
      *
      * @return Contition
      */
-    public function ifNotArray()
+    public function ifIsNotArray()
     {
         $this->condition = function ($value) {
             return !is_array($value);
@@ -274,13 +274,13 @@ class Condition
     {
         if (!$this->condition) {
             throw new \InvalidArgumentException(
-                sprintf('Condition of node "%s" is not declared.', $this->node->getKey())
+                sprintf('Condition of node "%s" is not declared.', $this->node->getFormattedKey())
             );
         }
 
         if (!$this->result) {
             throw new \InvalidArgumentException(
-                sprintf('Condition of node "%s" has no result.', $this->node->getKey())
+                sprintf('Condition of node "%s" has no result.', $this->node->getFormattedKey())
             );
         }
 
