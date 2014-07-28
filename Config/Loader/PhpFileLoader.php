@@ -30,6 +30,6 @@ abstract class PhpFileLoader extends FileLoader
      */
     protected function doLoad($resource)
     {
-        include $resource;
+        return include $resource;
     }
 }
