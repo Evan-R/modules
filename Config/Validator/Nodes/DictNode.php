@@ -33,14 +33,14 @@ class DictNode extends ArrayNode
      *
      * @var string
      */
-    private static $keySeparator = '-::-';
+    protected static $keySeparator = '-::-';
 
     /**
      * pattern
      *
      * @var string
      */
-    private static $pattern = '~-::-[0-9]+-::-~';
+    protected static $pattern = '~-::-[0-9]+-::-~';
 
     /**
      * Create a new DictNode object.

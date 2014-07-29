@@ -21,4 +21,6 @@ use \Selene\Components\DI\BuilderInterface;
 interface ConfigurationInterface
 {
     public function load(BuilderInterface $builder, array $values);
+
+    public function validate(array $config);
 }

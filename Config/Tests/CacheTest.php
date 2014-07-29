@@ -11,8 +11,9 @@
 
 namespace Selene\Components\Config\Tests\Cache;
 
-use \org\bovigo\vfs\vfsStream;
+use \Mockery as m;
 use \Selene\Components\Config\Cache;
+use \Selene\Components\Filesystem\Filesystem;
 use \Selene\Components\Config\Resource\FileResource;
 use \Selene\Components\TestSuite\TestCase;
 
@@ -27,15 +28,9 @@ use \Selene\Components\TestSuite\TestCase;
  */
 class CacheTest extends \PHPUnit_Framework_TestCase
 {
-    protected $root;
+    protected $fs;
 
     protected $path;
-
-    protected function setUp()
-    {
-        $this->root = vfsStream::setUp('testdrive');
-        $this->path = vfsStream::url('testdrive');
-    }
 
     /** @test */
     public function itShouldBeInstantiable()
@@ -73,6 +68,62 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         $cache->setDebug(true);
 
         $this->assertFalse($cache->isValid());
+    }
+
+    /** @test */
+    public function itShouldGetFile()
+    {
+        $path = $this->setUpCachefile('ContainerCache.php');
+        $this->setUpManifest(basename($path));
+
+        $cache = new Cache($path);
+
+        $this->assertSame($path, $cache->getFile());
+    }
+
+    /** @test */
+    public function itShouldValidateManifests()
+    {
+        $path = $this->setUpCachefile('ContainerCache.php');
+        $this->setUpManifest(
+            basename($path),
+            $files = [$this->mockResource('fileA.xml', true), $this->mockResource('fileB.xml', true)],
+            true
+        );
+
+        $cache = new Cache($path, true);
+
+        $cache->write('content', $files);
+
+        $this->assertTrue($cache->isValid());
+
+        $files = [$this->mockResource('fileA.xml', false), $this->mockResource('fileB.xml', false)];
+
+        $cache->write('content', $files);
+
+        $this->assertFalse($cache->isValid());
+    }
+
+    /** @test */
+    public function itShouldForgetCacheFile()
+    {
+        $path = $this->setUpCachefile('ContainerCache.php');
+        $cache = new Cache($path, true);
+
+        $this->assertTrue(is_file($path));
+        $cache->forget();
+        $this->assertFalse(is_file($path));
+    }
+
+    protected function mockResource($path, $valid = false, $exists = true)
+    {
+        $resource = m::mock('Selene\Components\Config\Resource\FileResource');
+        $resource->shouldReceive('isValid')->andReturn($valid);
+        $resource->shouldReceive('exists')->andReturn($exists);
+        $resource->shouldReceive('__toString')->andReturn($rpath = $this->path . DIRECTORY_SEPARATOR . $path);
+        $resource->shouldReceive('getPath')->andReturn($rpath);
+
+        return $resource;
     }
 
     /**
@@ -122,7 +173,28 @@ class CacheTest extends \PHPUnit_Framework_TestCase
             if (!file_exists($path = $this->path . '/' . $path)) {
                 mkdir($path, 0775, true);
             }
+
             touch($path . '/'. $file);
         }
+    }
+
+    protected function setUp()
+    {
+        $this->fs = new Filesystem;
+        $this->path = $this->getTestDir();
+
+        $this->fs->mkdir($this->path, 0775, true);
+    }
+
+    protected function getTestDir()
+    {
+        return dirname(__DIR__).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.'tests';
+    }
+
+    protected function teardown()
+    {
+        $this->fs->remove($this->path);
+
+        m::close();
     }
 }

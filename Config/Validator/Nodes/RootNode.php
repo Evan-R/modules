@@ -65,26 +65,27 @@ class RootNode extends DictNode implements RootNodeInterface
     public function finalize($value = null)
     {
         $this->value = (array)$value;
+        $this->finalized = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate()
-    {
-        $results = [];
-        $values  = $this->getValue();
+    ///**
+    // * {@inheritdoc}
+    // */
+    //public function validate()
+    //{
+    //    $results = [];
+    //    $values  = $this->getValue();
 
-        foreach ($this->getChildren() as $child) {
+    //    foreach ($this->getChildren() as $child) {
 
-            $key = $child->getKey();
+    //        $key = $child->getKey();
 
-            $child->finalize(array_key_exists($key, $values) ? $values[$key] : null);
-            $child->validate();
+    //        $child->finalize(array_key_exists($key, $values) ? $values[$key] : null);
+    //        $child->validate();
 
-            $results[$key] = $child->getValue();
-        }
+    //        $results[$key] = $child->getValue();
+    //    }
 
-        $this->value = $results;
-    }
+    //    $this->value = $results;
+    //}
 }

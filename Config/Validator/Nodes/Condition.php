@@ -90,6 +90,20 @@ class Condition
     }
 
     /**
+     * ifTrue
+     *
+     * @return Condition
+     */
+    public function ifIsMissing()
+    {
+        $this->condition = function ($value) {
+            return $value instanceof MissingValue;
+        };
+
+        return $this;
+    }
+
+    /**
      * ifInArray
      *
      * @param array $values

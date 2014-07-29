@@ -14,7 +14,9 @@ namespace Selene\Components\Config;
 use \Selene\Components\DI\ContainerInterface;
 use \Selene\Components\Config\Validator\Builder;
 use \Selene\Components\Config\Validator\Validator;
+use \Selene\Components\Config\Validator\Nodes\RootNode;
 use \Selene\Components\DI\BuilderInterface;
+use \Selene\Components\Config\Resource\LocatorInterface;
 
 /**
  * @class Configuration
@@ -52,12 +54,16 @@ abstract class Configuration implements ConfigurationInterface
     /**
      * validate
      *
-     * @access public
-     * @return mixed
+     * @return array
      */
     final public function validate(array $config)
     {
-        $validator = new Validator($this->getConfigTree(), $config);
+        $builder = $this->newValidatorBuilder();
+
+        $this->getConfigTree($root = $builder->getRoot());
+
+        $validator = $builder->getValidator();
+        $validator->load($config);
 
         return $validator->validate();
     }
@@ -65,13 +71,9 @@ abstract class Configuration implements ConfigurationInterface
     /**
      * getConfigTree
      *
-     * @access public
-     * @return mixed
+     * @return void;
      */
-    public function getConfigTree()
-    {
-        return $this->getConfigBuilder()->getRoot();
-    }
+    abstract public function getConfigTree(RootNode $rootNode);
 
     /**
      * getConfigBuilder
@@ -82,7 +84,7 @@ abstract class Configuration implements ConfigurationInterface
     public function getConfigBuilder($name = 'root')
     {
         if (null === $this->builder) {
-            $this->builder = new Builder($name);
+            $this->builder = $this->newValidatorBuilder($name);
         }
 
         return $this->builder;
@@ -98,16 +100,5 @@ abstract class Configuration implements ConfigurationInterface
     protected function newValidatorBuilder($name = null)
     {
         return new Builder($name);
-    }
-
-    /**
-     * getLoaders
-     *
-     * @access public
-     * @return mixed
-     */
-    public function getLoaders(LocatorInterface $locator)
-    {
-
     }
 }

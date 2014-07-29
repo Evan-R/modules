@@ -45,12 +45,10 @@ class Cache implements CacheInterface
     protected $file;
 
     /**
-     * files
+     * fs
      *
      * @var \Selene\Components\Filesystem\Filesystem
      */
-    protected $files;
-
     private $fs;
 
     /**
@@ -90,7 +88,7 @@ class Cache implements CacheInterface
      */
     public function setFilesystem(Filesystem $files)
     {
-        $this->files = $files;
+        $this->fs = $files;
     }
 
     /**
@@ -123,14 +121,13 @@ class Cache implements CacheInterface
      */
     public function forget()
     {
-        $this->fs->remove([$this->file, $this->file . '.manifest']);
+        $this->getFs()->remove([$this->file, $this->file . '.manifest']);
     }
 
     /**
      * Check if the chache is still valid.
      *
      * @api
-     * @access public
      * @return boolean
      */
     public function isValid()
@@ -145,7 +142,6 @@ class Cache implements CacheInterface
      * @param mixed $manifest
      *
      * @api
-     * @access public
      * @return void
      */
     public function write($data, array $manifest = null)
@@ -181,8 +177,6 @@ class Cache implements CacheInterface
     /**
      * validateManifest
      *
-     *
-     * @access protected
      * @return boolean
      */
     protected function validateManifest()
@@ -207,7 +201,7 @@ class Cache implements CacheInterface
      * getFs
      *
      * @access protected
-     * @return \Selene\Components\Filesystem\Filesystem
+     * @return Filesystem
      */
     protected function getFs()
     {

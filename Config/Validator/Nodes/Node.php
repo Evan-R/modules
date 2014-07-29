@@ -109,10 +109,6 @@ abstract class Node implements NodeInterface
         $this->allowEmpty = true;
         $this->finalized  = false;
         $this->conditions = [];
-
-        if (null !== $parent) {
-            $this->setParent($parent);
-        }
     }
 
     /**
@@ -341,7 +337,7 @@ abstract class Node implements NodeInterface
      */
     public function finalize($value = null)
     {
-        $this->value = null !== $value ? $value : $this->getDefault();
+        $this->value = $value; //null !== $value ? $value : $this->getDefault();
 
         $this->preValidate($this->value);
         $this->finalized = true;
@@ -360,7 +356,9 @@ abstract class Node implements NodeInterface
     public function validate()
     {
         if (!$this->finalized) {
-            throw new \BadMethodCallException('Node must be finalized before validation.');
+            throw new \BadMethodCallException(
+                sprintf('Node %s must be finalized before validation.', $this->getFormattedKey())
+            );
         }
 
         if ($this->isMarkedInvalid()) {
@@ -449,7 +447,7 @@ abstract class Node implements NodeInterface
         }
 
         throw new \BadMethodCallException(
-            sprintf('Call to undefined method %s::%s().', get_class($this), $method)
+            sprintf('Node %s: no builder set or method %s() does not exist.', $this->getFormattedKey(), $method)
         );
     }
 
@@ -462,6 +460,10 @@ abstract class Node implements NodeInterface
      */
     protected function preValidate(&$value)
     {
+        if ($this->isOptional() && $value instanceof MissingValue) {
+            $value = ($default = $this->getDefault()) ?: $value;
+        }
+
         foreach ($this->conditions as $condition) {
             $this->runCondition($condition, $value);
         }
@@ -521,19 +523,5 @@ abstract class Node implements NodeInterface
     final protected function isMarkedInvalid()
     {
         return $this->invalid instanceof ValidationException;
-    }
-
-    /**
-     * callOnBuilder
-     *
-     * @param Builder $builder
-     * @param string  $method
-     * @param array   $arguments
-     *
-     * @return mixed
-     */
-    private function callOnBuilder(Builder $builder, $method, array $arguments = [])
-    {
-        return call_user_func_array([$builder, $method], $arguments);
     }
 }

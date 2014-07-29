@@ -12,6 +12,7 @@
 namespace Selene\Components\Config\Tests\Validator;
 
 use \Selene\Components\Config\Validator\Builder;
+use \Selene\Components\Config\Validator\Exception\MissingValueException;
 
 /**
  * @class BuilderTest extends \PHPUnit_Framework_TestCase
@@ -192,6 +193,60 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function requiredNodeMustNotBeEmpty()
+    {
+        $builder = new Builder;
+        $builder->root()
+            ->string('test')->end();
+
+        $validator = $builder->getValidator();
+        $validator->load([]);
+
+        try {
+            $validator->validate();
+        } catch (MissingValueException $e) {
+            $this->assertEquals('root[test] is required but missing.', $e->getMessage());
+        }
+
+        $builder = new Builder;
+        $builder->root()
+            ->dict('test')
+                ->string('foo')->end()
+                ->string('bar')->end()
+            ->end();
+
+        $validator = $builder->getValidator();
+        $validator->load(['test' => ['foo' => 'bar']]);
+
+        try {
+            $validator->validate();
+        } catch (MissingValueException $e) {
+            $this->assertEquals('root[test][bar] is required but missing.', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail();
+    }
+
+    /** @test */
+    public function itShouldReplaceMissingValuesWhenOptional()
+    {
+        $builder = new Builder;
+        $builder->root()
+            ->string('test')
+                ->defaultValue('test')
+                ->optional()
+                ->end();
+
+        $validator = $builder->getValidator();
+        $validator->load([]);
+        $validator->validate();
+
+        $this->assertSame(['test' => 'test'], $validator->validate());
+    }
+
+    /** @test */
     public function itShouldGetValidatorAndValidate()
     {
         $builder = new Builder;
@@ -208,8 +263,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                 ->useMacro('test')
             ->end()
             ->dict('testme')
+                ->optional()
                 ->condition()
-                    ->ifEmpty()
+                    ->ifIsMissing()
                     ->then(function () {
                         return ['inserted' => true, 'test' => true];
                     })

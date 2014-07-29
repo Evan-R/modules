@@ -21,17 +21,6 @@ use \Selene\Components\Config\Validator\Nodes\ScalarNode as AbstractNode;
 class NodeStub extends AbstractNode
 {
     /**
-     * node
-     *
-     * @access public
-     * @return NodeInterface
-     */
-    public function node()
-    {
-        return new static($this);
-    }
-
-    /**
      * validateType
      *
      * @param mixed $type

@@ -251,15 +251,14 @@ if ($cache->isValid()) {
 }
 ```
 
-The above solution is file for loading a single file. `Cache::isValid()` will report `false` if
+The above solution is fine for loading a single file. `Cache::isValid()` will report `false` if
 the given cache file has been modified since the last request. 
 However, the actual configuration files won't be taken into account.
 
-The cache is capable of resource checking. Simply pass `true` as the second
-argument to the constructr and supply a list of resources to be tracked when
-writing the cache.
+The cache is capable of resource checking. Simply pass `true` to the constructr as a second argument 
+and supply a list of resources to be tracked when writing the cache.
 
-This is where the event capability of the loader is coming in handy. 
+This is where the event capability of the loader comes into play. 
 Lets modify the `Acme\Config\Config` class by implementing the `Loaderlistener`
 interface.
 
