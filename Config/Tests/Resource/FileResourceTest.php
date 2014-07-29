@@ -91,7 +91,8 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
         if (!$isFile) {
             return $file;
         }
-        touch($file, $timeStamp);
+
+        touch($file, $timestamp);
 
         return $file;
     }
