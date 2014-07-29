@@ -232,12 +232,16 @@ class Filesystem
      */
     public function remove($file)
     {
-        if ($this->isFile($file)) {
-            return $this->unlink($file);
-        }
+        $result = false;
 
-        if ($this->isDir($file)) {
-            return $this->rmdir($file);
+        foreach ($this->ensureTraversable($file) as $item) {
+            if ($this->isFile($item)) {
+                $result = $this->unlink($item);
+            }
+
+            if ($this->isDir($item)) {
+                $result = $this->rmdir($item);
+            }
         }
 
         return false;
@@ -981,9 +985,10 @@ class Filesystem
      */
     private function ensureTraversable($file)
     {
-        if (!(is_array($file) or $file instanceof \Traversable)) {
+        if (!(is_array($file) || $file instanceof \Traversable)) {
             return [$file];
         }
+
         return $file;
     }
 }
