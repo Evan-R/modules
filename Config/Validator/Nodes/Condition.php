@@ -135,7 +135,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifInArray(array $values)
+    public function ifIsInArray(array $values)
     {
         $this->condition = function ($value) use ($values) {
             return in_array($value, $values);
@@ -151,7 +151,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifNotInArray(array $values)
+    public function ifIsNotInArray(array $values)
     {
         $this->condition = function ($value) use ($values) {
             return !in_array($value, $values);
@@ -165,7 +165,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifEmpty()
+    public function ifIsEmpty()
     {
         $this->condition = function ($value) {
             return empty($value);
@@ -278,19 +278,6 @@ class Condition
     }
 
     /**
-     * merge
-     *
-     * @param Condition $condition
-     *
-     * @return void
-     */
-    public function copy(Condition $condition)
-    {
-        $this->condition = $condition->getCondition();
-        $this->result    = $condition->getResult();
-    }
-
-    /**
      * thenEmptyArray
      *
      * @return Contition
@@ -302,6 +289,19 @@ class Condition
         };
 
         return $this;
+    }
+
+    /**
+     * merge
+     *
+     * @param Condition $condition
+     *
+     * @return void
+     */
+    public function copy(Condition $condition)
+    {
+        $this->condition = $condition->getCondition();
+        $this->result    = $condition->getResult();
     }
 
     /**

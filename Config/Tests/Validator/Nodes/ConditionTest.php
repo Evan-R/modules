@@ -53,7 +53,7 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     {
         $cnd = $this->newCondition();
 
-        $cnd->ifInArray([1, 2, 3])->then(function () {
+        $cnd->ifIsInArray([1, 2, 3])->then(function () {
             throw new \BadMethodCallException('under test.');
         });
 
@@ -65,7 +65,7 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     {
         $cnd = $this->newCondition();
 
-        $cnd->ifNotInArray([1, 2, 3])->then(function () {
+        $cnd->ifIsNotInArray([1, 2, 3])->then(function () {
             throw new \BadMethodCallException('under test.');
         });
 

@@ -211,6 +211,32 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldThrowExceptionIfMacroIsNotFound()
+    {
+        $builder = new Builder;
+
+        try {
+            $builder->getMacro('foo');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Macro foo doesn\'t exist.', $e->getMessage());
+        }
+    }
+
+    /** @test */
+    public function itShouldThrowExceptionIfNodeHasNoKey()
+    {
+        $builder = new Builder;
+
+        try {
+            $builder->getRoot()
+                ->dict()
+                ->end();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Key can\'t be null.', $e->getMessage());
+        }
+    }
+
+    /** @test */
     public function itShouldntApplyMacrosOnScalars()
     {
 
@@ -321,7 +347,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                     ->dict()
                         ->string('foo')
                             ->condition()
-                            ->ifEmpty()
+                            ->ifIsEmpty()
                             ->then(function () {
                                 return 'replacement';
                             })->end()

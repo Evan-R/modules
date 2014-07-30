@@ -186,13 +186,16 @@ class Builder implements BuilderInterface
      *
      * @param mixed $name
      *
-     * @return mixed
+     * @throws \InvalidArgumentException
+     * @return \Closure
      */
     public function getMacro($name)
     {
         if (isset($this->macros[$name])) {
             return $this->macros[$name];
         }
+
+        throw new \InvalidArgumentException(sprintf('Macro %s doesn\'t exist.', $name));
     }
 
     /**
@@ -266,13 +269,7 @@ class Builder implements BuilderInterface
 
         $this->current->condition()->always(function ($value, $node) use ($name) {
 
-            if (!$callback = $node->getBuilder()->getMacro($name)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Macro %s doesn\'t exist.', $name)
-                );
-            }
-
-            $builder = call_user_func($callback);
+            $builder = call_user_func($node->getBuilder()->getMacro($name));
             $children = $builder->getRoot()->getChildren();
 
             foreach ($children as $childNode) {
@@ -352,16 +349,6 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * getCurrent
-     *
-     * @return NodeInterface
-     */
-    public function getCurrent()
-    {
-        return $this->current;
-    }
-
-    /**
      * addNode
      *
      * @param NodeInterface $node
@@ -373,7 +360,7 @@ class Builder implements BuilderInterface
     protected function addNode(NodeInterface $node, $key = null)
     {
         if (null == $key && !($this->current instanceof ListNode)) {
-            throw new \InvalidArgumentException('key can\'t be null');
+            throw new \InvalidArgumentException('Key can\'t be null.');
         }
 
         $key && $node->setKey($key);
