@@ -35,17 +35,22 @@ class Builder implements BuilderInterface
     /**
      * root
      *
-     * @var \Selene\Components\Config\Validator\Nodes\NodeInterface
+     * @var RootNode
      */
     protected $root;
 
     /**
      * current
      *
-     * @var \Selene\Components\Config\Validator\Nodes\NodeInterface
+     * @var NodeInterface
      */
     protected $current;
 
+    /**
+     * macros
+     *
+     * @var array
+     */
     protected $macros;
 
     /**
@@ -151,12 +156,55 @@ class Builder implements BuilderInterface
      */
     public function macro($name, \Closure $macro)
     {
-        $builder = new static($name);
-        call_user_func($macro, $builder);
+        $this->macros[$name] = function () use ($macro, $name) {
+            $macro($builder = new static($name));
 
-        $this->macros[$name] = $builder;
+            return $builder;
+        };
 
         return $this;
+    }
+
+    /**
+     * macros
+     *
+     * @param array $macros
+     *
+     * @return Builder
+     */
+    public function macros(array $macros)
+    {
+        foreach ($macros as $name => $builder) {
+            $this->macros[$name] = $builder;
+        }
+
+        return $this;
+    }
+
+    /**
+     * getMacro
+     *
+     * @param mixed $name
+     *
+     * @return mixed
+     */
+    public function getMacro($name)
+    {
+        if (isset($this->macros[$name])) {
+            return $this->macros[$name];
+        }
+    }
+
+    /**
+     * getMacros
+     *
+     *
+     * @access public
+     * @return mixed
+     */
+    public function getMacros()
+    {
+        return $this->macros;
     }
 
     /**
@@ -184,11 +232,19 @@ class Builder implements BuilderInterface
      */
     protected function mergeFromRootNode(RootNode $node)
     {
+        $this->macros($node->getBuilder()->getMacros());
+
         $newNode = new DictNode;
         $newNode->setKey($node->getKey());
 
         foreach ($node->getChildren() as $child) {
             $newNode->addChild($child);
+        }
+
+        foreach ($node->getConditions() as $condition) {
+            $newNode->condition()
+                ->when($condition->getCondition())
+                ->then($condition->getResult());
         }
 
         return $newNode;
@@ -208,11 +264,21 @@ class Builder implements BuilderInterface
             throw new \InvalidArgumentException('Can’\t use a macro on a scalar node');
         }
 
-        $node = $this->macros[$name]->getRoot();
+        $this->current->condition()->always(function ($value, $node) use ($name) {
 
-        foreach ($node->getChildren() as $childNode) {
-            $this->current->addChild(clone($childNode));
-        }
+            if (!$callback = $node->getBuilder()->getMacro($name)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Macro %s doesn\'t exist.', $name)
+                );
+            }
+
+            $builder = call_user_func($callback);
+            $children = $builder->getRoot()->getChildren();
+
+            foreach ($children as $childNode) {
+                $node->addChild(clone($childNode));
+            }
+        });
 
         return $this->current;
     }
@@ -283,6 +349,16 @@ class Builder implements BuilderInterface
         $this->current = $this->current->getParent();
 
         return $this;
+    }
+
+    /**
+     * getCurrent
+     *
+     * @return NodeInterface
+     */
+    public function getCurrent()
+    {
+        return $this->current;
     }
 
     /**

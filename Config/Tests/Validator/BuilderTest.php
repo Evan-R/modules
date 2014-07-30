@@ -142,18 +142,21 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldHandleMacros()
     {
-        $builder = new Builder;
+        $builder = new Builder('tree');
 
         $root = $builder->root()
             ->macro('test', function ($node) {
-                $node
-                    ->boolean('required')
-                    ->end();
+              $node
+                  ->boolean('required')
+                  ->end();
             })
-            ->dict('node_a')->useMacro('test')
-            ->end()
-            ->dict('node_b')->useMacro('test')
-            ->end()->getRoot();
+            ->dict('node_a')->useMacro('test')->end()
+            ->dict('node_b')->useMacro('test')->end()
+            ->getRoot();
+
+        $root->finalize(['node_a' => ['required' => false], 'node_b' => ['required' => true]]);
+
+        $root->validate();
 
         $this->assertInstanceof(
             'Selene\Components\Config\Validator\Nodes\BooleanNode',
@@ -166,6 +169,45 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertTrue($a !== $b);
+    }
+
+    /** @test */
+    public function macrosShouldBePortable()
+    {
+        $builder = new Builder('tree');
+
+        $callback = function () {
+            $builder = new Builder('subtree');
+            $builder->macro('test_b', function ($node) {
+                $node->string('test_b_string')->end();
+            });
+
+            $builder->getRoot()
+                ->useMacro('test_a')
+                ->useMacro('test_b');
+
+            return $builder->getRoot();
+        };
+
+        $builder->macro('test_a', function ($node) {
+            $node->string('test_a_string')->end();
+        })
+            ->append(call_user_func($callback));
+
+        $this->assertTrue((bool)$builder->getMacro('test_a'));
+        $this->assertTrue((bool)$builder->getMacro('test_b'));
+
+        $builder->getRoot()->finalize(['subtree' => ['test_a_string' => 'a']]);
+
+        try {
+            $builder->getRoot()->validate();
+        } catch (MissingValueException $e) {
+            $this->assertSame('tree[subtree][test_b_string] is required but missing.', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('tree[subtree][test_b_string] should be missing.');
     }
 
     /** @test */
@@ -249,6 +291,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldGetValidatorAndValidate()
     {
+        //$this->markTestIncomplete();
         $builder = new Builder;
 
         $builder->root()

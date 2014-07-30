@@ -154,6 +154,22 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($value, $clone->getValue());
     }
 
+    /** @test */
+    public function testCloneCondition()
+    {
+        $node = $this->newNode();
+        $c = $node->condition();
+        $c->when(function () {
+            return false;
+        })->then(function () {
+        });
+
+        $clone = clone($node);
+
+        $this->assertSame($node, $c->end());
+        $this->assertSame($clone, current($clone->getConditions())->end());
+    }
+
     /**
      * @test
      * @dataProvider nodeDefaultValueProvier

@@ -121,6 +121,18 @@ abstract class Node implements NodeInterface
         $this->value     = null;
         $this->invalid   = null;
         $this->finalized = false;
+
+        $conditions = [];
+
+        foreach ($this->conditions as $condition) {
+
+            $c = new Condition($this);
+            $c->copy($condition);
+
+            $conditions[] = $c;
+        }
+
+        $this->conditions = $conditions;
     }
 
     /**
@@ -148,6 +160,10 @@ abstract class Node implements NodeInterface
     {
         $this->parent =& $node;
         $node->addChild($this);
+
+        if (null !== ($builder = $this->parent->getBuilder()) && $builder !== $this->builder) {
+            $this->setBuilder($builder);
+        }
 
         return $this;
     }
@@ -247,6 +263,16 @@ abstract class Node implements NodeInterface
         $condition = new Condition($this);
 
         return $this->conditions[] = $condition;
+    }
+
+    /**
+     * getConditions
+     *
+     * @return array
+     */
+    public function getConditions()
+    {
+        return $this->conditions;
     }
 
     /**

@@ -151,6 +151,17 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function itShouldAlwaysExecute()
+    {
+        $cnd = $this->newCondition();
+        $cnd->always(function () {
+            return true;
+        });
+
+        $this->assertTrue($cnd->run());
+    }
+
+    /** @test */
     public function itShouldReturnNode()
     {
         $cnd = $this->newCondition();

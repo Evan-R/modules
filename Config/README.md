@@ -224,9 +224,9 @@ $loader->removeListener($configLoaderLogger);
 ## Caching
 
 Depending on the situation it may be useful to cache configuration, e.g.
-parsing an xml file on each request is likely a huge performance hit. Instead
+parsing an xml file on each request will affect performance. Instead
 you probably want to parse the configuration file once and store its contents
-as a php array. 
+in a php array. 
 
 ```php
 <?php

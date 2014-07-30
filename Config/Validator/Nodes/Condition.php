@@ -57,11 +57,38 @@ class Condition
     /**
      * getResult
      *
-     * @return mixed
+     * @return Closure
      */
     public function getResult()
     {
         return $this->result;
+    }
+
+    /**
+     * getCondition
+     *
+     *
+     * @return Closure
+     */
+    public function getCondition()
+    {
+        return $this->condition;
+    }
+
+    /**
+     * always
+     *
+     * @return Condition
+     */
+    public function always(\Closure $result)
+    {
+        $this->condition = function () {
+            return true;
+        };
+
+        $this->result = $result;
+
+        return $this;
     }
 
     /**
@@ -82,9 +109,7 @@ class Condition
      */
     public function ifTrue(\Closure $callback)
     {
-        $this->condition = function ($value) use ($callback) {
-            return (boolean)call_user_func($callback, $value);
-        };
+        $this->condition = $callback;
 
         return $this;
     }
@@ -253,6 +278,19 @@ class Condition
     }
 
     /**
+     * merge
+     *
+     * @param Condition $condition
+     *
+     * @return void
+     */
+    public function copy(Condition $condition)
+    {
+        $this->condition = $condition->getCondition();
+        $this->result    = $condition->getResult();
+    }
+
+    /**
      * thenEmptyArray
      *
      * @return Contition
@@ -275,7 +313,9 @@ class Condition
      */
     public function run($value = null)
     {
-        return call_user_func($this->condition, $value) ? call_user_func($this->result, $value) : null;
+        $node = $this->node;
+
+        return call_user_func($this->condition, $value, $node) ? call_user_func($this->result, $value, $node) : null;
     }
 
     /**
