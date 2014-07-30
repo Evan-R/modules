@@ -355,7 +355,7 @@ node type. e.g. on a string node, an empty string is an empty value.
 The value used if the node is optional and missing, or empty. 
  
 - **condition()**  
-Starts a conditional block. See [Conditions conditions](#Node conditions) below.
+Starts a conditional block. See [Conditions conditions](#node-conditions) below.
 
 - **end()**  
 When in context of the builder, `end()` will return the parent node of the
