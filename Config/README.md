@@ -312,6 +312,208 @@ $cache->write(
 
 ```
 
+## Validation
+
+The validator allows you to validate associative arrays. This is useful for
+validating user defined configuration before loading it. 
+
+The validator comes with a `Builder` class which allows you to define your
+configuration strcucture as a tree. The tree then will be validated agains an
+input array.
+
+```php
+<?php
+
+use \Selene\Components\Config\Validator\Builder;
+
+$builder = new Builder('config');
+$builder
+	->getRoot()
+	// build the tree
+
+
+$validator = $builder->getValidator();
+$validator->load($config);
+$validator->validate();
+
+```
+
+### Node types
+
+There're two different node types. **ScalarNodes** and **ArrayNodes**.
+
+Both share common methods for defining their behaviour on validation time. 
+
+- **optional()**    
+Marks the node to be required.
+
+- **notEmpty()**   
+Marks the node **not** to be not empty. The definition of an empty value depends on the
+node type. e.g. on a string node, an empty string is an empty value.
+
+- **defaultValue($value)**  
+The value used if the node is optional and missing, or empty. 
+ 
+- **condition()**  
+Starts a conditional block. See [Conditions conditions](#Node conditions) below.
+
+- **end()**  
+When in context of the builder, `end()` will return the parent node of the
+current one.
+
+#### Scalar nodes
+
+Scalar nodes represents scalar values like strings, booleans, integers. etc.
+
+Unlike ArrayNodes, scalar nodes cannot have childnodes. 
+
+##### boolean
+
+Represents a boolean value.	
+
+```php
+<?php
+
+$builder
+	->getRoot()
+	->boolean('required')
+	->end();
+```
+
+##### string
+
+Represents a string value.	
+
+```php
+<?php
+
+$builder
+	->getRoot()
+	->string('name')
+	->end();
+```
+##### integer
+
+Represents an integer.	
+
+```php
+<?php
+
+$builder
+	->getRoot()
+	->integer('port')
+	->end();
+```
+##### float
+
+Represents a float value.	
+
+```php
+<?php
+
+$builder
+	->getRoot()
+	->float('precission')
+	->end();
+```
+	
+#### Array nodes
+
+ArrayNodes may contain child nodes of both, type scalar and type array. 
+
+##### dict
+
+Represents an associative array.	
+
+```php
+<?php
+
+$builder
+	->getRoot()
+	->dict('memcached_server')
+		->string('host')->end()
+		->integer('port')->end()
+		->integer('weight')->end()
+	->end();
+```
+##### values
+
+Represents an indexed array.	
+
+Note that you only can define one child node on a value node.  
+The childnode then represents the value type that's supposed to be in that
+indexed array. 
+
+```php
+<?php
+
+$builder
+	->getRoot()
+	->values('paths')
+		->string('path')->end()
+	->end();
+```
+
+#### Node conditions
+
+Node conditions act as a simple if/then block. The "then" part is only executed
+if the "if" part return true.   
+
+```php
+<?php
+
+$root
+	->string()
+		->condition()
+			->when(function ($value) {…})
+			->then(function ($value) {…})
+		->end()
+	->end();
+```
+There're a couple if predefined "if" conditions.
+
+- **always()**  
+Will always be execued.
+
+- **ifTrue()**  
+Same as `when`.
+
+- **ifIsMissing()**  
+Will only trigger if the value (speaking the key of the input) is missing.
+
+- **ifIsEmpty()**  
+Will only trigger if the value is emtpy.
+
+- **ifIsNull()**  
+Will only trigger if the value is null.
+
+- **ifIsArray()**  
+Same as `when`.
+Will only trigger if the input value is an array.
+
+- **ifIsNotArray()**  
+Will only trigger if the input value is not an array.
+
+- **ifIsInArray(array $values)**  
+Will only trigger if the input value is in the `$values` array.
+
+- **ifIsNotInArray()**  
+Same as `when`.
+Will only trigger if the input value is not in the `$values` array.
+
+- **ifIsString()**  
+Will only trigger if the input value is a string.
+
+There're also a couple if predefined "then" results.
+
+- **thenMarkInvalid**  
+Marks the node invalid.
+
+- **thenUnset**  
+Unsets the current node an removes it from its parent node.
+
+- **thenEmptyArray**  
+Will return an empty array.
 
 [composer]: https://getcomposer.org
 [repo_config]: https://github.com/seleneapp/config
