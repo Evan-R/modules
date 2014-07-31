@@ -49,11 +49,11 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function isInArray()
+    public function ifInArray()
     {
         $cnd = $this->newCondition();
 
-        $cnd->ifIsInArray([1, 2, 3])->then(function () {
+        $cnd->ifInArray([1, 2, 3])->then(function () {
             throw new \BadMethodCallException('under test.');
         });
 
@@ -61,11 +61,11 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function isNotInArray()
+    public function ifNotInArray()
     {
         $cnd = $this->newCondition();
 
-        $cnd->ifIsNotInArray([1, 2, 3])->then(function () {
+        $cnd->ifNotInArray([1, 2, 3])->then(function () {
             throw new \BadMethodCallException('under test.');
         });
 
@@ -73,11 +73,11 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function ifIsArray()
+    public function ifArray()
     {
         $cnd = $this->newCondition();
 
-        $cnd->ifisArray()->then(function () {
+        $cnd->ifArray()->then(function () {
             throw new \BadMethodCallException('under test.');
         });
 
@@ -89,7 +89,7 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     {
         $cnd = $this->newCondition();
 
-        $cnd->ifisNotArray()->then(function () {
+        $cnd->ifNotArray()->then(function () {
             throw new \BadMethodCallException('under test.');
         });
 
@@ -97,11 +97,11 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function ifIsString()
+    public function ifString()
     {
         $cnd = $this->newCondition();
 
-        $cnd->ifIsString()->then(function () {
+        $cnd->ifString()->then(function () {
             throw new \BadMethodCallException('under test.');
         });
 
@@ -109,11 +109,35 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function ifIsNull()
+    public function ifInt()
     {
         $cnd = $this->newCondition();
 
-        $cnd->ifIsNull()->then(function () {
+        $cnd->ifInt()->then(function () {
+            throw new \BadMethodCallException('under test.');
+        });
+
+        return $this->execCallback($cnd, [1]);
+    }
+
+    /** @test */
+    public function ifFloat()
+    {
+        $cnd = $this->newCondition();
+
+        $cnd->ifFloat()->then(function () {
+            throw new \BadMethodCallException('under test.');
+        });
+
+        return $this->execCallback($cnd, [1.1]);
+    }
+
+    /** @test */
+    public function ifNull()
+    {
+        $cnd = $this->newCondition();
+
+        $cnd->ifNull()->then(function () {
             throw new \BadMethodCallException('under test.');
         });
 
@@ -121,15 +145,18 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function itShouldReturnEmptyArray()
+    public function idShouldRemoveNode()
     {
         $cnd = $this->newCondition();
-
-        $cnd->when(function () {
+        $cnd->ifTrue(function ($value) {
             return true;
-        })->thenEmptyArray();
+        })->thenRemove();
 
-        $this->assertSame([], $cnd->run());
+        try {
+            $cnd->run(true);
+        } catch (\Selene\Components\Config\Validator\Exception\ValueUnsetException $e) {
+            $this->assertTrue(true);
+        }
     }
 
     /** @test */

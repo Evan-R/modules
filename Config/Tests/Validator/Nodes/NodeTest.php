@@ -196,7 +196,7 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider nodeDefaultValueProvier
      */
-    public function itShouldUnsetNode($value)
+    public function itShouldRemoveNode($value)
     {
         // should unset the value
         $parent = new DictNode;
@@ -205,7 +205,7 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
             ->when(function () {
                 return true;
             })
-            ->thenUnset()->end();
+            ->thenRemove()->end();
 
         $node->setParent($parent);
         $this->assertTrue($node->hasParent());

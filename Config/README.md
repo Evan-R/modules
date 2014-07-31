@@ -24,7 +24,8 @@ $ composer install
 ```
 ## Loaders
 
-The [config package][repo_config] contains three different base loaders, the `PhpFileLoader`, the `XmlFileLoader`, and the `CallableLoader`. 
+The [config package][repo_config] contains three different base loaders, the `PhpFileLoader`, 
+the `XmlFileLoader`, and the `CallableLoader`. 
 Both, the `PhpFileLoader` and the `XmlFileLoader` extend `FileLoader` and
 require a resource locator instance. 
 
@@ -470,50 +471,56 @@ $root
 		->end()
 	->end();
 ```
-There're a couple if predefined "if" conditions.
+There're a couple of predefined "if" conditions.
 
 - **always()**  
 Will always be execued.
 
-- **ifTrue()**  
+- **when(Closure $expression)**  
+Evaluates the expression in the closure to be true or false.
+
+- **ifTrue(Closure $expression)**  
 Same as `when`.
 
-- **ifIsMissing()**  
+- **ifMissing()**  
 Will only trigger if the value (speaking the key of the input) is missing.
 
-- **ifIsEmpty()**  
+- **ifEmpty()**  
 Will only trigger if the value is emtpy.
 
-- **ifIsNull()**  
+- **ifNull()**  
 Will only trigger if the value is null.
 
-- **ifIsArray()**  
+- **ifArray()**  
 Same as `when`.
 Will only trigger if the input value is an array.
 
-- **ifIsNotArray()**  
+- **ifNotArray()**  
 Will only trigger if the input value is not an array.
 
-- **ifIsInArray(array $values)**  
+- **ifInArray(array $values)**  
 Will only trigger if the input value is in the `$values` array.
 
-- **ifIsNotInArray()**  
+- **ifNotInArray()**  
 Same as `when`.
 Will only trigger if the input value is not in the `$values` array.
 
-- **ifIsString()**  
+- **ifString()**  
 Will only trigger if the input value is a string.
 
-There're also a couple if predefined "then" results.
+There're also a couple of predefined "then" results.
+
+- **ifInt()**  
+Will only trigger if the input value is an integer.
+
+- **ifFloat()**  
+Will only trigger if the input value is a float value.
 
 - **thenMarkInvalid**  
 Marks the node invalid.
 
-- **thenUnset**  
+- **thenRemove**  
 Unsets the current node an removes it from its parent node.
-
-- **thenEmptyArray**  
-Will return an empty array.
 
 [composer]: https://getcomposer.org
 [repo_config]: https://github.com/seleneapp/config

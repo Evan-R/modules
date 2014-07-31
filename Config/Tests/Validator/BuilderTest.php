@@ -334,7 +334,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
             ->dict('testme')
                 ->optional()
                 ->condition()
-                    ->ifIsMissing()
+                    ->ifMissing()
                     ->then(function () {
                         return ['inserted' => true, 'test' => true];
                     })
@@ -347,7 +347,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                     ->dict()
                         ->string('foo')
                             ->condition()
-                            ->ifIsEmpty()
+                            ->ifEmpty()
                             ->then(function () {
                                 return 'replacement';
                             })->end()

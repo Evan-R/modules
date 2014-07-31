@@ -119,7 +119,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifIsMissing()
+    public function ifMissing()
     {
         $this->condition = function ($value) {
             return $value instanceof MissingValue;
@@ -135,7 +135,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifIsInArray(array $values)
+    public function ifInArray(array $values)
     {
         $this->condition = function ($value) use ($values) {
             return in_array($value, $values);
@@ -151,7 +151,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifIsNotInArray(array $values)
+    public function ifNotInArray(array $values)
     {
         $this->condition = function ($value) use ($values) {
             return !in_array($value, $values);
@@ -165,7 +165,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifIsEmpty()
+    public function ifEmpty()
     {
         $this->condition = function ($value) {
             return empty($value);
@@ -179,7 +179,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifIsNull()
+    public function ifNull()
     {
         $this->condition = function ($value) {
             return null === $value;
@@ -193,7 +193,7 @@ class Condition
      *
      * @return Condition
      */
-    public function ifIsArray()
+    public function ifArray()
     {
         $this->condition = function ($value) {
             return is_array($value);
@@ -207,7 +207,7 @@ class Condition
      *
      * @return Contition
      */
-    public function ifIsNotArray()
+    public function ifNotArray()
     {
         $this->condition = function ($value) {
             return !is_array($value);
@@ -221,10 +221,38 @@ class Condition
      *
      * @return Contition
      */
-    public function ifIsString()
+    public function ifString()
     {
         $this->condition = function ($value) {
             return is_string($value);
+        };
+
+        return $this;
+    }
+
+    /**
+     * ifNoArray
+     *
+     * @return Contition
+     */
+    public function ifInt()
+    {
+        $this->condition = function ($value) {
+            return is_int($value);
+        };
+
+        return $this;
+    }
+
+    /**
+     * ifNoArray
+     *
+     * @return Contition
+     */
+    public function ifFloat()
+    {
+        $this->condition = function ($value) {
+            return is_float($value);
         };
 
         return $this;
@@ -250,7 +278,7 @@ class Condition
      * @return Contition
 
      */
-    public function thenUnset()
+    public function thenRemove()
     {
         $this->result = function () {
             throw new ValueUnsetException;
@@ -272,20 +300,6 @@ class Condition
             $exp = $message ?
                 new ValidationException(sprintf($message, $value)) : ValidationException::invalidValue($value);
             throw $exp;
-        };
-
-        return $this;
-    }
-
-    /**
-     * thenEmptyArray
-     *
-     * @return Contition
-     */
-    public function thenEmptyArray()
-    {
-        $this->result = function () {
-            return [];
         };
 
         return $this;
