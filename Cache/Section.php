@@ -35,17 +35,14 @@ class Section implements CacheInterface
     protected $section;
 
     /**
-     * __construct
+     * Constructor.
      *
      * @param CacheInterface $storage
      * @param mixed $section
-     *
-     * @access public
-     * @return mixed
      */
     public function __construct(CacheInterface $storage, $section)
     {
-        $this->cache = $storage;
+        $this->cache   = $storage;
         $this->section = $section;
     }
 
@@ -62,6 +59,7 @@ class Section implements CacheInterface
         if ($value = $this->cache->get($this->getItemKey($key))) {
             return $value;
         }
+
         return $default;
     }
 
@@ -136,13 +134,14 @@ class Section implements CacheInterface
      *
      * @param string $key
      *
-     * @return void
+     * @return int|boolean
      */
     public function purge($key = null)
     {
         if (is_null($key)) {
             return $this->cache->increment($this->getKey());
         }
+
         return $this->cache->purge($this->getItemKey($key));
     }
 
@@ -151,11 +150,11 @@ class Section implements CacheInterface
      *
      * @param string $cacheid the cache item identifier
      *
-     * @return Boolean
+     * @return boolean
      */
     public function has($key)
     {
-        return !is_null($this->get($key));
+        return null !== $this->get($key);
     }
 
     /**

@@ -62,7 +62,6 @@ class MemcacheConnection implements ConnectionInterface
 
         $this->addServers();
 
-
         try {
             $this->memcache->getVersion();
         } catch (\Exception $e) {

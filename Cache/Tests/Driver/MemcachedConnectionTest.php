@@ -46,4 +46,26 @@ class MemcachedConnectionTest extends \PHPUnit_Framework_TestCase
             $this->assertFalse($conn->isConnected());
         }
     }
+
+    /** @test */
+    public function itShouldThrowExceptionOnConnectionFailure()
+    {
+        $conn = new Connection($mc = new \Memcached, [['host' => null, 'port' => 11211, 'weight' => 100]]);
+
+        $mc->quit();
+
+        try {
+            $conn->connect();
+        } catch (\RuntimeException $e) {
+            $this->assertTrue(true);
+
+            return;
+        }
+
+        if ($conn->isConnected()) {
+            $this->markTestSkipped();
+        }
+
+        $this->fail('oups');
+    }
 }

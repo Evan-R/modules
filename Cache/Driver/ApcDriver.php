@@ -23,35 +23,25 @@ namespace Selene\Components\Cache\Driver;
 class ApcDriver extends AbstractDriver
 {
     /**
-     * @access public
-     */
-    public function __construct()
-    {
-        $this->apcu = extension_loaded('apcu');
-    }
-
-    /**
-     * check if cached item exists
+     * Check if cached item exists
      *
      * @param Mixed $key
-     * @access protected
      * @return void
      */
     public function cachedItemExists($key)
     {
-        return $this->hasApcu() ? apcu_exists($key) : apc_exists($key);
+        return apc_exists($key);
     }
 
     /**
-     * retrieve cached item
+     * Retrieve cached item.
      *
-     * @param Mixed $key
-     * @access protected
-     * @return void
+     * @param string $key
+     * @return mixed
      */
     public function getFromCache($key)
     {
-        return $this->hasApcu() ? apcu_fetch($key) : apc_fetch($key);
+        return apc_fetch($key);
     }
 
     /**
@@ -62,12 +52,11 @@ class ApcDriver extends AbstractDriver
      * @param Mixed $expires Integer value of the expiry time in minutes or
      * @param boolean $compressed compress data
      * unix timestamp
-     * @access public
      * @return void
      */
     public function writeToCache($key, $data, $expires = 60, $compressed = false)
     {
-        $this->hasApcu() ? apcu_store($key, $data, $expires) : apc_store($key, $data, $expires);
+        return apc_store($key, $data, $expires);
     }
 
     /**
@@ -76,7 +65,6 @@ class ApcDriver extends AbstractDriver
      * @param Mixed $key
      * @param Mixed $data
      * @param boolean $compressed  compress data
-     * @access public
      * @return void
      */
     public function saveForever($key, $data, $compressed = false)
@@ -87,24 +75,22 @@ class ApcDriver extends AbstractDriver
     /**
      * delete a cached item
      *
-     * @param Mixed $key
-     * @access public
+     * @param string $key
      * @return void
      */
     public function deleteFromCache($key)
     {
-        $this->hasApcu() ? apcu_delete($key) : apc_delete($key);
+        return apc_delete($key);
     }
 
     /**
      * delete all cached items
      *
-     * @access protected
-     * @return void
+     * @return boolean
      */
     public function flushCache()
     {
-        $this->hasApcu() ? apcu_clear_cache('user') : apc_clear_cache('user');
+        return apc_clear_cache('user');
     }
 
     /**
@@ -113,12 +99,11 @@ class ApcDriver extends AbstractDriver
      * @param string $key
      * @param int    $value
      *
-     * @access protected
-     * @return void
+     * @return int
      */
     protected function incrementValue($key, $value)
     {
-        $this->hasApcu() ? apcu_inc($key, $value) : apc_inc($key, $value);
+        return apc_inc($key, $value);
     }
 
     /**
@@ -127,22 +112,10 @@ class ApcDriver extends AbstractDriver
      * @param string $key
      * @param int    $value
      *
-     * @access protected
-     * @return void
+     * @return int
      */
     protected function decrementValue($key, $value)
     {
-        $this->hasApcu() ? apcu_dec($key, $value) : apc_dec($key, $value);
-    }
-
-    /**
-     * hasApcu
-     *
-     * @access private
-     * @return boolean
-     */
-    private function hasApcu()
-    {
-        return $this->apcu;
+        return apc_dec($key, $value);
     }
 }

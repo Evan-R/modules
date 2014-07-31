@@ -46,6 +46,20 @@ abstract class StorageTestCase extends TestCase
 
     }
 
+    /** @test */
+    public function itShouldHaveArrayAccess()
+    {
+        $this->assertFalse(isset($this->cache['key']));
+        $this->cache['key'] = 'data';
+        $this->assertTrue(isset($this->cache['key']));
+
+        $this->assertSame('data', $this->cache['key']);
+
+        unset($this->cache['key']);
+
+        $this->assertFalse(isset($this->cache['key']));
+    }
+
     /**
      * @test
      */

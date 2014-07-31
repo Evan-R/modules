@@ -50,4 +50,27 @@ class MemcacheConnectionTest extends \PHPUnit_Framework_TestCase
         $conn->close();
         $this->assertFalse($conn->isConnected());
     }
+
+    /** @test */
+    public function itShouldReturnFalseIfAlreadyConnection()
+    {
+        $conn = new MemcacheConnection(new \Memcache, [['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]]);
+        $this->assertTrue($conn->connect());
+        $this->assertFalse($conn->connect());
+    }
+
+    /** @test */
+    public function itShouldThrowExceptionOnConnectionFailure()
+    {
+        $conn = new MemcacheConnection(new \Memcache, [['host' => 'fakehost', 'port' => 11211, 'weight' => 100]]);
+        try {
+            $conn->connect();
+        } catch (\RuntimeException $e) {
+            $this->assertTrue(true);
+
+            return;
+        }
+
+        $this->fail('oups');
+    }
 }
