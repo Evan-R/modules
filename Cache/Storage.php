@@ -29,17 +29,16 @@ use \Selene\Components\Cache\Driver\DriverInterface;
 class Storage implements CacheInterface, ArrayAccess
 {
     /**
-     * cache driver instance
+     * Cache driver instance
      *
-     * @var Stream\Cache\Interfaces\Driver
+     * @var DriverInterface
      */
     protected $driver;
 
     /**
-     * Array containing already retrieved items from the caching source
+     * Array containing already retrieved items from the caching source.
      *
      * @var array
-     * @access protected
      */
     protected $pool = [];
 
@@ -47,15 +46,14 @@ class Storage implements CacheInterface, ArrayAccess
      * cache id prefix
      *
      * @var string
-     * @access public
      */
     protected $prefix;
 
     /**
-     * __construct
+     * Constructor.
      *
-     * @param Stream\Cache\Interfaces\Driver $cachDriver
-     * @param string                         $prefix     cache id prefix
+     * @param DriverInterface $cachDriver
+     * @param string          $prefix cache id prefix
      */
     public function __construct(DriverInterface $cachDriver, $prefix = 'cache')
     {
@@ -67,8 +65,7 @@ class Storage implements CacheInterface, ArrayAccess
      * Check if an item is already cached
      *
      * @param String $key the cache item identifier
-     * @access public
-     * @return Boolean
+     * @return boolean
      */
     public function has($key)
     {
@@ -81,16 +78,10 @@ class Storage implements CacheInterface, ArrayAccess
         return $this->driver->cachedItemExists($key);
     }
 
-    public function segment($key)
-    {
-
-    }
-
     /**
      * Retrieves an Item from cache
      *
      * @param String $key the cache item identifier
-     * @access public
      * @return Mixed the cached data or null
      */
     public function get($key, $default = null)
@@ -117,7 +108,6 @@ class Storage implements CacheInterface, ArrayAccess
      * unix timestamp
      * @param Boolean $compressed weather the data should be compresse or not
      *
-     * @access public
      * @return bool
      */
     public function set($key, $data, $expires = null, $compressed = false)
@@ -143,7 +133,6 @@ class Storage implements CacheInterface, ArrayAccess
      * @param string  $key        the cache item identifier
      * @param mixed   $data       Data to be cached
      * @param boolean $compressed compress data
-     * @access public
      * @return boolean
      */
     public function seal($key, $data, $compressed = false)
@@ -161,7 +150,6 @@ class Storage implements CacheInterface, ArrayAccess
      * unix timestamp
      * @param Closure $callback   A callback function that returns default data
      * @param boolean $compressed compress data
-     * @access public
      * @return Mixed the cached item or results of the callback
      */
     public function setDefault($key, Closure $callback, $expires = null, $compressed = false)
@@ -178,7 +166,6 @@ class Storage implements CacheInterface, ArrayAccess
      * @param String  $key        the cache item identifier
      * @param Closure $callback   A callbacl function that returns default data
      * @param boolean $compressed compress data
-     * @access public
      * @return Mixed the cached item or results of the callback
      */
     public function sealDefault($key, Closure $callback, $compressed = false)
@@ -194,12 +181,10 @@ class Storage implements CacheInterface, ArrayAccess
      * If no cache id is specified, the cache will be flushed.
      *
      * @param String $key
-     * @access public
      * @return Boolena
      */
     public function purge($key = null)
     {
-
         if (is_null($key)) {
             $this->pool = [];
 
@@ -223,7 +208,6 @@ class Storage implements CacheInterface, ArrayAccess
      * @param mixed $key
      * @param int $value
      *
-     * @access public
      * @return void
      */
     public function increment($key, $value = 1)
@@ -239,7 +223,6 @@ class Storage implements CacheInterface, ArrayAccess
      * @param mixed $key
      * @param int $value
      *
-     * @access public
      * @return void
      */
     public function decrement($key, $value = 1)
@@ -254,7 +237,6 @@ class Storage implements CacheInterface, ArrayAccess
      *
      * @param mixed $section
      *
-     * @access public
      * @return mixed
      */
     public function section($section)
@@ -266,7 +248,6 @@ class Storage implements CacheInterface, ArrayAccess
      * offsetExists
      *
      * @param Mixed $offset
-     * @access public
      * @return void
      */
     public function offsetExists($offset)
@@ -278,7 +259,6 @@ class Storage implements CacheInterface, ArrayAccess
      * offsetUnset
      *
      * @param Mixed $offset
-     * @access public
      * @return void
      */
     public function offsetUnset($offset)
@@ -291,31 +271,28 @@ class Storage implements CacheInterface, ArrayAccess
      *
      * @param Mixed $offset
      * @param Mixed $value
-     * @access public
      * @return void
      */
     public function offsetSet($offset, $value)
     {
-        return $this->set($offset);
+        return $this->set($offset, $value);
     }
 
     /**
      * offsetGet
      *
      * @param Mixed $offset
-     * @access public
      * @return void
      */
     public function offsetGet($offset)
     {
-        return !$this->has($offset) ?: $this->read($offset);
+        return $this->get($offset);
     }
 
     /**
      * getCacheID
      *
      * @param Mixed $key
-     * @access protected
      * @return void
      */
     protected function getCacheID($key)
@@ -327,7 +304,6 @@ class Storage implements CacheInterface, ArrayAccess
      * setCachePrefix
      *
      * @param Mixed $prefix
-     * @access protected
      * @return void
      */
     protected function setCachePrefix($prefix = null)
@@ -340,7 +316,6 @@ class Storage implements CacheInterface, ArrayAccess
      *
      * @param Mixed   $key
      * @param Closure $callback
-     * @access protected
      * @return void
      */
     protected function execDefaultVal($key, Closure $callback)
