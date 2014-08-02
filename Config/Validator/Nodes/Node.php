@@ -12,15 +12,14 @@
 namespace Selene\Components\Config\Validator\Nodes;
 
 use \Selene\Components\Config\Validator\Builder;
+use \Selene\Components\Config\Validator\Exception\ValueUnsetException;
 use \Selene\Components\Config\Validator\Exception\ValidationException;
 use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
 use \Selene\Components\Config\Validator\Exception\MissingValueException;
-use \Selene\Components\Config\Validator\Exception\ValueUnsetException;
 
 /**
- * @abstract class Node implements NodeInterface
+ * @abstract class Node
  * @see NodeInterface
- * @abstract
  *
  * @package Selene\Components\Config
  * @version $Id$
@@ -52,14 +51,14 @@ abstract class Node implements NodeInterface
     /**
      * allowEmpty
      *
-     * @var mixed
+     * @var boolean
      */
     protected $allowEmpty;
 
     /**
      * builder
      *
-     * @var mixed
+     * @var Builder
      */
     protected $builder;
 
@@ -94,14 +93,14 @@ abstract class Node implements NodeInterface
     /**
      * invalid
      *
-     * @var void
+     * @var boolean
      */
     private $invalid;
 
     /**
      * Constructor.
      *
-     * @param NodeInterface $parent
+     * @param NodeInterface|null $parent
      */
     public function __construct(NodeInterface $parent = null)
     {
@@ -112,33 +111,9 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * Clone the node.
+     * Set the tree builder.
      *
-     * @return void
-     */
-    public function __clone()
-    {
-        $this->value     = null;
-        $this->invalid   = null;
-        $this->finalized = false;
-
-        $conditions = [];
-
-        foreach ($this->conditions as $condition) {
-
-            $c = new Condition($this);
-            $c->copy($condition);
-
-            $conditions[] = $c;
-        }
-
-        $this->conditions = $conditions;
-    }
-
-    /**
-     * setBuilder
-     *
-     * @param mixed $builder
+     * @param Builder $builder
      *
      * @return NodeInterface
      */
@@ -210,7 +185,7 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * setRequired
+     * Sets the required status.
      *
      * @param bool $required
      *
@@ -244,7 +219,7 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * getValue
+     * Get the value after the node's been finalized.
      *
      * @return mixed
      */
@@ -254,7 +229,7 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * condition
+     * Open a condition block
      *
      * @return Condition
      */
@@ -266,7 +241,7 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * getConditions
+     * Gets all conditions.
      *
      * @return array
      */
@@ -278,7 +253,7 @@ abstract class Node implements NodeInterface
     /**
      * Get the builder instance.
      *
-     * @return \Selene\Components\Config\Validator\Builder
+     * @return Builder
      */
     public function getBuilder()
     {
@@ -294,7 +269,7 @@ abstract class Node implements NodeInterface
      *
      * @param string|int $name
      *
-     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface this instance
+     * @return NodeInterface this instance
      */
     public function setKey($key)
     {
@@ -316,7 +291,7 @@ abstract class Node implements NodeInterface
     /**
      * Get the parent node.
      *
-     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface the parent node
+     * @return NodeInterface the parent node
      */
     public function getParent()
     {
@@ -336,7 +311,7 @@ abstract class Node implements NodeInterface
     /**
      * Do not allow empty values.
      *
-     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface the parent node
+     * @return NodeInterface the parent node
      */
     public function notEmpty()
     {
@@ -355,7 +330,7 @@ abstract class Node implements NodeInterface
     abstract public function validateType($value);
 
     /**
-     * finalize
+     * Finalize the node
      *
      * @param mixed $value
      *
@@ -377,6 +352,7 @@ abstract class Node implements NodeInterface
      * @throws MissingValueException if value is missing or empty.
      * @throws InvalidTypeException  if value has the wrong type.
      * @throws ValidationException   if marked invalid due to condition.
+     *
      * @return boolean
      */
     public function validate()
@@ -398,12 +374,16 @@ abstract class Node implements NodeInterface
         $empty = $missing ? false : $this->isEmptyValue($value);
         $valid = $this->validateType($value);
 
+        // if key is missing and none optional, throw exception.
         if ($missing && !$this->isOptional()) {
             throw MissingValueException::missingValue($this->getFormattedKey());
+        // Otherwise, if the value is considered empty and empty values are not
+        // allowed, throw exception.
         } elseif ($empty && !$this->allowEmpty) {
             throw ValidationException::notEmpty($this->getFormattedKey());
         }
 
+        // only typecheck value if is required but empty and/or missing.
         if (!$valid && !$empty && !$missing) {
             return $this->handleTypeError($value);
         }
@@ -412,7 +392,10 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * getFormattedKey
+     * Get the formatted key of this node.
+     *
+     * The key is formatted using the node's parent node, so e.g. a node with
+     * key of bar and a parent node with the key of foo will result in `foo[bar]`.
      *
      * @return string
      */
@@ -437,7 +420,7 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * getType
+     * Get the node type
      *
      * @return string
      */
@@ -446,8 +429,9 @@ abstract class Node implements NodeInterface
         return $this->type;
     }
 
+
     /**
-     * isEmptyValue
+     * Check if the given value is considered empty.
      *
      * @param mixed $value
      *
@@ -459,26 +443,9 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * __call
+     * Do prevalidation
      *
-     * @param mixed $method
-     * @param mixed $arguments
-     *
-     * @return mixed
-     */
-    public function __call($method, $arguments)
-    {
-        if (($builder = $this->getBuilder()) && method_exists($builder, $method)) {
-            return call_user_func_array([$builder, $method], $arguments);
-        }
-
-        throw new \BadMethodCallException(
-            sprintf('Node %s: no builder set or method %s() does not exist.', $this->getFormattedKey(), $method)
-        );
-    }
-
-    /**
-     * prevalidate
+     * Should be called on finalieze.
      *
      * @param mixed $value
      *
@@ -496,12 +463,12 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * runCondition
+     * Execute a condition callback.
      *
      * @param Condition $condition
      * @param mixed $value
      *
-     * @return mixed|null
+     * @return void
      */
     protected function runCondition(Condition $condition, &$value = null)
     {
@@ -518,10 +485,11 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * handleTypeError
+     * The exception thrown if there's a typeerror on validation.
      *
      * @param mixed $value
      *
+     * @throws InvalidTypeException
      * @return void
      */
     protected function handleTypeError($value)
@@ -530,7 +498,9 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * markInvalid
+     * Mark node as invalid.
+     *
+     * Will always trigger the node to be invalid.
      *
      * @param ValidationException $exception
      *
@@ -542,12 +512,55 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * isMarkedInvalid
+     * Checks if node is marked as invalid.
      *
      * @return boolean
      */
     final protected function isMarkedInvalid()
     {
         return $this->invalid instanceof ValidationException;
+    }
+
+    /**
+     * Clone the node.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->value     = null;
+        $this->invalid   = null;
+        $this->finalized = false;
+
+        $conditions = [];
+
+        foreach ($this->conditions as $condition) {
+
+            $c = new Condition($this);
+            $c->copy($condition);
+
+            $conditions[] = $c;
+        }
+
+        $this->conditions = $conditions;
+    }
+
+    /**
+     * Handles calls on the Builder instance.
+     *
+     * @param string $method
+     * @param array  $arguments
+     *
+     * @return mixed
+     */
+    public function __call($method, $arguments)
+    {
+        if (($builder = $this->getBuilder()) && method_exists($builder, $method)) {
+            return call_user_func_array([$builder, $method], $arguments);
+        }
+
+        throw new \BadMethodCallException(
+            sprintf('Node %s: no builder set or method %s() does not exist.', $this->getFormattedKey(), $method)
+        );
     }
 }
