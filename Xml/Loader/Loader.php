@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Loader;
+namespace Selene\Module\Xml\Loader;
 
-use \Selene\Components\Xml\Dom\DOMDocument;
-use \Selene\Components\Xml\SimpleXMLElement;
-use \Selene\Components\Common\Traits\Getter;
+use \Selene\Module\Xml\Dom\DOMDocument;
+use \Selene\Module\Xml\SimpleXMLElement;
+use \Selene\Module\Common\Traits\Getter;
 
 /**
  * @class Loader implements LoaderInterface
  * @see LoaderInterface
  *
- * @package Selene\Components\Xml\Loader
+ * @package Selene\Module\Xml\Loader
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -110,7 +110,7 @@ class Loader implements LoaderInterface
      */
     protected function doLoad($file)
     {
-        $domClass = $this->getOption(static::DOM_CLASS, '\Selene\Components\Xml\Dom\DOMDocument');
+        $domClass = $this->getOption(static::DOM_CLASS, '\Selene\Module\Xml\Dom\DOMDocument');
 
         $dom = new $domClass('1.0', $this->getOption(static::ENCODING, 'UTF-8'));
 
@@ -123,7 +123,7 @@ class Loader implements LoaderInterface
                 $dom,
                 $this->getOption(
                     static::SIMPLEXML_CLASS,
-                    'Selene\Components\Xml\SimpleXMLElement'
+                    'Selene\Module\Xml\SimpleXMLElement'
                 )
             );
             return $xml;

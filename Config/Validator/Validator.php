@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator package
+ * This File is part of the Selene\Module\Config\Validator package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,20 +9,20 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Validator;
+namespace Selene\Module\Config\Validator;
 
-use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\Config\Validator\Nodes\DictNode;
-use \Selene\Components\Config\Validator\Nodes\ListNode;
-use \Selene\Components\Config\Validator\Nodes\ArrayNode;
-use \Selene\Components\Config\Validator\Nodes\ScalarNode;
-use \Selene\Components\Config\Validator\Nodes\BooleanNode;
-use \Selene\Components\Config\Validator\Nodes\RootNodeInterface;
+use \Selene\Module\Common\Traits\Getter;
+use \Selene\Module\Config\Validator\Nodes\DictNode;
+use \Selene\Module\Config\Validator\Nodes\ListNode;
+use \Selene\Module\Config\Validator\Nodes\ArrayNode;
+use \Selene\Module\Config\Validator\Nodes\ScalarNode;
+use \Selene\Module\Config\Validator\Nodes\BooleanNode;
+use \Selene\Module\Config\Validator\Nodes\RootNodeInterface;
 
 /**
  * @class Tree
  *
- * @package Selene\Components\Config
+ * @package Selene\Module\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

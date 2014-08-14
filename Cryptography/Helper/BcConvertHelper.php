@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Cryptography\Traits package
+ * This File is part of the Selene\Module\Cryptography\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cryptography\Helper;
+namespace Selene\Module\Cryptography\Helper;
 
 /**
  * @class BcConvertHelper BcConvertHelper
  *
- * @package Selene\Components\Cryptography\Helper
+ * @package Selene\Module\Cryptography\Helper
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

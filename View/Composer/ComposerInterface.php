@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\View\Composer package
+ * This File is part of the Selene\Module\View\Composer package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,20 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View\Composer;
+namespace Selene\Module\View\Composer;
+
+use \Selene\Module\View\RendererInterface;
 
 /**
  * @interface ComposerInterface
- * @package Selene\Components\View\Composer
+ * @package Selene\Module\View\Composer
  * @version $Id$
  */
 interface ComposerInterface
 {
-    //public function compose($template, $context = []);
+    public function has($template);
+
+    public function addComposable($template, Composable $composable);
+
+    public function compose(RendererInterface $renderer);
 }

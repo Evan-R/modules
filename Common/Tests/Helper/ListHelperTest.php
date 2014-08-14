@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Tests\Helper package
+ * This File is part of the Selene\Module\Common\Tests\Helper package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Tests\Helper;
+namespace Selene\Module\Common\Tests\Helper;
 
-use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Module\Common\Helper\ListHelper;
 
 /**
  * @class ListHelperTest extends \PHPUnit_Framework_TestCase
  * @see \PHPUnit_Framework_TestCase
  *
- * @package Selene\Components\Common\Tests\Helper
+ * @package Selene\Module\Common\Tests\Helper
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

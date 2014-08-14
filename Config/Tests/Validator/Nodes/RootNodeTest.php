@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Tests\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator\Nodes;
+namespace Selene\Module\Config\Tests\Validator\Nodes;
 
 use \Mockery as m;
-use \Selene\Components\Config\Tests\Stubs\NodeStub;
-use \Selene\Components\Config\Validator\Nodes\RootNode;
+use \Selene\Module\Config\Tests\Stubs\NodeStub;
+use \Selene\Module\Config\Validator\Nodes\RootNode;
 
 class RootNodeTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,13 +26,13 @@ class RootNodeTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $node = new RootNode;
-        $this->assertInstanceOf('Selene\Components\Config\Validator\Nodes\NodeInterface', $node);
+        $this->assertInstanceOf('Selene\Module\Config\Validator\Nodes\NodeInterface', $node);
     }
 
     /** @test */
     public function itShoulThrowExceptionIfSettingAParent()
     {
-        $node = m::mock('Selene\Components\Config\Validator\Nodes\NodeInterface');
+        $node = m::mock('Selene\Module\Config\Validator\Nodes\NodeInterface');
         $node->shouldReceive('getKey')->andReturn($badName = 'badParentNode');
 
         $root = new RootNode;

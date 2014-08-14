@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing;
+namespace Selene\Module\Routing;
 
-use \Selene\Components\Common\Traits\Getter;
+use \Selene\Module\Common\Traits\Getter;
 
 /**
  * Creates Routes on a route collection.
  *
  * @class RouteBuilder
  *
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -30,7 +30,7 @@ class RouteBuilder
     /**
      * routes
      *
-     * @var \Selene\Components\Routing\RouteCollectionInterface
+     * @var \Selene\Module\Routing\RouteCollectionInterface
      */
     protected $routes;
 
@@ -132,11 +132,50 @@ class RouteBuilder
      *
      * @param RouteCollectionInterface $routes
      *
-     * @return RoutBuilder
+     * @return RouteBuilder
      */
     public function addRoutes(RouteCollectionInterface $routes)
     {
         $this->routes->merge($routes);
+
+        return $this;
+    }
+
+    /**
+     * appendRoutes
+     *
+     * @param RouteCollectionInterface $rotues
+     *
+     * @return RouteBuilder
+     */
+    public function appendRoutes(RouteCollectionInterface $routes)
+    {
+        foreach ($routes as $id => $route) {
+            $this->appendRoute($route, $id);
+        }
+    }
+
+    /**
+     * appendRoute
+     *
+     * @param Route  $route
+     * @param string $id
+     *
+     * @return RouteBuilder
+     */
+    public function appendRoute(Route $route, $id = null)
+    {
+        $newRoute = $this->define(
+            $route->getMethods(),
+            $id ?: $route->getName(),
+            $route->getPattern(),
+            $route->getAction(),
+            $route->getRequirements()
+        );
+
+        $newRoute->setDefaults($route->getDefaults());
+        //$newRoute->setConstraits($route->getConstraits());
+
         return $this;
     }
 

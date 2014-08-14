@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Tests\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,19 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator\Nodes;
+namespace Selene\Module\Config\Tests\Validator\Nodes;
 
-use \Selene\Components\Config\Validator\Nodes\FloatNode;
-use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
-use \Selene\Components\Config\Validator\Exception\ValidationException;
-use \Selene\Components\Config\Validator\Exception\RangeException;
-use \Selene\Components\Config\Validator\Exception\LengthException;
+use \Selene\Module\Config\Validator\Nodes\FloatNode;
+use \Selene\Module\Config\Validator\Exception\InvalidTypeException;
+use \Selene\Module\Config\Validator\Exception\ValidationException;
+use \Selene\Module\Config\Validator\Exception\RangeException;
+use \Selene\Module\Config\Validator\Exception\LengthException;
 
 /**
  * @class FloatNodeTest extends \PHPUnit_Framework_TestCase
  * @see \PHPUnit_Framework_TestCase
  *
- * @package Selene\Components\Config\Tests\Validator\Nodes
+ * @package Selene\Module\Config\Tests\Validator\Nodes
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -32,7 +32,7 @@ class FloatNodeTest extends RangeableNodeTest
     public function itShouldBeInstantiable()
     {
         $node = new FloatNode;
-        $this->assertInstanceOf('Selene\Components\Config\Validator\Nodes\NodeInterface', $node);
+        $this->assertInstanceOf('Selene\Module\Config\Validator\Nodes\NodeInterface', $node);
     }
 
     /**
@@ -98,6 +98,6 @@ class FloatNodeTest extends RangeableNodeTest
 
     protected function getNodeClass()
     {
-        return 'Selene\Components\Config\Validator\Nodes\FloatNode';
+        return 'Selene\Module\Config\Validator\Nodes\FloatNode';
     }
 }

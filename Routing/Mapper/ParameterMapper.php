@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Mapper;
+namespace Selene\Module\Routing\Mapper;
 
 use \Symfony\Component\HttpFoundation\Request;
 
@@ -17,7 +17,7 @@ use \Symfony\Component\HttpFoundation\Request;
  * Maps Request parameters to Controller arguments.
  *
  * @class ParamterMapper
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  */
 class ParameterMapper

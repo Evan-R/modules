@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem package
+ * This File is part of the Selene\Module\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Tests;
+namespace Selene\Module\Filesystem\Tests;
 
-use Selene\Components\Filesystem\File;
-use Selene\Components\Filesystem\Filesystem;
-use Selene\Components\Filesystem\Exception\IOException;
+use Selene\Module\Filesystem\File;
+use Selene\Module\Filesystem\Filesystem;
+use Selene\Module\Filesystem\Exception\IOException;
 
 /**
  * @class FileTest
@@ -23,7 +23,7 @@ use Selene\Components\Filesystem\Exception\IOException;
 class FileTest extends FilesystemTestCase
 {
     /**
-     * @expectedException Selene\Components\Filesystem\Exception\IOException
+     * @expectedException Selene\Module\Filesystem\Exception\IOException
      */
     public function testSetInvalidPathShouldThrowAnException()
     {
@@ -35,7 +35,7 @@ class FileTest extends FilesystemTestCase
      */
     public function testWrapperMethods()
     {
-        $mockedFs = $this->getMock('Selene\Components\Filesystem\Filesystem', ['chmod', 'chown', 'chgrp', 'touch']);
+        $mockedFs = $this->getMock('Selene\Module\Filesystem\Filesystem', ['chmod', 'chown', 'chgrp', 'touch']);
         $mockedFs->expects($this->once())->method('chmod');
         $mockedFs->expects($this->once())->method('chown');
         $mockedFs->expects($this->once())->method('chgrp');

@@ -22,7 +22,7 @@
     "selene/testsuite":"dev-development"
   },
   "autoload": {
-    "psr-4": {"Selene\\Components\\Kernel\\": ""}
+    "psr-4": {"Selene\\Module\\Kernel\\": ""}
   },
   "minimum-stability": "dev"
 }

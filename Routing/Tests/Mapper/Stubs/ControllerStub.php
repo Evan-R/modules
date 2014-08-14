@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Mapper\Stubs;
+namespace Selene\Module\Routing\Tests\Mapper\Stubs;
 
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * @class ControllerStub
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  */
 class ControllerStub

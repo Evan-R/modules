@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,22 +9,22 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI;
+namespace Selene\Module\DI;
 
-use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\DI\Processor\Processor;
-use \Selene\Components\DI\Processor\Configuration;
-use \Selene\Components\DI\Processor\ProcessorDecorator;
-use \Selene\Components\DI\Processor\ProcessorInterface;
-use \Selene\Components\Config\Resource\FileResource;
-use \Selene\Components\Config\Resource\ObjectResource;
-use \Selene\Components\Config\Loader\LoaderInterface;
+use \Selene\Module\Common\Traits\Getter;
+use \Selene\Module\DI\Processor\Processor;
+use \Selene\Module\DI\Processor\Configuration;
+use \Selene\Module\DI\Processor\ProcessorDecorator;
+use \Selene\Module\DI\Processor\ProcessorInterface;
+use \Selene\Module\Config\Resource\FileResource;
+use \Selene\Module\Config\Resource\ObjectResource;
+use \Selene\Module\Config\Loader\LoaderInterface;
 
 /**
  * @class Builder implements BuilderInterface
  * @see BuilderInterface
  *
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -36,21 +36,21 @@ class Builder implements BuilderInterface
     /**
      * processor
      *
-     * @var \Selene\Components\DI\Processor\ProcessorInterface
+     * @var \Selene\Module\DI\Processor\ProcessorInterface
      */
     protected $processor;
 
     /**
      * processor
      *
-     * @var \Selene\Components\DI\Processor\ProcessorInterface
+     * @var \Selene\Module\DI\Processor\ProcessorInterface
      */
     protected $processorDecorator;
 
     /**
      * container
      *
-     * @var \Selene\Components\DI\ContainerInterface
+     * @var \Selene\Module\DI\ContainerInterface
      */
     protected $container;
 
@@ -87,7 +87,7 @@ class Builder implements BuilderInterface
     /**
      * Get the current DI Container
      *
-     * @return \Selene\Components\DI\ContainerInterface
+     * @return \Selene\Module\DI\ContainerInterface
      */
     public function getContainer()
     {
@@ -97,7 +97,7 @@ class Builder implements BuilderInterface
     /**
      * Replaces the current DI Container.
      *
-     * @param \Selene\Components\DI\ContainerInterface $container a new
+     * @param \Selene\Module\DI\ContainerInterface $container a new
      * container.
      *
      * @return void
@@ -112,7 +112,7 @@ class Builder implements BuilderInterface
      *
      * This will merge the containers, resources, configs and parameters.
      *
-     * @param \Selene\Components\DI\BuilderInterface $builder
+     * @param \Selene\Module\DI\BuilderInterface $builder
      *
      * @return void
      */
@@ -130,7 +130,7 @@ class Builder implements BuilderInterface
      * Instead of returning the actual processor,
      * return a processor decorator.
      *
-     * @return \Selene\Components\DI\Processor\ProcessorInterface
+     * @return \Selene\Module\DI\Processor\ProcessorInterface
      */
     public function getProcessor()
     {
@@ -245,7 +245,7 @@ class Builder implements BuilderInterface
     /**
      * Merge extension configs.
      *
-     * @param \Selene\Components\DI\BuilderInterface $builder
+     * @param \Selene\Module\DI\BuilderInterface $builder
      *
      * @return void
      */
@@ -259,7 +259,7 @@ class Builder implements BuilderInterface
     /**
      * Merge resources.
      *
-     * @param \Selene\Components\DI\BuilderInterface $builder
+     * @param \Selene\Module\DI\BuilderInterface $builder
      *
      * @return void
      */

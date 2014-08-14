@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Cache package
+ * This File is part of the Selene\Module\Routing\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Cache;
+namespace Selene\Module\Routing\Cache;
 
-use \Selene\Components\Routing\RouteCollection;
-use \Selene\Components\Routing\StaticRouteCollection;
-use \Selene\Components\Routing\RouteCollectionInterface;
+use \Selene\Module\Routing\RouteCollection;
+use \Selene\Module\Routing\StaticRouteCollection;
+use \Selene\Module\Routing\RouteCollectionInterface;
 
 /**
  * @class Storage Storage
  *
- * @package Selene\Components\Routing\Cache
+ * @package Selene\Module\Routing\Cache
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\View\Template package
+ * This File is part of the Selene\Module\View\Template package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View\Template;
+namespace Selene\Module\View\Template;
 
-use \Selene\Components\Common\Helper\StringHelper;
+use \Selene\Module\Common\Helper\StringHelper;
 
 /**
  * @class TemplateResolver implements ResolverInterface
  * @see ResolverInterface
  *
- * @package Selene\Components\View\Template
+ * @package Selene\Module\View\Template
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

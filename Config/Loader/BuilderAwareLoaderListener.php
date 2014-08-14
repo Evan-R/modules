@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Loader package
+ * This File is part of the Selene\Module\Config\Loader package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Loader;
+namespace Selene\Module\Config\Loader;
 
-use \Selene\Components\DI\BuilderInterface;
+use \Selene\Module\DI\BuilderInterface;
 
 /**
  * @class BuilderAwareLoaderListener
- * @package Selene\Components\Config\Loader
+ * @package Selene\Module\Config\Loader
  * @version $Id$
  */
 class BuilderAwareLoaderListener implements LoaderListener

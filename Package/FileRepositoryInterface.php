@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
 
-use \Selene\Components\Filesystem\Traits\PathHelperTrait;
+use \Selene\Module\Filesystem\Traits\PathHelperTrait;
 
 /**
  * @class FileTargetRepository
- * @packageSelene\Components\Package
+ * @packageSelene\Module\Package
  * @version $Id$
  */
 interface FileRepositoryInterface

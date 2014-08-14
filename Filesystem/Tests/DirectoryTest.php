@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem package
+ * This File is part of the Selene\Module\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,10 +9,10 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Tests;
+namespace Selene\Module\Filesystem\Tests;
 
-use \Selene\Components\Common\Helper\ListHelper;
-use \Selene\Components\Filesystem\Directory;
+use \Selene\Module\Common\Helper\ListHelper;
+use \Selene\Module\Filesystem\Directory;
 
 /**
  * @class DirectoryTest

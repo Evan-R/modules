@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests package
+ * This File is part of the Selene\Module\Routing\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,20 +9,20 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests;
+namespace Selene\Module\Routing\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Routing\Route;
-use \Selene\Components\Routing\Router;
-use \Selene\Components\Routing\RouteCollection;
-use \Selene\Components\Routing\RouteCollectionInterface;
-use \Selene\Components\Routing\Events\RouterEvents as Events;
-use \Selene\Components\Events\Dispatcher;
-use \Selene\Components\TestSuite\TestCase;
+use \Selene\Module\Routing\Route;
+use \Selene\Module\Routing\Router;
+use \Selene\Module\Routing\RouteCollection;
+use \Selene\Module\Routing\RouteCollectionInterface;
+use \Selene\Module\Routing\Events\RouterEvents as Events;
+use \Selene\Module\Events\Dispatcher;
+use \Selene\Module\TestSuite\TestCase;
 
 /**
  * @class RouterTest
- * @package Selene\Components\Routing\Tests
+ * @package Selene\Module\Routing\Tests
  * @version $Id$
  */
 class RouterTest extends TestCase
@@ -37,9 +37,9 @@ class RouterTest extends TestCase
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof(
-            '\Selene\Components\Routing\RouterInterface',
+            '\Selene\Module\Routing\RouterInterface',
             new Router(
-                m::mock('Selene\Components\Routing\RouteCollectionInterface')
+                m::mock('Selene\Module\Routing\RouteCollectionInterface')
             )
         );
     }
@@ -59,12 +59,12 @@ class RouterTest extends TestCase
         $this->events->shouldReceive('dispatch')->with(Events::NOT_FOUND, m::any())->andReturnUsing(function ($eventName, $event) use (&$test) {
             $test = true;
             $this->assertSame(Events::NOT_FOUND, $eventName);
-            $this->assertInstanceof('Selene\Components\Routing\Events\RouteNotFoundEvent', $event);
+            $this->assertInstanceof('Selene\Module\Routing\Events\RouteNotFoundEvent', $event);
         });
 
         try {
             $router->dispatch($request);
-        } catch (\Selene\Components\Routing\Exception\RouteNotFoundException $e) {
+        } catch (\Selene\Module\Routing\Exception\RouteNotFoundException $e) {
             // no routes set;
             $this->assertTrue($test);
 
@@ -119,7 +119,7 @@ class RouterTest extends TestCase
     protected function getRouter()
     {
         $callback;
-        $this->events = m::mock('Selene\Components\Events\DispatcherInterface');
+        $this->events = m::mock('Selene\Module\Events\DispatcherInterface');
 
         $this->events->shouldReceive('on')->with(Events::DISPATCHED, m::any())->andReturnUsing(function ($event, $fn) use (&$callback) {
             $callback = $fn;
@@ -131,8 +131,8 @@ class RouterTest extends TestCase
 
         $router = new Router(
             $this->routes      = new RouteCollection,
-            $this->controllers = m::mock('Selene\Components\Routing\Controller\Dispatcher'),
-            $this->matcher     = m::mock('Selene\Components\Routing\RouteMatcherInterface'),
+            $this->controllers = m::mock('Selene\Module\Routing\Controller\Dispatcher'),
+            $this->matcher     = m::mock('Selene\Module\Routing\RouteMatcherInterface'),
             $this->events
         );
 

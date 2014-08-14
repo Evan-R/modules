@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator package
+ * This File is part of the Selene\Module\Config\Validator package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,23 +9,23 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Validator;
+namespace Selene\Module\Config\Validator;
 
-use \Selene\Components\Config\Validator\Nodes\RootNode;
-use \Selene\Components\Config\Validator\Nodes\ScalarNode;
-use \Selene\Components\Config\Validator\Nodes\DictNode;
-use \Selene\Components\Config\Validator\Nodes\ListNode;
-use \Selene\Components\Config\Validator\Nodes\FloatNode;
-use \Selene\Components\Config\Validator\Nodes\IntegerNode;
-use \Selene\Components\Config\Validator\Nodes\StringNode;
-use \Selene\Components\Config\Validator\Nodes\BooleanNode;
-use \Selene\Components\Config\Validator\Nodes\NodeInterface;
-use \Selene\Components\Config\Validator\Nodes\ParentableInterface;
+use \Selene\Module\Config\Validator\Nodes\RootNode;
+use \Selene\Module\Config\Validator\Nodes\ScalarNode;
+use \Selene\Module\Config\Validator\Nodes\DictNode;
+use \Selene\Module\Config\Validator\Nodes\ListNode;
+use \Selene\Module\Config\Validator\Nodes\FloatNode;
+use \Selene\Module\Config\Validator\Nodes\IntegerNode;
+use \Selene\Module\Config\Validator\Nodes\StringNode;
+use \Selene\Module\Config\Validator\Nodes\BooleanNode;
+use \Selene\Module\Config\Validator\Nodes\NodeInterface;
+use \Selene\Module\Config\Validator\Nodes\ParentableInterface;
 
 /**
  * @class Builder Builder
  *
- * @package Selene\Components\Config
+ * @package Selene\Module\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -70,7 +70,7 @@ class Builder implements BuilderInterface
      * getValidator
      *
      * @access public
-     * @return \Selene\Components\Config\Validator\TreeValidatorInterface
+     * @return \Selene\Module\Config\Validator\TreeValidatorInterface
      */
     public function getValidator()
     {
@@ -107,7 +107,7 @@ class Builder implements BuilderInterface
      * Initializes the root node.
      *
      * @access public
-     * @return \Selene\Components\Config\Validator\Builder
+     * @return \Selene\Module\Config\Validator\Builder
      */
     public function root()
     {
@@ -333,7 +333,7 @@ class Builder implements BuilderInterface
      *
      * @access public
      * @throws \BadMethodCallException if current node is already root
-     * @return \Selene\Components\Config\Validator\Builder
+     * @return \Selene\Module\Config\Validator\Builder
      */
     public function end()
     {

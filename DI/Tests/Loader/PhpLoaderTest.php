@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Loader package
+ * This File is part of the Selene\Module\DI\Tests\Loader package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Loader;
+namespace Selene\Module\DI\Tests\Loader;
 
 use \Mockery as m;
-use \Selene\Components\DI\Loader\PhpLoader;
-use \Selene\Components\DI\Builder;
-use \Selene\Components\DI\Container;
-use \Selene\Components\Config\Resource\Locator;
+use \Selene\Module\DI\Loader\PhpLoader;
+use \Selene\Module\DI\Builder;
+use \Selene\Module\DI\Container;
+use \Selene\Module\Config\Resource\Locator;
 
 /**
  * @class PhpLoaderInterface
- * @package Selene\Components\DI\Tests\Loader
+ * @package Selene\Module\DI\Tests\Loader
  * @version $Id$
  */
 class PhpLoaderTest extends \PHPUnit_Framework_TestCase
@@ -36,13 +36,13 @@ class PhpLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = $this->getLoaderMock();
 
-        $this->assertInstanceof('\Selene\Components\DI\Loader\PhpLoader', $loader);
+        $this->assertInstanceof('\Selene\Module\DI\Loader\PhpLoader', $loader);
     }
 
     /** @test */
     public function itShouldSupportPhpFiles()
     {
-        $container = m::mock('\Selene\Components\DI\ContainerInterface');
+        $container = m::mock('\Selene\Module\DI\ContainerInterface');
         $loader = $this->getLoaderMock();
 
         $this->assertTrue($loader->supports('some/file.php'));
@@ -75,9 +75,9 @@ class PhpLoaderTest extends \PHPUnit_Framework_TestCase
 
     protected function getLoaderMock($builder = null, $container = null, $locator = null)
     {
-        $builder =   $builder = $builder ?: m::mock('\Selene\Components\DI\BuilderInterface');
-        $container = m::mock('\Selene\Components\DI\ContainerInterface');
-        $locator   = $locator ?: m::mock('\Selene\Components\Config\Resource\LocatorInterface');
+        $builder =   $builder = $builder ?: m::mock('\Selene\Module\DI\BuilderInterface');
+        $container = m::mock('\Selene\Module\DI\ContainerInterface');
+        $locator   = $locator ?: m::mock('\Selene\Module\Config\Resource\LocatorInterface');
 
         $builder->shouldReceive('getContainer')->andReturn($container);
 

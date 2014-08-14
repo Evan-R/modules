@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Validator\Nodes;
+namespace Selene\Module\Config\Validator\Nodes;
 
 /**
  * @class ChildAwareNodeInterface
- * @package Selene\Components\Config\Validator\Nodes
+ * @package Selene\Module\Config\Validator\Nodes
  * @version $Id$
  */
 interface ParentableInterface
@@ -30,7 +30,7 @@ interface ParentableInterface
     /**
      * hasChild
      *
-     * @param \Selene\Components\Config\Validator\Nodes\NodeInterface $node
+     * @param \Selene\Module\Config\Validator\Nodes\NodeInterface $node
      *
      * @access public
      * @return boolean
@@ -59,7 +59,7 @@ interface ParentableInterface
      * getFirstChild
      *
      * @access public
-     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface
+     * @return \Selene\Module\Config\Validator\Nodes\NodeInterface
      */
     public function getFirstChild();
 
@@ -67,7 +67,7 @@ interface ParentableInterface
      * getLastChild
      *
      * @access public
-     * @return \Selene\Components\Config\Validator\Nodes\NodeInterface
+     * @return \Selene\Module\Config\Validator\Nodes\NodeInterface
      */
     public function getLastChild();
 }

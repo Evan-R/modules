@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common package
+ * This File is part of the Selene\Module\Common package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common;
+namespace Selene\Module\Common;
 
 /**
  * Passes through input data
@@ -17,7 +17,7 @@ namespace Selene\Components\Common;
  * @class IOPassThrough implements IOProxyInterface
  * @see IOHandlerInterface
  *
- * @package Selene\Components\Common
+ * @package Selene\Module\Common
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

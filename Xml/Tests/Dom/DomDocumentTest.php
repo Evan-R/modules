@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml\Tests\Dom package
+ * This File is part of the Selene\Module\Xml\Tests\Dom package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Tests\Dom;
+namespace Selene\Module\Xml\Tests\Dom;
 
-use \Selene\Components\Xml\Dom\DOMElement;
-use \Selene\Components\Xml\Dom\DOMDocument;
+use \Selene\Module\Xml\Dom\DOMElement;
+use \Selene\Module\Xml\Dom\DOMDocument;
 
 /**
  * @class DomDocumentTest
- * @package Selene\Components\Xml\Tests\Dom
+ * @package Selene\Module\Xml\Tests\Dom
  * @version $Id$
  */
 class DomDocumentTest extends \PHPUnit_Framework_TestCase
@@ -25,7 +25,7 @@ class DomDocumentTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof('\DOMDocument', new DOMDocument);
-        $this->assertInstanceof('\Selene\Components\Xml\Dom\DOMDocument', new DOMDocument);
+        $this->assertInstanceof('\Selene\Module\Xml\Dom\DOMDocument', new DOMDocument);
     }
 
     /** @test */
@@ -35,7 +35,7 @@ class DomDocumentTest extends \PHPUnit_Framework_TestCase
 
         $element = $dom->createElement('foo', 'bar');
 
-        $this->assertInstanceof('\Selene\Components\Xml\Dom\DOMElement', $element);
+        $this->assertInstanceof('\Selene\Module\Xml\Dom\DOMElement', $element);
     }
 
     /** @test */
@@ -47,7 +47,7 @@ class DomDocumentTest extends \PHPUnit_Framework_TestCase
         $dom->loadXML($xml, LIBXML_NONET);
 
         foreach ($dom->xpath('//foo|//bar') as $node) {
-            $this->assertInstanceof('\Selene\Components\Xml\Dom\DOMElement', $node);
+            $this->assertInstanceof('\Selene\Module\Xml\Dom\DOMElement', $node);
         }
     }
 

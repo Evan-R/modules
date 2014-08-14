@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,24 +9,24 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
 
-use \Selene\Components\Filesystem\Filesystem;
-use \Selene\Components\Events\DispatcherInterface;
-use \Selene\Components\Package\Events\PackageEvent;
-use \Selene\Components\Package\Events\PublishEvents;
-use \Selene\Components\Package\Events\PackagePublishEvent;
-use \Selene\Components\Package\Events\PackageExceptionEvent;
-use \Selene\Components\Package\Traits\FileBackUpHelper;
-use \Selene\Components\Package\Dumper\ConfigDumperInterface;
-use \Selene\Components\Package\Dumper\DelegateAbleDumperInterface;
-use \Selene\Components\Package\PackageRepositoryInterface as Packages;
-use \Selene\Components\Package\PackageInterface as IPackage;
-use \Selene\Components\Package\Exception\PublishException;
+use \Selene\Module\Filesystem\Filesystem;
+use \Selene\Module\Events\DispatcherInterface;
+use \Selene\Module\Package\Events\PackageEvent;
+use \Selene\Module\Package\Events\PublishEvents;
+use \Selene\Module\Package\Events\PackagePublishEvent;
+use \Selene\Module\Package\Events\PackageExceptionEvent;
+use \Selene\Module\Package\Traits\FileBackUpHelper;
+use \Selene\Module\Package\Dumper\ConfigDumperInterface;
+use \Selene\Module\Package\Dumper\DelegateAbleDumperInterface;
+use \Selene\Module\Package\PackageRepositoryInterface as Packages;
+use \Selene\Module\Package\PackageInterface as IPackage;
+use \Selene\Module\Package\Exception\PublishException;
 
 /**
  * @class PackagePublisher
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  */
 class PackagePublisher
@@ -77,6 +77,8 @@ class PackagePublisher
     private $events;
 
     /**
+     * Constructor.
+     *
      * @param Packages $packages
      * @param ConfigDumperInterface $dumper
      * @param string $path

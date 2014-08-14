@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Resource package
+ * This File is part of the Selene\Module\Config\Resource package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Resource;
+namespace Selene\Module\Config\Resource;
 
 /**
  * @interface ObjectResourceInterface extends ResourceInterface
  * @see ResourceInterface
  *
- * @package Selene\Components\Config\Resource
+ * @package Selene\Module\Config\Resource
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */

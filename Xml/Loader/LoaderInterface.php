@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml package
+ * This File is part of the Selene\Module\Xml package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Loader;
+namespace Selene\Module\Xml\Loader;
 
 /**
  * @interface LoaderInterface
- * @package Selene\Components\Xml
+ * @package Selene\Module\Xml
  * @version $Id$
  */
 interface LoaderInterface

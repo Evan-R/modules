@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem package
+ * This File is part of the Selene\Module\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem;
+namespace Selene\Module\Filesystem;
 
-use \Selene\Components\Filesystem\Traits\SubstitudePath;
+use \Selene\Module\Filesystem\Traits\SubstitudePath;
 
 /**
  * @class FilesystemIterator
- * @package Selene\Components\Filesystem
+ * @package Selene\Module\Filesystem
  * @version $Id$
  */
 class FilesystemIterator extends \FilesystemIterator

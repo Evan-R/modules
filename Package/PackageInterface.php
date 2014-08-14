@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
 
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Kernel\ApplicationInterface;
-use \Selene\Components\Console\Application as Console;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Adapter\Kernel\ApplicationInterface;
+use \Selene\Adapter\Console\Application as Console;
 
 /**
  * @interface PackageInterface
  *
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -35,8 +35,8 @@ interface PackageInterface
     /**
      * build
      *
-     * @param \Selene\Components\DI\BuilderInterface $builder
-     * @internal param \Selene\Components\Package\ContainerInterface $container
+     * @param \Selene\Module\DI\BuilderInterface $builder
+     * @internal param \Selene\Module\Package\ContainerInterface $container
      *
      * @return void
      */
@@ -45,7 +45,7 @@ interface PackageInterface
     /**
      * boot up the package
      *
-     * @param \Selene\Components\Kernel\ApplicationInterface $app
+     * @param \Selene\Module\Kernel\ApplicationInterface $app
      * @return void
      */
     public function boot(ApplicationInterface $app);
@@ -62,7 +62,7 @@ interface PackageInterface
     /**
      * registerCommands
      *
-     * @param \Selene\Components\Console\Application $console
+     * @param \Selene\Module\Console\Application $console
      * @return void
      */
     public function registerCommands(Console $console);
@@ -70,7 +70,7 @@ interface PackageInterface
     /**
      * getConfiguration
      *
-     * @return null|\Selene\Components\Config\ContainerInterface
+     * @return null|\Selene\Module\Config\ContainerInterface
      */
     public function getConfiguration();
 

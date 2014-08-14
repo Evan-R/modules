@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing;
+namespace Selene\Module\Routing;
 
-use \Selene\Components\Http\RequestStack;
+use \Selene\Adapter\Http\RequestStack;
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * @class UrlBuilder
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  */
 class UrlBuilder
@@ -34,14 +34,14 @@ class UrlBuilder
     /**
      * routes
      *
-     * @var \Selene\Components\Routing\RouteCollectionInterface
+     * @var \Selene\Module\Routing\RouteCollectionInterface
      */
     private $routes;
 
     /**
      * routes
      *
-     * @var \Selene\Components\Http\RequestStack
+     * @var \Selene\Module\Http\RequestStack
      */
     private $stack;
 

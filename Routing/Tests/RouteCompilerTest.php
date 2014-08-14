@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests package
+ * This File is part of the Selene\Module\Routing\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests;
+namespace Selene\Module\Routing\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Routing\Route;
-use \Selene\Components\Routing\RouteCompiler as Compiler;
+use \Selene\Module\Routing\Route;
+use \Selene\Module\Routing\RouteCompiler as Compiler;
 
 /**
  * @class RouteCompilerTest
- * @package Selene\Components\Routing\Tests
+ * @package Selene\Module\Routing\Tests
  * @version $Id$
  */
 class RouteCompilerTest extends \PHPUnit_Framework_TestCase
@@ -263,7 +263,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     {
         $host = isset($requirements['_host']) ? $requirements['_host'] : null;
 
-        $route = m::mock('Selene\Components\Routing\Route');
+        $route = m::mock('Selene\Module\Routing\Route');
         $route->constraints = ['host' => [], 'route' => []];
 
         $route->shouldReceive('getPattern')->andReturn($path);

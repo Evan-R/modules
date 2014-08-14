@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Events package
+ * This File is part of the Selene\Module\Routing\Events package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Events;
+namespace Selene\Module\Routing\Events;
 
 /**
  * @class RouteFilterEvent extends Event
  * @see Event
  *
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

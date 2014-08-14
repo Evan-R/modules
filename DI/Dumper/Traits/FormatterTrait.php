@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Dumper\Traits package
+ * This File is part of the Selene\Module\DI\Dumper\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Dumper\Traits;
+namespace Selene\Module\DI\Dumper\Traits;
 
-use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Module\Common\Helper\ListHelper;
 
 /**
  * @class FormatterTrait
- * @package Selene\Components\DI\Dumper\Traits
+ * @package Selene\Module\DI\Dumper\Traits
  * @version $Id$
  */
 trait FormatterTrait
@@ -112,6 +112,10 @@ trait FormatterTrait
     private function isOrderedList(array $array)
     {
         if (!ListHelper::arrayIsList($array)) {
+            return false;
+        }
+
+        if (0 !== key($array)) {
             return false;
         }
 

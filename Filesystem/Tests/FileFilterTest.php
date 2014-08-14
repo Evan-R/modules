@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem\Tests package
+ * This File is part of the Selene\Module\Filesystem\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,10 +9,10 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Tests;
+namespace Selene\Module\Filesystem\Tests;
 
-use Selene\Components\TestSuite\TestCase;
-use Selene\Components\Filesystem\Filter\FileFilter;
+use Selene\Module\TestSuite\TestCase;
+use Selene\Module\Filesystem\Filter\FileFilter;
 
 /**
  * @class FileFilterTest

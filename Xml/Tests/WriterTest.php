@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml\Tests package
+ * This File is part of the Selene\Module\Xml\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Tests;
+namespace Selene\Module\Xml\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Xml\Writer;
-use \Selene\Components\Xml\Normalizer\Normalizer;
-use \Selene\Components\Xml\Normalizer\NormalizerInterface;
+use \Selene\Module\Xml\Writer;
+use \Selene\Module\Xml\Normalizer\Normalizer;
+use \Selene\Module\Xml\Normalizer\NormalizerInterface;
 
 /**
  * @class WriterTest
- * @package Selene\Components\Xml\Tests
+ * @package Selene\Module\Xml\Tests
  * @version $Id$
  */
 class WriterTest extends \PHPUnit_Framework_TestCase
@@ -27,14 +27,14 @@ class WriterTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $writer = new Writer(m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface'));
-        $this->assertInstanceof('\Selene\Components\Xml\Writer', $writer);
+        $writer = new Writer(m::mock('\Selene\Module\Xml\Normalizer\NormalizerInterface'));
+        $this->assertInstanceof('\Selene\Module\Xml\Writer', $writer);
     }
 
     /** @test */
     public function itSouldDumpAnXmlString()
     {
-        $writer = new Writer($n = m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface'));
+        $writer = new Writer($n = m::mock('\Selene\Module\Xml\Normalizer\NormalizerInterface'));
 
         $n->shouldReceive('ensureBuildable')->with([])->andReturn([]);
         $xml = $writer->dump([]);
@@ -59,7 +59,7 @@ class WriterTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldWriteToADOMDocument()
     {
-        $writer = new Writer($n = m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface'));
+        $writer = new Writer($n = m::mock('\Selene\Module\Xml\Normalizer\NormalizerInterface'));
 
         $n->shouldReceive('ensureBuildable')->with([])->andReturn([]);
         $xml = $writer->writeToDom([]);
@@ -471,7 +471,7 @@ class WriterTest extends \PHPUnit_Framework_TestCase
 
     protected function getNormalizerMock()
     {
-        $n = m::mock('\Selene\Components\Xml\Normalizer\NormalizerInterface');
+        $n = m::mock('\Selene\Module\Xml\Normalizer\NormalizerInterface');
 
         $n->shouldReceive('ensureBuildable')->andReturnUsing(function ($arg) {
             return $arg;

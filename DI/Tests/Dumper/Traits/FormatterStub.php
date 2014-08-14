@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Dumper package
+ * This File is part of the Selene\Module\DI\Tests\Dumper package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Dumper\Traits;
+namespace Selene\Module\DI\Tests\Dumper\Traits;
 
-use Selene\Components\DI\Dumper\Traits\FormatterTrait;
+use Selene\Module\DI\Dumper\Traits\FormatterTrait;
 
 /**
  * @class FormatterStub
- * @package Selene\Components\DI\Tests\Dumper
+ * @package Selene\Module\DI\Tests\Dumper
  * @version $Id$
  */
 class FormatterStub

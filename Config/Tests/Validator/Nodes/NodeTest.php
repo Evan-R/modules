@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Tests\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator\Nodes;
+namespace Selene\Module\Config\Tests\Validator\Nodes;
 
-use \Selene\Components\Config\Validator\Nodes\DictNode;
-use \Selene\Components\Config\Validator\Nodes\MissingValue;
-use \Selene\Components\Config\Validator\Exception\ValidationException;
-use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
-use \Selene\Components\Config\Validator\Exception\MissingValueException;
+use \Selene\Module\Config\Validator\Nodes\DictNode;
+use \Selene\Module\Config\Validator\Nodes\MissingValue;
+use \Selene\Module\Config\Validator\Exception\ValidationException;
+use \Selene\Module\Config\Validator\Exception\InvalidTypeException;
+use \Selene\Module\Config\Validator\Exception\MissingValueException;
 
 /**
  * @class NodeTest
- * @package Selene\Components\Config\Tests\Validator\Nodes
+ * @package Selene\Module\Config\Tests\Validator\Nodes
  * @version $Id$
  */
 abstract class NodeTest extends \PHPUnit_Framework_TestCase
@@ -84,7 +84,7 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException Selene\Components\Config\Validator\Exception\MissingValueException
+     * @expectedException Selene\Module\Config\Validator\Exception\MissingValueException
      */
     public function itShouldThrowIfValueIsNotOptionalAndMissing()
     {
@@ -111,7 +111,7 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException Selene\Components\Config\Validator\Exception\ValidationException
+     * @expectedException Selene\Module\Config\Validator\Exception\ValidationException
      */
     public function itShouldThrowIfValueIsNotOptionalButEmpty()
     {

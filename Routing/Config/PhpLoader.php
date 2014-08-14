@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Config\Stubs package
+ * This File is part of the Selene\Module\Routing\Config\Stubs package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Config\Stubs;
+namespace Selene\Module\Routing\Config\Stubs;
 
 /**
  * @class PhpLoader
- * @package Selene\Components\Routing\Config\Stubs
+ * @package Selene\Module\Routing\Config\Stubs
  * @version $Id$
  */
 class PhpLoader

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Cache package
+ * This File is part of the Selene\Module\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache;
+namespace Selene\Module\Cache;
 
 use \Closure;
 

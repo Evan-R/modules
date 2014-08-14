@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Controller;
+namespace Selene\Module\Routing\Controller;
 
-use \Selene\Components\Common\SeparatorParserInterface;
-use \Selene\Components\Routing\Mapper\ParameterMapper;
-use \Selene\Components\Routing\Matchers\MatchContext;
-use \Selene\Components\Routing\Events\RouteDispatchEvent;
+use \Selene\Module\Common\SeparatorParserInterface;
+use \Selene\Module\Routing\Mapper\ParameterMapper;
+use \Selene\Module\Routing\Matchers\MatchContext;
+use \Selene\Module\Routing\Events\RouteDispatchEvent;
 
 /**
  * @class Resolver implements ResolverInterface
  * @see ResolverInterface
  *
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -102,7 +102,7 @@ class Dispatcher implements DispatcherInterface
         }
 
         // If `callAction` is present (in case the controller inherits from
-        // \Selene\Components\Routing\Controller\Controller), put the actual
+        // \Selene\Module\Routing\Controller\Controller), put the actual
         // method and arguments into an array that matches the `callAction`
         // call.
         if (null !== $callAction) {
@@ -188,11 +188,25 @@ class Dispatcher implements DispatcherInterface
         return [$instance, $action, $instance instanceof Controller ? 'callAction' : null];
     }
 
+    /**
+     * hasService
+     *
+     * @param string $id
+     *
+     * @return boolean
+     */
     protected function hasService($id)
     {
         return false;
     }
 
+    /**
+     * getService
+     *
+     * @param string $id
+     *
+     * @return Object
+     */
     protected function getService($id)
     {
         return null;

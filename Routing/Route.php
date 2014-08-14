@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing;
+namespace Selene\Module\Routing;
 
 use \Serializable;
-use \Selene\Components\Common\Traits\Getter;
+use \Selene\Module\Common\Traits\Getter;
 
 /**
  * @class Route implements Serializable
  * @see Serializable
  *
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -928,7 +928,7 @@ class Route implements Serializable
      */
     public function getCompileMethod()
     {
-        return 'Selene\Components\Routing\RouteCompiler::compile';
+        return 'Selene\Module\Routing\RouteCompiler::compile';
     }
 
     /**

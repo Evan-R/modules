@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Interfaces package
+ * This File is part of the Selene\Module\Common\Interfaces package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Interfaces;
+namespace Selene\Module\Common\Interfaces;
 
 /**
  * @class Jsonable

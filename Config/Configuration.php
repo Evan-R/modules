@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config;
+namespace Selene\Module\Config;
 
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\Config\Validator\Builder;
-use \Selene\Components\Config\Validator\Validator;
-use \Selene\Components\Config\Validator\Nodes\RootNode;
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Config\Resource\LocatorInterface;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\Config\Validator\Builder;
+use \Selene\Module\Config\Validator\Validator;
+use \Selene\Module\Config\Validator\Nodes\RootNode;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\Config\Resource\LocatorInterface;
 
 /**
  * @class Configuration
- * @package Selene\Components\Config
+ * @package Selene\Module\Config
  * @version $Id$
  */
 abstract class Configuration implements ConfigurationInterface

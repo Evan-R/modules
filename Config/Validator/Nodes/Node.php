@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,19 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Validator\Nodes;
+namespace Selene\Module\Config\Validator\Nodes;
 
-use \Selene\Components\Config\Validator\Builder;
-use \Selene\Components\Config\Validator\Exception\ValueUnsetException;
-use \Selene\Components\Config\Validator\Exception\ValidationException;
-use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
-use \Selene\Components\Config\Validator\Exception\MissingValueException;
+use \Selene\Module\Config\Validator\Builder;
+use \Selene\Module\Config\Validator\Exception\ValueUnsetException;
+use \Selene\Module\Config\Validator\Exception\ValidationException;
+use \Selene\Module\Config\Validator\Exception\InvalidTypeException;
+use \Selene\Module\Config\Validator\Exception\MissingValueException;
 
 /**
  * @abstract class Node
  * @see NodeInterface
  *
- * @package Selene\Components\Config
+ * @package Selene\Module\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -235,9 +235,21 @@ abstract class Node implements NodeInterface
      */
     final public function condition()
     {
-        $condition = new Condition($this);
+        $this->addCondition($condition = new Condition($this));
 
-        return $this->conditions[] = $condition;
+        return $condition;
+    }
+
+    /**
+     * addCondition
+     *
+     * @param Condition $condition
+     *
+     * @return void
+     */
+    public function addCondition(Condition $condition)
+    {
+        $this->conditions[] = $condition;
     }
 
     /**
@@ -383,6 +395,11 @@ abstract class Node implements NodeInterface
             throw ValidationException::notEmpty($this->getFormattedKey());
         }
 
+        // don't allow MissingValue to slip through
+        if ($this->isOptional() && $missing) {
+            $this->value = $value = null;
+        }
+
         // only typecheck value if is required but empty and/or missing.
         if (!$valid && !$empty && !$missing) {
             return $this->handleTypeError($value);
@@ -454,7 +471,7 @@ abstract class Node implements NodeInterface
     protected function preValidate(&$value)
     {
         if ($this->isOptional() && $value instanceof MissingValue) {
-            $value = ($default = $this->getDefault()) ?: $value;
+            $value = null !== ($default = $this->getDefault()) ? $default : $value;
         }
 
         foreach ($this->conditions as $condition) {
@@ -473,7 +490,7 @@ abstract class Node implements NodeInterface
     protected function runCondition(Condition $condition, &$value = null)
     {
         try {
-            if ($result = $condition->run($value)) {
+            if (null !== ($result = $condition->run($value))) {
                 $value = $result;
             }
         } catch (ValueUnsetException $e) {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,20 +9,21 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing;
+namespace Selene\Module\Routing;
 
+use \SplStack;
 use \Symfony\Component\HttpFoundation\Request;
-use \Selene\Components\Routing\Matchers\MethodMacher;
-use \Selene\Components\Routing\Matchers\HostMatcher;
-use \Selene\Components\Routing\Matchers\RegexPathMatcher;
-use \Selene\Components\Routing\Matchers\StaticPathMatcher;
-use \Selene\Components\Routing\Matchers\DirectPathMatcher;
-use \Selene\Components\Routing\Matchers\SchemeMatcher;
-use \Selene\Components\Routing\Matchers\MatchContext;
+use \Selene\Module\Routing\Matchers\MethodMacher;
+use \Selene\Module\Routing\Matchers\HostMatcher;
+use \Selene\Module\Routing\Matchers\RegexPathMatcher;
+use \Selene\Module\Routing\Matchers\StaticPathMatcher;
+use \Selene\Module\Routing\Matchers\DirectPathMatcher;
+use \Selene\Module\Routing\Matchers\SchemeMatcher;
+use \Selene\Module\Routing\Matchers\MatchContext;
 
 /**
  * @class RouteMatcher
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  */
 class RouteMatcher implements RouteMatcherInterface
@@ -35,20 +36,25 @@ class RouteMatcher implements RouteMatcherInterface
     private $matchers;
 
     /**
+     * matches
+     *
+     * @var SplStack
+     */
+    private $matches;
+
+    /**
      * prepared
      *
      * @var boolean
      */
     private $prepared;
 
-    private $matchContext;
-
     /**
-     * Create new RouteMatcher instance
+     * Constructor.
      */
     public function __construct()
     {
-        $this->prepared = false;
+        $this->matches = new SplStack;
     }
 
     /**
@@ -104,22 +110,22 @@ class RouteMatcher implements RouteMatcherInterface
      */
     protected function prepareMatchers()
     {
-        if ($this->prepared) {
+        if (true === $this->prepared) {
             return;
         }
 
         $this->prepared = true;
 
         $this->getHostMatcher()->onMatch(function ($route) {
-            $this->matchContext = new MatchContext($route, []);
+            $this->matches->push(new MatchContext($route, []));
         });
 
         $this->getDirectMatcher()->onMatch(function (Route $route) {
-            $this->matchContext = new MatchContext($route, []);
+            $this->matches->push(new MatchContext($route, []));
         });
 
         $this->getRegexpPathMatcher()->onMatch(function (Route $route, $params = []) {
-            $this->matchContext = new MatchContext($route, $params);
+            $this->matches->push(new MatchContext($route, $params));
         });
     }
 
@@ -233,7 +239,6 @@ class RouteMatcher implements RouteMatcherInterface
     /**
      * getRegexpPathMatcher
      *
-     * @access protected
      * @return MatcherInterface
      */
     protected function getRegexpPathMatcher()
@@ -248,7 +253,6 @@ class RouteMatcher implements RouteMatcherInterface
     /**
      * getHostMatcher
      *
-     * @access protected
      * @return MatcherInterface
      */
     protected function getHostMatcher()
@@ -263,7 +267,7 @@ class RouteMatcher implements RouteMatcherInterface
     /**
      * getDirectPathMatcher
      *
-     * @return mixed
+     * @return DirectPathMatcher
      */
     protected function getDirectPathMatcher()
     {
@@ -279,14 +283,12 @@ class RouteMatcher implements RouteMatcherInterface
      */
     private function getMatchContext(Request $request)
     {
-        if (!$context = $this->matchContext) {
-            return false;
+        try {
+            $context = $this->matches->pop();
+            $context->setRequest($request);
+
+            return $context;
+        } catch (\Exception $e) {
         }
-
-        $context->setRequest($request);
-
-        $this->matchContext = null;
-
-        return $context;
     }
 }

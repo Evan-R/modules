@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Tests\Traits package
+ * This File is part of the Selene\Module\Common\Tests\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Tests\Traits;
+namespace Selene\Module\Common\Tests\Traits;
 
-use \Selene\Components\TestSuite\TestCase;
-use \Selene\Components\Common\Tests\Stubs\Traits\SegmentParserClass;
+use \Selene\Module\TestSuite\TestCase;
+use \Selene\Module\Common\Tests\Stubs\Traits\SegmentParserClass;
 
 /**
  * @class SegmentParserTest extends TestCase
  * @see TestCase
  *
- * @package Selene\Components\Common\Tests\Traits
+ * @package Selene\Module\Common\Tests\Traits
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

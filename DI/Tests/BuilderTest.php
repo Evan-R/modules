@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests package
+ * This File is part of the Selene\Module\DI\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests;
+namespace Selene\Module\DI\Tests;
 
 use \Mockery as m;
-use \Selene\Components\DI\Builder;
-use \Selene\Components\DI\Container;
-use \Selene\Components\DI\Tests\Stubs\BuilderStub;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Processor\ProcessInterface;
-use \Selene\Components\DI\Processor\ProcessorInterface;
+use \Selene\Module\DI\Builder;
+use \Selene\Module\DI\Container;
+use \Selene\Module\DI\Tests\Stubs\BuilderStub;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Processor\ProcessInterface;
+use \Selene\Module\DI\Processor\ProcessorInterface;
 
 class BuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +25,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof(
-            'Selene\Components\DI\Builder',
+            'Selene\Module\DI\Builder',
             new Builder(
                 $this->getContainerMock()
             )
@@ -48,7 +48,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder($this->getContainerMock());
 
-        $this->assertInstanceof('\Selene\Components\DI\Processor\ProcessorInterface', $builder->getProcessor());
+        $this->assertInstanceof('\Selene\Module\DI\Processor\ProcessorInterface', $builder->getProcessor());
     }
 
     /** @test */
@@ -56,10 +56,10 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder(
             $this->getContainerMock(),
-            $processor = m::mock('\Selene\Components\DI\Processor\ProcessorInterface')
+            $processor = m::mock('\Selene\Module\DI\Processor\ProcessorInterface')
         );
 
-        $this->assertInstanceof('\Selene\Components\DI\Processor\ProcessorDecorator', $builder->getProcessor());
+        $this->assertInstanceof('\Selene\Module\DI\Processor\ProcessorDecorator', $builder->getProcessor());
     }
 
     /** @test */
@@ -143,7 +143,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     protected function prepareContainerToBuild($container)
     {
         $container->shouldReceive('getParameters')->andReturn(
-            $params = m::mock('\Selene\Components\DI\ParameterInterface')
+            $params = m::mock('\Selene\Module\DI\ParameterInterface')
         );
 
         $container->shouldReceive('getDefinitions')->andReturn([]);
@@ -160,12 +160,12 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getContainerMock()
     {
-        return m::mock('\Selene\Components\DI\ContainerInterface');
+        return m::mock('\Selene\Module\DI\ContainerInterface');
     }
 
     protected function getProcessorConfigMock()
     {
-        return m::mock('\Selene\Components\DI\Processor\ConfigInterface');
+        return m::mock('\Selene\Module\DI\Processor\ConfigInterface');
     }
 
     protected function tearDown()

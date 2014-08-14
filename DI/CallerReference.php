@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI;
+namespace Selene\Module\DI;
 
-use \Selene\Components\DI\Reference;
+use \Selene\Module\DI\Reference;
 
 /**
  * @class ReferenceCaller
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  */
 class CallerReference

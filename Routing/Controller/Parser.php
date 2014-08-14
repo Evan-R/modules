@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Controller package
+ * This File is part of the Selene\Module\Routing\Controller package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Controller;
+namespace Selene\Module\Routing\Controller;
 
-use \Selene\Components\Common\SeparatorParser;
-use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\Common\Helper\StringHelper;
+use \Selene\Module\Common\SeparatorParser;
+use \Selene\Module\Common\Traits\Getter;
+use \Selene\Module\Common\Helper\StringHelper;
 
 /**
  * @class ResolverParser extends SeparatorParser
  * @see SeparatorParser
  *
- * @package Selene\Components\Routing\Controller
+ * @package Selene\Module\Routing\Controller
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

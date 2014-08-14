@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Meta;
+namespace Selene\Module\DI\Tests\Meta;
 
-use \Selene\Components\DI\Meta\Data;
+use \Selene\Module\DI\Meta\Data;
 
 /**
  * @class DataTest
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  */
 class DataTest extends \PHPUnit_Framework_TestCase
@@ -24,7 +24,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $data = new Data('foo');
-        $this->assertInstanceof('Selene\Components\DI\Meta\MetaDataInterface', $data);
+        $this->assertInstanceof('Selene\Module\DI\Meta\MetaDataInterface', $data);
     }
 
     /** @test */

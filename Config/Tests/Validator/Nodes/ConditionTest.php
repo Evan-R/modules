@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Tests\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator\Nodes;
+namespace Selene\Module\Config\Tests\Validator\Nodes;
 
 use \Mockery as m;
-use \Selene\Components\Config\Validator\Nodes\Condition;
-use \Selene\Components\Config\Validator\Exception\ValidationException;
+use \Selene\Module\Config\Validator\Nodes\Condition;
+use \Selene\Module\Config\Validator\Exception\ValidationException;
 
 /**
  * @class ConditionTest
- * @package Selene\Components\Config\Tests\Validator\Nodes
+ * @package Selene\Module\Config\Tests\Validator\Nodes
  * @version $Id$
  */
 class ConditionTest extends \PHPUnit_Framework_TestCase
@@ -29,7 +29,7 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Nodes\Condition',
+            'Selene\Module\Config\Validator\Nodes\Condition',
             new Condition($this->node)
         );
     }
@@ -154,7 +154,7 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
 
         try {
             $cnd->run(true);
-        } catch (\Selene\Components\Config\Validator\Exception\ValueUnsetException $e) {
+        } catch (\Selene\Module\Config\Validator\Exception\ValueUnsetException $e) {
             $this->assertTrue(true);
         }
     }
@@ -258,7 +258,7 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
 
     protected function mockNode()
     {
-        $node = m::mock('Selene\Components\Config\Validator\Nodes\NodeInterface');
+        $node = m::mock('Selene\Module\Config\Validator\Nodes\NodeInterface');
 
         return $node;
     }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Cache package
+ * This File is part of the Selene\Module\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache;
+namespace Selene\Module\Cache;
 
 use \Closure;
 use \ArrayAccess;
-use \Selene\Components\Cache\Driver\DriverInterface;
+use \Selene\Module\Cache\Driver\DriverInterface;
 
 /**
  * Class: Storage
@@ -21,7 +21,7 @@ use \Selene\Components\Cache\Driver\DriverInterface;
  * @implements CacheInterface
  * @implements ArrayAccess
  *
- * @package Selene\Components\Cache
+ * @package Selene\Module\Cache
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,29 +9,31 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
 
-use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\DI\Loader\PhpLoader;
-use \Selene\Components\DI\Loader\XmlLoader;
-use \Selene\Components\DI\Loader\CallableLoader;
-use \Selene\Components\Config\Configuration;
-use \Selene\Components\Config\Resource\Locator;
-use \Selene\Components\Config\Loader\Resolver as LoaderResolver;
-use \Selene\Components\Config\Loader\DelegatingLoader;
-use \Selene\Components\Config\Resource\LocatorInterface;
-use \Selene\Components\Routing\Loader\DI\PhpLoader as PhpRoutingLoader;
-use \Selene\Components\Routing\Loader\DI\XmlLoader as XmlRoutingLoader;
-use \Selene\Components\Routing\Loader\DI\CallableLoader as CallableRoutingLoader;
-use \Selene\Components\Routing\RouteCollectionInterface as Routes;
+use \Selene\Module\Common\Traits\Getter;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\DI\Loader\PhpLoader;
+use \Selene\Module\DI\Loader\XmlLoader;
+use \Selene\Module\DI\Loader\CallableLoader;
+use \Selene\Module\Config\Configuration;
+use \Selene\Module\Config\Resource\Locator;
+use \Selene\Module\Config\Loader\Resolver as LoaderResolver;
+use \Selene\Module\Config\Loader\DelegatingLoader;
+use \Selene\Module\Config\Validator\Nodes\RootNode;
+use \Selene\Module\Config\Validator\Builder as ValidationBuilder;
+use \Selene\Module\Config\Resource\LocatorInterface;
+use \Selene\Module\Routing\Loader\DI\PhpLoader as PhpRoutingLoader;
+use \Selene\Module\Routing\Loader\DI\XmlLoader as XmlRoutingLoader;
+use \Selene\Module\Routing\Loader\DI\CallableLoader as CallableRoutingLoader;
+use \Selene\Module\Routing\RouteCollectionInterface as Routes;
 
 /**
  * @abstract class PackageConfiguration extends BaseConfig
  * @see BaseConfig
  * @abstract
  *
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -57,7 +59,7 @@ abstract class PackageConfiguration extends Configuration
     /**
      * parameters
      *
-     * @var \Selene\Components\DI\ParameterInterface
+     * @var \Selene\Module\DI\ParameterInterface
      */
     private $parameters;
 
@@ -80,7 +82,9 @@ abstract class PackageConfiguration extends Configuration
     {
         $this->parameters = $builder->getContainer()->getParameters();
 
-        $this->setup($builder, $this->mergeValues($values));
+        $this->loadResources($builder, $this->getResources());
+
+        $this->setup($builder, $this->validate($this->mergeValues($values)));
 
         $this->parameters = null;
     }
@@ -98,6 +102,10 @@ abstract class PackageConfiguration extends Configuration
      * @return void
      */
     public function setup(BuilderInterface $builder, array $values)
+    {
+    }
+
+    public function getConfigTree(RootNode $rootNode)
     {
     }
 
@@ -142,6 +150,15 @@ abstract class PackageConfiguration extends Configuration
         );
     }
 
+    protected function resolveParameter($param)
+    {
+        if ($this->parameters) {
+            return $this->parameters->resolveParam($param);
+        }
+
+        return $param;
+    }
+
     /**
      * getRoutingLoader
      *
@@ -177,6 +194,30 @@ abstract class PackageConfiguration extends Configuration
             new PhpLoader($builder, $locator),
             new XmlLoader($builder, $locator)
         ]));
+    }
+
+    /**
+     * getResources
+     *
+     * @return array
+     */
+    protected function getResources()
+    {
+        return [];
+    }
+
+    /**
+     * loadResources
+     *
+     * @return void
+     */
+    protected function loadResources(BuilderInterface $builder, array $resources = [])
+    {
+        $loader = $this->getConfigLoader($builder);
+
+        foreach ($resources as $resource) {
+            $loader->load('services.xml');
+        }
     }
 
     /**
@@ -223,9 +264,21 @@ abstract class PackageConfiguration extends Configuration
         $config = [];
 
         foreach ($values as $v) {
-            $config = array_merge($config, $v);
+            $config = array_merge($config, (array)$v);
         }
 
         return $config;
+    }
+
+    /**
+     * newValidatorBuilder
+     *
+     * @param string $name
+     *
+     * @return Builder
+     */
+    protected function newValidatorBuilder($name = null)
+    {
+        return new ValidationBuilder($name ?: $this->getPackageAlias());
     }
 }

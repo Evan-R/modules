@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator;
+namespace Selene\Module\Config\Tests\Validator;
 
 use \Mockery as m;
-use \Selene\Components\Config\Validator\Nodes\DictNode;
-use \Selene\Components\Config\Validator\Validator;
+use \Selene\Module\Config\Validator\Nodes\DictNode;
+use \Selene\Module\Config\Validator\Validator;
 
 /**
  * @class ValidatorTest extends \PHPUnit_Framework_TestCase
  * @see \PHPUnit_Framework_TestCase
  *
- * @package Selene\Components\Config
+ * @package Selene\Module\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -29,7 +29,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $validator = new Validator(m::mock('\Selene\Components\Config\Validator\Nodes\DictNode'));
-        $this->assertInstanceof('\Selene\Components\Config\Validator\Validator', $validator);
+        $validator = new Validator(m::mock('\Selene\Module\Config\Validator\Nodes\DictNode'));
+        $this->assertInstanceof('\Selene\Module\Config\Validator\Validator', $validator);
     }
 }

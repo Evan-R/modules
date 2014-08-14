@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Loader\DI package
+ * This File is part of the Selene\Module\Routing\Tests\Loader\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Loader\DI;
+namespace Selene\Module\Routing\Tests\Loader\DI;
 
 use \Mockery as m;
-use \Selene\Components\Routing\RouteCollection;
-use \Selene\Components\Routing\Loader\DI\CallableLoader;
-use \Selene\Components\Routing\Tests\Loader\LoaderTestHelper;
+use \Selene\Module\Routing\RouteCollection;
+use \Selene\Module\Routing\Loader\DI\CallableLoader;
+use \Selene\Module\Routing\Tests\Loader\LoaderTestHelper;
 
 /**
  * @class CallableLoaderTest
- * @package Selene\Components\Routing\Tests\Loader\DI
+ * @package Selene\Module\Routing\Tests\Loader\DI
  * @version $Id$
  */
 class CallableLoaderTest extends \PHPUnit_Framework_TestCase
@@ -29,7 +29,7 @@ class CallableLoaderTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof(
-            '\Selene\Components\Routing\Loader\CallableLoader',
+            '\Selene\Module\Routing\Loader\CallableLoader',
             $loader = new CallableLoader(
                 $this->builder,
                 new RouteCollection

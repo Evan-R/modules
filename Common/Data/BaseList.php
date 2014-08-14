@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common package
+ * This File is part of the Selene\Module\Common package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,9 +9,9 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Data;
+namespace Selene\Module\Common\Data;
 
-use \Selene\Components\Common\Interfaces\ArrayableInterface;
+use \Selene\Module\Common\Interfaces\ArrayableInterface;
 
 /**
  * Inspired by python lists.
@@ -22,7 +22,7 @@ use \Selene\Components\Common\Interfaces\ArrayableInterface;
  * @see \Serializable
  * @see \IteratorAggregate
  *
- * @package Selene\Components\Common
+ * @package Selene\Module\Common
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

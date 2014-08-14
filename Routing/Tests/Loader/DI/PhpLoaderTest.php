@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Loader\DI package
+ * This File is part of the Selene\Module\Routing\Tests\Loader\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Loader\DI;
+namespace Selene\Module\Routing\Tests\Loader\DI;
 
 use \Mockery as m;
-use \Selene\Components\Routing\RouteCollection;
-use \Selene\Components\Routing\Loader\DI\PhpLoader;
-use \Selene\Components\Routing\Tests\Loader\PhpLoaderTest as BasePhpLoaderTest;
+use \Selene\Module\Routing\RouteCollection;
+use \Selene\Module\Routing\Loader\DI\PhpLoader;
+use \Selene\Module\Routing\Tests\Loader\PhpLoaderTest as BasePhpLoaderTest;
 
 
 /**
  * @class PhpLoaderTest
- * @package Selene\Components\Routing\Tests\Loader\DI
+ * @package Selene\Module\Routing\Tests\Loader\DI
  * @version $Id$
  */
 class PhpLoaderTest extends BasePhpLoaderTest
@@ -29,11 +29,11 @@ class PhpLoaderTest extends BasePhpLoaderTest
     {
         $loader = new PhpLoader($this->builder, $this->routes, $this->locator);
         $this->assertInstanceof(
-            '\Selene\Components\Routing\Loader\PhpLoader',
+            '\Selene\Module\Routing\Loader\PhpLoader',
             $loader
         );
         $this->assertInstanceof(
-            '\Selene\Components\Routing\Loader\DI\PhpLoader',
+            '\Selene\Module\Routing\Loader\DI\PhpLoader',
             $loader
         );
     }

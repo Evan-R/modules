@@ -24,7 +24,7 @@
     "selene/config":""
   },
   "autoload": {
-    "psr-4": {"Selene\\Components\\DI\\": ""}
+    "psr-4": {"Selene\\Module\\DI\\": ""}
   },
   "minimum-stability": "dev"
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events\Tests package
+ * This File is part of the Selene\Module\Events\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events\Tests;
+namespace Selene\Module\Events\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Events\EventQueueDispatcher;
-use \Selene\Components\Events\Tests\Stubs\ConcreteEvent;
+use \Selene\Module\Events\EventQueueDispatcher;
+use \Selene\Module\Events\Tests\Stubs\ConcreteEvent;
 
 /**
  * @class EventDispatcherTest extends TestCase
  * @see TestCase
  *
- * @package Selene\Components\Events\Tests
+ * @package Selene\Module\Events\Tests
  * @version $Id$
  */
 class EventQueueDispatcherTest extends \PHPUnit_Framework_TestCase
@@ -27,7 +27,7 @@ class EventQueueDispatcherTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\Events\EventQueueDispatcherInterface', new EventQueueDispatcher);
+        $this->assertInstanceof('Selene\Module\Events\EventQueueDispatcherInterface', new EventQueueDispatcher);
     }
 
     /** @test */
@@ -119,7 +119,7 @@ class EventQueueDispatcherTest extends \PHPUnit_Framework_TestCase
 
     protected function getEvent($name)
     {
-        $event = m::mock('Selene\Components\Events\EventInterface');
+        $event = m::mock('Selene\Module\Events\EventInterface');
         $event->shouldReceive('getEventName')->andReturn($name);
 
         return $event;
@@ -127,7 +127,7 @@ class EventQueueDispatcherTest extends \PHPUnit_Framework_TestCase
 
     protected function getListener()
     {
-        return m::mock('Selene\Components\Events\EventListenerInteface');
+        return m::mock('Selene\Module\Events\EventListenerInteface');
     }
 
     protected function tearDown()

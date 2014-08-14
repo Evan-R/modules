@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Loader;
+namespace Selene\Module\DI\Loader;
 
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Config\Traits\ContainerBuilderAwareLoaderTrait;
-use \Selene\Components\Config\Loader\LoaderAwareListener;
-use \Selene\Components\Config\Loader\CallableLoader as BaseCallableLoader;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\Config\Traits\ContainerBuilderAwareLoaderTrait;
+use \Selene\Module\Config\Loader\LoaderAwareListener;
+use \Selene\Module\Config\Loader\CallableLoader as BaseCallableLoader;
 
 /**
  * @class CallableLoader extends Loader
  * @see ConfigLoader
  *
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

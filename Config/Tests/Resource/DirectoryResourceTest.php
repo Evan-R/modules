@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,10 +9,10 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Resource;
+namespace Selene\Module\Config\Tests\Resource;
 
 use \Mockery as m;
-use \Selene\Components\Config\Resource\DirectoryResource;
+use \Selene\Module\Config\Resource\DirectoryResource;
 
 class DirectoryResourceTest extends FileResourceTest
 {

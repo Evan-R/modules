@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Kernel package
+ * This File is part of the Selene\Module\Kernel package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,36 +9,36 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel;
+namespace Selene\Module\Kernel;
 
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpFoundation\Response;
 use \Symfony\Component\HttpKernel\HttpKernelInterface;
 use \Symfony\Component\HttpKernel\TerminableInterface;
-use \Selene\Components\Common\Helper\ListHelper;
-use \Selene\Components\Config\CacheInterface;
-use \Selene\Components\Config\Loader\DelegatingLoader;
-use \Selene\Components\Config\Loader\Resolver as LoaderResolver;
-use \Selene\Components\Config\Resource\Locator;
-use \Selene\Components\Config\Cache as ConfigCache;
-use \Selene\Components\Routing\RouterInterface;
-use \Selene\Components\DI\Builder;
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Processor\Processor;
-use \Selene\Components\DI\Processor\Configuration;
-use \Selene\Components\DI\Dumper\PhpDumper;
-use \Selene\Components\DI\Dumper\ContainerGenerator;
-use \Selene\Components\DI\Dumper\ContainerDumper;
-use \Selene\Components\DI\Parameters;
-use \Selene\Components\DI\ContainerAwareInterface;
-use \Selene\Components\DI\Traits\ContainerAwareTrait;
-use \Selene\Components\DI\Loader\XmlLoader;
-use \Selene\Components\DI\Loader\PhpLoader;
-use \Selene\Components\DI\Loader\CallableLoader;
-use \Selene\Components\Events\DispatcherInterface;
-use \Selene\Components\Package\PackageRepository;
-use \Selene\Components\Stack\StackBuilder as KernelStackBuilder;
+use \Selene\Module\Common\Helper\ListHelper;
+use \Selene\Module\Config\CacheInterface;
+use \Selene\Module\Config\Loader\DelegatingLoader;
+use \Selene\Module\Config\Loader\Resolver as LoaderResolver;
+use \Selene\Module\Config\Resource\Locator;
+use \Selene\Module\Config\Cache as ConfigCache;
+use \Selene\Module\Routing\RouterInterface;
+use \Selene\Module\DI\Builder;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Processor\Processor;
+use \Selene\Module\DI\Processor\Configuration;
+use \Selene\Module\DI\Dumper\PhpDumper;
+use \Selene\Module\DI\Dumper\ContainerGenerator;
+use \Selene\Module\DI\Dumper\ContainerDumper;
+use \Selene\Module\DI\Parameters;
+use \Selene\Module\DI\ContainerAwareInterface;
+use \Selene\Module\DI\Traits\ContainerAwareTrait;
+use \Selene\Module\DI\Loader\XmlLoader;
+use \Selene\Module\DI\Loader\PhpLoader;
+use \Selene\Module\DI\Loader\CallableLoader;
+use \Selene\Module\Events\DispatcherInterface;
+use \Selene\Module\Package\PackageRepository;
+use \Selene\Module\Stack\StackBuilder as KernelStackBuilder;
 
 /**
  * @class Application implements HttpKernelInterface, TerminableInterface, ContainerAwareInterface
@@ -46,7 +46,7 @@ use \Selene\Components\Stack\StackBuilder as KernelStackBuilder;
  * @see TerminableInterface
  * @see ContainerAwareInterface
  *
- * @package Selene\Components\Kernel
+ * @package Selene\Module\Kernel
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -57,7 +57,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * debugger
      *
-     * @var Selene\Components\Kernel\Debugger
+     * @var Selene\Module\Kernel\Debugger
      */
     public $debugger;
 
@@ -78,7 +78,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * packages
      *
-     * @var \Selene\Components\Package\PackageRepository
+     * @var \Selene\Module\Package\PackageRepository
      */
     protected $packages;
 
@@ -231,7 +231,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
 
         $this->initializePackages();
         $this->initializeContainer();
-        $this->injectServices();
+        $this->injectServicesOnBoot();
         $this->bootKernelStack();
 
         $this->booted = true;
@@ -386,7 +386,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     /**
      * getKernelStack
      *
-     * @return \Selene\Components\Kernel\Stack
+     * @return \Selene\Module\Kernel\Stack
      */
     public function getKernelStack()
     {
@@ -452,7 +452,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      */
     protected function getContainerClass()
     {
-        return 'Selene\Components\DI\Container';
+        return 'Selene\Module\DI\Container';
     }
 
     /**
@@ -460,7 +460,7 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
      *
      * @return void
      */
-    protected function injectServices()
+    protected function injectServicesOnBoot()
     {
         $this->getContainer()->inject(static::$appServiceId.'.package_repository', $this->packages);
     }
@@ -660,9 +660,6 @@ class Application implements ApplicationInterface, HttpKernelInterface, Terminab
     protected function getContainerDumper(ContainerInterface $container, $namespace, $className, $id)
     {
         return new ContainerGenerator($container, $namespace, $className, $id);
-        //file_put_contents('/Users/malcolm/container.php.dist', $gen->generate());
-        //die;
-        //return new PhpDumper($container, $namespace, $className, $id);
     }
 
     /**

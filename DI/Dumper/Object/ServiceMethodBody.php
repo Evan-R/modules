@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Dumper\Object package
+ * This File is part of the Selene\Module\DI\Dumper\Object package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,29 +9,29 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Dumper\Object;
+namespace Selene\Module\DI\Dumper\Object;
 
-use \Selene\Writer\Writer;
-use \Selene\Writer\Generator\Object\Method;
-use \Selene\Writer\Generator\GeneratorInterface;
-use \Selene\Components\DI\Reference;
-use \Selene\Components\DI\Container;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\ContainerAwareInterface;
-use \Selene\Components\DI\Traits\ContainerAwareTrait;
-use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
-use \Selene\Components\DI\Dumper\ImportResolver;
-use \Selene\Components\DI\CallerReference;
-use \Selene\Components\DI\Definition\DefinitionInterface;
+use \Selene\Module\Writer\Writer;
+use \Selene\Module\Writer\Object\Method;
+use \Selene\Module\Writer\FormatterHelper;
+use \Selene\Module\Writer\GeneratorInterface;
+use \Selene\Module\DI\Reference;
+use \Selene\Module\DI\Container;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\ContainerAwareInterface;
+use \Selene\Module\DI\Traits\ContainerAwareTrait;
+use \Selene\Module\DI\Dumper\ImportResolver;
+use \Selene\Module\DI\CallerReference;
+use \Selene\Module\DI\Definition\DefinitionInterface;
 
 /**
  * @class ServiceMethod
- * @package Selene\Components\DI\Dumper\Object
+ * @package Selene\Module\DI\Dumper\Object
  * @version $Id$
  */
 class ServiceMethodBody implements GeneratorInterface
 {
-    use FormatterTrait;
+    use FormatterHelper;
 
     private $writer;
     private $serviceId;

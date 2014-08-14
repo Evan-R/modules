@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Traits;
+namespace Selene\Module\Config\Traits;
 
-use \Selene\Components\Xml\Parser;
-use \Selene\Components\Xml\Normalizer\PhpVarNormalizer;
-use \Selene\Components\Xml\Loader\Loader as XmlFileLoader;
+use \Selene\Module\Xml\Parser;
+use \Selene\Module\Xml\Normalizer\PhpVarNormalizer;
+use \Selene\Module\Xml\Loader\Loader as XmlFileLoader;
 
 /**
  * @trait XmlLoaderHelperTrait
  *
- * @package Selene\Components\Config
+ * @package Selene\Module\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -27,14 +27,14 @@ trait XmlLoaderHelperTrait
     /**
      * parser
      *
-     * @var \Selene\Components\Xml\Parser|null
+     * @var \Selene\Module\Xml\Parser|null
      */
     protected $parser;
 
     /**
      * xmlLoader
      *
-     * @var \Selene\Components\Xml\Loader\LoaderInterface|null
+     * @var \Selene\Module\Xml\Loader\LoaderInterface|null
      */
     protected $xmlLoader;
 
@@ -43,7 +43,7 @@ trait XmlLoaderHelperTrait
      *
      * @param string $xml filepath to an xml file
      *
-     * @return \Selene\Components\Xml\Dom\DOMDocument
+     * @return \Selene\Module\Xml\Dom\DOMDocument
      */
     public function loadXml($xml)
     {
@@ -53,7 +53,7 @@ trait XmlLoaderHelperTrait
     /**
      * Get the XmlLoader instance.
      *
-     * @return \Selene\Components\Xml\Loader\LoaderInterface
+     * @return \Selene\Module\Xml\Loader\LoaderInterface
      */
     protected function getXmlLoader()
     {
@@ -69,7 +69,7 @@ trait XmlLoaderHelperTrait
     /**
      * Get the XmlParser instance.
      *
-     * @return \Selene\Components\Xml\Parser
+     * @return \Selene\Module\Xml\Parser
      */
     protected function getParser()
     {

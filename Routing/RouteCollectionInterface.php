@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing;
+namespace Selene\Module\Routing;
 
 /**
  * @interface RouteCollectionInterface
  *
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -39,7 +39,7 @@ interface RouteCollectionInterface
      * @param mixed $name
      *
      * @access public
-     * @return Selene\Components\Routing\Route
+     * @return Selene\Module\Routing\Route
      */
     public function get($name);
 
@@ -49,7 +49,7 @@ interface RouteCollectionInterface
      * @param mixed $method
      *
      * @access public
-     * @return Selene\Components\Routing\CollectionInterface
+     * @return Selene\Module\Routing\CollectionInterface
      */
     public function findByMethod($method);
 

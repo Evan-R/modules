@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Stubs package
+ * This File is part of the Selene\Module\Config\Tests\Stubs package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Stubs;
+namespace Selene\Module\Config\Tests\Stubs;
 
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Config\Configuration;
-use \Selene\Components\Config\Validator\Nodes\RootNode;
-use \Selene\Components\Config\Resource\LocatorInterface;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\Config\Configuration;
+use \Selene\Module\Config\Validator\Nodes\RootNode;
+use \Selene\Module\Config\Resource\LocatorInterface;
 
 /**
  * @class Config
- * @package Selene\Components\Config\Tests\Stubs
+ * @package Selene\Module\Config\Tests\Stubs
  * @version $Id$
  */
 class Config extends Configuration

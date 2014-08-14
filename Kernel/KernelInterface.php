@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Kernel package
+ * This File is part of the Selene\Module\Kernel package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel;
+namespace Selene\Module\Kernel;
 
-use \Selene\Components\Events\SubscriberInterface;
+use \Selene\Module\Events\SubscriberInterface;
 use \Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @class KernelInterface
- * @package Selene\Components\Kernel
+ * @package Selene\Module\Kernel
  * @version $Id$
  */
 interface KernelInterface extends HttpKernelInterface

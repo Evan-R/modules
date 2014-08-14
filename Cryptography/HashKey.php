@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cryptography;
+namespace Selene\Module\Cryptography;
 
-use \Selene\Components\Common\Helper\StringHelper;
-use \Selene\Components\Cryptography\Helper\BcConvertHelper;
+use \Selene\Module\Common\Helper\StringHelper;
+use \Selene\Module\Cryptography\Helper\BcConvertHelper;
 
 /**
  * @class HashKey
  * @see HashInterface
  *
- * @package Selene\Components\Cryptography
+ * @package Selene\Module\Cryptography
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT

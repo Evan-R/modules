@@ -8,13 +8,13 @@
  * For full copyright and license information, please refer to the LICENSE file
  * that was distributed with this package.
  */
-namespace Selene\Components\Cryptography;
+namespace Selene\Module\Cryptography;
 
 /**
  * @class HashBcrypt
  * @see HashInterface
  *
- * @package Selene\Components\Cryptography
+ * @package Selene\Module\Cryptography
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT

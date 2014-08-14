@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem\Tests\Filter package
+ * This File is part of the Selene\Module\Filesystem\Tests\Filter package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Tests\Filter;
+namespace Selene\Module\Filesystem\Tests\Filter;
 
-use \Selene\Components\Filesystem\Filter\FileFilter;
+use \Selene\Module\Filesystem\Filter\FileFilter;
 
 /**
  * @class IgnoreFilterTest extends \PHPUnit_Framework_TestSuite
  * @see \PHPUnit_Framework_TestSuite
  *
- * @package Selene\Components\Filesystem\Tests\Filter
+ * @package Selene\Module\Filesystem\Tests\Filter
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

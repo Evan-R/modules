@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Cryptography package
+ * This File is part of the Selene\Module\Cryptography package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cryptography;
+namespace Selene\Module\Cryptography;
 
 /**
  * @class Crypter
  *
- * @package Selene\Components\Cryptography
+ * @package Selene\Module\Cryptography
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT

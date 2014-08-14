@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem package
+ * This File is part of the Selene\Module\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem;
+namespace Selene\Module\Filesystem;
 
-use Selene\Components\Filesystem\Traits\IteratorTrait;
+use Selene\Module\Filesystem\Traits\IteratorTrait;
 
 /**
  * @class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
  * @see \RecursiveDirectoryIterator
  *
- * @package Selene\Components\Filesystem
+ * @package Selene\Module\Filesystem
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

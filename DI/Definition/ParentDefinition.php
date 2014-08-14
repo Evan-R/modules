@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Processor package
+ * This File is part of the Selene\Module\DI\Processor package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Definition;
+namespace Selene\Module\DI\Definition;
 
 /**
  * Class ParentDefinition
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  */
 class ParentDefinition extends AbstractDefinition
 {

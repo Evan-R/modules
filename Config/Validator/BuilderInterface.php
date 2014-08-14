@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator package
+ * This File is part of the Selene\Module\Config\Validator package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Validator;
+namespace Selene\Module\Config\Validator;
 
 /**
  * @interface BuilderInterface
- * @package Selene\Components\Config\Validator
+ * @package Selene\Module\Config\Validator
  * @version $Id$
  */
 interface BuilderInterface

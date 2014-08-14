@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Validator\Nodes;
+namespace Selene\Module\Config\Validator\Nodes;
 
-use \Selene\Components\Config\Validator\Exception\ValidationException;
+use \Selene\Module\Config\Validator\Exception\ValidationException;
 
 /**
  * @class StringNode
- * @package Selene\Components\Config\Validator\Nodes
+ * @package Selene\Module\Config\Validator\Nodes
  * @version $Id$
  */
 class StringNode extends ScalarNode

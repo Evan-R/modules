@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem package
+ * This File is part of the Selene\Module\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,24 +9,24 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem;
+namespace Selene\Module\Filesystem;
 
 use \RecursiveIteratorIterator;
-use \Selene\Components\Filesystem\FilesystemIterator;
-use \Selene\Components\Filesystem\RecursiveDirectoryIterator;
-use \Selene\Components\Filesystem\R;
-use \Selene\Components\Filesystem\Filter\FileFilter;
-use \Selene\Components\Filesystem\Filter\DirectoryFilter;
-use \Selene\Components\Common\Interfaces\JsonableInterface;
-use \Selene\Components\Common\Interfaces\ArrayableInterface;
-use \Selene\Components\Filesystem\Traits\SubstitudePath;
+use \Selene\Module\Filesystem\FilesystemIterator;
+use \Selene\Module\Filesystem\RecursiveDirectoryIterator;
+use \Selene\Module\Filesystem\R;
+use \Selene\Module\Filesystem\Filter\FileFilter;
+use \Selene\Module\Filesystem\Filter\DirectoryFilter;
+use \Selene\Module\Common\Interfaces\JsonableInterface;
+use \Selene\Module\Common\Interfaces\ArrayableInterface;
+use \Selene\Module\Filesystem\Traits\SubstitudePath;
 
 /**
  * @class Directory
  * @see ArrayableInterface
  * @see JsonableInterface
  *
- * @package Selene\Components\Filesystem
+ * @package Selene\Module\Filesystem
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

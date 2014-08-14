@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests package
+ * This File is part of the Selene\Module\Routing\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests;
+namespace Selene\Module\Routing\Tests;
 
-use \Selene\Components\Routing\GroupDefinition;
+use \Selene\Module\Routing\GroupDefinition;
 
 /**
  * @class GroupDefinitionTest
- * @package Selene\Components\Routing\Tests
+ * @package Selene\Module\Routing\Tests
  * @version $Id$
  */
 class GroupDefinitionTest extends \PHPUnit_Framework_TestCase
@@ -23,7 +23,7 @@ class GroupDefinitionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\Routing\GroupDefinition', new GroupDefinition('foo', []));
+        $this->assertInstanceof('Selene\Module\Routing\GroupDefinition', new GroupDefinition('foo', []));
     }
 
     /** @test */

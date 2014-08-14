@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Resolver\Pass package
+ * This File is part of the Selene\Module\DI\Resolver\Pass package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Processor;
+namespace Selene\Module\DI\Processor;
 
-use \Selene\Components\DI\CallerReference;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Definition\DefinitionInterface;
-use \Selene\Components\DI\Exception\CircularReferenceException;
+use \Selene\Module\DI\CallerReference;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Definition\DefinitionInterface;
+use \Selene\Module\DI\Exception\CircularReferenceException;
 
 /**
  * @class ResolveCircularReference implements ProcessInterface
  * @see ProcessInterface
  *
- * @package Selene\Components\DI\Processor
+ * @package Selene\Module\DI\Processor
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -79,7 +79,7 @@ class ResolveCircularReference implements ProcessInterface
      * @param string $current
      * @param string $self
      *
-     * @throws \Selene\Components\DI\Exception\CircularReferenceException if
+     * @throws \Selene\Module\DI\Exception\CircularReferenceException if
      * a circular reference occurred.
      * @access protected
      * @return void

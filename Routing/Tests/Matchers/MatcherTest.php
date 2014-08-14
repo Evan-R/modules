@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Matchers package
+ * This File is part of the Selene\Module\Routing\Tests\Matchers package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Matchers;
+namespace Selene\Module\Routing\Tests\Matchers;
 
-use \Selene\Components\Routing\Route;
+use \Selene\Module\Routing\Route;
 
 /**
  * @class MatcherTest
- * @package Selene\Components\Routing\Tests\Matchers
+ * @package Selene\Module\Routing\Tests\Matchers
  * @version $Id$
  */
 abstract class MatcherTest extends \PHPUnit_Framework_TestCase

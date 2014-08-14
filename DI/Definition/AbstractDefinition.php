@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,20 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Definition;
+namespace Selene\Module\DI\Definition;
 
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Meta\Data as MetaData;
-use \Selene\Components\DI\Meta\MetaDataInterface;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Meta\Data as MetaData;
+use \Selene\Module\DI\Meta\MetaDataInterface;
 
 /**
  * @class AbstractDefinition implements DefinitionInterface
  * @see DefinitionInterface
  *
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 class AbstractDefinition implements DefinitionInterface
 {

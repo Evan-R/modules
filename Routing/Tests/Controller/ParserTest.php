@@ -1,16 +1,16 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Controller package
+ * This File is part of the Selene\Module\Routing\Tests\Controller package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
  * For full copyright and license information, please refer to the LICENSE file
  * that was distributed with this package.
  */
-namespace Selene\Components\Routing\Tests\Controller;
+namespace Selene\Module\Routing\Tests\Controller;
 
-use \Selene\Components\Routing\Controller\Parser;
+use \Selene\Module\Routing\Controller\Parser;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +18,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $parser = new Parser;
-        $this->assertInstanceOf('\Selene\Components\Routing\Controller\Parser', $parser);
+        $this->assertInstanceOf('\Selene\Module\Routing\Controller\Parser', $parser);
     }
 
     /** @test */

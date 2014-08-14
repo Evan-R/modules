@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Processor;
+namespace Selene\Module\DI\Processor;
 
-use \Selene\Components\DI\Reference;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Definition\DefinitionInterface;
+use \Selene\Module\DI\Reference;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Definition\DefinitionInterface;
 
 /**
  * @class ResolveAliasWithDefinition
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  */
 class ResolveAliasWithDefinition implements ProcessInterface

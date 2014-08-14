@@ -9,20 +9,20 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Normalizer;
+namespace Selene\Module\Xml\Normalizer;
 
 use \ReflectionObject;
 use \ReflectionMethod;
 use \ReflectionProperty;
-use \Selene\Components\Common\Helper\ListHelper;
-use \Selene\Components\Common\Helper\StringHelper;
-use \Selene\Components\Xml\Traits\XmlHelperTrait;
+use \Selene\Module\Common\Helper\ListHelper;
+use \Selene\Module\Common\Helper\StringHelper;
+use \Selene\Module\Xml\Traits\XmlHelperTrait;
 
 /**
  * @class Normalizer implements NormalizerInterface
  * @see NormalizerInterface
  *
- * @package Selene\Components\Xml\Normalizer
+ * @package Selene\Module\Xml\Normalizer
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

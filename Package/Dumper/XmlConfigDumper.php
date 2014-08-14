@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package\Dumper;
+namespace Selene\Module\Package\Dumper;
 
-use \Selene\Components\Xml\Writer as XmlWriter;
+use \Selene\Module\Xml\Writer as XmlWriter;
 
 /**
  * @interface ConfigDumperInterface
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  */
 class XmlConfigDumper implements ConfigDumperInterface

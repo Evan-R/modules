@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Resource package
+ * This File is part of the Selene\Module\Config\Tests\Resource package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Resource;
+namespace Selene\Module\Config\Tests\Resource;
 
 use \org\bovigo\vfs\vfsStream;
-use \Selene\Components\TestSuite\TestCase;
-use \Selene\Components\Config\Resource\Locator;
-use \Selene\Components\Config\Resource\LocatorInterface;
+use \Selene\Module\TestSuite\TestCase;
+use \Selene\Module\Config\Resource\Locator;
+use \Selene\Module\Config\Resource\LocatorInterface;
 
 /**
  * @class LocatorTest
- * @package Selene\Components\Config\Tests\Resource
+ * @package Selene\Module\Config\Tests\Resource
  * @version $Id$
  */
 class LocatorTest extends TestCase
@@ -47,7 +47,7 @@ class LocatorTest extends TestCase
     public function itShouldBeInstantiable()
     {
         $locator = new Locator;
-        $this->assertInstanceof('\Selene\Components\Config\Resource\LocatorInterface', $locator);
+        $this->assertInstanceof('\Selene\Module\Config\Resource\LocatorInterface', $locator);
     }
 
     /**

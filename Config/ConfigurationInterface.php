@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,9 +9,9 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config;
+namespace Selene\Module\Config;
 
-use \Selene\Components\DI\BuilderInterface;
+use \Selene\Module\DI\BuilderInterface;
 
 /**
  * @class ConfigrurationInterface

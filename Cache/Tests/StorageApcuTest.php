@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Cache\Tests package
+ * This File is part of the Selene\Module\Cache\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,10 +9,10 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache\Tests;
+namespace Selene\Module\Cache\Tests;
 
-use Selene\Components\Cache\Storage;
-use Selene\Components\Cache\Driver\ApcuDriver;
+use Selene\Module\Cache\Storage;
+use Selene\Module\Cache\Driver\ApcuDriver;
 
 class StorageApcuTest extends StorageApcTest
 {

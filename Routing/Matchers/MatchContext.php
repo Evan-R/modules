@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Matchers;
+namespace Selene\Module\Routing\Matchers;
 
-use \Selene\Components\Routing\Route;
+use \Selene\Module\Routing\Route;
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * @class MatchContext
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  */
 class MatchContext

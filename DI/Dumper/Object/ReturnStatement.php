@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Dumper\Object package
+ * This File is part of the Selene\Module\DI\Dumper\Object package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Dumper\Object;
+namespace Selene\Module\DI\Dumper\Object;
 
-use \Selene\Writer\Writer;
-use \Selene\Writer\Generator\GeneratorInterface;
+use \Selene\Module\Writer\Writer;
+use \Selene\Module\Writer\GeneratorInterface;
 
 /**
  * @class ReturnStatement
- * @package Selene\Components\DI\Dumper\Object
+ * @package Selene\Module\DI\Dumper\Object
  * @version $Id$
  */
 class ReturnStatement implements GeneratorInterface

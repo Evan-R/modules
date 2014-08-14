@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Kernel\Tests package
+ * This File is part of the Selene\Module\Kernel\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel\Tests;
+namespace Selene\Module\Kernel\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Kernel\Kernel;
-use \Selene\Components\TestSuite\TestCase;
-use \Selene\Components\Http\RequestStack;
-use \Selene\Components\Kernel\Events\KernelEvents as Events;
+use \Selene\Module\Kernel\Kernel;
+use \Selene\Module\TestSuite\TestCase;
+use \Selene\Module\Http\RequestStack;
+use \Selene\Module\Kernel\Events\KernelEvents as Events;
 
 /**
  * @class KernelTest
- * @package Selene\Components\Kernel\Tests
+ * @package Selene\Module\Kernel\Tests
  * @version $Id$
  */
 class KernelTest extends TestCase
@@ -31,7 +31,7 @@ class KernelTest extends TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\Kernel\Kernel', new Kernel($this->mockEvents()));
+        $this->assertInstanceof('Selene\Module\Kernel\Kernel', new Kernel($this->mockEvents()));
     }
 
     /** @test */
@@ -52,7 +52,7 @@ class KernelTest extends TestCase
             ->with(Events::REQUEST, m::any())
             ->andReturnUsing(function ($eventName, $event) {
                 $this->assertSame(Events::REQUEST, $eventName);
-                $this->assertInstanceof('Selene\Components\Kernel\Events\HandleRequestEvent', $event);
+                $this->assertInstanceof('Selene\Module\Kernel\Events\HandleRequestEvent', $event);
                 $event->setResponse($this->mockResponse('handle request', 200));
             });
 
@@ -61,7 +61,7 @@ class KernelTest extends TestCase
             ->with(Events::FILTER_RESPONSE, m::any())
             ->andReturnUsing(function ($eventName, $event) {
                 $this->assertSame(Events::FILTER_RESPONSE, $eventName);
-                $this->assertInstanceof('Selene\Components\Kernel\Events\FilterResponseEvent', $event);
+                $this->assertInstanceof('Selene\Module\Kernel\Events\FilterResponseEvent', $event);
                 $event->setResponse($this->mockResponse('handle request', 200));
             });
 
@@ -93,7 +93,7 @@ class KernelTest extends TestCase
             ->andReturnUsing(function ($eventName, $event) {
                 $exception = true;
                 $this->assertSame(Events::HANDLE_EXCEPTION, $eventName);
-                $this->assertInstanceof('Selene\Components\Kernel\Events\HandleExceptionEvent', $event);
+                $this->assertInstanceof('Selene\Module\Kernel\Events\HandleExceptionEvent', $event);
                 $this->assertSame('exception thrown', $m = $event->getException()->getMessage());
 
                 $event->setResponse($this->mockResponse($m, 500));
@@ -252,7 +252,7 @@ class KernelTest extends TestCase
 
         $kernel = $this->newKernel();
 
-        $subscriber = m::mock('Selene\Components\Events\SubscriberInterface');
+        $subscriber = m::mock('Selene\Module\Events\SubscriberInterface');
 
         $this->events->shouldReceive('addSubscriber')
             ->once()
@@ -273,7 +273,7 @@ class KernelTest extends TestCase
 
     protected function mockEvents()
     {
-        return $this->events = m::mock('Selene\Components\Events\DispatcherInterface');
+        return $this->events = m::mock('Selene\Module\Events\DispatcherInterface');
     }
 
     protected function mockRequest()
@@ -292,7 +292,7 @@ class KernelTest extends TestCase
 
     protected function mockRouter()
     {
-        return $this->router = m::mock('Selene\Components\Routing\RouterInterface');
+        return $this->router = m::mock('Selene\Module\Routing\RouterInterface');
     }
 
     protected function tearDown()

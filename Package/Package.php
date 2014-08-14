@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
 
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Kernel\ApplicationInterface;
-use \Selene\Components\Common\Helper\StringHelper;
-use \Selene\Components\Console\Application as Console;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\Common\Helper\StringHelper;
+use \Selene\Adapter\Kernel\ApplicationInterface;
+use \Selene\Adapter\Console\Application as Console;
 
 /**
  * The package class is an entry point for extending functionality of the
@@ -24,7 +24,7 @@ use \Selene\Components\Console\Application as Console;
  * @see PackageInterface
  * @abstract
  *
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -78,12 +78,12 @@ abstract class Package implements PackageInterface
      * If no additional Configuration is required for a package, this method
      * should return `null` or `false`.
      *
-     * @access public
      * @return null|PackageConfiguration
      */
     public function getConfiguration()
     {
-        $class = $this->getNamespace() . '\\Config\\Config';
+        $class = sprintf('%s\%s', $this->getNamespace(), $this->getConfigClassName());
+
         return new $class($this);
     }
 
@@ -93,8 +93,7 @@ abstract class Package implements PackageInterface
      * Resources are flat files meant to scaffold configuration, routing, or
      * static assets.
      *
-     * @access public
-     * @return mixed
+     * @return string
      */
     public function getResourcePath()
     {
@@ -107,7 +106,6 @@ abstract class Package implements PackageInterface
      * The Alias is the snake cased version of your package name omitting the
      * `Package` suffix
      *
-     * @access public
      * @return string
      */
     public function getAlias()
@@ -127,10 +125,9 @@ abstract class Package implements PackageInterface
      *
      * This method is called only once before the service container is built.
      *
-     * @param \Selene\Components\DI\BuilderInterface $builder
-     * @internal param \Selene\Components\DI\BuilderInterface $container
+     * @param \Selene\Module\DI\BuilderInterface $builder
+     * @internal param \Selene\Module\DI\BuilderInterface $container
      *
-     * @access public
      * @return void
      */
     public function build(BuilderInterface $builder)
@@ -142,8 +139,7 @@ abstract class Package implements PackageInterface
      *
      * Provice additional bootstrapping for a package.
      *
-     * @access public
-     * @param \Selene\Components\Kernel\ApplicationInterface $app
+     * @param \Selene\Module\Kernel\ApplicationInterface $app
      * @return void
      */
     public function boot(ApplicationInterface $app)
@@ -162,7 +158,6 @@ abstract class Package implements PackageInterface
     /**
      * Shutdown ops on this package.
      *
-     * @access public
      * @return void
      */
     public function shutdown()
@@ -170,20 +165,8 @@ abstract class Package implements PackageInterface
     }
 
     /**
-     * getMeta
-     *
-     * @access public
-     * @return string
-     */
-    public function getMeta()
-    {
-        return $this->getPath().DIRECTORY_SEPARATOR.'package.xml';
-    }
-
-    /**
      * Get the namespace of this package.
      *
-     * @access public
      * @final
      * @return string
      */
@@ -196,14 +179,12 @@ abstract class Package implements PackageInterface
         return $this->namespace;
     }
 
-
     /**
      * Get the package name.
      *
      * The default package name is the short name of the package class,
      * e.g. `Acme\Special\FooPackage` will result in `FooPackage`.
      *
-     * @access public
      * @return string
      */
     final public function getName()
@@ -218,7 +199,6 @@ abstract class Package implements PackageInterface
     /**
      * Get the actual filesystem path of this package.
      *
-     * @access public
      * @return string
      */
     final public function getPath()
@@ -233,7 +213,6 @@ abstract class Package implements PackageInterface
     /**
      * Get the reflection object of this package.
      *
-     * @access protected
      * @final
      * @return \ReflectionObject
      */
@@ -251,12 +230,21 @@ abstract class Package implements PackageInterface
      *
      * This method is only invoked when booting the application in cli mode.
      *
-     * @param \Selene\Components\Console\Application $console
+     * @param \Selene\Module\Console\Application $console
      *
-     * @access public
      * @return void
      */
     public function registerCommands(Console $console)
     {
+    }
+
+    /**
+     * getConfigClassName
+     *
+     * @return string
+     */
+    protected function getConfigClassName()
+    {
+        return 'Config';
     }
 }

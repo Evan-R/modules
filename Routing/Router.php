@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,29 +9,29 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing;
+namespace Selene\Module\Routing;
 
 use \Symfony\Component\HttpFoundation\Request;
-use \Selene\Components\Events\Dispatcher;
-use \Selene\Components\Events\EventInterface;
-use \Selene\Components\Events\DispatcherInterface;
-use \Selene\Components\Routing\Exception\RouteNotFoundException;
-use \Selene\Components\Routing\Matchers\MatchContext;
-use \Selene\Components\Routing\Events\RouteDispatchEvent;
-use \Selene\Components\Routing\Events\RouteNotFoundEvent;
-use \Selene\Components\Routing\Events\RouteFilterEvent;
-use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
-use \Selene\Components\Routing\Events\RouterEvents as Events;
-use \Selene\Components\Routing\Controller\DispatcherInterface as ControllerDispatcher;
-use \Selene\Components\Routing\Controller\Dispatcher as Controllers;
-use \Selene\Components\Routing\RouteMatcherInterface as Matcher;
-use \Selene\Components\Common\Helper\StringHelper;
+use \Selene\Module\Events\Dispatcher;
+use \Selene\Module\Events\EventInterface;
+use \Selene\Module\Events\DispatcherInterface;
+use \Selene\Module\Routing\Exception\RouteNotFoundException;
+use \Selene\Module\Routing\Matchers\MatchContext;
+use \Selene\Module\Routing\Events\RouteDispatchEvent;
+use \Selene\Module\Routing\Events\RouteNotFoundEvent;
+use \Selene\Module\Routing\Events\RouteFilterEvent;
+use \Selene\Module\Routing\Events\RouteFilterAbortEvent;
+use \Selene\Module\Routing\Events\RouterEvents as Events;
+use \Selene\Module\Routing\Controller\DispatcherInterface as ControllerDispatcher;
+use \Selene\Module\Routing\Controller\Dispatcher as Controllers;
+use \Selene\Module\Routing\RouteMatcherInterface as Matcher;
+use \Selene\Module\Common\Helper\StringHelper;
 
 /**
  * @class Router implements RouterInterface
  * @see RouterInterface
  *
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -48,21 +48,21 @@ class Router implements RouterInterface
     /**
      * events
      *
-     * @var \Selene\Components\Events\DispatcherInterface
+     * @var \Selene\Module\Events\DispatcherInterface
      */
     private $events;
 
     /**
      * matcher
      *
-     * @var \Selene\Components\Routing\Matchers\MatcherInterface
+     * @var \Selene\Module\Routing\Matchers\MatcherInterface
      */
     private $matcher;
 
     /**
      * controllers
      *
-     * @var \Selene\Components\Routing\Controller\DispatcherInterface
+     * @var \Selene\Module\Routing\Controller\DispatcherInterface
      */
     private $controllers;
 
@@ -148,27 +148,13 @@ class Router implements RouterInterface
     }
 
     /**
-     * initControllerHandler
-     *
-     * @return void
-     */
-    protected function initControllerHandler()
-    {
-        $this->events->on(Events::DISPATCHED, function (EventInterface $event) {
-            if ($result = $this->controllers->dispatch($event->getContext(), $event)) {
-                $event->setResponse($result);
-            }
-        });
-    }
-
-    /**
      * Dispatch events on the route retreival.
      *
      * @param Route $route the matched route.
      *
-     * @return void
+     * @return Response|mixed
      */
-    protected function dispatchRoute(MatchContext $context)
+    public function dispatchRoute(MatchContext $context)
     {
         $route   = $context->getRoute();
         $request = $context->getRequest();
@@ -184,7 +170,7 @@ class Router implements RouterInterface
         // if the controller returns no result, or there's no controller, or
         // the event is not populated with a resoponse, handle the route not
         // found:
-        if (!$result = $event->getResponse()) {
+        if (null === ($result = $event->getResponse())) {
             $this->handleNotFound(
                 $request,
                 sprintf('No handler found for Route "%s".', $context->getRequest()->getPathInfo())
@@ -200,6 +186,20 @@ class Router implements RouterInterface
         }
 
         return $event->getResponse();
+    }
+
+    /**
+     * initControllerHandler
+     *
+     * @return void
+     */
+    protected function initControllerHandler()
+    {
+        $this->events->on(Events::DISPATCHED, function (EventInterface $event) {
+            if ($result = $this->controllers->dispatch($event->getContext(), $event)) {
+                $event->setResponse($result);
+            }
+        });
     }
 
     /**
@@ -271,7 +271,7 @@ class Router implements RouterInterface
     private function filterEvents(array $events)
     {
         return array_filter($events, function ($event) {
-            return StringHelper::strStartsWith($event, 'router.route_');
+            return 0 === strpos($event, 'router.route_');
         });
     }
 }

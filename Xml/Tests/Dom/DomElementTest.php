@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml\Tests\Dom package
+ * This File is part of the Selene\Module\Xml\Tests\Dom package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Tests\Dom;
+namespace Selene\Module\Xml\Tests\Dom;
 
-use \Selene\Components\Xml\Dom\DOMElement;
-use \Selene\Components\Xml\Dom\DOMDocument;
+use \Selene\Module\Xml\Dom\DOMElement;
+use \Selene\Module\Xml\Dom\DOMDocument;
 
 /**
  * @class DomElementTest extends \PHPUnit_Framework_TestCase
  * @see \PHPUnit_Framework_TestCase
  *
- * @package Selene\Components\Xml\Tests\Dom
+ * @package Selene\Module\Xml\Tests\Dom
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -29,7 +29,7 @@ class DomElementTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof('\DOMElement', new DOMElement('foo'));
-        $this->assertInstanceof('\Selene\Components\Xml\Dom\DOMElement', new DOMElement('foo'));
+        $this->assertInstanceof('\Selene\Module\Xml\Dom\DOMElement', new DOMElement('foo'));
     }
 
     /** @test */

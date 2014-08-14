@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml\Tests\Normalizer\Stubs package
+ * This File is part of the Selene\Module\Xml\Tests\Normalizer\Stubs package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Tests\Normalizer\Stubs;
+namespace Selene\Module\Xml\Tests\Normalizer\Stubs;
 
 /**
  * @class NestedPropertyStub
- * @package Selene\Components\Xml\Tests\Normalizer\Stubs
+ * @package Selene\Module\Xml\Tests\Normalizer\Stubs
  * @version $Id$
  */
 class NestedPropertyStub

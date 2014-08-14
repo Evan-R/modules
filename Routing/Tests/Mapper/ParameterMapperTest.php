@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Mapper;
+namespace Selene\Module\Routing\Tests\Mapper;
 
 use \Mockery as m;
-use \Selene\Components\Routing\Mapper\ParameterMapper;
-use \Selene\Components\Routing\Tests\Mapper\Stubs\ControllerStub as Controller;
+use \Selene\Module\Routing\Mapper\ParameterMapper;
+use \Selene\Module\Routing\Tests\Mapper\Stubs\ControllerStub as Controller;
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * @class ParameterMapperTest
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  */
 class ParameterMapperTest extends \PHPUnit_Framework_TestCase
@@ -26,7 +26,7 @@ class ParameterMapperTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\Routing\Mapper\ParameterMapper', new ParameterMapper);
+        $this->assertInstanceof('\Selene\Module\Routing\Mapper\ParameterMapper', new ParameterMapper);
     }
 
     /** @test */

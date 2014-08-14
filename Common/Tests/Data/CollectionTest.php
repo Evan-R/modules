@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Session\Tests\Collection package
+ * This File is part of the Selene\Module\Session\Tests\Collection package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Tests\Data;
+namespace Selene\Module\Common\Tests\Data;
 
-use \Selene\Components\Common\Data\Collection;
+use \Selene\Module\Common\Data\Collection;
 
 /**
  * @class CollectionTest
- * @package Selene\Components\Session\Tests\Collection
+ * @package Selene\Module\Session\Tests\Collection
  * @version $Id$
  */
 class CollectionTest extends \PHPUnit_Framework_TestCase
@@ -24,8 +24,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $collection = $this->getCollection();
-        $this->assertInstanceof('Selene\Components\Common\Data\Collection', $collection);
-        $this->assertInstanceof('Selene\Components\Common\Data\CollectionInterface', $collection);
+        $this->assertInstanceof('Selene\Module\Common\Data\Collection', $collection);
+        $this->assertInstanceof('Selene\Module\Common\Data\CollectionInterface', $collection);
     }
 
     /** @test */

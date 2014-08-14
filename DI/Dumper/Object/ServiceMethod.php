@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Dumper\Object package
+ * This File is part of the Selene\Module\DI\Dumper\Object package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,22 +9,22 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Dumper\Object;
+namespace Selene\Module\DI\Dumper\Object;
 
-use \Selene\Writer\Generator\Object\Method;
-use \Selene\Writer\Generator\Object\Argument;
-use \Selene\Components\DI\Container;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
+use \Selene\Module\Writer\Object\Method;
+use \Selene\Module\Writer\Object\Argument;
+use \Selene\Module\Writer\FormatterHelper;
+use \Selene\Module\DI\Container;
+use \Selene\Module\DI\ContainerInterface;
 
 /**
  * @class ServiceMethod
- * @package Selene\Components\DI\Dumper\Object
+ * @package Selene\Module\DI\Dumper\Object
  * @version $Id$
  */
 class ServiceMethod extends Method
 {
-    use FormatterTrait;
+    use FormatterHelper;
 
     /**
      * id
@@ -102,7 +102,7 @@ class ServiceMethod extends Method
      *
      * @return string
      */
-    protected function getName()
+    public function getName()
     {
         $def = $this->container->getDefinition($this->id);
 

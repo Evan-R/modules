@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml\Tests package
+ * This File is part of the Selene\Module\Xml\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Tests;
+namespace Selene\Module\Xml\Tests;
 
-use \Selene\Components\Xml\Dom\DOMDocument;
-use \Selene\Components\Xml\SimpleXMLElement;
+use \Selene\Module\Xml\Dom\DOMDocument;
+use \Selene\Module\Xml\SimpleXMLElement;
 
 /**
  * @class simpleXMLElementTest
- * @package Selene\Components\Xml\Tests
+ * @package Selene\Module\Xml\Tests
  * @version $Id$
  */
 class SimpleXmlElementTest extends \PHPUnit_Framework_TestCase

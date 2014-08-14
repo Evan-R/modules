@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Exception package
+ * This File is part of the Selene\Module\DI\Exception package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Exception;
+namespace Selene\Module\DI\Exception;
 
 /**
  * @class ContainerLockedException extends \BadMethodCallException
  * @see \BadMethodCallException
  *
- * @package Selene\Components\DI\Exception
+ * @package Selene\Module\DI\Exception
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */

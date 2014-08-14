@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Resource package
+ * This File is part of the Selene\Module\Config\Resource package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Loader;
+namespace Selene\Module\Config\Loader;
 
 /**
  * @interface LoaderResolverInterface
  *
- * @package Selene\Components\Config
+ * @package Selene\Module\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -27,7 +27,7 @@ interface ResolverInterface
      * @param mixed $resource
      *
      * @access public
-     * @return \Selene\Components\Config\Resource\LoaderInterface
+     * @return \Selene\Module\Config\Resource\LoaderInterface
      */
     public function resolve($resource);
 

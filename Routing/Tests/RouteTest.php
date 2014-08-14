@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests package
+ * This File is part of the Selene\Module\Routing\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,9 +9,9 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests;
+namespace Selene\Module\Routing\Tests;
 
-use \Selene\Components\Routing\Route;
+use \Selene\Module\Routing\Route;
 
 class RouteTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +21,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function itSouldBeInstatiable()
     {
         $route = new Route('foo', 'foo');
-        $this->assertInstanceOf('Selene\Components\Routing\Route', $route);
+        $this->assertInstanceOf('Selene\Module\Routing\Route', $route);
     }
 
     /**

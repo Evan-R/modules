@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Tests\Helper package
+ * This File is part of the Selene\Module\Common\Tests\Helper package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Tests\Helper;
+namespace Selene\Module\Common\Tests\Helper;
 
 /**
  * @class RandTest
- * @package Selene\Components\Common\Tests\Helper
+ * @package Selene\Module\Common\Tests\Helper
  * @version $Id$
  */
 class RandTest extends \PHPUnit_Framework_TestCase

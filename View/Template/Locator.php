@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\View\Template package
+ * This File is part of the Selene\Module\View\Template package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View\Template;
+namespace Selene\Module\View\Template;
 
-use \Selene\Components\Common\Helper\StringHelper;
-use \Selene\Components\Filesystem\Traits\PathHelperTrait;
-use \Selene\Components\Common\SeparatorParserInterface;
+use \Selene\Module\Common\Helper\StringHelper;
+use \Selene\Module\Filesystem\Traits\PathHelperTrait;
+use \Selene\Module\Common\SeparatorParserInterface;
 
 /**
  * @class Locator Locator
  *
- * @package Selene\Components\View\Template
+ * @package Selene\Module\View\Template
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -95,7 +95,7 @@ class Locator implements LocatorInterface
             }
         }
 
-        return $optimistic ? $tempalte : false;
+        return $optimistic ? $template : false;
     }
 
     /**

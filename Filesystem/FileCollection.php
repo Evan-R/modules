@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem package
+ * This File is part of the Selene\Module\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem;
+namespace Selene\Module\Filesystem;
 
 use \ArrayIterator;
 use \IteratorAggregate;
-use \Selene\Components\Common\Helper\ListHelper;
-use \Selene\Components\Common\Interfaces\JsonableInterface;
-use \Selene\Components\Common\Interfaces\ArrayableInterface;
+use \Selene\Module\Common\Helper\ListHelper;
+use \Selene\Module\Common\Interfaces\JsonableInterface;
+use \Selene\Module\Common\Interfaces\ArrayableInterface;
 
 /**
  * @class FileCollection implements IteratorAggregate, ArrayableInterface, JsonableInterface
@@ -23,7 +23,7 @@ use \Selene\Components\Common\Interfaces\ArrayableInterface;
  * @see ArrayableInterface
  * @see JsonableInterface
  *
- * @package Selene\Components\Filesystem
+ * @package Selene\Module\Filesystem
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

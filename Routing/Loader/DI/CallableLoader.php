@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\DI\Loader package
+ * This File is part of the Selene\Module\Routing\DI\Loader package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Loader\DI;
+namespace Selene\Module\Routing\Loader\DI;
 
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Routing\RouteCollectionInterface;
-use \Selene\Components\Config\Traits\ContainerBuilderAwareLoaderTrait;
-use \Selene\Components\Routing\Loader\CallableLoader as BaseCallableLoader;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\Routing\RouteCollectionInterface;
+use \Selene\Module\Config\Traits\ContainerBuilderAwareLoaderTrait;
+use \Selene\Module\Routing\Loader\CallableLoader as BaseCallableLoader;
 
 /**
  * @class CallableLoader
- * @package Selene\Components\Routing\DI\Loader
+ * @package Selene\Module\Routing\DI\Loader
  * @version $Id$
  */
 class CallableLoader extends BaseCallableLoader

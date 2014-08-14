@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI;
+namespace Selene\Module\DI;
 
-use \Selene\Components\Common\Helper\StringHelper;
-use \Selene\Components\DI\Exception\ParameterNotFoundException;
-use \Selene\Components\DI\Exception\ParameterResolvingException;
+use \Selene\Module\Common\Helper\StringHelper;
+use \Selene\Module\DI\Exception\ParameterNotFoundException;
+use \Selene\Module\DI\Exception\ParameterResolvingException;
 
 /**
  * @class Parameters implements ParameterInterface Parameters
  * @see ParameterInterface
  *
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -105,7 +105,7 @@ class Parameters implements ParameterInterface
      *
      * @api
      *
-     * @throws \Selene\Components\DI\Exception\ParameterNotFoundException
+     * @throws \Selene\Module\DI\Exception\ParameterNotFoundException
      * @return mixed
      */
     public function get($param)
@@ -132,7 +132,7 @@ class Parameters implements ParameterInterface
     }
 
     /**
-     * Merges two objects that implement `\Selene\Components\DI\ParameterInterface`.
+     * Merges two objects that implement `\Selene\Module\DI\ParameterInterface`.
      *
      * Merging two objects will cause the current one to be reset to unresolved;
      *
@@ -401,7 +401,7 @@ class Parameters implements ParameterInterface
     /**
      * {@inheritdoc}
      *
-     * @throws \Selene\Components\DI\Exception\ParameterNotFoundException
+     * @throws \Selene\Module\DI\Exception\ParameterNotFoundException
      * @return mixed
      */
     public function offsetGet($param)
@@ -428,7 +428,7 @@ class Parameters implements ParameterInterface
      * Check for circular references while resolving a value.
      *
      * @param mixed $value
-     * @throws \Selene\Components\DI\Exception\ParameterResolvingException
+     * @throws \Selene\Module\DI\Exception\ParameterResolvingException
      *
      * @return void
      */

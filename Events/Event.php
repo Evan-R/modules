@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events package
+ * This File is part of the Selene\Module\Events package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events;
+namespace Selene\Module\Events;
 
-use \Selene\Components\Common\Helper\StringHelper;
+use \Selene\Module\Common\Helper\StringHelper;
 
 /**
  * @class Event
- * @package Selene\Components\Events
+ * @package Selene\Module\Events
  * @version $Id$
  */
 class Event implements EventInterface

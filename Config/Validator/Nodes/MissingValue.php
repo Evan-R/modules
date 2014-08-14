@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Tests\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Validator\Nodes;
+namespace Selene\Module\Config\Validator\Nodes;
 
 /**
  * @class MissingValue
- * @package Selene\Components\Config\Tests\Validator\Nodes
+ * @package Selene\Module\Config\Tests\Validator\Nodes
  * @version $Id$
  */
 class MissingValue

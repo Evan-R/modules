@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests package
+ * This File is part of the Selene\Module\DI\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests;
+namespace Selene\Module\DI\Tests;
 
-use \Selene\Components\DI\Alias;
+use \Selene\Module\DI\Alias;
 
 class AliasTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\DI\Alias', new Alias('foo'));
+        $this->assertInstanceof('Selene\Module\DI\Alias', new Alias('foo'));
     }
 
     /** @test */

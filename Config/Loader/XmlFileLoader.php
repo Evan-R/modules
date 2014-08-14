@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Loader package
+ * This File is part of the Selene\Module\Config\Loader package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Loader;
+namespace Selene\Module\Config\Loader;
 
-use \Selene\Components\Config\Traits\XmlLoaderHelperTrait;
+use \Selene\Module\Config\Traits\XmlLoaderHelperTrait;
 
 /**
  * @class XmlLoader
- * @package Selene\Components\Config\Loader
+ * @package Selene\Module\Config\Loader
  * @version $Id$
  */
 abstract class XmlFileLoader extends FileLoader

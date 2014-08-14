@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Controller package
+ * This File is part of the Selene\Module\Routing\Controller package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Controller;
+namespace Selene\Module\Routing\Controller;
 
-use \Selene\Components\Routing\Events\RouteDispatchEvent;
+use \Selene\Module\Routing\Events\RouteDispatchEvent;
 
 /**
  * @interface EventAware
- * @package Selene\Components\Routing\Controller
+ * @package Selene\Module\Routing\Controller
  * @version $Id$
  */
 interface EventAware

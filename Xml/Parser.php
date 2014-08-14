@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml package
+ * This File is part of the Selene\Module\Xml package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,20 +9,20 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml;
+namespace Selene\Module\Xml;
 
-use \Selene\Components\Xml\Dom\DOMElement;
-use \Selene\Components\Xml\Dom\DOMDocument;
-use \Selene\Components\Xml\Loader\Loader;
-use \Selene\Components\Xml\Loader\LoaderInterface;
-use \Selene\Components\Common\Helper\clearValue;
-use \Selene\Components\Common\Helper\ListHelper;
-use \Selene\Components\Common\Helper\StringHelper;
-use \Selene\Components\Common\Traits\Getter;
+use \Selene\Module\Xml\Dom\DOMElement;
+use \Selene\Module\Xml\Dom\DOMDocument;
+use \Selene\Module\Xml\Loader\Loader;
+use \Selene\Module\Xml\Loader\LoaderInterface;
+use \Selene\Module\Common\Helper\clearValue;
+use \Selene\Module\Common\Helper\ListHelper;
+use \Selene\Module\Common\Helper\StringHelper;
+use \Selene\Module\Common\Traits\Getter;
 
 /**
  * @class Parser
- * @package Selene\Components\Xml
+ * @package Selene\Module\Xml
  * @version $Id$
  */
 class Parser implements ParserInterface
@@ -576,7 +576,7 @@ class Parser implements ParserInterface
 
     /**
      * Converts a `\DOMDocument`that is not an instance of
-     * `Selene\Components\Dom\DOMDocument`.
+     * `Selene\Module\Dom\DOMDocument`.
      *
      * @param \DOMDocument $xml the document to convert
      *

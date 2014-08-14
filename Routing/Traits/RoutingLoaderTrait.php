@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Traits package
+ * This File is part of the Selene\Module\Routing\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Traits;
+namespace Selene\Module\Routing\Traits;
 
-use \Selene\Components\Routing\RouteBuilder;
-use \Selene\Components\Routing\RouteCollectionInterface;
+use \Selene\Module\Routing\RouteBuilder;
+use \Selene\Module\Routing\RouteCollectionInterface;
 
 /**
  * @class RoutingLoaderTrait
- * @package Selene\Components\Routing\Traits
+ * @package Selene\Module\Routing\Traits
  * @version $Id$
  */
 trait RoutingLoaderTrait

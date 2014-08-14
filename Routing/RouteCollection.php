@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing;
+namespace Selene\Module\Routing;
 
 use \Serializable;
 use \JsonSerializable;
 use \IteratorAggregate;
-use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\Common\Data\AbstractList;
+use \Selene\Module\Common\Traits\Getter;
+use \Selene\Module\Common\Data\AbstractList;
 
 /**
  * @class RouteCollection
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  */
 class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Serializable
@@ -111,7 +111,7 @@ class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Se
      * findByMethod
      *
      * @access public
-     * @return \Selene\Components\Routing\RouteCollection
+     * @return \Selene\Module\Routing\RouteCollection
      */
     public function findByMethod($method)
     {
@@ -166,7 +166,7 @@ class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Se
      * @param mixed $data
      *
      * @access public
-     * @return \Selene\Components\Routing\RouteCollectionInterface this
+     * @return \Selene\Module\Routing\RouteCollectionInterface this
      * instance
      */
     public function unserialize($data)

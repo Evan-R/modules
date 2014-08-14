@@ -18,7 +18,7 @@
         "league/phpunit-coverage-listener": "dev-master"
     },
     "autoload": {
-      "psr-4": {"Selene\\Components\\Http\\": ""}
+      "psr-4": {"Selene\\Module\\Http\\": ""}
     },
     "minimum-stability": "dev"
 }

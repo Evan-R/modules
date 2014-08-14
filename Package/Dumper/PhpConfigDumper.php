@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package\Dumper;
+namespace Selene\Module\Package\Dumper;
 
-use \Selene\Components\DI\Dumper\Stubs\Lines;
-use \Selene\Components\DI\Dumper\Stubs\DocComment;
-use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
+use \Selene\Module\DI\Dumper\Stubs\Lines;
+use \Selene\Module\DI\Dumper\Stubs\DocComment;
+use \Selene\Module\DI\Dumper\Traits\FormatterTrait;
 
 /**
  * @interface ConfigDumperInterface
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  */
 class PhpConfigDumper implements ConfigDumperInterface

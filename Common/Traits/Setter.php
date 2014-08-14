@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Traits package
+ * This File is part of the Selene\Module\Common\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Traits;
+namespace Selene\Module\Common\Traits;
 
-use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Module\Common\Helper\ListHelper;
 
 /**
  * @trait Setter
  *
- * @package Selene\Components\Common\Traits
+ * @package Selene\Module\Common\Traits
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

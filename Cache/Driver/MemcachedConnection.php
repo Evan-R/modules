@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Cache package
+ * This File is part of the Selene\Module\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -10,7 +10,7 @@
  */
 
 
-namespace Selene\Components\Cache\Driver;
+namespace Selene\Module\Cache\Driver;
 
 use \Memcached;
 use \RuntimeException;
@@ -18,7 +18,7 @@ use \RuntimeException;
 /**
  * @class MemcachedConnection
  *
- * @package Selene\Components\Cache\Driver
+ * @package Selene\Module\Cache\Driver
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT

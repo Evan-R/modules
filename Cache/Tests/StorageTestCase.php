@@ -9,10 +9,10 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache\Tests;
+namespace Selene\Module\Cache\Tests;
 
 use StdClass;
-use Selene\Components\TestSuite\TestCase;
+use Selene\Module\TestSuite\TestCase;
 
 /**
  * Class: TestCase

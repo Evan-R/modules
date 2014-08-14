@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Loader package
+ * This File is part of the Selene\Module\DI\Loader package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Loader;
+namespace Selene\Module\DI\Loader;
 
-use \Selene\Components\Config\Resource\Loader;
+use \Selene\Module\Config\Resource\Loader;
 
 /**
  * @class BuilderAwareLoader
- * @package Selene\Components\DI\Loader
+ * @package Selene\Module\DI\Loader
  * @version $Id$
  */
 abstract class BuilderAwareLoader extends Loader

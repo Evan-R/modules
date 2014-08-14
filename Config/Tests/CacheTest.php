@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Cache package
+ * This File is part of the Selene\Module\Config\Tests\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,19 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Cache;
+namespace Selene\Module\Config\Tests\Cache;
 
 use \Mockery as m;
-use \Selene\Components\Config\Cache;
-use \Selene\Components\Filesystem\Filesystem;
-use \Selene\Components\Config\Resource\FileResource;
-use \Selene\Components\TestSuite\TestCase;
+use \Selene\Module\Config\Cache;
+use \Selene\Module\Filesystem\Filesystem;
+use \Selene\Module\Config\Resource\FileResource;
+use \Selene\Module\TestSuite\TestCase;
 
 /**
  * @class ConfigCacheTest extends TestCase
  * @see TestCase
  *
- * @package Selene\Components\Config\Tests\Cache
+ * @package Selene\Module\Config\Tests\Cache
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -35,7 +35,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\Config\Cache', new Cache('some file'));
+        $this->assertInstanceof('\Selene\Module\Config\Cache', new Cache('some file'));
     }
 
     /** @test */
@@ -117,7 +117,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
 
     protected function mockResource($path, $valid = false, $exists = true)
     {
-        $resource = m::mock('Selene\Components\Config\Resource\FileResource');
+        $resource = m::mock('Selene\Module\Config\Resource\FileResource');
         $resource->shouldReceive('isValid')->andReturn($valid);
         $resource->shouldReceive('exists')->andReturn($exists);
         $resource->shouldReceive('__toString')->andReturn($rpath = $this->path . DIRECTORY_SEPARATOR . $path);

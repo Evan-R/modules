@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\View\Exception package
+ * This File is part of the Selene\Module\View\Exception package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View\Exception;
+namespace Selene\Module\View\Exception;
 
 /**
  * @class RenderException
- * @package Selene\Components\View\Exception
+ * @package Selene\Module\View\Exception
  * @version $Id$
  */
 class RenderException extends \RuntimeException

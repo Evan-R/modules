@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem\Exception package
+ * This File is part of the Selene\Module\Filesystem\Exception package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Exception;
+namespace Selene\Module\Filesystem\Exception;
 
 /**
  * @class IOException
  * @see \RuntimeException
  *
- * @package Selene\Components\Filesystem\Exception
+ * @package Selene\Module\Filesystem\Exception
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT

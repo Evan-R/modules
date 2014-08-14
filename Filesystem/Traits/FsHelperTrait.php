@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem package
+ * This File is part of the Selene\Module\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Traits;
+namespace Selene\Module\Filesystem\Traits;
 
-use \Selene\Components\Filesystem\Exception\IOException;
+use \Selene\Module\Filesystem\Exception\IOException;
 
 /**
  * @trait FsHelperTrait
  *
- * @package Selene\Components\Filesystem
+ * @package Selene\Module\Filesystem
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -40,7 +40,7 @@ trait FsHelperTrait
      * Ensures that the cachedir is writable.
      *
      * @api
-     * @throws \Selene\Components\Filesystem\Exception\IOException
+     * @throws \Selene\Module\Filesystem\Exception\IOException
      * @throws \RuntimeException
      * @access public
      * @return ConfigCache

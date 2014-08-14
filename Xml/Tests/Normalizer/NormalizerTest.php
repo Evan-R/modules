@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml\Tests\Normalizer package
+ * This File is part of the Selene\Module\Xml\Tests\Normalizer package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,23 +9,23 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Tests\Normalizer;
+namespace Selene\Module\Xml\Tests\Normalizer;
 
 use \Mockery as m;
 
-use \Selene\Components\Xml\Normalizer\Normalizer;
-use \Selene\Components\Xml\Normalizer\NormalizerInterface;
-use \Selene\Components\Xml\Tests\Normalizer\Stubs\ArrayableStub;
-use \Selene\Components\Xml\Tests\Normalizer\Stubs\ConvertToArrayStub;
-use \Selene\Components\Xml\Tests\Normalizer\Stubs\SinglePropertyStub;
-use \Selene\Components\Xml\Tests\Normalizer\Stubs\NestedPropertyStub;
-use \Selene\Components\Xml\Tests\Normalizer\Stubs\TraversableStub;
+use \Selene\Module\Xml\Normalizer\Normalizer;
+use \Selene\Module\Xml\Normalizer\NormalizerInterface;
+use \Selene\Module\Xml\Tests\Normalizer\Stubs\ArrayableStub;
+use \Selene\Module\Xml\Tests\Normalizer\Stubs\ConvertToArrayStub;
+use \Selene\Module\Xml\Tests\Normalizer\Stubs\SinglePropertyStub;
+use \Selene\Module\Xml\Tests\Normalizer\Stubs\NestedPropertyStub;
+use \Selene\Module\Xml\Tests\Normalizer\Stubs\TraversableStub;
 
 /**
  * @class NormalizerTest extends \PHPUnit_Framework_TestCase
  * @see \PHPUnit_Framework_TestCase
  *
- * @package Selene\Components\Xml\Tests\Normalizer
+ * @package Selene\Module\Xml\Tests\Normalizer
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -36,7 +36,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $normalizer = new Normalizer;
-        $this->assertInstanceof('\Selene\Components\Xml\Normalizer\Normalizer', $normalizer);
+        $this->assertInstanceof('\Selene\Module\Xml\Normalizer\Normalizer', $normalizer);
     }
 
     public function stringProvider()
@@ -102,7 +102,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $normalizer = new Normalizer;
 
-        $normalizer->setIgnoredObjects((array)'\Selene\Components\Xml\Tests\Normalizer\Stubs\NestedPropertyStub');
+        $normalizer->setIgnoredObjects((array)'\Selene\Module\Xml\Tests\Normalizer\Stubs\NestedPropertyStub');
         $data = ['foo' => ['bar' => new NestedPropertyStub]];
         $normalized = $normalizer->ensureArray($data);
 

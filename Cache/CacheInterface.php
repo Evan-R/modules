@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache;
+namespace Selene\Module\Cache;
 
 use \Closure;
 

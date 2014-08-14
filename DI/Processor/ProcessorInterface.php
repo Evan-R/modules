@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Processor package
+ * This File is part of the Selene\Module\DI\Processor package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Processor;
+namespace Selene\Module\DI\Processor;
 
-use \Selene\Components\DI\ContainerInterface;
+use \Selene\Module\DI\ContainerInterface;
 
 /**
  * @interface ProcessorInterface
- * @package Selene\Components\DI\Processor
+ * @package Selene\Module\DI\Processor
  * @version $Id$
  */
 interface ProcessorInterface

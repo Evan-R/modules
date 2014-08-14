@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem package
+ * This File is part of the Selene\Module\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Tests;
+namespace Selene\Module\Filesystem\Tests;
 
 use org\bovigo\vfs\vfsStream;
-use Selene\Components\TestSuite\TestCase;
-use Selene\Components\Filesystem\Filesystem;
-use Selene\Components\Filesystem\FileCollection;
+use Selene\Module\TestSuite\TestCase;
+use Selene\Module\Filesystem\Filesystem;
+use Selene\Module\Filesystem\FileCollection;
 
 /**
  * @class FilesystemTest extends FilesystemTestCase FilesystemTest
  * @see FilesystemTestCase
  *
- * @package Selene\Components\Filesystem
+ * @package Selene\Module\Filesystem
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -103,10 +103,10 @@ class FilesystemTest extends FilesystemTestCase
 
         try {
             $this->fs->mkdir($target);
-        } catch (\Selene\Components\Filesystem\Exception\IOException $e) {
+        } catch (\Selene\Module\Filesystem\Exception\IOException $e) {
             $this->assertTrue(true);
         } catch (\Exception $e) {
-            $this->fail('test sould throw \Selene\Components\Filesystem\Exception\IOException');
+            $this->fail('test sould throw \Selene\Module\Filesystem\Exception\IOException');
         }
     }
 
@@ -199,7 +199,7 @@ class FilesystemTest extends FilesystemTestCase
     }
 
     /**
-     * @expectedException Selene\Components\Filesystem\Exception\IOException
+     * @expectedException Selene\Module\Filesystem\Exception\IOException
      */
     public function testRenameFileShouldThrowIoException()
     {
@@ -423,7 +423,7 @@ class FilesystemTest extends FilesystemTestCase
 
     /**
      * @test
-     * @expectedException Selene\Components\Filesystem\Exception\IOException
+     * @expectedException Selene\Module\Filesystem\Exception\IOException
      */
     public function testFileCopyOnExistingTargetShouldThrowExceptionWithoutReplaceFlag()
     {
@@ -463,7 +463,7 @@ class FilesystemTest extends FilesystemTestCase
 
     /**
      * @test
-     * @expectedException Selene\Components\Filesystem\Exception\IOException
+     * @expectedException Selene\Module\Filesystem\Exception\IOException
      */
     public function testCopyNoneExistingFileShouldThrowIOExeption()
     {

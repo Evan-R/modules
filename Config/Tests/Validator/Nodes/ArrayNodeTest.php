@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,19 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator\Nodes;
+namespace Selene\Module\Config\Tests\Validator\Nodes;
 
-use \Selene\Components\Config\Validator\Nodes\StringNode;
-use \Selene\Components\Config\Validator\Nodes\NodeInterface;
-use \Selene\Components\Config\Tests\Validator\Stubs\NodeStub;
-use \Selene\Components\Config\Tests\Validator\Stubs\ArrayNodeStub as ArrayNode;
+use \Selene\Module\Config\Validator\Nodes\StringNode;
+use \Selene\Module\Config\Validator\Nodes\NodeInterface;
+use \Selene\Module\Config\Tests\Validator\Stubs\NodeStub;
+use \Selene\Module\Config\Tests\Validator\Stubs\ArrayNodeStub as ArrayNode;
 
 /**
  * @abstract class ArrayNodeTest extends NodeTest
  * @see NodeTest
  * @abstract
  *
- * @package Selene\Components\Config
+ * @package Selene\Module\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */

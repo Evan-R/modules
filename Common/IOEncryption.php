@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common package
+ * This File is part of the Selene\Module\Common package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,9 +9,9 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common;
+namespace Selene\Module\Common;
 
-use \Selene\Components\Cryptography\Crypter;
+use \Selene\Module\Cryptography\Crypter;
 
 /**
  * De/Encryption of input data.
@@ -19,7 +19,7 @@ use \Selene\Components\Cryptography\Crypter;
  * @class IOEncryption implements IOProxyInterface
  * @see IOHandlerInterface
  *
- * @package Selene\Components\Common
+ * @package Selene\Module\Common
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

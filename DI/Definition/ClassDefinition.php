@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Definition;
+namespace Selene\Module\DI\Definition;
 
-use \Selene\Components\DI\ContainerInterface;
+use \Selene\Module\DI\ContainerInterface;
 
 /**
  * @class ClassDefinition extends ServiceDefinition
  * @see ServiceDefinition
  *
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

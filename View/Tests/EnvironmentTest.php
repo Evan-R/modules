@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\View\Tests package
+ * This File is part of the Selene\Module\View\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View\Tests;
+namespace Selene\Module\View\Tests;
 
 use \Mockery as m;
-use \Selene\Components\View\Environment;
-use \Selene\Components\View\EngineResolverInterface;
-use \Selene\Components\View\TemplateResolverInterface;
+use \Selene\Module\View\Environment;
+use \Selene\Module\View\EngineResolverInterface;
+use \Selene\Module\View\TemplateResolverInterface;
 
 /**
  * @class EnvironmentTest
- * @package Selene\Components\View\Tests
+ * @package Selene\Module\View\Tests
  * @version $Id$
  */
 class EnvironmentTest extends \PHPUnit_Framework_TestCase
@@ -36,22 +36,22 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
     {
         $env = new Environment(
             null,
-            m::mock('\Selene\Components\View\EngineResolverInterface'),
-            m::mock('\Selene\Components\View\TemplateResolverInterface')
+            m::mock('\Selene\Module\View\EngineResolverInterface'),
+            m::mock('\Selene\Module\View\TemplateResolverInterface')
         );
 
-        $this->assertInstanceof('\Selene\Components\View\EnvironmentInterface', $env);
+        $this->assertInstanceof('\Selene\Module\View\EnvironmentInterface', $env);
     }
 
     public function testRender()
     {
         $env = new Environment(
             null,
-            $er = m::mock('\Selene\Components\View\EngineResolverInterface'),
-            $tr = m::mock('\Selene\Components\View\TemplateResolverInterface')
+            $er = m::mock('\Selene\Module\View\EngineResolverInterface'),
+            $tr = m::mock('\Selene\Module\View\TemplateResolverInterface')
         );
 
-        $engine = m::mock('\Selene\Components\View\EngineInterface');
+        $engine = m::mock('\Selene\Module\View\EngineInterface');
         $engine->shouldReceive('render');
         $er->shouldReceive('addEngine')->with($engine);
         $er->shouldReceive('resolve')->with('twig')->andReturn($engine);

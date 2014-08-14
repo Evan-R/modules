@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Cache\Tests\Driver package
+ * This File is part of the Selene\Module\Cache\Tests\Driver package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache\Tests\Driver;
+namespace Selene\Module\Cache\Tests\Driver;
 
-use \Selene\Components\Cache\Driver\MemcacheConnection;
+use \Selene\Module\Cache\Driver\MemcacheConnection;
 
 /**
  * @class MemcacheConnectionTest
- * @package Selene\Components\Cache\Tests\Driver
+ * @package Selene\Module\Cache\Tests\Driver
  * @version $Id$
  */
 class MemcacheConnectionTest extends \PHPUnit_Framework_TestCase
@@ -23,7 +23,7 @@ class MemcacheConnectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\Cache\Driver\ConnectionInterface', new MemcacheConnection);
+        $this->assertInstanceof('\Selene\Module\Cache\Driver\ConnectionInterface', new MemcacheConnection);
     }
 
     /** @test */

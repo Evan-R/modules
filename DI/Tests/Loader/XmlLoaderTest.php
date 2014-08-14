@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Loader package
+ * This File is part of the Selene\Module\DI\Tests\Loader package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Loader;
+namespace Selene\Module\DI\Tests\Loader;
 
 
 use \Mockery as m;
-use \Selene\Components\DI\Builder;
-use \Selene\Components\DI\Container;
-use \Selene\Components\DI\Loader\XmlLoader;
-use \Selene\Components\Config\Resource\Locator;
+use \Selene\Module\DI\Builder;
+use \Selene\Module\DI\Container;
+use \Selene\Module\DI\Loader\XmlLoader;
+use \Selene\Module\Config\Resource\Locator;
 
 /**
  * @class XmlLoaderTest
- * @package Selene\Components\DI\Tests\Loader
+ * @package Selene\Module\DI\Tests\Loader
  * @version $Id$
  */
 class XmlLoaderTest extends \PHPUnit_Framework_TestCase
@@ -39,14 +39,14 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldBeInstantiable()
     {
-        $container = m::mock('\Selene\Components\DI\ContainerInterface');
-        $builder = m::mock('\Selene\Components\DI\BuilderInterface');
-        $locator   = m::mock('\Selene\Components\Config\Resource\LocatorInterface');
+        $container = m::mock('\Selene\Module\DI\ContainerInterface');
+        $builder = m::mock('\Selene\Module\DI\BuilderInterface');
+        $locator   = m::mock('\Selene\Module\Config\Resource\LocatorInterface');
 
         $builder->shouldReceive('getContainer')->andReturn($container);
 
         $loader = new XmlLoader($builder, $locator);
-        $this->assertInstanceof('\Selene\Components\DI\Loader\XmlLoader', $loader);
+        $this->assertInstanceof('\Selene\Module\DI\Loader\XmlLoader', $loader);
     }
 
     /** @test */
@@ -232,7 +232,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
         $this->loader->load('services.5.xml', false);
 
         $this->assertInstanceof(
-            'Selene\Components\DI\Definition\ParentDefinition',
+            'Selene\Module\DI\Definition\ParentDefinition',
             $this->container->getDefinition('concrete')
         );
     }
@@ -252,9 +252,9 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
 
     protected function getLoaderMock($builder = null, $container = null, $locator = null)
     {
-        $builder =   $builder = $builder ?: m::mock('\Selene\Components\DI\BuilderInterface');
-        $container = m::mock('\Selene\Components\DI\ContainerInterface');
-        $locator   = $locator ?: m::mock('\Selene\Components\Config\Resource\LocatorInterface');
+        $builder =   $builder = $builder ?: m::mock('\Selene\Module\DI\BuilderInterface');
+        $container = m::mock('\Selene\Module\DI\ContainerInterface');
+        $locator   = $locator ?: m::mock('\Selene\Module\Config\Resource\LocatorInterface');
 
         $builder->shouldReceive('getContainer')->andReturn($container);
 

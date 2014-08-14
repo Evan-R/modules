@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Matchers package
+ * This File is part of the Selene\Module\Routing\Matchers package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Matchers;
+namespace Selene\Module\Routing\Matchers;
 
-use \Selene\Components\Routing\Route;
+use \Selene\Module\Routing\Route;
 
 /**
  * @class MethodMatcher
- * @package Selene\Components\Routing\Matchers
+ * @package Selene\Module\Routing\Matchers
  * @version $Id$
  */
 class MethodMatcher extends AbstractMatcher

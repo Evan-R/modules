@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the \Users\malcolm\www\selene_source\src\Selene\Components\Routing\Cache package
+ * This File is part of the \Users\malcolm\www\selene_source\src\Selene\Module\Routing\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Cache;
+namespace Selene\Module\Routing\Cache;
 
-use \Selene\Components\Filesystem\Traits\FsHelperTrait;
+use \Selene\Module\Filesystem\Traits\FsHelperTrait;
 
 /**
  * @class FilesystemDriver
- * @package Selene\Components\Routing\Cache
+ * @package Selene\Module\Routing\Cache
  * @version $Id$
  */
 class FilesystemDriver implements DriverInterface

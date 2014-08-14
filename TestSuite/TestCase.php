@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\TestSuite package
+ * This File is part of the Selene\Module\TestSuite package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\TestSuite;
+namespace Selene\Module\TestSuite;
 
 use \Mockery as m;
 

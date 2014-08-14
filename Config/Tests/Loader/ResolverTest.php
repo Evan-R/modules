@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Resource package
+ * This File is part of the Selene\Module\Config\Tests\Resource package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Resource;
+namespace Selene\Module\Config\Tests\Resource;
 
 use \Mockery as m;
-use \Selene\Components\Config\Loader\Resolver;
-use \Selene\Components\Config\Loader\LoaderInterface;
-use \Selene\Components\Config\Resource\LoaderResolverInterface;
+use \Selene\Module\Config\Loader\Resolver;
+use \Selene\Module\Config\Loader\LoaderInterface;
+use \Selene\Module\Config\Resource\LoaderResolverInterface;
 
 /**
  * @class LoaderResolverTest
- * @package Selene\Components\Config\Tests\Resource
+ * @package Selene\Module\Config\Tests\Resource
  * @version $Id$
  */
 class ResolverTest extends \PHPUnit_Framework_TestCase
@@ -32,7 +32,7 @@ class ResolverTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $resolver = new Resolver;
-        $this->assertInstanceof('\Selene\Components\Config\Loader\ResolverInterface', $resolver);
+        $this->assertInstanceof('\Selene\Module\Config\Loader\ResolverInterface', $resolver);
     }
 
     /** @test */
@@ -67,7 +67,7 @@ class ResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \Selene\Components\Config\Exception\LoaderException
+     * @expectedException \Selene\Module\Config\Exception\LoaderException
      */
     public function itShouldThrowExceptionWhenNoLoaderIsFound()
     {
@@ -110,7 +110,7 @@ class ResolverTest extends \PHPUnit_Framework_TestCase
      */
     protected function mockLoader($resolver)
     {
-        $loader  = m::mock('\Selene\Components\Config\Loader\LoaderInterface');
+        $loader  = m::mock('\Selene\Module\Config\Loader\LoaderInterface');
         $loader->shouldReceive('setResolver')->with($resolver);
 
         return $loader;

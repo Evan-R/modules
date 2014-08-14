@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Tests\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator\Nodes;
+namespace Selene\Module\Config\Tests\Validator\Nodes;
 
 use \Mockery as m;
-use \Selene\Components\Config\Validator\Nodes\MissingValue;
+use \Selene\Module\Config\Validator\Nodes\MissingValue;
 
 /**
  * @class MissingValueTest
- * @package Selene\Components\Config\Tests\Validator\Nodes
+ * @package Selene\Module\Config\Tests\Validator\Nodes
  * @version $Id$
  */
 class MissingValueTest extends \PHPUnit_Framework_TestCase
@@ -25,7 +25,7 @@ class MissingValueTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Nodes\MissingValue',
+            'Selene\Module\Config\Validator\Nodes\MissingValue',
             new MissingValue($this->mockNode())
         );
     }
@@ -45,7 +45,7 @@ class MissingValueTest extends \PHPUnit_Framework_TestCase
 
     protected function mockNode()
     {
-        return m::mock('\Selene\Components\Config\Validator\Nodes\NodeInterface');
+        return m::mock('\Selene\Module\Config\Validator\Nodes\NodeInterface');
     }
 
     protected function tearDown()

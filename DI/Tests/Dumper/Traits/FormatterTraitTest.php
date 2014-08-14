@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Dumper\Traits package
+ * This File is part of the Selene\Module\DI\Tests\Dumper\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,9 +9,9 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Dumper\Traits;
+namespace Selene\Module\DI\Tests\Dumper\Traits;
 
-use Selene\Components\DI\Dumper\Traits\FormatterTrait;
+use Selene\Module\DI\Dumper\Traits\FormatterTrait;
 
 class FormatterTraitTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml\Traits package
+ * This File is part of the Selene\Module\Xml\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Traits;
+namespace Selene\Module\Xml\Traits;
 
-use \Selene\Components\Xml\Dom\DOMDocument;
-use \Selene\Components\Xml\SimpleXMLElement;
-use \Selene\Components\Common\Traits\Getter;
+use \Selene\Module\Xml\Dom\DOMDocument;
+use \Selene\Module\Xml\SimpleXMLElement;
+use \Selene\Module\Common\Traits\Getter;
 
 trait XmlLoaderTrait
 {

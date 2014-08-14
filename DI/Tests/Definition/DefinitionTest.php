@@ -1,24 +1,24 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Definition package
+ * This File is part of the Selene\Module\DI\Tests\Definition package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
  * For full copyright and license information, please refer to the LICENSE file
  * that was distributed with this package.
  */
-namespace Selene\Components\DI\Tests\Definition;
+namespace Selene\Module\DI\Tests\Definition;
 
 use \Mockery as m;
-use \Selene\Components\DI\ContainerInterface;
+use \Selene\Module\DI\ContainerInterface;
 
 /**
  * @abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
  * @see \PHPUnit_Framework_TestCase
  * @abstract
  *
- * @package Selene\Components\DI\Tests\Definition
+ * @package Selene\Module\DI\Tests\Definition
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -174,11 +174,11 @@ abstract class DefinitionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($def->hasMetaData('foo'));
         $data = $def->getMetaData('foo');
-        $this->assertInstanceof('\Selene\Components\DI\Meta\MetaDataInterface', $data);
+        $this->assertInstanceof('\Selene\Module\DI\Meta\MetaDataInterface', $data);
 
         $def->setMetaData('foo', []);
 
-        $this->assertInstanceof('\Selene\Components\DI\Meta\MetaDataInterface', $def->getMetaData('foo'));
+        $this->assertInstanceof('\Selene\Module\DI\Meta\MetaDataInterface', $def->getMetaData('foo'));
         $this->assertFalse($data === $def->getMetaData('foo'));
     }
 

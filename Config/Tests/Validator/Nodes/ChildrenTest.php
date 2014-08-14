@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Tests\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator\Nodes;
+namespace Selene\Module\Config\Tests\Validator\Nodes;
 
-use \Selene\Components\Config\Validator\Nodes\Children;
-use \Selene\Components\Config\Validator\Nodes\StringNode;
+use \Selene\Module\Config\Validator\Nodes\Children;
+use \Selene\Module\Config\Validator\Nodes\StringNode;
 
 /**
  * @class ChildrenTest
- * @package Selene\Components\Config\Tests\Validator\Nodes
+ * @package Selene\Module\Config\Tests\Validator\Nodes
  * @version $Id$
  */
 class ChildrenTest extends \PHPUnit_Framework_TestCase

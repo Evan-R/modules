@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events package
+ * This File is part of the Selene\Module\Events package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events\Traits;
+namespace Selene\Module\Events\Traits;
 
-use \Selene\Components\Events\DispatcherInterface;
+use \Selene\Module\Events\DispatcherInterface;
 
 /**
  * @trait SubscriberTrait
  *
- * @package Selene\Components\Events
+ * @package Selene\Module\Events
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */

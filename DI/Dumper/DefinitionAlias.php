@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Dumper package
+ * This File is part of the Selene\Module\DI\Dumper package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Dumper;
+namespace Selene\Module\DI\Dumper;
 
 /**
  * @class DefinitionAlias
- * @package Selene\Components\DI\Dumper
+ * @package Selene\Module\DI\Dumper
  * @version $Id$
  */
 class DefinitionAlias

@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache\Tests;
+namespace Selene\Module\Cache\Tests;
 
-use Selene\Components\Cache\Storage;
-use Selene\Components\Cache\Driver\ArrayDriver;
-use Selene\Components\TestSuite\Traits\TestDrive;
+use Selene\Module\Cache\Storage;
+use Selene\Module\Cache\Driver\ArrayDriver;
+use Selene\Module\TestSuite\Traits\TestDrive;
 
 /**
  * @class StorageFilesystemTest
  * @see StorageTestCase
  *
- * @package Selene\Components\Cache
+ * @package Selene\Module\Cache
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT

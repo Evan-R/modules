@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Loader;
+namespace Selene\Module\Routing\Tests\Loader;
 
 use \Mockery as m;
-use \Selene\Components\DI\Container;
-use \Selene\Components\Routing\Loader\XmlLoader;
-use \Selene\Components\Routing\RouteCollection;
+use \Selene\Module\DI\Container;
+use \Selene\Module\Routing\Loader\XmlLoader;
+use \Selene\Module\Routing\RouteCollection;
 
 /**
  * @class XmlLoaderTest
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  */
 class XmlLoaderTest extends \PHPUnit_Framework_TestCase
@@ -31,7 +31,7 @@ class XmlLoaderTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof(
-            '\Selene\Components\Routing\Loader\XmlLoader',
+            '\Selene\Module\Routing\Loader\XmlLoader',
             new XmlLoader(
                 $this->routes,
                 $this->locator

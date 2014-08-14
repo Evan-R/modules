@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Http package
+ * This File is part of the Selene\Module\Http package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Http;
+namespace Selene\Module\Http;
 
 use \Symfony\Compoment\HttpFoundation\ParameterBag;
 use \Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -18,7 +18,7 @@ use \Symfony\Component\HttpFoundation\Request as SymfonyRequest;
  * @class Request extends SymfonyRequest
  * @see SymfonyRequest
  *
- * @package Selene\Components\Http
+ * @package Selene\Module\Http
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

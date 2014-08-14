@@ -9,9 +9,9 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache\Driver;
+namespace Selene\Module\Cache\Driver;
 
-use Selene\Components\Filesystem\Filesystem;
+use Selene\Module\Filesystem\Filesystem;
 
 /**
  * DriverFileSystem

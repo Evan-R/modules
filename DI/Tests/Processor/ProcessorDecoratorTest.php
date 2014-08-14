@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Processor package
+ * This File is part of the Selene\Module\DI\Tests\Processor package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Processor;
+namespace Selene\Module\DI\Tests\Processor;
 
 use \Mockery as m;
-use \Selene\Components\TestSuite\TestCase;
-use \Selene\Components\DI\Processor\ProcessorDecorator;
+use \Selene\Module\TestSuite\TestCase;
+use \Selene\Module\DI\Processor\ProcessorDecorator;
 
 /**
  * @class ProcessorDecoratorTest
- * @package Selene\Components\DI\Tests\Processor
+ * @package Selene\Module\DI\Tests\Processor
  * @version $Id$
  */
 class ProcessorDecoratorTest extends TestCase
@@ -25,19 +25,19 @@ class ProcessorDecoratorTest extends TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $proc = m::mock('Selene\Components\DI\Processor\ProcessorInterface');
+        $proc = m::mock('Selene\Module\DI\Processor\ProcessorInterface');
 
-        $this->assertInstanceof('Selene\Components\DI\Processor\ProcessorDecorator', new ProcessorDecorator($proc));
+        $this->assertInstanceof('Selene\Module\DI\Processor\ProcessorDecorator', new ProcessorDecorator($proc));
     }
 
     /** @test */
     public function itShouldThrowExceptionWhenCallingProcess()
     {
-        $proc = m::mock('Selene\Components\DI\Processor\ProcessorInterface');
+        $proc = m::mock('Selene\Module\DI\Processor\ProcessorInterface');
         $decorator = new ProcessorDecorator($proc);
 
         try {
-            $decorator->process(m::mock('Selene\Components\DI\ContainerInterface'));
+            $decorator->process(m::mock('Selene\Module\DI\ContainerInterface'));
         } catch (\BadMethodCallException $e) {
             $this->assertSame('Calling "process()" is not allowed.', $e->getMessage());
 
@@ -51,8 +51,8 @@ class ProcessorDecoratorTest extends TestCase
     public function itShouldAllowToAddProcesses()
     {
         $called = false;
-        $proc = m::mock('Selene\Components\DI\Processor\ProcessorInterface');
-        $proccess = m::mock('Selene\Components\DI\Processor\ProcessInterface');
+        $proc = m::mock('Selene\Module\DI\Processor\ProcessorInterface');
+        $proccess = m::mock('Selene\Module\DI\Processor\ProcessInterface');
 
         $proc->shouldReceive('add')->once()->with($proccess, 0)->andReturnUsing(function ($pro) use (&$called) {
             $called = true;

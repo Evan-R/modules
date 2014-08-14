@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Controller package
+ * This File is part of the Selene\Module\Routing\Tests\Controller package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Controller;
+namespace Selene\Module\Routing\Tests\Controller;
 
 use \Mockery as m;
-use \Selene\Components\Routing\Controller\ContainerAwareDispatcher;
+use \Selene\Module\Routing\Controller\ContainerAwareDispatcher;
 
 /**
  * @class ContainerAwareDispatcherTest
- * @package Selene\Components\Routing\Tests\Controller
+ * @package Selene\Module\Routing\Tests\Controller
  * @version $Id$
  */
 class ContainerAwareDispatcherTest extends DispatcherTest
@@ -25,7 +25,7 @@ class ContainerAwareDispatcherTest extends DispatcherTest
     public function itShouldBeInstantiable()
     {
         parent::itShouldBeInstantiable();
-        $this->assertInstanceof('Selene\Components\DI\ContainerAwareInterface', $this->newDispatcher());
+        $this->assertInstanceof('Selene\Module\DI\ContainerAwareInterface', $this->newDispatcher());
     }
 
     /** @test */
@@ -49,17 +49,17 @@ class ContainerAwareDispatcherTest extends DispatcherTest
 
     protected function mockContainer()
     {
-        return m::mock('Selene\Components\DI\ContainerInterface');
+        return m::mock('Selene\Module\DI\ContainerInterface');
     }
 
     protected function mockController($container = false)
     {
         if (!$container) {
-            return m::mock('Selene\Components\Routing\Controller\Controller');
+            return m::mock('Selene\Module\Routing\Controller\Controller');
         }
 
         return m::mock(
-            'Selene\Components\Routing\Controller\Controller, Selene\Components\DI\ContainerAwareInterface'
+            'Selene\Module\Routing\Controller\Controller, Selene\Module\DI\ContainerAwareInterface'
         );
     }
 

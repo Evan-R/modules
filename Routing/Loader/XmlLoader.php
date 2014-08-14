@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,22 +9,22 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Loader;
+namespace Selene\Module\Routing\Loader;
 
-use \Selene\Components\Routing\Route;
-use \Selene\Components\Routing\RouteCollectionInterface;
-use \Selene\Components\Routing\Traits\RoutingLoaderTrait;
-use \Selene\Components\Xml\Parser;
-use \Selene\Components\Xml\Dom\DOMElement;
-use \Selene\Components\Xml\Dom\DOMDocument;
-use \Selene\Components\Config\Loader\XmlFileLoader;
-use \Selene\Components\Config\Resource\LocatorInterface;
+use \Selene\Module\Routing\Route;
+use \Selene\Module\Routing\RouteCollectionInterface;
+use \Selene\Module\Routing\Traits\RoutingLoaderTrait;
+use \Selene\Module\Xml\Parser;
+use \Selene\Module\Xml\Dom\DOMElement;
+use \Selene\Module\Xml\Dom\DOMDocument;
+use \Selene\Module\Config\Loader\XmlFileLoader;
+use \Selene\Module\Config\Resource\LocatorInterface;
 
 /**
  * @class XmlLoader extends RoutingLoader XmlLoader
  * @see RoutingLoader
  *
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */

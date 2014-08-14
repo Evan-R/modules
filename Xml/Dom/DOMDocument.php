@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml package
+ * This File is part of the Selene\Module\Xml package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Dom;
+namespace Selene\Module\Xml\Dom;
 
 use \DOMNode;
 use \DOMXpath;
@@ -19,7 +19,7 @@ use \DOMDocument as BaseDOM;
  * @class DOMDocument extends BaseDom
  * @see BaseDom
  *
- * @package Selene\Components\Xml
+ * @package Selene\Module\Xml
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -44,7 +44,7 @@ class DOMDocument extends BaseDom
     public function __construct($version = null, $encoding = null)
     {
         parent::__construct($version, $encoding);
-        $this->registerNodeClass('DOMElement', 'Selene\Components\Xml\Dom\DOMElement');
+        $this->registerNodeClass('DOMElement', 'Selene\Module\Xml\Dom\DOMElement');
     }
 
     /**

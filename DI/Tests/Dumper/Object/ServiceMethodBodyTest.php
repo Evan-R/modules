@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Dumper\Object package
+ * This File is part of the Selene\Module\DI\Tests\Dumper\Object package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Dumper\Object;
+namespace Selene\Module\DI\Tests\Dumper\Object;
 
-use \Selene\Components\DI\Container;
-use \Selene\Components\DI\Reference;
-use \Selene\Components\DI\CallerReference;
-use \Selene\Components\DI\Dumper\Object\ServiceMethodBody;
+use \Selene\Module\DI\Container;
+use \Selene\Module\DI\Reference;
+use \Selene\Module\DI\CallerReference;
+use \Selene\Module\DI\Dumper\Object\ServiceMethodBody;
 
 /**
  * @class ServiceMethodBodyTets
- * @package Selene\Components\DI\Tests\Dumper\Object
+ * @package Selene\Module\DI\Tests\Dumper\Object
  * @version $Id$
  */
 class ServiceMethodBodyTest extends \PHPUnit_Framework_TestCase

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Cache\Driver package
+ * This File is part of the Selene\Module\Cache\Driver package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache\Driver;
+namespace Selene\Module\Cache\Driver;
 
 /**
  * @class ApcuDriver
- * @package Selene\Components\Cache\Driver
+ * @package Selene\Module\Cache\Driver
  * @version $Id$
  */
 class ApcuDriver extends ApcDriver

@@ -22,7 +22,7 @@
     "selene/di":""
   },
   "autoload": {
-    "psr-4": {"Selene\\Components\\Events\\": ""}
+    "psr-4": {"Selene\\Module\\Events\\": ""}
   },
   "minimum-stability": "dev"
 }

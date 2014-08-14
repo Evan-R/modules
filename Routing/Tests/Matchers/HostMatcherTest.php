@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Matchers package
+ * This File is part of the Selene\Module\Routing\Tests\Matchers package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Matchers;
+namespace Selene\Module\Routing\Tests\Matchers;
 
-use \Selene\Components\Routing\Matchers\HostMatcher;
+use \Selene\Module\Routing\Matchers\HostMatcher;
 
 /**
  * @class HostMatcherTest
- * @package Selene\Components\Routing\Tests\Matchers
+ * @package Selene\Module\Routing\Tests\Matchers
  * @version $Id$
  */
 class HostMatcherTest extends MatcherTest

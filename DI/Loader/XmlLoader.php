@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,26 +9,26 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Loader;
+namespace Selene\Module\DI\Loader;
 
-use \Selene\Components\Xml\Parser;
-use \Selene\Components\Xml\Dom\DOMElement;
-use \Selene\Components\Xml\Dom\DOMDocument;
-use \Selene\Components\DI\Reference;
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Definition\ParentDefinition;
-use \Selene\Components\DI\Definition\ServiceDefinition;
-use \Selene\Components\DI\Definition\DefinitionInterface;
-use \Selene\Components\Config\Resource\LocatorInterface;
-use \Selene\Components\Config\Loader\XmlFileLoader;
-use \Selene\Components\Config\Traits\ContainerBuilderAwareLoaderTrait;
-use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Module\Xml\Parser;
+use \Selene\Module\Xml\Dom\DOMElement;
+use \Selene\Module\Xml\Dom\DOMDocument;
+use \Selene\Module\DI\Reference;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Definition\ParentDefinition;
+use \Selene\Module\DI\Definition\ServiceDefinition;
+use \Selene\Module\DI\Definition\DefinitionInterface;
+use \Selene\Module\Config\Resource\LocatorInterface;
+use \Selene\Module\Config\Loader\XmlFileLoader;
+use \Selene\Module\Config\Traits\ContainerBuilderAwareLoaderTrait;
+use \Selene\Module\Common\Helper\ListHelper;
 
 /**
  * @class XmlLoader XmlLoader
  *
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -356,7 +356,7 @@ class XmlLoader extends XmlFileLoader
      * of the service node.
      *
      * @param DOMElement $service the service node.
-     * @param \Selene\Components\DI\Definition\ServiceDefinition $def the
+     * @param \Selene\Module\DI\Definition\ServiceDefinition $def the
      * service definition.
      *
      * @access private

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events\Tests\Stubs package
+ * This File is part of the Selene\Module\Events\Tests\Stubs package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events\Tests\Stubs;
+namespace Selene\Module\Events\Tests\Stubs;
 
 /**
  * @class CounterOverflowException

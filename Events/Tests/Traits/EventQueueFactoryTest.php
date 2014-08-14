@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events\Tests package
+ * This File is part of the Selene\Module\Events\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events\Tests\Traits;
+namespace Selene\Module\Events\Tests\Traits;
 
 use \Mockery as m;
-use \Selene\Components\Events\Traits\EventQueueFactory;
+use \Selene\Module\Events\Traits\EventQueueFactory;
 
 /**
  * @class EventDispatcherTest extends TestCase
  * @see TestCase
  *
- * @package Selene\Components\Events\Tests
+ * @package Selene\Module\Events\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -29,8 +29,8 @@ class EventQueueFactoryTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldQueueAndReleaseEvents()
     {
-        $eventA = m::mock('Selene\Components\Events\EventInterface');
-        $eventB = m::mock('Selene\Components\Events\EventInterface');
+        $eventA = m::mock('Selene\Module\Events\EventInterface');
+        $eventB = m::mock('Selene\Module\Events\EventInterface');
 
         $this->raiseEvent($eventA);
         $this->raiseEvent($eventB);

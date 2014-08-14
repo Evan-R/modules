@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Controller package
+ * This File is part of the Selene\Module\Routing\Tests\Controller package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Controller;
+namespace Selene\Module\Routing\Tests\Controller;
 
 use \Mockery as m;
-use \Selene\Components\Routing\Route;
-use \Selene\Components\TestSuite\TestCase;
-use \Selene\Components\Routing\Controller\Dispatcher;
+use \Selene\Module\Routing\Route;
+use \Selene\Module\TestSuite\TestCase;
+use \Selene\Module\Routing\Controller\Dispatcher;
 
 /**
  * @class ResolverTest
- * @package Selene\Components\Routing\Tests\Controller
+ * @package Selene\Module\Routing\Tests\Controller
  * @version $Id$
  */
 class DispatcherTest extends TestCase
@@ -26,7 +26,7 @@ class DispatcherTest extends TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\Routing\Controller\Dispatcher', $this->newDispatcher());
+        $this->assertInstanceof('Selene\Module\Routing\Controller\Dispatcher', $this->newDispatcher());
     }
 
     /** @test */
@@ -63,12 +63,12 @@ class DispatcherTest extends TestCase
 
     protected function getContext($route = null, $request = null, array $params = [])
     {
-        $context = m::mock('Selene\Components\Routing\Matchers\MatchContext');
+        $context = m::mock('Selene\Module\Routing\Matchers\MatchContext');
 
         if (null === $route) {
             $route = $this->mockRoute();
             $route->shouldReceive('getAction')
-                ->andReturn('Selene\Components\Routing\Tests\Controller\Stubs\Controller@testAction');
+                ->andReturn('Selene\Module\Routing\Tests\Controller\Stubs\Controller@testAction');
         }
 
         if (null === $request) {
@@ -85,7 +85,7 @@ class DispatcherTest extends TestCase
 
     protected function mockRoute()
     {
-        $route = m::mock('Selene\Components\Routing\Route');
+        $route = m::mock('Selene\Module\Routing\Route');
 
         return $route;
     }
@@ -99,7 +99,7 @@ class DispatcherTest extends TestCase
 
     protected function mockContainer()
     {
-        return m::mock('Selene\Components\DI\ContainerInterface');
+        return m::mock('Selene\Module\DI\ContainerInterface');
     }
 
     protected function newDispatcher()

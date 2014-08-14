@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common package
+ * This File is part of the Selene\Module\Common package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *

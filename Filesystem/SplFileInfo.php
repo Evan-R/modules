@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem package
+ * This File is part of the Selene\Module\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem;
+namespace Selene\Module\Filesystem;
 
-use Selene\Components\Common\Interfaces\ArrayableInterface;
+use Selene\Module\Common\Interfaces\ArrayableInterface;
 
 /**
  * @class SplFileInfo extends \SplFileInfo implements ArrayableInterface
  * @see ArrayableInterface
  * @see \SplFileInfo
  *
- * @package Selene\Components\Filesystem
+ * @package Selene\Module\Filesystem
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

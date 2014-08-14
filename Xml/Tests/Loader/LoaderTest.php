@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml\Tests package
+ * This File is part of the Selene\Module\Xml\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Tests\Loader;
+namespace Selene\Module\Xml\Tests\Loader;
 
-use \Selene\Components\Xml\Loader\Loader;
+use \Selene\Module\Xml\Loader\Loader;
 
 /**
  * @class XmlLoaderTest
- * @package Selene\Components\Xml\Tests
+ * @package Selene\Module\Xml\Tests
  * @version $Id$
  */
 class LoaderTest extends \PHPUnit_Framework_TestCase
@@ -24,7 +24,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\Xml\Loader\LoaderInterface', new Loader);
+        $this->assertInstanceof('\Selene\Module\Xml\Loader\LoaderInterface', new Loader);
     }
 
     /** @test */
@@ -35,14 +35,14 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new Loader;
 
         $xml = $loader->load($file);
-        $this->assertInstanceof('Selene\Components\Xml\Dom\DOMDocument', $xml);
+        $this->assertInstanceof('Selene\Module\Xml\Dom\DOMDocument', $xml);
 
         $this->assertInstanceof('DOMDocument', $xml);
 
         $loader->setOption(Loader::SIMPLEXML, true);
 
         $xml = $loader->load($file);
-        $this->assertInstanceof('Selene\Components\Xml\SimpleXMLElement', $xml);
+        $this->assertInstanceof('Selene\Module\Xml\SimpleXMLElement', $xml);
     }
 
     /** @test */
@@ -66,7 +66,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
 
         $xml = $loader->load($file);
 
-        $this->assertFalse($xml instanceof \Selene\Components\Xml\Dom\DOMDocument);
+        $this->assertFalse($xml instanceof \Selene\Module\Xml\Dom\DOMDocument);
         $this->assertInstanceof('DOMDocument', $xml);
     }
 
@@ -83,7 +83,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
 
         $xml = $loader->load($file);
 
-        $this->assertFalse($xml instanceof \Selene\Components\Xml\SimpleXmlElement);
+        $this->assertFalse($xml instanceof \Selene\Module\Xml\SimpleXmlElement);
         $this->assertInstanceof('SimpleXMLElement', $xml);
     }
 

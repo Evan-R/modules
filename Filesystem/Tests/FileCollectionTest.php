@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem\Tests package
+ * This File is part of the Selene\Module\Filesystem\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Tests;
+namespace Selene\Module\Filesystem\Tests;
 
-use Selene\Components\Filesystem\FileCollection;
+use Selene\Module\Filesystem\FileCollection;
 
 /**
  * @class FileCollectionTest extends FilesystemTestCase FileCollectionTest
  * @see FilesystemTestCase
  *
- * @package Selene\Components\Filesystem\Tests
+ * @package Selene\Module\Filesystem\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

@@ -42,7 +42,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Selene\\Components\\":""
+      "Selene\\Module\\":""
     },
     "files": [
       "Common/Helper/functions.php"

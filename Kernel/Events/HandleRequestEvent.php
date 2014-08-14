@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the \Users\malcolm\www\selene_source\src\Selene\Components\Kernel\Events package
+ * This File is part of the \Users\malcolm\www\selene_source\src\Selene\Module\Kernel\Events package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel\Events;
+namespace Selene\Module\Kernel\Events;
 
 use \Symfony\Component\HttpFoundation\Response;
 
 /**
  * @class HandleRequestEvent
- * @package \Users\malcolm\www\selene_source\src\Selene\Components\Kernel\Events
+ * @package \Users\malcolm\www\selene_source\src\Selene\Module\Kernel\Events
  * @version $Id$
  */
 class HandleRequestEvent extends KernelEvent

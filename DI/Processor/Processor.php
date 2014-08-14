@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Processor package
+ * This File is part of the Selene\Module\DI\Processor package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Processor;
+namespace Selene\Module\DI\Processor;
 
-use \Selene\Components\DI\ContainerInterface;
+use \Selene\Module\DI\ContainerInterface;
 
 /**
  * @class Processor
- * @package Selene\Components\DI\Processor
+ * @package Selene\Module\DI\Processor
  * @version $Id$
  */
 class Processor implements ProcessorInterface
@@ -88,7 +88,7 @@ class Processor implements ProcessorInterface
      * @param ProcessInterface $process
      * @param mixed $priority
      *
-     * @return \Selene\Components\DI\Processor\ProcessorInterface
+     * @return \Selene\Module\DI\Processor\ProcessorInterface
      */
     public function add(ProcessInterface $process, $priority = ProcessorInterface::BEFORE_OPTIMIZE)
     {

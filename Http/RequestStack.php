@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Net package
+ * This File is part of the Selene\Module\Net package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Http;
+namespace Selene\Module\Http;
 
 use \SplStack;
 use \Countable;
@@ -19,7 +19,7 @@ use \Symfony\Component\HttpFoundation\Request as SymfonyRequest;
  * @class RequestStack implements StackInterface
  * @see StackInterface
  *
- * @package Selene\Components\Net
+ * @package Selene\Module\Net
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
+
+use \Selene\Module\Package\Exception\RequirementConflictException;
 
 /**
  * @class DependencyManager
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  * @author <mail@thomas-appel.com>
  */
@@ -99,6 +101,7 @@ class DependencyManager
      *
      * @param PackageInterface $package
      * @param array $res
+     *
      * @return array
      */
     protected function doGetRequirements(PackageInterface $package, &$res = [])
@@ -115,11 +118,11 @@ class DependencyManager
                 if ($optional) {
                     continue;
                 }
-                $this->handlePackageNotFound($alias, $req);
+                throw RequirementConflictException::missingPackage($alias, $req);
             }
 
             if (isset($this->current[$req]) || $req === $alias) {
-                $this->handleCircularReference($alias, $req);
+                throw RequirementConflictException::circularReference($alias, $req);
             }
 
             $this->doGetRequirements($this->repository->get($req), $res);
@@ -133,43 +136,5 @@ class DependencyManager
     private function isOptional($package)
     {
         return '?' === $package[strlen($package) - 1];
-    }
-
-    /**
-     * handleCircularReference
-     *
-     * @param mixed $package
-     * @param mixed $requirement
-     *
-     * @return void
-     */
-    private function handleCircularReference($package, $requirement)
-    {
-        throw new \InvalidArgumentException(
-            sprintf(
-                'Circular reference error: Package "%1$s" requires "%2$s" wich requires "%1$s".',
-                $package,
-                $requirement
-            )
-        );
-    }
-
-    /**
-     * handlePackageNotFound
-     *
-     * @param mixed $package
-     * @param mixed $requirement
-     *
-     * @return void
-     */
-    private function handlePackageNotFound($package, $requirement)
-    {
-        throw new \InvalidArgumentException(
-            sprintf(
-                'Package "%1$s" requires "%2$s", but "%2$s" does not exist.',
-                $package,
-                $requirement
-            )
-        );
     }
 }

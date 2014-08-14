@@ -1,6 +1,6 @@
 <?php
 
-namespace Selene\Components\DI\Tests\Stubs;
+namespace Selene\Module\DI\Tests\Stubs;
 
 class BarService
 {

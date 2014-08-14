@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Resource package
+ * This File is part of the Selene\Module\Config\Resource package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Loader;
+namespace Selene\Module\Config\Loader;
 
-use \Selene\Components\Config\Exception\LoaderException;
+use \Selene\Module\Config\Exception\LoaderException;
 
 /**
  * @class LoaderResolver
- * @package Selene\Components\Config\Resource
+ * @package Selene\Module\Config\Resource
  * @version $Id$
  */
 class Resolver implements ResolverInterface

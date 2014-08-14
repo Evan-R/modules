@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem\Traits package
+ * This File is part of the Selene\Module\Filesystem\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Traits;
+namespace Selene\Module\Filesystem\Traits;
 
 /**
  * @class SubstitudePath
- * @package Selene\Components\Filesystem\Traits
+ * @package Selene\Module\Filesystem\Traits
  * @version $Id$
  */
 trait SubstitudePath

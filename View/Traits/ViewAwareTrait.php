@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\View\Traits package
+ * This File is part of the Selene\Module\View\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View\Traits;
+namespace Selene\Module\View\Traits;
 
-use \Selene\Components\View\ManagerInterface;
+use \Selene\Module\View\ManagerInterface;
 
 /**
  * @trait ViewAwareTrait
  *
- * @package Selene\Components\View\Traits
+ * @package Selene\Module\View\Traits
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -26,14 +26,14 @@ trait ViewAwareTrait
     /**
      * view
      *
-     * @var \Selene\Components\View\ManagerInterface
+     * @var \Selene\Module\View\ManagerInterface
      */
     protected $view;
 
     /**
      * setView
      *
-     * @param \Selene\Components\ViewManagerInterface $view
+     * @param \Selene\Module\ViewManagerInterface $view
      *
      * @access public
      * @return mixed
@@ -47,7 +47,7 @@ trait ViewAwareTrait
      * getView
      *
      * @access public
-     * @return \Selene\Components\View\EnvironmentInterface
+     * @return \Selene\Module\View\EnvironmentInterface
      */
     public function getView()
     {

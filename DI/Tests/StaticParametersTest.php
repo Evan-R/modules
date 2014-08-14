@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests package
+ * This File is part of the Selene\Module\DI\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests;
+namespace Selene\Module\DI\Tests;
 
-use \Selene\Components\DI\Parameters;
-use \Selene\Components\DI\StaticParameters;
+use \Selene\Module\DI\Parameters;
+use \Selene\Module\DI\StaticParameters;
 
 class StaticParametersTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\DI\ParameterInterface', new StaticParameters([]));
+        $this->assertInstanceof('Selene\Module\DI\ParameterInterface', new StaticParameters([]));
     }
 
     /**

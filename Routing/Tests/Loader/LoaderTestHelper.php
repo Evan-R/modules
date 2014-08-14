@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Loader package
+ * This File is part of the Selene\Module\Routing\Tests\Loader package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Loader;
+namespace Selene\Module\Routing\Tests\Loader;
 
 use \Mockery as m;
 
 /**
  * @class LoaderTestHelper
- * @package Selene\Components\Routing\Tests\Loader
+ * @package Selene\Module\Routing\Tests\Loader
  * @version $Id$
  */
 trait LoaderTestHelper
@@ -28,16 +28,16 @@ trait LoaderTestHelper
 
     protected function mockBuilder()
     {
-        return m::mock('Selene\Components\DI\BuilderInterface');
+        return m::mock('Selene\Module\DI\BuilderInterface');
     }
 
     protected function mockLocator()
     {
-        return m::mock('Selene\Components\Config\Resource\LocatorInterface');
+        return m::mock('Selene\Module\Config\Resource\LocatorInterface');
     }
 
     protected function mockRoutes()
     {
-        return m::mock('Selene\Components\Routing\RouteCollectionInterface');
+        return m::mock('Selene\Module\Routing\RouteCollectionInterface');
     }
 }

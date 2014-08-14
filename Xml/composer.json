@@ -19,7 +19,7 @@
     "league/phpunit-coverage-listener":"dev-master"
   },
   "autoload": {
-    "psr-4": {"Selene\\Components\\Xml\\": ""}
+    "psr-4": {"Selene\\Module\\Xml\\": ""}
   },
   "minimum-stability": "dev"
 }

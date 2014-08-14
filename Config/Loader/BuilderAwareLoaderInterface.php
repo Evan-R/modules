@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Loader package
+ * This File is part of the Selene\Module\Config\Loader package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Loader;
+namespace Selene\Module\Config\Loader;
 
 /**
  * @interface BuilderAwareLoaderInterface
- * @package Selene\Components\Config\Loader
+ * @package Selene\Module\Config\Loader
  * @version $Id$
  */
 interface BuilderAwareLoaderInterface extends LoaderInterface

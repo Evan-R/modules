@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Traits package
+ * This File is part of the Selene\Module\Config\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Traits;
+namespace Selene\Module\Config\Traits;
 
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Config\Loader\BuilderAwareLoaderListener;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\Config\Loader\BuilderAwareLoaderListener;
 
 /**
  * @class ContainerBuilderAwareLoaderTrait
- * @package Selene\Components\Config\Traits
+ * @package Selene\Module\Config\Traits
  * @version $Id$
  */
 trait ContainerBuilderAwareLoaderTrait

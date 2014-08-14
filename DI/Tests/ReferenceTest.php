@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests package
+ * This File is part of the Selene\Module\DI\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests;
+namespace Selene\Module\DI\Tests;
 
-use \Selene\Components\DI\Reference;
+use \Selene\Module\DI\Reference;
 
 class ReferenceTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\DI\Reference', new Reference('service'));
+        $this->assertInstanceof('\Selene\Module\DI\Reference', new Reference('service'));
     }
 
     /** @test */

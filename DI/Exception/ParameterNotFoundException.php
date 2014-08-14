@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Exception package
+ * This File is part of the Selene\Module\DI\Exception package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Exception;
+namespace Selene\Module\DI\Exception;
 
 /**
  * @class ParameterNotFoundException
- * @package Selene\Components\DI\Exception
+ * @package Selene\Module\DI\Exception
  * @version $Id$
  */
 class ParameterNotFoundException extends \RuntimeException

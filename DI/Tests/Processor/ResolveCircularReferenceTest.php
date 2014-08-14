@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Processor package
+ * This File is part of the Selene\Module\DI\Tests\Processor package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,19 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Processor;
+namespace Selene\Module\DI\Tests\Processor;
 
-use \Selene\Components\DI\Container;
-use \Selene\Components\DI\Reference;
-use \Selene\Components\DI\CallerReference;
-use \Selene\Components\DI\Processor\ResolveCircularReference;
+use \Selene\Module\DI\Container;
+use \Selene\Module\DI\Reference;
+use \Selene\Module\DI\CallerReference;
+use \Selene\Module\DI\Processor\ResolveCircularReference;
 
 class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\DI\Processor\ProcessInterface', new ResolveCircularReference);
+        $this->assertInstanceof('\Selene\Module\DI\Processor\ProcessInterface', new ResolveCircularReference);
     }
 
     /** @test */
@@ -35,7 +35,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
 
         try {
             $process->process($container);
-        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+        } catch (\Selene\Module\DI\Exception\CircularReferenceException $e) {
             $this->assertSame('Service \'foo\' has circular reference on \'foo\'', $e->getMessage());
             return;
         } catch (\Exception $e) {
@@ -75,7 +75,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
 
         try {
             (new ResolveCircularReference)->process($container);
-        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+        } catch (\Selene\Module\DI\Exception\CircularReferenceException $e) {
             $this->assertSame('Service \'foo\' has circular reference on \'foo\'', $e->getMessage());
             return;
         }
@@ -96,7 +96,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
 
         try {
             $process->process($container);
-        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+        } catch (\Selene\Module\DI\Exception\CircularReferenceException $e) {
             $this->assertSame('Service \'foo\' has circular reference on \'bar\'', $e->getMessage());
             return;
         } catch (\Exception $e) {
@@ -119,7 +119,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
 
         try {
             $process->process($container);
-        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+        } catch (\Selene\Module\DI\Exception\CircularReferenceException $e) {
             $this->assertSame('Service \'foo\' has circular reference on \'bar\'', $e->getMessage());
             return;
         } catch (\Exception $e) {
@@ -146,7 +146,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
 
         try {
             $process->process($container);
-        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+        } catch (\Selene\Module\DI\Exception\CircularReferenceException $e) {
             $this->assertSame('Service \'foo\' has circular reference on \'bar\'', $e->getMessage());
             return;
         } catch (\Exception $e) {
@@ -171,7 +171,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
 
         try {
             $process->process($container);
-        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+        } catch (\Selene\Module\DI\Exception\CircularReferenceException $e) {
             $this->assertSame('Service \'foo\' has circular reference on \'foo\'', $e->getMessage());
             return;
         } catch (\Exception $e) {
@@ -210,7 +210,7 @@ class ResolveCircularReferenceTest extends \PHPUnit_Framework_TestCase
 
         try {
             $process->process($container);
-        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+        } catch (\Selene\Module\DI\Exception\CircularReferenceException $e) {
             $this->assertSame('Service \'d\' has circular reference on \'c\'', $e->getMessage());
             return;
         } catch (\Exception $e) {

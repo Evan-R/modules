@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Processor package
+ * This File is part of the Selene\Module\DI\Tests\Processor package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Processor;
+namespace Selene\Module\DI\Tests\Processor;
 
 use \Mockery as m;
-use \Selene\Components\DI\Container;
-use \Selene\Components\DI\Processor\RemoveAbstractDefinition;
+use \Selene\Module\DI\Container;
+use \Selene\Module\DI\Processor\RemoveAbstractDefinition;
 
 class RemoveAbstractDefinitionTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\DI\Processor\ProcessInterface', new RemoveAbstractDefinition);
+        $this->assertInstanceof('\Selene\Module\DI\Processor\ProcessInterface', new RemoveAbstractDefinition);
     }
 
     /** @test */

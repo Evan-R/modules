@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package\Tests package
+ * This File is part of the Selene\Module\Package\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package\Tests;
+namespace Selene\Module\Package\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Package\Package;
-use \Selene\Components\Core\Application;
-use \Selene\Components\TestSuite\TestCase;
-use \Selene\Components\Package\Tests\Stubs\StubPackage;
+use \Selene\Module\Package\Package;
+use \Selene\Module\Core\Application;
+use \Selene\Module\TestSuite\TestCase;
+use \Selene\Module\Package\Tests\Stubs\StubPackage;
 
 /**
  * @class PackageTest
- * @package Selene\Components\Package\Tests
+ * @package Selene\Module\Package\Tests
  * @version $Id$
  */
 class PackageTest extends \PHPUnit_Framework_TestCase

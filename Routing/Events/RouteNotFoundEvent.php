@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Events;
+namespace Selene\Module\Routing\Events;
 
-use \Selene\Components\Events\Event;
+use \Selene\Module\Events\Event;
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * @class RouteNotFoundEvent extends Event
  * @see Event
  *
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

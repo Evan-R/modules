@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Definition;
+namespace Selene\Module\DI\Tests\Definition;
 
 use \Mockery as m;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Definition\ServiceDefinition;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Definition\ServiceDefinition;
 
 /**
  * @class ServiceDefinitionTest
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  */
 class ServiceDefinitionTest extends DefinitionTest

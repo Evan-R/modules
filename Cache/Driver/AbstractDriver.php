@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache\Driver;
+namespace Selene\Module\Cache\Driver;
 
 use Closure;
 
@@ -18,7 +18,7 @@ use Closure;
  * @see DriverInterface
  * @abstract
  *
- * @package Selene\Components\Cache
+ * @package Selene\Module\Cache
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT

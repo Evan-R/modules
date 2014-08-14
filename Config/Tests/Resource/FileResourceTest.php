@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Resource;
+namespace Selene\Module\Config\Tests\Resource;
 
 use \Mockery as m;
 use \org\bovigo\vfs\vfsStream;
-use \Selene\Components\Config\Resource\FileResource;
+use \Selene\Module\Config\Resource\FileResource;
 
 /**
  * @class FileResourceTest
- * @package Selene\Components\Config\Tests\Resource
+ * @package Selene\Module\Config\Tests\Resource
  * @version $Id$
  */
 class FileResourceTest extends \PHPUnit_Framework_TestCase
@@ -41,7 +41,7 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $resource = new FileResource('somefile');
-        $this->assertInstanceof('\Selene\Components\Config\Resource\FileResource', $resource);
+        $this->assertInstanceof('\Selene\Module\Config\Resource\FileResource', $resource);
     }
 
     /**

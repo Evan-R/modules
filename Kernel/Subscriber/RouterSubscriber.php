@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Kernel\Listener package
+ * This File is part of the Selene\Module\Kernel\Listener package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,19 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel\Subscriber;
+namespace Selene\Module\Kernel\Subscriber;
 
 
 use \Symfony\Component\HttpFoundation\Response;
-use \Selene\Components\Kernel\KernelInterface;
-use \Selene\Components\Routing\RouterInterface;
-use \Selene\Components\Events\Traits\SubscriberTrait;
-use \Selene\Components\Kernel\Events\HandleRequestEvent;
-use \Selene\Components\Kernel\Events\KernelEvents as Events;
+use \Selene\Module\Kernel\KernelInterface;
+use \Selene\Module\Routing\RouterInterface;
+use \Selene\Module\Events\Traits\SubscriberTrait;
+use \Selene\Module\Kernel\Events\HandleRequestEvent;
+use \Selene\Module\Kernel\Events\KernelEvents as Events;
 
 /**
  * @class RouterListener
- * @package Selene\Components\Kernel\Listener
+ * @package Selene\Module\Kernel\Listener
  * @version $Id$
  */
 class RouterSubscriber implements KernelSubscriber

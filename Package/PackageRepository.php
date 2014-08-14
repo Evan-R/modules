@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,20 +9,21 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
 
-use \Selene\Components\DI\Parameters;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\Config\ConfigurationInterface;
+use \Selene\Module\DI\Parameters;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\Config\ConfigurationInterface;
 use \Symfony\Component\HttpKernel\HttpKernelInterface;
-use \Selene\Components\Kernel\StackBuilder as KernelStackBuilder;
-use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
-use \Selene\Components\DI\Builder as ContainerBuilder;
+use \Selene\Module\Kernel\StackBuilder as KernelStackBuilder;
+use \Selene\Module\DI\BuilderInterface as ContainerBuilderInterface;
+use \Selene\Module\DI\Builder as ContainerBuilder;
+use \Selene\Adapter\Kernel\ApplicationInterface;
 
 /**
  * @class PackageRepository
  *
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -192,10 +193,10 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      * @access public
      * @return mixed
      */
-    public function boot()
+    public function boot(ApplicationInterface $app)
     {
         foreach ($this->packages as $package) {
-            $package->boot();
+            $package->boot($app);
         }
     }
 

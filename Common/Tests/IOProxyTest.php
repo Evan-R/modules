@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Tests package
+ * This File is part of the Selene\Module\Common\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Tests;
+namespace Selene\Module\Common\Tests;
 
-use Selene\Components\TestSuite\TestCase;
-use Selene\Components\Common\IOPassThrough;
+use Selene\Module\TestSuite\TestCase;
+use Selene\Module\Common\IOPassThrough;
 
 /**
  * @class IOProxyTest
- * @package Selene\Components\Common\Tests
+ * @package Selene\Module\Common\Tests
  * @version $Id$
  */
 class IOProxyTest extends TestCase

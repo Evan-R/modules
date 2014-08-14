@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests package
+ * This File is part of the Selene\Module\Routing\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests;
+namespace Selene\Module\Routing\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Routing\Route;
-use \Selene\Components\Routing\RouteCollection;
-use \Selene\Components\Routing\RouteCollectionInterface;
-use \Selene\Components\Routing\RouteMatcher;
+use \Selene\Module\Routing\Route;
+use \Selene\Module\Routing\RouteCollection;
+use \Selene\Module\Routing\RouteCollectionInterface;
+use \Selene\Module\Routing\RouteMatcher;
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * @class RouteMatcherTest
- * @package Selene\Components\Routing\Tests
+ * @package Selene\Module\Routing\Tests
  * @version $Id$
  */
 class RouteMatcherTest extends \PHPUnit_Framework_TestCase
@@ -44,7 +44,7 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
         $routes->add($c = new Route('image', '/image', 'GET', ['_action' => 'foo']));
 
         $this->assertInstanceof(
-            'Selene\Components\Routing\Matchers\MatchContext',
+            'Selene\Module\Routing\Matchers\MatchContext',
             $matcher->matches($request, $routes)
         );
     }

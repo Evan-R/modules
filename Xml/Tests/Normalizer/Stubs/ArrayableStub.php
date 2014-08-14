@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Tests\Normalizer\Stubs;
+namespace Selene\Module\Xml\Tests\Normalizer\Stubs;
 
 /**
  * @class ConvertToArrayStub

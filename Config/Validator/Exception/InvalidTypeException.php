@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator\Exception package
+ * This File is part of the Selene\Module\Config\Validator\Exception package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Validator\Exception;
+namespace Selene\Module\Config\Validator\Exception;
 
-use \Selene\Components\Config\Validator\Nodes\NodeInterface;
+use \Selene\Module\Config\Validator\Nodes\NodeInterface;
 
 /**
  * @class InvalidTypeException
- * @package Selene\Components\Config\Validator\Exception
+ * @package Selene\Module\Config\Validator\Exception
  * @version $Id$
  */
 class InvalidTypeException extends ValidationException

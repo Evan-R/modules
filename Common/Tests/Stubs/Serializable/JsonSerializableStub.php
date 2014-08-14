@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Tests\Stubs\Serializable package
+ * This File is part of the Selene\Module\Common\Tests\Stubs\Serializable package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Tests\Stubs\Serializable;
+namespace Selene\Module\Common\Tests\Stubs\Serializable;
 
-use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\Common\Traits\SerializeableJson;
+use \Selene\Module\Common\Traits\Getter;
+use \Selene\Module\Common\Traits\SerializeableJson;
 
 /**
  * @class JsonSerializableStub
- * @package Selene\Components\Common\Tests\Stubs\Serializable
+ * @package Selene\Module\Common\Tests\Stubs\Serializable
  * @version $Id$
  */
 class JsonSerializableStub

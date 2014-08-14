@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Loader\Fixures package
+ * This File is part of the Selene\Module\Routing\Tests\Loader\Fixures package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *

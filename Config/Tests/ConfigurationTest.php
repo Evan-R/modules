@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests package
+ * This File is part of the Selene\Module\Config\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests;
+namespace Selene\Module\Config\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Config\Tests\Stubs\Config;
+use \Selene\Module\Config\Tests\Stubs\Config;
 
 /**
  * @class ConfigurationTest
- * @package Selene\Components\Config\Tests
+ * @package Selene\Module\Config\Tests
  * @version $Id$
  */
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
@@ -24,7 +24,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\Config\ConfigurationInterface', new Config);
+        $this->assertInstanceof('Selene\Module\Config\ConfigurationInterface', new Config);
     }
 
     /** @test */
@@ -38,7 +38,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     protected function mockBuilder()
     {
-        return m::mock('Selene\Components\DI\BuilderInterface');
+        return m::mock('Selene\Module\DI\BuilderInterface');
     }
 
     protected function tearDown()

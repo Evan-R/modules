@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events\Tests package
+ * This File is part of the Selene\Module\Events\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events\Tests;
+namespace Selene\Module\Events\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Events\Event;
-use \Selene\Components\Events\Tests\Stubs\ConcreteEvent;
+use \Selene\Module\Events\Event;
+use \Selene\Module\Events\Tests\Stubs\ConcreteEvent;
 
 /**
  * @class EventDispatcherTest extends TestCase
  * @see TestCase
  *
- * @package Selene\Components\Events\Tests
+ * @package Selene\Module\Events\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -59,7 +59,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($event->getEventDispatcher());
 
-        $dispatcher = m::mock('Selene\Components\Events\DispatcherInterface');
+        $dispatcher = m::mock('Selene\Module\Events\DispatcherInterface');
 
         $event->setEventDispatcher($dispatcher);
 

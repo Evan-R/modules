@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Processor package
+ * This File is part of the Selene\Module\DI\Tests\Processor package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Processor;
+namespace Selene\Module\DI\Tests\Processor;
 
 use \Mockery as m;
-use \Selene\Components\DI\Processor\Processor;
-use \Selene\Components\DI\Processor\ProcessInterface;
-use \Selene\Components\DI\Processor\ProcessorInterface;
-use \Selene\Components\DI\ContainerInterface;
+use \Selene\Module\DI\Processor\Processor;
+use \Selene\Module\DI\Processor\ProcessInterface;
+use \Selene\Module\DI\Processor\ProcessorInterface;
+use \Selene\Module\DI\ContainerInterface;
 
 class ProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +24,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $conf = $this->mockConfig();
         $conf->shouldReceive('configure');
-        $this->assertInstanceof('Selene\Components\DI\Processor\ProcessorInterface', new Processor($conf));
+        $this->assertInstanceof('Selene\Module\DI\Processor\ProcessorInterface', new Processor($conf));
     }
 
     /** @test */
@@ -98,7 +98,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getContainerMock()
     {
-        return m::mock('\Selene\Components\DI\ContainerInterface');
+        return m::mock('\Selene\Module\DI\ContainerInterface');
     }
 
     /**
@@ -112,7 +112,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getProcessMock(ContainerInterface $container, &$orders, $order)
     {
-        $process = m::mock('\Selene\Components\DI\Processor\ProcessInterface');
+        $process = m::mock('\Selene\Module\DI\Processor\ProcessInterface');
 
         $process->shouldReceive('process')
             ->with($container)
@@ -125,7 +125,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function mockConfig()
     {
-        return m::mock('\Selene\Components\DI\Processor\ConfigInterface');
+        return m::mock('\Selene\Module\DI\Processor\ConfigInterface');
     }
 
     protected function tearDown()

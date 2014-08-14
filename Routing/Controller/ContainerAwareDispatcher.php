@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Controller package
+ * This File is part of the Selene\Module\Routing\Controller package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Controller;
+namespace Selene\Module\Routing\Controller;
 
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\ContainerAwareInterface;
-use \Selene\Components\DI\Traits\ContainerAwareTrait;
-use \Selene\Components\DI\Exception\ContainerResolveException;
-use \Selene\Components\Routing\Matchers\MatchContext;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\ContainerAwareInterface;
+use \Selene\Module\DI\Traits\ContainerAwareTrait;
+use \Selene\Module\DI\Exception\ContainerResolveException;
+use \Selene\Module\Routing\Matchers\MatchContext;
 
 /**
  * @class ContainerAwareDispatcher
- * @package Selene\Components\Routing\Controller
+ * @package Selene\Module\Routing\Controller
  * @version $Id$
  */
 class ContainerAwareDispatcher extends Dispatcher implements ContainerAwareInterface

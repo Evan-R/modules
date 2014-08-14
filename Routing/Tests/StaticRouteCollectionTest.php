@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests package
+ * This File is part of the Selene\Module\Routing\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests;
+namespace Selene\Module\Routing\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Routing\Route;
-use \Selene\Components\Routing\RouteCollection;
-use \Selene\Components\Routing\StaticRouteCollection;
-use \Selene\Components\Routing\RouteCollectionInterface;
+use \Selene\Module\Routing\Route;
+use \Selene\Module\Routing\RouteCollection;
+use \Selene\Module\Routing\StaticRouteCollection;
+use \Selene\Module\Routing\RouteCollectionInterface;
 
 class StaticRouteCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,13 +29,13 @@ class StaticRouteCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldThrowAnExceptionWhenAttemptingToAddARoute()
     {
-        $c = m::mock('\Selene\Components\Routing\RouteCollectionInterface');
+        $c = m::mock('\Selene\Module\Routing\RouteCollectionInterface');
         $c->shouldReceive('raw')->andReturn([]);
 
         $collection = new StaticRouteCollection($c);
 
         try {
-            $collection->add(m::mock('\Selene\Components\Routing\Route'));
+            $collection->add(m::mock('\Selene\Module\Routing\Route'));
         } catch (\BadMethodCallException $e) {
             $this->assertEquals('cannot add route to a static collection', $e->getMessage());
             return;

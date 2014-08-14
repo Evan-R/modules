@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Kernel\Events package
+ * This File is part of the Selene\Module\Kernel\Events package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel\Events;
+namespace Selene\Module\Kernel\Events;
 
-use \Selene\Components\Events\Event;
+use \Selene\Module\Events\Event;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpFoundation\Response;
 
 /**
  * @class HandleShutDownEvent
- * @package Selene\Components\Kernel\Events
+ * @package Selene\Module\Kernel\Events
  * @version $Id$
  */
 class HandleShutDownEvent extends Event

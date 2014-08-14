@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Processor package
+ * This File is part of the Selene\Module\DI\Tests\Processor package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Processor;
+namespace Selene\Module\DI\Tests\Processor;
 
-use \Selene\Components\DI\Container;
-use \Selene\Components\DI\Processor\RemoveInjectedArguments;
+use \Selene\Module\DI\Container;
+use \Selene\Module\DI\Processor\RemoveInjectedArguments;
 
 class RemoveInjectedArgumentsTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\DI\Processor\ProcessInterface', new RemoveInjectedArguments);
+        $this->assertInstanceof('\Selene\Module\DI\Processor\ProcessInterface', new RemoveInjectedArguments);
     }
 
     /** @test */

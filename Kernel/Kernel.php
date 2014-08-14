@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Kernel package
+ * This File is part of the Selene\Module\Kernel package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,37 +9,37 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel;
+namespace Selene\Module\Kernel;
 
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpFoundation\Response;
 use \Symfony\Component\HttpKernel\HttpKernelInterface;
 use \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use \Symfony\Component\HttpKernel\TerminableInterface;
-use \Selene\Components\Events\DispatcherInterface;
-use \Selene\Components\Routing\RouterInterface;
-use \Selene\Components\Http\RequestStack;
-use \Selene\Components\DI\ContainerAwareInterface;
-use \Selene\Components\DI\Traits\ContainerAwareTrait;
-use \Selene\Components\Events\SubscriberInterface;
-use \Selene\Components\Routing\Events\RouteDispatchEvent;
-use \Selene\Components\Routing\Events\RouteFilterAbortEvent;
-use \Selene\Components\Kernel\Events\FilterResponseEvent;
-use \Selene\Components\Kernel\Events\HandleRequestEvent;
-use \Selene\Components\Kernel\Events\HandleResponsetEvent;
-use \Selene\Components\Kernel\Events\HandleExceptionEvent;
-use \Selene\Components\Kernel\Events\AbortRequestEvent;
-use \Selene\Components\Kernel\Events\HandleShutDownEvent;
-use \Selene\Components\Kernel\Events\HandleRequestEndEvent;
-use \Selene\Components\Kernel\Events\ResponseEvent;
-use \Selene\Components\Kernel\Events\KernelEvents as Events;
-use \Selene\Components\Kernel\Subscriber\KernelSubscriber;
+use \Selene\Module\Events\DispatcherInterface;
+use \Selene\Module\Routing\RouterInterface;
+use \Selene\Module\Http\RequestStack;
+use \Selene\Module\DI\ContainerAwareInterface;
+use \Selene\Module\DI\Traits\ContainerAwareTrait;
+use \Selene\Module\Events\SubscriberInterface;
+use \Selene\Module\Routing\Events\RouteDispatchEvent;
+use \Selene\Module\Routing\Events\RouteFilterAbortEvent;
+use \Selene\Module\Kernel\Events\FilterResponseEvent;
+use \Selene\Module\Kernel\Events\HandleRequestEvent;
+use \Selene\Module\Kernel\Events\HandleResponsetEvent;
+use \Selene\Module\Kernel\Events\HandleExceptionEvent;
+use \Selene\Module\Kernel\Events\AbortRequestEvent;
+use \Selene\Module\Kernel\Events\HandleShutDownEvent;
+use \Selene\Module\Kernel\Events\HandleRequestEndEvent;
+use \Selene\Module\Kernel\Events\ResponseEvent;
+use \Selene\Module\Kernel\Events\KernelEvents as Events;
+use \Selene\Module\Kernel\Subscriber\KernelSubscriber;
 
 /**
  * @class Kernel implements HttpKernelInterface
  * @see HttpKernelInterface
  *
- * @package Selene\Components\Kernel
+ * @package Selene\Module\Kernel
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */

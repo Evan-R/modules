@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\View package
+ * This File is part of the Selene\Module\View package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View;
+namespace Selene\Module\View;
 
 /**
  * @interface ViewAwareInterface
  *
- * @package Selene\Components\View
+ * @package Selene\Module\View
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

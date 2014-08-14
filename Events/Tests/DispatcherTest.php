@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events\Tests package
+ * This File is part of the Selene\Module\Events\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,22 +9,22 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events\Tests;
+namespace Selene\Module\Events\Tests;
 
 use \Mockery as m;
-use \Selene\Components\TestSuite\TestCase;
-use \Selene\Components\Events\Event;
-use \Selene\Components\Events\Dispatcher;
-use \Selene\Components\Events\Tests\Stubs\EventStub;
-use \Selene\Components\Events\Tests\Stubs\EventSubscriberStub;
-use \Selene\Components\Events\Tests\Stubs\InvalidSubscriber;
-use \Selene\Components\DI\ContainerInterface;
+use \Selene\Module\TestSuite\TestCase;
+use \Selene\Module\Events\Event;
+use \Selene\Module\Events\Dispatcher;
+use \Selene\Module\Events\Tests\Stubs\EventStub;
+use \Selene\Module\Events\Tests\Stubs\EventSubscriberStub;
+use \Selene\Module\Events\Tests\Stubs\InvalidSubscriber;
+use \Selene\Module\DI\ContainerInterface;
 
 /**
  * @class EventDispatcherTest extends TestCase
  * @see TestCase
  *
- * @package Selene\Components\Events\Tests
+ * @package Selene\Module\Events\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -147,12 +147,12 @@ class DispatcherTest extends TestCase
 
         $dispatcher = $this->newDispatcher();
 
-        $listener = m::mock('Selene\Components\Events\EventListenerInterface');
+        $listener = m::mock('Selene\Module\Events\EventListenerInterface');
         $listener->shouldReceive('handleEvent')->andReturnUsing(function () use (&$called) {
             $called = true;
         });
 
-        $event = m::mock('Selene\Components\Events\\EventInterface');
+        $event = m::mock('Selene\Module\Events\\EventInterface');
 
         $event->shouldReceive('setEventDispatcher')->with($dispatcher);
         $event->shouldReceive('setEventName')->with('event');
@@ -173,13 +173,13 @@ class DispatcherTest extends TestCase
 
         $dispatcher = $this->newDispatcher();
 
-        $listener = m::mock('Selene\Components\Events\EventListenerInterface');
+        $listener = m::mock('Selene\Module\Events\EventListenerInterface');
 
         $listener->shouldReceive('handleEvent')->andReturnUsing(function () use (&$called) {
             $called++;
         });
 
-        $event = m::mock('Selene\Components\Events\\EventInterface');
+        $event = m::mock('Selene\Module\Events\\EventInterface');
 
         $event->shouldReceive('setEventDispatcher')->with($dispatcher);
         $event->shouldReceive('setEventName')->with('event');
@@ -203,19 +203,19 @@ class DispatcherTest extends TestCase
 
         $dispatcher = $this->newDispatcher();
 
-        $listenerA = m::mock('Selene\Components\Events\EventListenerInterface');
+        $listenerA = m::mock('Selene\Module\Events\EventListenerInterface');
 
         $listenerA->shouldReceive('handleEvent')->andReturnUsing(function () use (&$called) {
             $called++;
         });
 
-        $listenerB = m::mock('Selene\Components\Events\EventListenerInterface');
+        $listenerB = m::mock('Selene\Module\Events\EventListenerInterface');
 
         $listenerB->shouldReceive('handleEvent')->andReturnUsing(function () use (&$called) {
             $called++;
         });
 
-        $event = m::mock('Selene\Components\Events\\EventInterface');
+        $event = m::mock('Selene\Module\Events\\EventInterface');
 
         $event->shouldReceive('setEventDispatcher')->with($dispatcher);
         $event->shouldReceive('setEventName')->with('event');
@@ -271,7 +271,7 @@ class DispatcherTest extends TestCase
         $dispatcherSet = false;
         $dispatcher = $this->newDispatcher();
 
-        $event = m::mock('Selene\Components\Events\\EventInterface');
+        $event = m::mock('Selene\Module\Events\\EventInterface');
 
         $event->shouldReceive('setEventDispatcher')->with($dispatcher)
             ->andReturnUsing(function ($dsp) use (&$dispatcherSet, $dispatcher) {
@@ -296,7 +296,7 @@ class DispatcherTest extends TestCase
     {
         $dispatcher = $this->newDispatcher();
 
-        $container = m::mock('Selene\Components\DI\ContainerInterface');
+        $container = m::mock('Selene\Module\DI\ContainerInterface');
         $container->shouldReceive('has')->with('bar')->andReturn(true);
         $container->shouldReceive('get')->with('bar')->andReturn(new \stdClass);
 
@@ -374,7 +374,7 @@ class DispatcherTest extends TestCase
             }
         );
 
-        $container = m::mock('Selene\Components\DI\ContainerInterface');
+        $container = m::mock('Selene\Module\DI\ContainerInterface');
         $container->shouldReceive('get')->with('some_service')->andReturn($class);
         $container->shouldReceive('has')->with('some_service')->andReturn(true);
 
@@ -395,7 +395,7 @@ class DispatcherTest extends TestCase
     {
         $event = new Event;
 
-        $class = m::mock('Selene\Components\Events\EventListenerInterface');
+        $class = m::mock('Selene\Module\Events\EventListenerInterface');
         $class->shouldReceive('handleEvent')->with($event)->andReturnUsing(
             function () {
                 $this->assertTrue(true);
@@ -404,7 +404,7 @@ class DispatcherTest extends TestCase
             }
         );
 
-        $container = m::mock('Selene\Components\DI\ContainerInterface');
+        $container = m::mock('Selene\Module\DI\ContainerInterface');
         $container->shouldReceive('get')->with('some_service')->andReturn($class);
         $container->shouldReceive('has')->with('some_service')->andReturn(true);
 
@@ -431,7 +431,7 @@ class DispatcherTest extends TestCase
             }
         );
 
-        $container = m::mock('Selene\Components\DI\ContainerInterface');
+        $container = m::mock('Selene\Module\DI\ContainerInterface');
         $container->shouldReceive('get')->with('some_service')->andReturn($class);
         $container->shouldReceive('has')->with('some_service')->andReturn(true);
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem package
+ * This File is part of the Selene\Module\Filesystem package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem;
+namespace Selene\Module\Filesystem;
 
 use \FilesystemIterator;
-use \Selene\Components\Filesystem\Exception\IOException;
-use \Selene\Components\Filesystem\Traits\FsHelperTrait;
-use \Selene\Components\Filesystem\Traits\PathHelperTrait;
+use \Selene\Module\Filesystem\Exception\IOException;
+use \Selene\Module\Filesystem\Traits\FsHelperTrait;
+use \Selene\Module\Filesystem\Traits\PathHelperTrait;
 
 /**
  * @class Filesystem
  *
- * @package Selene\Components\Filesystem
+ * @package Selene\Module\Filesystem
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -141,7 +141,7 @@ class Filesystem
      *
      * @param string $dir the directory path.
      *
-     * @throws \Selene\Components\Filesystem\Exception\IOException
+     * @throws \Selene\Module\Filesystem\Exception\IOException
      *
      * @return void
      */
@@ -158,7 +158,7 @@ class Filesystem
     /**
      * Removes all conatining files and directories within the given directory.
      *
-     * @throws \Selene\Components\Filesystem\Exception\IOException
+     * @throws \Selene\Module\Filesystem\Exception\IOException
      *
      * @return void
      */
@@ -198,7 +198,7 @@ class Filesystem
      * @param integer $time  the modifytime as unix timestamp.
      * @param integer $atime the accesstime as unix timestamp.
      *
-     * @throws \Selene\Components\Filesystem\Exception\IOException
+     * @throws \Selene\Module\Filesystem\Exception\IOException
      *
      * @return boolean true if touching of the file was successful.
      */
@@ -257,7 +257,7 @@ class Filesystem
      * @param string  $target
      * @param boolean $replace
      *
-     * @throws \Selene\Components\Filesystem\Exception\IOException
+     * @throws \Selene\Module\Filesystem\Exception\IOException
      *
      * @return integer returns the total count of bytes that where copied.
      */
@@ -312,7 +312,7 @@ class Filesystem
      * @param integer $permission
      * @param boolean $recursive
      *
-     * @throws \Selene\Components\Filesystem\Exception\IOException
+     * @throws \Selene\Module\Filesystem\Exception\IOException
      *
      * @return void
      */
@@ -339,7 +339,7 @@ class Filesystem
      *
      * @param mixed $param
      *
-     * @throws \Selene\Components\Filesystem\Exception\IOException
+     * @throws \Selene\Module\Filesystem\Exception\IOException
      *
      * @return boolean
      */
@@ -375,7 +375,7 @@ class Filesystem
      * @param mixed $file
      * @param mixed $group
      *
-     * @throws \Selene\Components\Filesystem\Exception\IOException
+     * @throws \Selene\Module\Filesystem\Exception\IOException
      *
      * @return boolean
      */
@@ -828,7 +828,7 @@ class Filesystem
      * Enumerate a directory name based on its occurrance of the parent
      * directory.
      *
-     * @see \Selene\Components\Filesystem::enum()
+     * @see \Selene\Module\Filesystem::enum()
      *
      * @param string  $dir      the path of directory.
      * @param integer $counter  the enumeration count offset.
@@ -853,7 +853,7 @@ class Filesystem
      * Enumerate a file name based on its occurrance of the parent
      * directory.
      *
-     * @see \Selene\Components\Filesystem::enum()
+     * @see \Selene\Module\Filesystem::enum()
      *
      * @param string $file the path of file.
      * @param integer $counter  the enumeration count offset.

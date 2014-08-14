@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests;
+namespace Selene\Module\Routing\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Routing\Route;
-use \Selene\Components\Routing\UrlBuilder;
+use \Selene\Module\Routing\Route;
+use \Selene\Module\Routing\UrlBuilder;
 use \Symfony\Component\HttpFoundation\Request;
-use \Selene\Components\Http\StackInterface;
-use \Selene\Components\Routing\RouteCollectionInterface;
+use \Selene\Module\Http\StackInterface;
+use \Selene\Module\Routing\RouteCollectionInterface;
 
 /**
  * @class UrlBuilderTest
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  */
 class UrlBuilderTest extends \PHPUnit_Framework_TestCase
@@ -29,7 +29,7 @@ class UrlBuilderTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof(
-            'Selene\Components\Routing\UrlBuilder',
+            'Selene\Module\Routing\UrlBuilder',
             new UrlBuilder($this->getRoutes(), $this->getStack())
         );
     }
@@ -171,11 +171,11 @@ class UrlBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function getStack()
     {
-        return m::mock('Selene\Components\Http\RequestStack, Selene\Components\Http\StackInterface');
+        return m::mock('Selene\Module\Http\RequestStack, Selene\Module\Http\StackInterface');
     }
 
     protected function getRoutes()
     {
-        return m::mock('Selene\Components\Routing\RouteCollectionInterface');
+        return m::mock('Selene\Module\Routing\RouteCollectionInterface');
     }
 }

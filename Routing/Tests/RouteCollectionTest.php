@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests package
+ * This File is part of the Selene\Module\Routing\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests;
+namespace Selene\Module\Routing\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Routing\Route;
-use \Selene\Components\Routing\RouteCollection;
+use \Selene\Module\Routing\Route;
+use \Selene\Module\Routing\RouteCollection;
 
 class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,7 +35,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function routesShouldBeAddable()
     {
-        $route = m::mock('\Selene\Components\Routing\Route');
+        $route = m::mock('\Selene\Module\Routing\Route');
         $route->shouldReceive('getName')->andReturn('app.index');
         $route->shouldReceive('collection')->with($this->collection);
 
@@ -47,9 +47,9 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function routesSouldBeRetrieveableByMethod()
     {
-        $routeA = m::mock('\Selene\Components\Routing\Route');
-        $routeB = m::mock('\Selene\Components\Routing\Route');
-        $routeC = m::mock('\Selene\Components\Routing\Route');
+        $routeA = m::mock('\Selene\Module\Routing\Route');
+        $routeB = m::mock('\Selene\Module\Routing\Route');
+        $routeC = m::mock('\Selene\Module\Routing\Route');
 
         $routeA->shouldReceive('getName')->andReturn('app.index');
         $routeB->shouldReceive('getName')->andReturn('app.foo');
@@ -78,7 +78,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeIteratable()
     {
-        $route = m::mock('\Selene\Components\Routing\Route');
+        $route = m::mock('\Selene\Module\Routing\Route');
         $route->shouldReceive('collection');
         $route->shouldReceive('getName')->andReturn('app.index');
         $this->collection->add($route);
@@ -100,7 +100,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeSerilizeable()
     {
         $this->assertInstanceOf(
-            '\Selene\Components\Routing\RouteCollection',
+            '\Selene\Module\Routing\RouteCollection',
             unserialize(serialize($this->collection))
         );
     }

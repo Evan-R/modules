@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
 
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\BuilderInterface as ContainerBuilderInterface;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Adapter\Kernel\ApplicationInterface;
+use \Selene\Module\DI\BuilderInterface as ContainerBuilderInterface;
 
 /**
  * @interface PackageRepositoryInterface
  *
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -36,7 +37,7 @@ interface PackageRepositoryInterface
 
     public function build(ContainerBuilderInterface $builder);
 
-    public function boot();
+    public function boot(ApplicationInterface $app);
 
     public function shutDown();
 }

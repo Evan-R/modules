@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Net package
+ * This File is part of the Selene\Module\Net package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Http;
+namespace Selene\Module\Http;
 
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * @interface StackInterface
  *
- * @package Selene\Components\Net
+ * @package Selene\Module\Net
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -26,8 +26,7 @@ interface StackInterface
     /**
      * getCurrent
      *
-     * @access public
-     * @return mixed
+     * @return Request|null
      */
     public function getCurrent();
 
@@ -39,8 +38,33 @@ interface StackInterface
      */
     public function getPrevious();
 
+    /**
+     * getMain
+     *
+     * @return Request
+     */
+    public function getMain();
 
+    /**
+     * removeSubRequests
+     *
+     * @return void
+     */
+    public function removeSubRequests();
+
+    /**
+     * push
+     *
+     * @param Request $request
+     *
+     * @return void
+     */
     public function push(Request $request);
 
+    /**
+     * pop
+     *
+     * @return Request
+     */
     public function pop();
 }

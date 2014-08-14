@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Resource package
+ * This File is part of the Selene\Module\Config\Tests\Resource package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Resource;
+namespace Selene\Module\Config\Tests\Resource;
 
-use \Selene\Components\Config\Resource\ObjectResource;
+use \Selene\Module\Config\Resource\ObjectResource;
 
 /**
  * @class ObjectResourceTest
- * @package Selene\Components\Config\Tests\Resource
+ * @package Selene\Module\Config\Tests\Resource
  * @version $Id$
  */
 class ObjectResourceTest extends \PHPUnit_Framework_TestCase
@@ -25,8 +25,8 @@ class ObjectResourceTest extends \PHPUnit_Framework_TestCase
     {
         $resource = new ObjectResource($this);
 
-        $this->assertInstanceof('\Selene\Components\Config\Resource\ResourceInterface', $resource);
-        $this->assertInstanceof('\Selene\Components\Config\Resource\ObjectResourceInterface', $resource);
+        $this->assertInstanceof('\Selene\Module\Config\Resource\ResourceInterface', $resource);
+        $this->assertInstanceof('\Selene\Module\Config\Resource\ObjectResourceInterface', $resource);
     }
 
     /** @test */

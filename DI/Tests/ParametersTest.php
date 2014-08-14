@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests package
+ * This File is part of the Selene\Module\DI\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests;
+namespace Selene\Module\DI\Tests;
 
 use \Mockery as m;
-use \Selene\Components\TestSuite\TestCase;
-use \Selene\Components\DI\Parameters;
+use \Selene\Module\TestSuite\TestCase;
+use \Selene\Module\DI\Parameters;
 
 /**
  * @class ParametersTest extends TestCase
  * @see TestCase
  *
- * @package Selene\Components\DI\Tests
+ * @package Selene\Module\DI\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -97,7 +97,7 @@ class ParametersTest extends TestCase
 
         try {
             $parameters->get('baz');
-        } catch (\Selene\Components\DI\Exception\ParameterNotFoundException $e) {
+        } catch (\Selene\Module\DI\Exception\ParameterNotFoundException $e) {
             $this->assertSame('Parameter \'baz\' was not found', $e->getMessage());
             return;
         } catch (\Exception $e) {
@@ -149,7 +149,7 @@ class ParametersTest extends TestCase
             $parameters = $this->getParameters(['foo' => '%bar%', 'bar' => '%foobar%', 'foobar' => '%foo%']);
             $parameters->resolveParam('%foo%');
             $this->fail('->resolve() has failed');
-        } catch (\Selene\Components\DI\Exception\ParameterResolvingException $e) {
+        } catch (\Selene\Module\DI\Exception\ParameterResolvingException $e) {
             $this->assertEquals('[circular reference]: param "foo" is referencing itself', $e->getMessage());
         } catch (\Exception $e) {
             $this->fail('->resolve() should detect circular references');
@@ -177,7 +177,7 @@ class ParametersTest extends TestCase
 
         try {
             $parameters->resolve();
-        } catch (\Selene\Components\DI\Exception\ParameterResolvingException $e) {
+        } catch (\Selene\Module\DI\Exception\ParameterResolvingException $e) {
             $this->assertEquals('[circular reference]: param "foo" is referencing itself', $e->getMessage());
         } catch (\Exception $e) {
             $this->fail('->resolve() should detect circular references');
@@ -195,7 +195,7 @@ class ParametersTest extends TestCase
         try {
             $parameters->resolve();
             $this->fail('->resolve() has failed');
-        } catch (\Selene\Components\DI\Exception\ParameterResolvingException $e) {
+        } catch (\Selene\Module\DI\Exception\ParameterResolvingException $e) {
             $this->assertEquals('[circular reference]: param "nest" is referencing itself', $e->getMessage());
         } catch (\Exception $e) {
             $this->fail('->resolve() should detect circular references');

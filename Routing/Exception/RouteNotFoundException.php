@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Exception package
+ * This File is part of the Selene\Module\Routing\Exception package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Exception;
+namespace Selene\Module\Routing\Exception;
 
 use \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @class RouteNotFoundException
- * @package Selene\Components\Routing\Exception
+ * @package Selene\Module\Routing\Exception
  * @version $Id$
  */
 class RouteNotFoundException extends NotFoundHttpException

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem\Tests\Traits package
+ * This File is part of the Selene\Module\Filesystem\Tests\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Tests\Traits;
+namespace Selene\Module\Filesystem\Tests\Traits;
 
-use \Selene\Components\Filesystem\Traits\PathHelperTrait;
+use \Selene\Module\Filesystem\Traits\PathHelperTrait;
 
 /**
  * @class PathHelperTraitTest
- * @package Selene\Components\Filesystem\Tests\Traits
+ * @package Selene\Module\Filesystem\Tests\Traits
  * @version $Id$
  */
 class PathHelperTraitTest extends \PHPUnit_Framework_TestCase

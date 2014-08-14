@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\TestSuite\Traits package
+ * This File is part of the Selene\Module\TestSuite\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\TestSuite\Traits;
+namespace Selene\Module\TestSuite\Traits;
 
 use org\bovigo\vfs\vfsStream;
 

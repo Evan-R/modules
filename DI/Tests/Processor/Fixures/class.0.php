@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Processor\Fixures package
+ * This File is part of the Selene\Module\DI\Tests\Processor\Fixures package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -10,7 +10,7 @@
  */
 
 /**
- * @package Selene\Components\DI\Tests\Processor\Fixures
+ * @package Selene\Module\DI\Tests\Processor\Fixures
  * @version $Id$
  */
 class FooFactory

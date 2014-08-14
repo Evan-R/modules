@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml\Tests package
+ * This File is part of the Selene\Module\Xml\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,19 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml\Tests;
+namespace Selene\Module\Xml\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Xml\Parser;
-use \Selene\Components\Xml\Dom\DOMElement;
-use \Selene\Components\Xml\Dom\DOMDocument;
-use \Selene\Components\Xml\Loader\LoaderInterface;
+use \Selene\Module\Xml\Parser;
+use \Selene\Module\Xml\Dom\DOMElement;
+use \Selene\Module\Xml\Dom\DOMDocument;
+use \Selene\Module\Xml\Loader\LoaderInterface;
 
 /**
  * @class ParserTest extends \PHPUnit_Framework_TestCase
  * @see \PHPUnit_Framework_TestCase
  *
- * @package Selene\Components\Xml\Tests
+ * @package Selene\Module\Xml\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -31,11 +31,11 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $parser = new Parser(m::mock('\Selene\Components\Xml\Loader\LoaderInterface'));
-        $this->assertInstanceof('\Selene\Components\Xml\Parser', $parser);
+        $parser = new Parser(m::mock('\Selene\Module\Xml\Loader\LoaderInterface'));
+        $this->assertInstanceof('\Selene\Module\Xml\Parser', $parser);
 
         $parser = new Parser;
-        $this->assertInstanceof('\Selene\Components\Xml\Parser', $parser);
+        $this->assertInstanceof('\Selene\Module\Xml\Parser', $parser);
     }
 
     /** @test */

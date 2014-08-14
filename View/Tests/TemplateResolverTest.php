@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\View\Tests package
+ * This File is part of the Selene\Module\View\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View\Tests;
+namespace Selene\Module\View\Tests;
 
 use \Mockery as m;
 use \org\bovigo\vfs\vfsStream;
-use \Selene\Components\View\TemplateResolver;
-use \Selene\Components\View\TemplateResolverInterface;
+use \Selene\Module\View\TemplateResolver;
+use \Selene\Module\View\TemplateResolverInterface;
 
 /**
  * @class TemplateResolverTest extends \PHPUnit_Framework_TestCase
  * @see \PHPUnit_Framework_TestCase
  *
- * @package Selene\Components\View\Tests
+ * @package Selene\Module\View\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -70,7 +70,7 @@ class TemplateResolverTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $resolver = new TemplateResolver;
-        $this->assertInstanceof('Selene\Components\View\TemplateResolverInterface', $resolver);
+        $this->assertInstanceof('Selene\Module\View\TemplateResolverInterface', $resolver);
     }
 
     /**

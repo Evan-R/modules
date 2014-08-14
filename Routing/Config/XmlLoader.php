@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Config package
+ * This File is part of the Selene\Module\Routing\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Config;
+namespace Selene\Module\Routing\Config;
 
 /**
  * @class XmlLoader
- * @package Selene\Components\Routing\Config
+ * @package Selene\Module\Routing\Config
  * @version $Id$
  */
 class XmlLoader extends Loader

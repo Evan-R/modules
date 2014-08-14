@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,32 +9,32 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests;
+namespace Selene\Module\DI\Tests;
 
 use \Mockery as m;
-use \Selene\Components\DI\Container;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Reference;
-use \Selene\Components\DI\Parameters;
-use \Selene\Components\DI\DefinitionInterface;
-use \Selene\Components\DI\Definition\ServiceDefinition;
-use \Selene\Components\DI\Tests\Stubs\FooService;
-use \Selene\Components\DI\Tests\Stubs\BarService;
-use \Selene\Components\DI\Tests\Stubs\ChildService;
-use \Selene\Components\DI\Tests\Stubs\SetterAwareService;
-use \Selene\Components\DI\Tests\Stubs\ParentService;
-use \Selene\Components\DI\Tests\Stubs\ContainerStub;
-use \Selene\Components\DI\Tests\Stubs\ServiceFactory;
-use \Selene\Components\DI\Exception\ContainerResolveException;
-use \Selene\Components\DI\Exception\ContainerLockedException;
+use \Selene\Module\DI\Container;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Reference;
+use \Selene\Module\DI\Parameters;
+use \Selene\Module\DI\DefinitionInterface;
+use \Selene\Module\DI\Definition\ServiceDefinition;
+use \Selene\Module\DI\Tests\Stubs\FooService;
+use \Selene\Module\DI\Tests\Stubs\BarService;
+use \Selene\Module\DI\Tests\Stubs\ChildService;
+use \Selene\Module\DI\Tests\Stubs\SetterAwareService;
+use \Selene\Module\DI\Tests\Stubs\ParentService;
+use \Selene\Module\DI\Tests\Stubs\ContainerStub;
+use \Selene\Module\DI\Tests\Stubs\ServiceFactory;
+use \Selene\Module\DI\Exception\ContainerResolveException;
+use \Selene\Module\DI\Exception\ContainerLockedException;
 
-use \Selene\Components\TestSuite\TestCase;
+use \Selene\Module\TestSuite\TestCase;
 
 /**
  * @class ContainerTest extends TestCase
  * @see TestCase
  *
- * @package Selene\Components\DI\Tests
+ * @package Selene\Module\DI\Tests
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -45,7 +45,7 @@ class ContainerTest extends TestCase
     public function itShouldBeInstatiable()
     {
         $container = $this->createContainer();
-        $this->assertInstanceOf('Selene\Components\DI\ContainerInterface', $container);
+        $this->assertInstanceOf('Selene\Module\DI\ContainerInterface', $container);
     }
 
     /** @test */
@@ -60,9 +60,9 @@ class ContainerTest extends TestCase
 
         $this->assertSame('bar', $container->getParameter('foo'));
 
-        $this->assertInstanceof('Selene\Components\DI\ParameterInterface', $container->getParameters());
+        $this->assertInstanceof('Selene\Module\DI\ParameterInterface', $container->getParameters());
 
-        $parameters = m::mock('Selene\Components\DI\ParameterInterface');
+        $parameters = m::mock('Selene\Module\DI\ParameterInterface');
 
         $container->replaceParameters($parameters);
 
@@ -72,10 +72,10 @@ class ContainerTest extends TestCase
     /** @test */
     public function itShouldThrowExceptionOnParamReplacementIfContainerIsLocked()
     {
-        $container = new Container(m::mock('Selene\Components\DI\StaticParameters'));
+        $container = new Container(m::mock('Selene\Module\DI\StaticParameters'));
 
         try {
-            $container->replaceParameters(m::mock('Selene\Components\DI\ParameterInterface'));
+            $container->replaceParameters(m::mock('Selene\Module\DI\ParameterInterface'));
         } catch (ContainerLockedException $e) {
             $this->assertSame('Can\'t replace parameters on a locked container.', $e->getMessage());
             return;
@@ -101,7 +101,7 @@ class ContainerTest extends TestCase
         $container = $this->createContainer();
 
         foreach (['foo', 'bar', 'baz'] as $name) {
-            $container->setDefinition($name, m::mock('\Selene\Components\DI\Definition\DefinitionInterface'));
+            $container->setDefinition($name, m::mock('\Selene\Module\DI\Definition\DefinitionInterface'));
         }
 
         $this->assertSame(3, count($container->getDefinitions()));
@@ -126,7 +126,7 @@ class ContainerTest extends TestCase
         $container = $this->createContainer();
 
         foreach (['foo', 'bar', 'baz'] as $i => $name) {
-            $defs[$name] = m::mock('\Selene\Components\DI\Definition\DefinitionInterface');
+            $defs[$name] = m::mock('\Selene\Module\DI\Definition\DefinitionInterface');
             $container->setDefinition($name, $defs[$name]);
         }
 
@@ -142,7 +142,7 @@ class ContainerTest extends TestCase
         $container = $this->createContainer();
 
         foreach (['foo', 'bar', 'baz'] as $i => $name) {
-            $defs[$name] = m::mock('\Selene\Components\DI\Definition\DefinitionInterface');
+            $defs[$name] = m::mock('\Selene\Module\DI\Definition\DefinitionInterface');
             $container->setDefinition($name, $defs[$name]);
         }
 
@@ -172,7 +172,7 @@ class ContainerTest extends TestCase
     {
         $container = $this->createContainer();
 
-        $def = m::mock('\Selene\Components\DI\Definition\ServiceDefinition');
+        $def = m::mock('\Selene\Module\DI\Definition\ServiceDefinition');
 
         $container->setDefinition('foo.service', $def);
         $this->assertTrue($container->hasDefinition('foo.service'));
@@ -280,7 +280,7 @@ class ContainerTest extends TestCase
 
         $class = __NAMESPACE__.'\\Stubs\\BarService';
 
-        $reference = m::mock('Selene\Components\DI\Reference');
+        $reference = m::mock('Selene\Module\DI\Reference');
         $reference->shouldReceive('__toString')->andReturn('foo.service');
 
 
@@ -396,7 +396,7 @@ class ContainerTest extends TestCase
     public function testDeclareAbstract()
     {
         $container = $this->createContainer();
-        $def = m::mock('Selene\Components\DI\Definition\DefinitionInterface');
+        $def = m::mock('Selene\Module\DI\Definition\DefinitionInterface');
         $def->shouldReceive('isInternal')->andReturn(false);
         $def->shouldReceive('isAbstract')->andReturn(true);
 
@@ -404,7 +404,7 @@ class ContainerTest extends TestCase
 
         try {
             $container->get($service);
-        } catch (\Selene\Components\DI\Exception\ContainerResolveException $e) {
+        } catch (\Selene\Module\DI\Exception\ContainerResolveException $e) {
             $this->assertEquals(
                 $e->getMessage(),
                 sprintf('Service %s is declared abstract. Instantiating abstract services is not allowed.', $service),
@@ -419,14 +419,14 @@ class ContainerTest extends TestCase
     public function testDeclareInternal()
     {
         $container = $this->createContainer();
-        $def = m::mock('Selene\Components\DI\Definition\DefinitionInterface');
+        $def = m::mock('Selene\Module\DI\Definition\DefinitionInterface');
         $def->shouldReceive('isInternal')->andReturn(true);
 
         $container->setDefinition($service = 'internal.service', $def);
 
         try {
             $container->get($service);
-        } catch (\Selene\Components\DI\Exception\ContainerResolveException $e) {
+        } catch (\Selene\Module\DI\Exception\ContainerResolveException $e) {
             $this->assertEquals(
                 $e->getMessage(),
                 sprintf('A service with id %s was is not defined', $service),
@@ -443,11 +443,11 @@ class ContainerTest extends TestCase
     {
         $container = $this->createContainer();
 
-        $container->define('foo', '\Selene\Components\DI\Tests\Stubs\BarService')->addArgument(new Reference('foo'));
+        $container->define('foo', '\Selene\Module\DI\Tests\Stubs\BarService')->addArgument(new Reference('foo'));
 
         try {
             $container->get('foo');
-        } catch (\Selene\Components\DI\Exception\CircularReferenceException $e) {
+        } catch (\Selene\Module\DI\Exception\CircularReferenceException $e) {
             $this->assertSame('service foo is in a circular reference', $e->getMessage());
             return;
         } catch (\Exception $e) {
@@ -492,9 +492,9 @@ class ContainerTest extends TestCase
     {
         $container = $this->createContainer();
 
-        $def = new ServiceDefinition('\Selene\Components\DI\Tests\Stubs\SetterAwareService');
+        $def = new ServiceDefinition('\Selene\Module\DI\Tests\Stubs\SetterAwareService');
         $def->addSetter('setFoo', ['$injected']);
-        $injected = new ServiceDefinition('\Selene\Components\DI\Tests\Stubs\FooService');
+        $injected = new ServiceDefinition('\Selene\Module\DI\Tests\Stubs\FooService');
         $injected->setInjected(true);
 
         $container->setDefinition('dependent', $def);
@@ -513,9 +513,9 @@ class ContainerTest extends TestCase
 
         $container = $this->createContainer();
 
-        $def = new ServiceDefinition('\Selene\Components\DI\Tests\Stubs\SetterAwareService');
+        $def = new ServiceDefinition('\Selene\Module\DI\Tests\Stubs\SetterAwareService');
         $def->addSetter('setFooBar', ['$injected', '$injectedb']);
-        $injected = new ServiceDefinition('\Selene\Components\DI\Tests\Stubs\FooService');
+        $injected = new ServiceDefinition('\Selene\Module\DI\Tests\Stubs\FooService');
         $injected->setInjected(true);
 
         $injectedB = new ServiceDefinition('\StdClass');
@@ -554,8 +554,8 @@ class ContainerTest extends TestCase
     /** @test */
     public function itShouldThrowExceptionWhenLockedWhileSettingADefinition()
     {
-        $def    = m::mock('Selene\Components\DI\Definition\DefinitionInterface');
-        $params = m::mock('Selene\Components\DI\StaticParameters, Selene\Components\DI\ParameterInterface');
+        $def    = m::mock('Selene\Module\DI\Definition\DefinitionInterface');
+        $params = m::mock('Selene\Module\DI\StaticParameters, Selene\Components\DI\ParameterInterface');
 
         $container = new Container($params);
 
@@ -585,7 +585,7 @@ class ContainerTest extends TestCase
 
         try {
             $container->get('bar');
-        } catch (\Selene\Components\DI\Exception\ContainerResolveException $e) {
+        } catch (\Selene\Module\DI\Exception\ContainerResolveException $e) {
             $this->assertSame('A service with id bar was is not defined', $e->getMessage());
         }
     }
@@ -596,7 +596,7 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container->setParameter('test', 'abc');
 
-        $mock = m::mock('Selene\Components\DI\ContainerInterface');
+        $mock = m::mock('Selene\Module\DI\ContainerInterface');
         $mock->shouldReceive('isLocked')->once()->andReturn(false);
         $mock->shouldReceive('getServices')->once()->andReturn(['foo' => new \StdClass]);
         $mock->shouldReceive('getParameters')->once()->andReturn($params = new Parameters);
@@ -613,7 +613,7 @@ class ContainerTest extends TestCase
     /** @test */
     public function itShouldHaveAliases()
     {
-        $this->assertInstanceof('Selene\Components\DI\Aliases', (new Container)->getAliases());
+        $this->assertInstanceof('Selene\Module\DI\Aliases', (new Container)->getAliases());
     }
 
     /** @test */
@@ -622,8 +622,8 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container->setParameter('foo_args', $args = [1, 2, 4]);
         $container
-            ->define('foo_service', $serviceClass = 'Selene\Components\DI\Tests\Stubs\FooService')
-            ->setFactory('Selene\Components\DI\Tests\Stubs\ServiceFactory', 'makeFoo')
+            ->define('foo_service', $serviceClass = 'Selene\Module\DI\Tests\Stubs\FooService')
+            ->setFactory('Selene\Module\DI\Tests\Stubs\ServiceFactory', 'makeFoo')
             ->addArgument('%foo_args%');
 
         $service = $container->get('foo_service');
@@ -632,8 +632,8 @@ class ContainerTest extends TestCase
         $this->assertSame($args, $service->getOptions());
 
         $container
-            ->define('bar_service', $serviceClassB = 'Selene\Components\DI\Tests\Stubs\BarService')
-            ->setFactory('Selene\Components\DI\Tests\Stubs\ServiceFactory', 'makeBar')
+            ->define('bar_service', $serviceClassB = 'Selene\Module\DI\Tests\Stubs\BarService')
+            ->setFactory('Selene\Module\DI\Tests\Stubs\ServiceFactory', 'makeBar')
             ->addArgument(new Reference('foo_service'));
 
         $serviceB = $container->get('bar_service');
@@ -643,8 +643,8 @@ class ContainerTest extends TestCase
         $this->assertSame($service, $serviceB->getFoo());
 
         $container
-            ->define('bar_service_b', $serviceClassB = 'Selene\Components\DI\Tests\Stubs\BarService')
-            ->setFactory('Selene\Components\DI\Tests\Stubs\ServiceFactory', 'makeBarB');
+            ->define('bar_service_b', $serviceClassB = 'Selene\Module\DI\Tests\Stubs\BarService')
+            ->setFactory('Selene\Module\DI\Tests\Stubs\ServiceFactory', 'makeBarB');
 
         try {
             $container->get('bar_service_b');
@@ -663,7 +663,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
 
-        $mock = m::mock('Selene\Components\DI\ContainerInterface');
+        $mock = m::mock('Selene\Module\DI\ContainerInterface');
         $mock->shouldReceive('isLocked')->andReturn(true);
 
         try {
@@ -675,9 +675,9 @@ class ContainerTest extends TestCase
             $this->fail($e->getMessage());
         }
 
-        $mock = m::mock('Selene\Components\DI\ContainerInterface');
+        $mock = m::mock('Selene\Module\DI\ContainerInterface');
         $mock->shouldReceive('isLocked')->andReturn(false);
-        $container = new Container(m::mock('Selene\Components\DI\StaticParameters'));
+        $container = new Container(m::mock('Selene\Module\DI\StaticParameters'));
         try {
             $container->merge($mock);
         } catch (ContainerLockedException $e) {
@@ -754,7 +754,7 @@ class ContainerTest extends TestCase
      */
     protected function getDefinitionMock(array $arguments = null, $class = null)
     {
-        $class = $class ?: 'Selene\Components\DI\Definition\ServiceDefinition';
+        $class = $class ?: 'Selene\Module\DI\Definition\ServiceDefinition';
 
         $def = m::mock($class);
         foreach ($arguments as $argument) {
@@ -772,14 +772,14 @@ class ContainerTest extends TestCase
 
     protected function createReferenceMock($id)
     {
-        $reference = m::mock('Selene\Components\DI\Reference');
+        $reference = m::mock('Selene\Module\DI\Reference');
         $reference->shouldReceive('__toString')->andReturn($id);
         return $reference;
     }
 
     protected function createAliasMock($id)
     {
-        $alias = m::mock('Selene\Components\DI\Alias');
+        $alias = m::mock('Selene\Module\DI\Alias');
         $alias->shouldReceive('__toString')->andReturn($id);
         return $alias;
     }

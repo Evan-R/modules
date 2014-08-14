@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events\Tests\Traits package
+ * This File is part of the Selene\Module\Events\Tests\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events\Tests\Traits;
+namespace Selene\Module\Events\Tests\Traits;
 
 use \Mockery as m;
-use \Selene\Components\Events\SubscriberInterface;
-use \Selene\Components\Events\Traits\SubscriberTrait;
+use \Selene\Module\Events\SubscriberInterface;
+use \Selene\Module\Events\Traits\SubscriberTrait;
 
 /**
  * @class SubscriberTraitTest
- * @package Selene\Components\Events\Tests\Traits
+ * @package Selene\Module\Events\Tests\Traits
  * @version $Id$
  */
 class SubscriberTraitTest extends \PHPUnit_Framework_TestCase implements SubscriberInterface
@@ -33,7 +33,7 @@ class SubscriberTraitTest extends \PHPUnit_Framework_TestCase implements Subscri
     {
         $subscribed = false;
 
-        $events = m::mock('Selene\Components\Events\Dispatcher');
+        $events = m::mock('Selene\Module\Events\Dispatcher');
 
         $events->shouldReceive('addSubscriber')->with($this)
             ->andReturnUsing(function () use (&$subscribed) {

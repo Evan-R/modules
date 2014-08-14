@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Kernel\Tests package
+ * This File is part of the Selene\Module\Kernel\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel\Tests;
+namespace Selene\Module\Kernel\Tests;
 
 use \Mockery as m;
 use \org\bovigo\vfs\vfsStream;
-use \Selene\Components\TestSuite\TestCase;
-use \Selene\Components\Kernel\Application;
-use \Selene\Components\Kernel\Tests\Stubs\ApplicationStub;
+use \Selene\Module\TestSuite\TestCase;
+use \Selene\Module\Kernel\Application;
+use \Selene\Module\Kernel\Tests\Stubs\ApplicationStub;
 
 /**
  * @class ApplicationTest
- * @package Selene\Components\Kernel\Tests
+ * @package Selene\Module\Kernel\Tests
  * @version $Id$
  */
 class ApplicationTest extends TestCase
@@ -27,7 +27,7 @@ class ApplicationTest extends TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\Kernel\Application', new Application('testing'));
+        $this->assertInstanceof('\Selene\Module\Kernel\Application', new Application('testing'));
     }
 
     /** @test */
@@ -61,7 +61,7 @@ class ApplicationTest extends TestCase
 
     protected function mockCache($valid = false, $env = 'testing')
     {
-        $cache = m::mock('Selene\Components\Config\CacheInterface');
+        $cache = m::mock('Selene\Module\Config\CacheInterface');
         $cache->shouldReceive('isValid')->andReturn((bool)$valid);
 
         $cache->shouldReceive('getFile')->andReturn($this->replaceContainerSubCode($env));

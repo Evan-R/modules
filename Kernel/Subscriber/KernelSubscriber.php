@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Kernel\Subscriber package
+ * This File is part of the Selene\Module\Kernel\Subscriber package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel\Subscriber;
+namespace Selene\Module\Kernel\Subscriber;
 
-use \Selene\Components\Kernel\KernelInterface;
-use \Selene\Components\Events\SubscriberInterface;
-use \Selene\Components\Events\DispatcherInterface;
+use \Selene\Module\Kernel\KernelInterface;
+use \Selene\Module\Events\SubscriberInterface;
+use \Selene\Module\Events\DispatcherInterface;
 
 /**
  * @interface KernelSubscriber
- * @package Selene\Components\Kernel\Subscriber
+ * @package Selene\Module\Kernel\Subscriber
  * @version $Id$
  */
 interface KernelSubscriber extends SubscriberInterface

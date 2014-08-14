@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Processor package
+ * This File is part of the Selene\Module\DI\Tests\Processor package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Processor;
+namespace Selene\Module\DI\Tests\Processor;
 
-use \Selene\Components\DI\Container;
-use \Selene\Components\DI\Reference;
-use \Selene\Components\DI\Processor\ResolveAliasWithDefinition;
+use \Selene\Module\DI\Container;
+use \Selene\Module\DI\Reference;
+use \Selene\Module\DI\Processor\ResolveAliasWithDefinition;
 
 class ResolveAliasWithDefinitionTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('\Selene\Components\DI\Processor\ProcessInterface', new ResolveAliasWithDefinition);
+        $this->assertInstanceof('\Selene\Module\DI\Processor\ProcessInterface', new ResolveAliasWithDefinition);
     }
 
     /** @test */

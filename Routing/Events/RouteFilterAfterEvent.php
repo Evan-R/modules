@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Events package
+ * This File is part of the Selene\Module\Routing\Events package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Events;
+namespace Selene\Module\Routing\Events;
 
-use \Selene\Components\Events\Event;
-use \Selene\Components\Routing\Route;
+use \Selene\Module\Events\Event;
+use \Selene\Module\Routing\Route;
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * @class RouteFilterAfterEvent
- * @package Selene\Components\Routing\Events
+ * @package Selene\Module\Routing\Events
  * @version $Id$
  */
 class RouteFilterAfterEvent extends RouteFilterEvent

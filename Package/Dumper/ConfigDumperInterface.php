@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package\Dumper;
+namespace Selene\Module\Package\Dumper;
 
 /**
  * @interface ConfigDumperInterface

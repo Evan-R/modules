@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Definition package
+ * This File is part of the Selene\Module\DI\Tests\Definition package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Definition;
+namespace Selene\Module\DI\Tests\Definition;
 
-use \Selene\Components\DI\Reference;
-use \Selene\Components\DI\CallerReference;
+use \Selene\Module\DI\Reference;
+use \Selene\Module\DI\CallerReference;
 
 /**
  * @class CallerReferenceTest
- * @package Selene\Components\DI\Tests\Definition
+ * @package Selene\Module\DI\Tests\Definition
  * @version $Id$
  */
 class CallerReferenceTest extends \PHPUnit_Framework_TestCase
@@ -25,7 +25,7 @@ class CallerReferenceTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof(
-            'Selene\Components\DI\CallerReference',
+            'Selene\Module\DI\CallerReference',
             new CallerReference('foo', 'getBar')
         );
     }
@@ -34,7 +34,7 @@ class CallerReferenceTest extends \PHPUnit_Framework_TestCase
     public function itShouldCreateAreferenceIfStringGiven()
     {
         $def = new CallerReference('foo', 'getBar');
-        $this->assertInstanceof('Selene\Components\DI\Reference', $def->getService());
+        $this->assertInstanceof('Selene\Module\DI\Reference', $def->getService());
     }
 
     /** @test */

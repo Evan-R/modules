@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml package
+ * This File is part of the Selene\Module\Xml package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,19 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml;
+namespace Selene\Module\Xml;
 
-use \Selene\Components\Xml\DOM\DOMElement;
-use \Selene\Components\Xml\DOM\DOMDocument;
-use \Selene\Components\Xml\Traits\XmlHelperTrait;
-use \Selene\Components\Xml\Normalizer\Normalizer;
-use \Selene\Components\Xml\Normalizer\NormalizerInterface;
-use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Module\Xml\DOM\DOMElement;
+use \Selene\Module\Xml\DOM\DOMDocument;
+use \Selene\Module\Xml\Traits\XmlHelperTrait;
+use \Selene\Module\Xml\Normalizer\Normalizer;
+use \Selene\Module\Xml\Normalizer\NormalizerInterface;
+use \Selene\Module\Common\Helper\ListHelper;
 
 /**
  * @class Writer
  *
- * @package Selene\Components\Xml
+ * @package Selene\Module\Xml
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator\Stubs package
+ * This File is part of the Selene\Module\Config\Tests\Validator\Stubs package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator\Stubs;
+namespace Selene\Module\Config\Tests\Validator\Stubs;
 
-use \Selene\Components\Config\Validator\Nodes\ArrayNode;
+use \Selene\Module\Config\Validator\Nodes\ArrayNode;
 
 /**
  * @class ArrayNodeStub
- * @package Selene\Components\Config\Tests\Validator\Stubs
+ * @package Selene\Module\Config\Tests\Validator\Stubs
  * @version $Id$
  */
 class ArrayNodeStub extends ArrayNode

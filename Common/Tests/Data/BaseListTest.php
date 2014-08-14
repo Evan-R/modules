@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Tests\Data;
+namespace Selene\Module\Common\Tests\Data;
 
-use \Selene\Components\Common\Data\BaseList;
+use \Selene\Module\Common\Data\BaseList;
 
 /**
  * @class BaseListTest extends \PHPUnit_Framework_TestCase
  * @see \PHPUnit_Framework_TestCase
  *
- * @package Selene\Components\Common
+ * @package Selene\Module\Common
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

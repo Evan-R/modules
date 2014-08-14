@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events package
+ * This File is part of the Selene\Module\Events package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events;
+namespace Selene\Module\Events;
 
-use \Selene\Components\Common\Traits\Getter;
+use \Selene\Module\Common\Traits\Getter;
 
 /**
  * @class Dispatcher implements DispatcherInterface
  * @see DispatcherInterface
  *
- * @package Selene\Components\Events
+ * @package Selene\Module\Events
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -138,7 +138,7 @@ class Dispatcher implements DispatcherInterface
     /**
      * Registers an event subscriber object.
      *
-     * Also see `Selene\Components\Events\SubscriberInterface`
+     * Also see `Selene\Module\Events\SubscriberInterface`
      *
      * @param SubscriberInterface $subscriber the subscriber object.
      *

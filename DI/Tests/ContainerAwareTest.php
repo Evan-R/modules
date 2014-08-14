@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests package
+ * This File is part of the Selene\Module\DI\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,10 +9,10 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests;
+namespace Selene\Module\DI\Tests;
 
-use \Selene\Components\DI\Tests\Stubs\ContainerAwareStub;
-use \Selene\Components\DI\Container;
+use \Selene\Module\DI\Tests\Stubs\ContainerAwareStub;
+use \Selene\Module\DI\Container;
 
 class ContainerAwareTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +23,7 @@ class ContainerAwareTest extends \PHPUnit_Framework_TestCase
 
         $aware = new ContainerAwareStub;
 
-        $this->assertInstanceof('\Selene\Components\DI\ContainerAwareInterface', $aware);
+        $this->assertInstanceof('\Selene\Module\DI\ContainerAwareInterface', $aware);
 
         $aware->setContainer($container);
 

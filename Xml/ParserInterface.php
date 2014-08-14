@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Xml package
+ * This File is part of the Selene\Module\Xml package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Xml;
+namespace Selene\Module\Xml;
 
-use \Selene\Components\Xml\Dom\DOMElement;
+use \Selene\Module\Xml\Dom\DOMElement;
 
 /**
  * @interface ParserInterface
  *
- * @package Selene\Components\Xml
+ * @package Selene\Module\Xml
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

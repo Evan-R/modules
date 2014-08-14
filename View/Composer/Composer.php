@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\View\Composer package
+ * This File is part of the Selene\Module\View\Composer package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,30 +9,42 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View\Composer;
+namespace Selene\Module\View\Composer;
 
-use \Selene\Components\View\ManagerInterface as View;
+use \Selene\Module\View\RendererInterface;
+use \Selene\Module\View\DispatcherInterface as View;
 
 /**
  * @class Composer
- * @package Selene\Components\View\Composer
+ * @package Selene\Module\View\Composer
  * @version $Id$
  */
-class Composer implements ComposerInterface
+abstract class Composer implements ComposerInterface
 {
-    private $context;
+    /**
+     * context
+     *
+     * @var array
+     */
+    protected $composables;
 
     /**
      * compose
      *
-     * @param mixed $template
-     * @param mixed $context
+     * @param string $template
+     * @param Composable $context
      *
      * @return void
      */
-    public function compose($template, Composable $composable)
+    public function addComposable($template, Composable $composable)
     {
-        $this->context[(string)$template] = &$composable;
+        if ($this->hasService($template)) {
+            throw new \InvalidArgumentException(
+                sprintf('A composer for template %s already exists as service', $template)
+            );
+        }
+
+        $this->composables[(string)$template] = &$composable;
     }
 
     /**
@@ -44,21 +56,46 @@ class Composer implements ComposerInterface
      */
     public function has($template)
     {
-        return isset($this->context[(string)$template]);
+        if (isset($this->composables[(string)$template])) {
+            return true;
+        }
+
+        try {
+            $res = $this->getService($template);
+
+            return (bool)$res;
+        } catch (\Exception $e) {
+        }
+
+        return false;
     }
 
     /**
-     * render
+     * compose
      *
-     * @param mixed $template
-     * @param mixed $context
+     * @param RendererInterface $renderer
      *
-     * @return string
+     * @access public
+     * @return mixed
      */
-    public function render(View $view, $template, $context = [])
+    public function compose(RendererInterface $renderer)
     {
-        if ($this->has($template)) {
-            return $this->context[(string)$template]->render($view, $template, $context);
+        if (!$this->has($template = $renderer->getTemplateName())) {
+            return;
         }
+
+        try {
+            $res = $this->getService($template);
+        } catch (\Exception $e) {
+            $res = $this->composables[(string)$template];
+        }
+
+        $res->compose(new Context($renderer));
     }
+
+    abstract public function setService($template, $id);
+
+    abstract public function getService($template);
+
+    abstract public function hasService($template);
 }

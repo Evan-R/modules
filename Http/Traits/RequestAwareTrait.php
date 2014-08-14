@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Http\Traits package
+ * This File is part of the Selene\Module\Http\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Http\Traits;
+namespace Selene\Module\Http\Traits;
 
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
  * @class RequestAwareTrait
- * @package Selene\Components\Http\Traits
+ * @package Selene\Module\Http\Traits
  * @version $Id$
  */
 trait RequestAwareTrait

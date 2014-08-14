@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Data package
+ * This File is part of the Selene\Module\Common\Data package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Data;
+namespace Selene\Module\Common\Data;
 
-use \Selene\Components\Common\Traits\Getter;
-use \Selene\Components\Common\Traits\Setter;
-use \Selene\Components\Common\Helper\ListHelper;
-use \Selene\Components\Common\Interfaces\ArrayableInterface;
+use \Selene\Module\Common\Traits\Getter;
+use \Selene\Module\Common\Traits\Setter;
+use \Selene\Module\Common\Helper\ListHelper;
+use \Selene\Module\Common\Interfaces\ArrayableInterface;
 
 /**
  * @class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregate
@@ -22,7 +22,7 @@ use \Selene\Components\Common\Interfaces\ArrayableInterface;
  * @see \ArrayAccess
  * @see \IteratorAggregate
  *
- * @package Selene\Components\Common\Data
+ * @package Selene\Module\Common\Data
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

@@ -9,10 +9,10 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cryptography\Tests;
+namespace Selene\Module\Cryptography\Tests;
 
-use Selene\Components\TestSuite\TestCase;
-use Selene\Components\Cryptography\HashKey;
+use Selene\Module\TestSuite\TestCase;
+use Selene\Module\Cryptography\HashKey;
 
 /**
  * Class HashKeyTest

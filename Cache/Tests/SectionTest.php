@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Cache\Tests package
+ * This File is part of the Selene\Module\Cache\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache\Tests;
+namespace Selene\Module\Cache\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Cache\Section;
-use \Selene\Components\TestSuite\TestCase;
+use \Selene\Module\Cache\Section;
+use \Selene\Module\TestSuite\TestCase;
 
 /**
  * @class SectionTest
- * @package Selene\Components\Cache\Tests
+ * @package Selene\Module\Cache\Tests
  * @version $Id$
  */
 class SectionTest extends TestCase
@@ -27,14 +27,14 @@ class SectionTest extends TestCase
     /** @test */
     public function itShouldBeInstantiable()
     {
-        $this->assertInstanceof('Selene\Components\Cache\CacheInterface', new Section($this->mockStorage(), 'section'));
+        $this->assertInstanceof('Selene\Module\Cache\CacheInterface', new Section($this->mockStorage(), 'section'));
     }
 
     /** @test */
     public function itShouldReturnSection()
     {
         $this->assertInstanceof(
-            'Selene\Components\Cache\Section',
+            'Selene\Module\Cache\Section',
             $this->newSection()->section('test')
         );
     }
@@ -116,6 +116,6 @@ class SectionTest extends TestCase
 
     protected function mockStorage()
     {
-        return m::mock('Selene\Components\Cache\CacheInterface');
+        return m::mock('Selene\Module\Cache\CacheInterface');
     }
 }

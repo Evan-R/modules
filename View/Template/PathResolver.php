@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\View package
+ * This File is part of the Selene\Module\View package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\View\Template;
+namespace Selene\Module\View\Template;
 
 /**
  * @class PathResolver
- * @package Selene\Components\View
+ * @package Selene\Module\View
  * @version $Id$
  */
 class PathResolver implements ResolverInterface, LocatorInterface
@@ -112,6 +112,10 @@ class PathResolver implements ResolverInterface, LocatorInterface
             return $this->cache[$name];
         }
 
+        if (is_file($name)) {
+            return $name;
+        }
+
         list ($name, $namespace, $template) = $this->parser->parse($name);
 
         if (!isset($this->paths[$namespace])) {
@@ -120,13 +124,26 @@ class PathResolver implements ResolverInterface, LocatorInterface
 
         $path = null;
 
+
         foreach ($this->paths[$namespace] as $filePath) {
 
-            if (is_file($path = rtrim($filePath, '\\\/').'/'.ltrim($template, '\\\/'))) {
-                return $this->cache[$name] = $path;
+            if ($file = $this->findFile($filePath, $template)) {
+                return $this->cache[$name] = $file;
             }
         }
 
         throw new \InvalidArgumentException(sprintf('no template found for "%s"', $name));
+    }
+
+    protected function findFile($rootPath, $template)
+    {
+        if (is_file($file = $this->concatPath($rootPath, $template))) {
+            return $file;
+        }
+    }
+
+    protected function concatPath($filePath, $template)
+    {
+        return rtrim($filePath, '\\\/').'/'.ltrim($template, '\\\/');
     }
 }

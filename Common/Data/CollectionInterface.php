@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Data package
+ * This File is part of the Selene\Module\Common\Data package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Data;
+namespace Selene\Module\Common\Data;
 
 /**
  * @class CollectionInterface
- * @package Selene\Components\Common\Data
+ * @package Selene\Module\Common\Data
  * @version $Id$
  */
 interface CollectionInterface

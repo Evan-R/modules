@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Resource package
+ * This File is part of the Selene\Module\Config\Resource package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Resource;
+namespace Selene\Module\Config\Resource;
 
-use \Selene\Components\Config\Loader\LoaderInterface;
-use \Selene\Components\Filesystem\Traits\PathHelperTrait;
+use \Selene\Module\Config\Loader\LoaderInterface;
+use \Selene\Module\Filesystem\Traits\PathHelperTrait;
 
 /**
  * @class Locator implements LocatorInterface
  * @see LocatorInterface
  *
- * @package Selene\Components\Config\Resource
+ * @package Selene\Module\Config\Resource
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Processor package
+ * This File is part of the Selene\Module\DI\Processor package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Processor;
+namespace Selene\Module\DI\Processor;
 
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Definition\DefinitionInterface;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Definition\DefinitionInterface;
 
 /**
  * @class ResolveCallerMethodCalls extends Process
  * @see Process
  *
- * @package Selene\Components\DI\Processor
+ * @package Selene\Module\DI\Processor
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

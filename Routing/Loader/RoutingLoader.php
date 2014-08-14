@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Loader package
+ * This File is part of the Selene\Module\Routing\Loader package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Loader;
+namespace Selene\Module\Routing\Loader;
 
-use \Selene\Components\Routing\RouteBuilder;
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Config\Resource\Loader;
-use \Selene\Components\Config\Resource\LocatorInterface;
-use \Selene\Components\Routing\RouteCollectionInterface;
+use \Selene\Module\Routing\RouteBuilder;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\Config\Resource\Loader;
+use \Selene\Module\Config\Resource\LocatorInterface;
+use \Selene\Module\Routing\RouteCollectionInterface;
 
 /**
  * @class RoutingLoader
- * @package Selene\Components\Routing\Loader
+ * @package Selene\Module\Routing\Loader
  * @version $Id$
  */
 abstract class RoutingLoader extends Loader
@@ -67,6 +67,16 @@ abstract class RoutingLoader extends Loader
         $this->loaded = [];
 
         parent::__construct($locator);
+    }
+
+    /**
+     * getRouteBuilder
+     *
+     * @return RouteBuilder
+     */
+    public function getRouteBuilder()
+    {
+        return $this->routes;
     }
 
     /**

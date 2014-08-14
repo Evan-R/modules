@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Validator\Nodes;
+namespace Selene\Module\Config\Validator\Nodes;
 
-use \Selene\Components\Config\Validator\Exception\RangeException;
-use \Selene\Components\Config\Validator\Exception\LengthException;
+use \Selene\Module\Config\Validator\Exception\RangeException;
+use \Selene\Module\Config\Validator\Exception\LengthException;
 
 /**
  * @class Rangeable
- * @package Selene\Components\Config\Validator\Nodes
+ * @package Selene\Module\Config\Validator\Nodes
  * @version $Id$
  */
 trait Rangeable

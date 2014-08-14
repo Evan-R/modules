@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator\Nodes package
+ * This File is part of the Selene\Module\Config\Tests\Validator\Nodes package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator\Nodes;
+namespace Selene\Module\Config\Tests\Validator\Nodes;
 
 use \Mockery as m;
-use \Selene\Components\Config\Validator\Nodes\DictNode;
-use \Selene\Components\Config\Validator\Nodes\StringNode;
-use \Selene\Components\Config\Validator\Exception\ValidationException;
-use \Selene\Components\Config\Validator\Exception\InvalidTypeException;
+use \Selene\Module\Config\Validator\Nodes\DictNode;
+use \Selene\Module\Config\Validator\Nodes\StringNode;
+use \Selene\Module\Config\Validator\Exception\ValidationException;
+use \Selene\Module\Config\Validator\Exception\InvalidTypeException;
 
 /**
  * @class DictNodeTest
- * @package Selene\Components\Config\Tests\Validator\Nodes
+ * @package Selene\Module\Config\Tests\Validator\Nodes
  * @version $Id$
  */
 class DictNodeTest extends ArrayNodeTest
@@ -120,6 +120,6 @@ class DictNodeTest extends ArrayNodeTest
      */
     protected function getNodeClass()
     {
-        return 'Selene\Components\Config\Validator\Nodes\DictNode';
+        return 'Selene\Module\Config\Validator\Nodes\DictNode';
     }
 }

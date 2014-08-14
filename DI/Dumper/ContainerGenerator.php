@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Dumper package
+ * This File is part of the Selene\Module\DI\Dumper package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,29 +9,29 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Dumper;
+namespace Selene\Module\DI\Dumper;
 
-use \Selene\Writer\Writer;
-use \Selene\Writer\Generator\GeneratorInterface;
-use \Selene\Writer\Generator\Object\Method;
-use \Selene\Writer\Generator\Object\Property;
-use \Selene\Writer\Generator\Object\Argument;
-use \Selene\Writer\Generator\Object\ClassGenerator;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Dumper\Object\ServiceMethod;
-use \Selene\Components\DI\Dumper\Object\ServiceMethodBody;
-use \Selene\Components\DI\Dumper\Object\ReturnStatement;
-use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
+use \Selene\Module\Writer\Writer;
+use \Selene\Module\Writer\FormatterHelper;
+use \Selene\Module\Writer\GeneratorInterface;
+use \Selene\Module\Writer\Object\Method;
+use \Selene\Module\Writer\Object\Property;
+use \Selene\Module\Writer\Object\Argument;
+use \Selene\Module\Writer\Object\ClassWriter;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Dumper\Object\ServiceMethod;
+use \Selene\Module\DI\Dumper\Object\ServiceMethodBody;
+use \Selene\Module\DI\Dumper\Object\ReturnStatement;
 
 /**
  * @class Generator
- * @package Selene\Components\DI\Dumper
+ * @package Selene\Module\DI\Dumper
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
 class ContainerGenerator implements GeneratorInterface
 {
-    use FormatterTrait;
+    use FormatterHelper;
 
     /**
      * containerServiceName
@@ -87,10 +87,11 @@ class ContainerGenerator implements GeneratorInterface
         $this->className = $className;
         $this->namespace = $namespace;
 
-        $this->importResolver = new ImportResolver;
-
-        $this->cg = new ClassGenerator($className, $namespace, '\\' . get_class($container));
+        //$this->cg = new ClassWriter($className, $namespace, '\\' . get_class($container), get_class($container));
+        $this->cg = new ClassWriter($namespace . '\\' . $className);
+        $this->cg->setParent(get_class($container));
     }
+
 
     /**
      * setServiceId
@@ -143,6 +144,13 @@ class ContainerGenerator implements GeneratorInterface
 
         $result = $this->cg->generate($raw);
 
+        //var_dump($result);
+        //die;
+        //echo '<pre>';
+        //echo $result;
+        //echo '</pre>';
+        //die;
+
         return $result;
     }
 
@@ -157,8 +165,13 @@ class ContainerGenerator implements GeneratorInterface
             return;
         }
 
-        $this->cg->setUseStatements($this->getImports());
-        $this->cg->setTraits($this->getTraits());
+        foreach ($this->getImports() as $import) {
+            $this->cg->addUseStatement($import);
+        }
+
+        foreach ($this->getTraits() as $trait) {
+            $this->cg->addTrait($trait);
+        }
 
         $this->setProperties();
         $this->setConstructor();
@@ -189,7 +202,7 @@ class ContainerGenerator implements GeneratorInterface
     {
         $this->cg->addMethod($method = new Method('__construct'));
 
-        $method->setDocComment('Constructor.');
+        $method->setDescription('Constructor.');
         $method->setBody(
             (new Writer)
             ->writeln('$this->parameters  = new StaticParameters($this->getDefaultParams());')
@@ -229,11 +242,11 @@ class ContainerGenerator implements GeneratorInterface
             }
 
             // Resolve the class alias according to previous imports
-            $this->importResolver->add($class = $definition->getClass());
+            $this->cg->addUseStatement($class = $definition->getClass());
             // Set the method body and inject the service class alias.
-            $method->setBody(new ServiceMethodBody($this->container, $id, $this->importResolver->getAlias($class)));
-            // Set the resolved import statement on the container.
-            $this->cg->addUseStatement($this->importResolver->getImport($class));
+            $method->setBody(
+                new ServiceMethodBody($this->container, $id, $this->cg->getImportResolver()->getAlias($class))
+            );
         }
     }
 
@@ -268,9 +281,9 @@ class ContainerGenerator implements GeneratorInterface
         ksort($aliases);
 
         $map    = $this->extractParams($names, 0);
+        $ids    = $this->extractParams($aliases, 0);
         $imap   = $this->extractParams($internal, 0);
         $params = $this->extractParams($parameters, 0);
-        $ids    = $this->extractParams($aliases, 0);
 
         $this->cg->addMethod($method = new Method('getConstructorMap', Method::IS_PRIVATE));
         $method->setBody((string)(new ReturnStatement($map)));
@@ -326,19 +339,11 @@ class ContainerGenerator implements GeneratorInterface
             ->writeln('}')
         );
 
-        // method: ContainerInterface::resolveId():
-        //$this->cg->addMethod($method = new Method('resolveId', Method::IS_PROTECTED, Method::T_STRING));
-
-        //$method->addArgument(new Argument('id', Method::T_STRING));
-        ////$method->setBody((string)(new ReturnStatement('$this->getDefault($this->aliases, $id, $id)')));
-        //$method->setBody((string)(new ReturnStatement('$id')));
-
-
         // method: ContainerInterface::getInternal():
         $this->cg->addMethod($method = new Method('getInternal', Method::IS_PROTECTED));
 
         $method->addArgument(new Argument('id', Method::T_STRING));
-        $method->setDocComment('Get an internal service');
+        $method->setDescription('Get an internal service');
 
         $method->setBody(
             (new Writer)
@@ -360,7 +365,7 @@ class ContainerGenerator implements GeneratorInterface
         $comment .= "Post check if a setter of a called service that\n";
         $comment .= "has synced dependencies needs to be called immediately.";
 
-        $method->setDocComment($comment);
+        $method->setDescription($comment);
 
         $method->addArgument($arg = new Argument('synced', Method::T_ARRAY));
 
@@ -384,12 +389,12 @@ class ContainerGenerator implements GeneratorInterface
     protected function getImports()
     {
         return array_unique(array_merge([
-            '\Selene\Components\DI\Aliases',
-            '\Selene\Components\DI\Container',
-            '\Selene\Components\DI\ContainerInterface',
-            '\Selene\Components\DI\ParameterInterface',
-            '\Selene\Components\DI\StaticParameters',
-            '\Selene\Components\Common\Traits\Getter',
+            '\Selene\Module\DI\Aliases',
+            '\Selene\Module\DI\Container',
+            '\Selene\Module\DI\ContainerInterface',
+            '\Selene\Module\DI\ParameterInterface',
+            '\Selene\Module\DI\StaticParameters',
+            '\Selene\Module\Common\Traits\Getter',
         ], $this->imports));
     }
 
@@ -401,7 +406,7 @@ class ContainerGenerator implements GeneratorInterface
     protected function getTraits()
     {
         return array_unique(array_merge([
-            '\Selene\Components\Common\Traits\Getter'
+            '\Selene\Module\Common\Traits\Getter'
         ], $this->traits));
     }
 }

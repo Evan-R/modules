@@ -23,7 +23,7 @@
     "selene/filesystem":""
   },
   "autoload": {
-    "psr-4": {"Selene\\Components\\Cache\\": ""}
+    "psr-4": {"Selene\\Module\\Cache\\": ""}
   },
   "minimum-stability": "dev"
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events\Tests package
+ * This File is part of the Selene\Module\Events\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events\Tests;
+namespace Selene\Module\Events\Tests;
 
 use \Mockery as m;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\Events\ContainerAwareDispatcher;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\Events\ContainerAwareDispatcher;
 
 /**
  * @class ContainerAwareDispatcherTest
- * @package Selene\Components\Events\Tests
+ * @package Selene\Module\Events\Tests
  * @version $Id$
  */
 class ContainerAwareDispatcherTest extends DispatcherTest
@@ -41,7 +41,7 @@ class ContainerAwareDispatcherTest extends DispatcherTest
                 }
             );
 
-        $container = m::mock('Selene\Components\DI\ContainerInterface');
+        $container = m::mock('Selene\Module\DI\ContainerInterface');
         $container->shouldReceive('get')->with('some_service')->andReturn($class);
         $container->shouldReceive('has')->with('some_service')->andReturn(true);
 
@@ -71,7 +71,7 @@ class ContainerAwareDispatcherTest extends DispatcherTest
             );
         }
 
-        $container = m::mock('Selene\Components\DI\ContainerInterface');
+        $container = m::mock('Selene\Module\DI\ContainerInterface');
         $container->shouldReceive('has')->with('bar')->andReturn(false);
 
         $dispatcher->setContainer($container);

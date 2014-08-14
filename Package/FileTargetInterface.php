@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
 
 /**
  * @interface FileTargetInterface
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  */
 interface FileTargetInterface

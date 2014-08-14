@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Stubs package
+ * This File is part of the Selene\Module\DI\Tests\Stubs package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -13,7 +13,7 @@ namespace DI\Stubs;
 
 /**
  * @class RequiredService
- * @package Selene\Components\DI\Tests\Stubs
+ * @package Selene\Module\DI\Tests\Stubs
  * @version $Id$
  */
 class RequiredService

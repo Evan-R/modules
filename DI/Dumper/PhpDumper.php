@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Dumper package
+ * This File is part of the Selene\Module\DI\Dumper package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,25 +9,25 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Dumper;
+namespace Selene\Module\DI\Dumper;
 
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\ContainerAwareInterface;
-use \Selene\Components\DI\Traits\ContainerAwareTrait;
-use \Selene\Components\DI\Dumper\Stubs\ServiceMethod;
-use \Selene\Components\DI\Dumper\Stubs\ContainerService;
-use \Selene\Components\DI\Dumper\Stubs\Constructor;
-use \Selene\Components\DI\Dumper\Stubs\ClassHeader;
-use \Selene\Components\DI\Dumper\Stubs\ClassFooter;
-use \Selene\Components\DI\Dumper\Stubs\Property;
-use \Selene\Components\DI\Dumper\Stubs\String;
-use \Selene\Components\DI\Dumper\Stubs\UseStatements;
-use \Selene\Components\DI\Dumper\Stubs\NamespaceStatement;
-use \Selene\Components\DI\Dumper\Traits\FormatterTrait;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\ContainerAwareInterface;
+use \Selene\Module\DI\Traits\ContainerAwareTrait;
+use \Selene\Module\DI\Dumper\Stubs\ServiceMethod;
+use \Selene\Module\DI\Dumper\Stubs\ContainerService;
+use \Selene\Module\DI\Dumper\Stubs\Constructor;
+use \Selene\Module\DI\Dumper\Stubs\ClassHeader;
+use \Selene\Module\DI\Dumper\Stubs\ClassFooter;
+use \Selene\Module\DI\Dumper\Stubs\Property;
+use \Selene\Module\DI\Dumper\Stubs\String;
+use \Selene\Module\DI\Dumper\Stubs\UseStatements;
+use \Selene\Module\DI\Dumper\Stubs\NamespaceStatement;
+use \Selene\Module\DI\Dumper\Traits\FormatterTrait;
 
 /**
  * @class Dumper
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  */
 class PhpDumper implements ContainerAwareInterface

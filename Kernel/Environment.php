@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Kernel package
+ * This File is part of the Selene\Module\Kernel package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel;
+namespace Selene\Module\Kernel;
 
 /**
  * @class Environment
  *
- * @package Selene\Components\Kernel
+ * @package Selene\Module\Kernel
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

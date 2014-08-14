@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package\Tests\Stubs package
+ * This File is part of the Selene\Module\Package\Tests\Stubs package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package\Tests\Stubs;
+namespace Selene\Module\Package\Tests\Stubs;
 
-use \Selene\Components\Package\Package;
+use \Selene\Module\Package\Package;
 
 /**
  * @class StubPackage
- * @package Selene\Components\Package\Tests\Stubs
+ * @package Selene\Module\Package\Tests\Stubs
  * @version $Id$
  */
 class StubPackage extends Package

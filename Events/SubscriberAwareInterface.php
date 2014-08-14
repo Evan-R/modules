@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events package
+ * This File is part of the Selene\Module\Events package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events;
+namespace Selene\Module\Events;
 
 /**
  * @interface SubscriberAwareInterface
  *
- * @package Selene\Components\Events
+ * @package Selene\Module\Events
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

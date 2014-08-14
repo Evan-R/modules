@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing\Tests\Controller package
+ * This File is part of the Selene\Module\Routing\Tests\Controller package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Tests\Controller;
+namespace Selene\Module\Routing\Tests\Controller;
 
-use \Selene\Components\Routing\Tests\Controller\Stubs\ErrorAwareController;
+use \Selene\Module\Routing\Tests\Controller\Stubs\ErrorAwareController;
 
 /**
  * @class BaseControllerTest
- * @package Selene\Components\Routing\Tests\Controller
+ * @package Selene\Module\Routing\Tests\Controller
  * @version $Id$
  */
 class BaseControllerTest extends \PHPUnit_Framework_TestCase

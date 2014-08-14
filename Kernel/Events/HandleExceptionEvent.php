@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Kernel package
+ * This File is part of the Selene\Module\Kernel package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Kernel\Events;
+namespace Selene\Module\Kernel\Events;
 
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\HttpFoundation\Response;
@@ -17,7 +17,7 @@ use \Symfony\Component\HttpKernel\HttpKernelInterface as Kernel;
 
 /**
  * @class KernelEvent
- * @package Selene\Components\Kernel
+ * @package Selene\Module\Kernel
  * @version $Id$
  */
 class HandleExceptionEvent extends ResponseEvent

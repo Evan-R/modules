@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Processor;
+namespace Selene\Module\DI\Processor;
 
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\DI\Definition\ParentDefinition;
-use \Selene\Components\DI\Definition\DefinitionInterface;
-use \Selene\Components\DI\Definition\ServiceDefinition;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\DI\Definition\ParentDefinition;
+use \Selene\Module\DI\Definition\DefinitionInterface;
+use \Selene\Module\DI\Definition\ServiceDefinition;
 
 /**
  * @class ResolveAbstractDefinition implements ProcessInterface
  * @see ProcessInterface
  *
- * @package \Selene\Components\DI
+ * @package \Selene\Module\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -83,8 +83,8 @@ class ResolveParentDefinition implements ProcessInterface
     /**
      * replaceDefinition
      *
-     * @param \Selene\Components\DI\Definition\ParentDefinition $definition
-     * @internal param \Selene\Components\DI\Definition\ParentDefinition $definitions
+     * @param \Selene\Module\DI\Definition\ParentDefinition $definition
+     * @internal param \Selene\Module\DI\Definition\ParentDefinition $definitions
      *
      * @access private
      * @return DefinitionInterface

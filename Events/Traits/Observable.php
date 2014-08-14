@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Events package
+ * This File is part of the Selene\Module\Events package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Events\Traits;
+namespace Selene\Module\Events\Traits;
 
 use SplObserver;
-use Selene\Components\Events\ObserverInterface;
+use Selene\Module\Events\ObserverInterface;
 
 /**
  * @trait AbstractObservable
  *
- * @package Selene\Components\Events
+ * @package Selene\Module\Events
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT

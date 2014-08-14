@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Processor\Traits package
+ * This File is part of the Selene\Module\DI\Processor\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Processor\Traits;
+namespace Selene\Module\DI\Processor\Traits;
 
 /**
  * @class FlaggedDefinitionFinderTrait
- * @package Selene\Components\DI\Processor\Traits
+ * @package Selene\Module\DI\Processor\Traits
  * @version $Id$
  */
 trait DefinitionFinderTrait

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Helper package
+ * This File is part of the Selene\Module\Common\Helper package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Helper;
+namespace Selene\Module\Common\Helper;
 
 use \RecursiveArrayIterator;
 use \RecursiveIteratorIterator;
@@ -17,7 +17,7 @@ use \RecursiveIteratorIterator;
 /**
  * @class ListHelper ListHelper
  *
- * @package \Users\malcolm\www\selene_source\src\Selene\Components\Common\Helper
+ * @package \Users\malcolm\www\selene_source\src\Selene\Module\Common\Helper
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

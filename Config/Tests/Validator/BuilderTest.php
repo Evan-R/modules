@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Tests\Validator package
+ * This File is part of the Selene\Module\Config\Tests\Validator package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Tests\Validator;
+namespace Selene\Module\Config\Tests\Validator;
 
-use \Selene\Components\Config\Validator\Builder;
-use \Selene\Components\Config\Validator\Exception\MissingValueException;
+use \Selene\Module\Config\Validator\Builder;
+use \Selene\Module\Config\Validator\Exception\MissingValueException;
 
 /**
  * @class BuilderTest extends \PHPUnit_Framework_TestCase
  * @see \PHPUnit_Framework_TestCase
  *
- * @package Selene\Components\Config\Tests\Validator
+ * @package Selene\Module\Config\Tests\Validator
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -29,7 +29,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     public function itShoudBeInstantiable()
     {
         $builder = new Builder;
-        $this->assertInstanceof('Selene\Components\Config\Validator\Builder', $builder);
+        $this->assertInstanceof('Selene\Module\Config\Validator\Builder', $builder);
     }
 
     /** @test */
@@ -37,7 +37,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder;
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Nodes\IntegerNode',
+            'Selene\Module\Config\Validator\Nodes\IntegerNode',
             $builder->root()->integer('int')
         );
     }
@@ -47,7 +47,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder;
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Nodes\FloatNode',
+            'Selene\Module\Config\Validator\Nodes\FloatNode',
             $builder->root()->float('double')
         );
     }
@@ -57,7 +57,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder;
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Nodes\StringNode',
+            'Selene\Module\Config\Validator\Nodes\StringNode',
             $builder->root()->string('string')
         );
 
@@ -68,7 +68,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder;
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Nodes\BooleanNode',
+            'Selene\Module\Config\Validator\Nodes\BooleanNode',
             $builder->root()->boolean('bool')
         );
     }
@@ -78,7 +78,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder;
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Nodes\ListNode',
+            'Selene\Module\Config\Validator\Nodes\ListNode',
             $builder->root()->values('array')
         );
     }
@@ -88,7 +88,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder;
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Nodes\DictNode',
+            'Selene\Module\Config\Validator\Nodes\DictNode',
             $builder->root()->dict('array')
         );
     }
@@ -99,14 +99,14 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
 
         $builder = new Builder;
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Builder',
+            'Selene\Module\Config\Validator\Builder',
             $builder->root()->dict('array')->end(),
             'End node should be the builder.'
         );
 
         $builder = new Builder;
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Builder',
+            'Selene\Module\Config\Validator\Builder',
             $builder->root()->dict('array')->dict('nested')->end(),
             'End node should be the builder.'
         );
@@ -136,7 +136,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                 ->optional()
                 ->defaultValue(true)
                 ->end();
-        $this->assertInstanceof('Selene\Components\Config\Validator\Builder', $b);
+        $this->assertInstanceof('Selene\Module\Config\Validator\Builder', $b);
     }
 
     /** @test */
@@ -159,12 +159,12 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $root->validate();
 
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Nodes\BooleanNode',
+            'Selene\Module\Config\Validator\Nodes\BooleanNode',
             $a = $root->getFirstChild()->findChildByKey('required')
         );
 
         $this->assertInstanceof(
-            'Selene\Components\Config\Validator\Nodes\BooleanNode',
+            'Selene\Module\Config\Validator\Nodes\BooleanNode',
             $b = $root->getLastChild()->findChildByKey('required')
         );
 

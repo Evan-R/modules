@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package\Tests package
+ * This File is part of the Selene\Module\Package\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package\Tests;
+namespace Selene\Module\Package\Tests;
 
 use \Mockery as m;
-use \Selene\Components\Package\PackageRepository;
-use \Selene\Components\Package\DependencyManager;
+use \Selene\Module\Package\PackageRepository;
+use \Selene\Module\Package\DependencyManager;
 
 /**
  * @class DependencyManagerTest
- * @package Selene\Components\Package\Tests
+ * @package Selene\Module\Package\Tests
  * @version $Id$
  */
 class DependencyManagerTest extends \PHPUnit_Framework_TestCase
@@ -25,32 +25,32 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldGetDependencies()
     {
-        $p10 = m::mock('Selene\Components\Package\PackageInterface');
+        $p10 = m::mock('Selene\Module\Package\PackageInterface');
         $p10->shouldReceive('getName')->andReturn('p10Package')
            ->shouldReceive('getAlias')->andReturn('p10')
            ->shouldReceive('requires')->andReturn([]);
 
-        $p1 = m::mock('Selene\Components\Package\PackageInterface');
+        $p1 = m::mock('Selene\Module\Package\PackageInterface');
         $p1->shouldReceive('getName')->andReturn('p1Package')
            ->shouldReceive('getAlias')->andReturn('p1')
            ->shouldReceive('requires')->andReturn(['p10']);
 
-        $p2 = m::mock('Selene\Components\Package\PackageInterface');
+        $p2 = m::mock('Selene\Module\Package\PackageInterface');
         $p2->shouldReceive('getName')->andReturn('p2Package')
            ->shouldReceive('getAlias')->andReturn('p2')
            ->shouldReceive('requires')->andReturn(['p1', 'p4']);
 
-        $p3 = m::mock('Selene\Components\Package\PackageInterface');
+        $p3 = m::mock('Selene\Module\Package\PackageInterface');
         $p3->shouldReceive('getName')->andReturn('p3Package')
            ->shouldReceive('getAlias')->andReturn('p3')
            ->shouldReceive('requires')->andReturn(['p1']);
 
-        $p4 = m::mock('Selene\Components\Package\PackageInterface');
+        $p4 = m::mock('Selene\Module\Package\PackageInterface');
         $p4->shouldReceive('getName')->andReturn('p4Package')
            ->shouldReceive('getAlias')->andReturn('p4')
            ->shouldReceive('requires')->andReturn(['p1', 'p5']);
 
-        $p5 = m::mock('Selene\Components\Package\PackageInterface');
+        $p5 = m::mock('Selene\Module\Package\PackageInterface');
         $p5->shouldReceive('getName')->andReturn('p5Package')
            ->shouldReceive('getAlias')->andReturn('p5')
            ->shouldReceive('requires')->andReturn(['p1', 'p3', 'optional?']);
@@ -77,17 +77,17 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
     public function itShouldDetectCircularRefs()
     {
         //$this->markTestIncomplete();
-        $p1 = m::mock('Selene\Components\Package\PackageInterface');
+        $p1 = m::mock('Selene\Module\Package\PackageInterface');
         $p1->shouldReceive('getName')->andReturn('p1Package')
            ->shouldReceive('getAlias')->andReturn('p1')
            ->shouldReceive('requires')->andReturn([]);
 
-        $p2 = m::mock('Selene\Components\Package\PackageInterface');
+        $p2 = m::mock('Selene\Module\Package\PackageInterface');
         $p2->shouldReceive('getName')->andReturn('p2Package')
            ->shouldReceive('getAlias')->andReturn('p2')
            ->shouldReceive('requires')->andReturn(['p1', 'p3']);
 
-        $p3 = m::mock('Selene\Components\Package\PackageInterface');
+        $p3 = m::mock('Selene\Module\Package\PackageInterface');
         $p3->shouldReceive('getName')->andReturn('p3Package')
            ->shouldReceive('getAlias')->andReturn('p3')
            ->shouldReceive('requires')->andReturn(['p2']);

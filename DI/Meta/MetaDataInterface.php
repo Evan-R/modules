@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Meta package
+ * This File is part of the Selene\Module\DI\Meta package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Meta;
+namespace Selene\Module\DI\Meta;
 
 
 /**
  * @class MetaDataInterface
- * @package Selene\Components\DI\Meta
+ * @package Selene\Module\DI\Meta
  * @version $Id$
  */
 interface MetaDataInterface

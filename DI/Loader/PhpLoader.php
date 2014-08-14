@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package
+ * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Loader;
+namespace Selene\Module\DI\Loader;
 
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\Config\Loader\PhpFileLoader;
-use \Selene\Components\Config\Resource\LocatorInterface;
-use \Selene\Components\Config\Traits\ContainerBuilderAwareLoaderTrait;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\Config\Loader\PhpFileLoader;
+use \Selene\Module\Config\Resource\LocatorInterface;
+use \Selene\Module\Config\Traits\ContainerBuilderAwareLoaderTrait;
 
 /**
  * @class PhpLoader extends ConfigLoader
  * @see ConfigLoader
  *
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests package
+ * This File is part of the Selene\Module\DI\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests;
+namespace Selene\Module\DI\Tests;
 
-use \Selene\Components\DI\Aliases;
-use \Selene\Components\TestSuite\TestCase;
+use \Selene\Module\DI\Aliases;
+use \Selene\Module\TestSuite\TestCase;
 
 /**
  * @class AliasTest
- * @package Selene\Components\DI\Tests
+ * @package Selene\Module\DI\Tests
  * @version $Id$
  */
 class AliasesTest extends TestCase

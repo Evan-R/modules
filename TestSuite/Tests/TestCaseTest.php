@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\TestSuite\Tests package
+ * This File is part of the Selene\Module\TestSuite\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,9 +9,9 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\TestSuite\Tests;
+namespace Selene\Module\TestSuite\Tests;
 
-use Selene\Components\TestSuite\TestCase;
+use Selene\Module\TestSuite\TestCase;
 
 /**
  * @class TestCaseTest

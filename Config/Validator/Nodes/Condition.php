@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Validator\Nodes;
+namespace Selene\Module\Config\Validator\Nodes;
 
-use \Selene\Components\Config\Validator\Exception\ValueUnsetException;
-use \Selene\Components\Config\Validator\Exception\ValidationException;
+use \Selene\Module\Config\Validator\Exception\ValueUnsetException;
+use \Selene\Module\Config\Validator\Exception\ValidationException;
 
 /**
  * @class Condition
  *
- * @package Selene\Components\Config
+ * @package Selene\Module\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */

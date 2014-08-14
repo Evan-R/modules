@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
 
-use \Selene\Components\DI\Parameters;
-use \Selene\Components\DI\BuilderInterface;
-use \Selene\Components\DI\ContainerInterface;
-use \Selene\Components\Config\ConfigurationInterface;
+use \Selene\Module\DI\Parameters;
+use \Selene\Module\DI\BuilderInterface;
+use \Selene\Module\DI\ContainerInterface;
+use \Selene\Module\Config\ConfigurationInterface;
 
 /**
  * @class ConfigLoader
- * @package Selene\Components\Package
+ * @package Selene\Module\Package
  * @version $Id$
  */
 class ConfigLoader

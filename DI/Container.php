@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI package.
+ * This File is part of the Selene\Module\DI package.
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,22 +9,22 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI;
+namespace Selene\Module\DI;
 
 use \BadMethodCallException;
 use \InvalidArgumentException;
-use \Selene\Components\Common\Helper\StringHelper;
-use \Selene\Components\DI\Definition\ServiceDefinition;
-use \Selene\Components\DI\Definition\DefinitionInterface;
-use \Selene\Components\DI\Exception\ContainerLockedException;
-use \Selene\Components\DI\Exception\ContainerResolveException;
-use \Selene\Components\DI\Exception\CircularReferenceException;
+use \Selene\Module\Common\Helper\StringHelper;
+use \Selene\Module\DI\Definition\ServiceDefinition;
+use \Selene\Module\DI\Definition\DefinitionInterface;
+use \Selene\Module\DI\Exception\ContainerLockedException;
+use \Selene\Module\DI\Exception\ContainerResolveException;
+use \Selene\Module\DI\Exception\CircularReferenceException;
 
 /**
  * @class BaseContainer implements ContainerInterface
  * @see ContainerInterface
  *
- * @package Selene\Components\DI
+ * @package Selene\Module\DI
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
@@ -33,7 +33,7 @@ class Container implements ContainerInterface
     /**
      * parameters
      *
-     * @var \Selene\Components\DI\ParameterInterface
+     * @var \Selene\Module\DI\ParameterInterface
      */
     protected $parameters;
 
@@ -47,7 +47,7 @@ class Container implements ContainerInterface
     /**
      * aliases
      *
-     * @var \Selene\Components\DI\Aliases
+     * @var \Selene\Module\DI\Aliases
      */
     protected $aliases;
 
@@ -140,7 +140,7 @@ class Container implements ContainerInterface
     /**
      * Get the parameter collection of the service.
      *
-     * @return \Selene\Components\DI\Parameters the parameter collection object.
+     * @return \Selene\Module\DI\Parameters the parameter collection object.
      */
     public function getParameters()
     {
@@ -537,7 +537,7 @@ class Container implements ContainerInterface
      *
      * @param string $id
      *
-     * @throws \Selene\Components\DI\Exception\CircularReferenceException
+     * @throws \Selene\Module\DI\Exception\CircularReferenceException
      * @throws RuntimeException
      * @return object the service instance.
      */

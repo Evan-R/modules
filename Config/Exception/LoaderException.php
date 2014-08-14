@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config\Exception package
+ * This File is part of the Selene\Module\Config\Exception package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config\Exception;
+namespace Selene\Module\Config\Exception;
 
 /**
  * @class LoaderException
- * @package Selene\Components\Config\Exception
+ * @package Selene\Module\Config\Exception
  * @version $Id$
  */
 class LoaderException extends \RuntimeException

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Http package
+ * This File is part of the Selene\Module\Http package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Http;
+namespace Selene\Module\Http;
 
 use \Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
  * @class RequestAwareInterface
- * @package Selene\Components\Http
+ * @package Selene\Module\Http
  * @version $Id$
  */
 interface RequestAwareInterface

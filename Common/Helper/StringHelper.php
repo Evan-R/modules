@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Common\Helper package
+ * This File is part of the Selene\Module\Common\Helper package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Common\Helper;
+namespace Selene\Module\Common\Helper;
 
 /**
  * @class StringHelper
  *
- * @package Selene\Components\Common
+ * @package Selene\Module\Common
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -212,7 +212,7 @@ final class StringHelper
     /**
      * strPad
      *
-     * @param mixed $str
+     * @param string $str
      * @param int $len
      *
      * @access public

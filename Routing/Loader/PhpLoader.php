@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Routing package
+ * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,18 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Routing\Loader;
+namespace Selene\Module\Routing\Loader;
 
-use \Selene\Components\Config\Loader\PhpFileLoader;
-use \Selene\Components\Config\Resource\LocatorInterface;
-use \Selene\Components\Routing\RouteCollectionInterface;
-use \Selene\Components\Routing\Traits\RoutingLoaderTrait;
+use \Selene\Module\Config\Loader\PhpFileLoader;
+use \Selene\Module\Config\Resource\LocatorInterface;
+use \Selene\Module\Routing\RouteCollectionInterface;
+use \Selene\Module\Routing\Traits\RoutingLoaderTrait;
 
 /**
  * @class PhpLoader extends ConfigLoader
  * @see ConfigLoader
  *
- * @package Selene\Components\Routing
+ * @package Selene\Module\Routing
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT

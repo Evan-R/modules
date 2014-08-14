@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Filesystem\Tests package
+ * This File is part of the Selene\Module\Filesystem\Tests package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,13 +9,13 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Filesystem\Tests;
+namespace Selene\Module\Filesystem\Tests;
 
 use org\bovigo\vfs\vfsStream;
-use Selene\Components\TestSuite\TestCase;
-use Selene\Components\Filesystem\Filesystem;
-use Selene\Components\Filesystem\FileCollection;
-use Selene\Components\TestSuite\Traits\TestDrive;
+use Selene\Module\TestSuite\TestCase;
+use Selene\Module\Filesystem\Filesystem;
+use Selene\Module\Filesystem\FileCollection;
+use Selene\Module\TestSuite\Traits\TestDrive;
 
 /**
  * @class FilesystemTest

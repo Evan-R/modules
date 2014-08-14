@@ -9,12 +9,12 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache\Tests;
+namespace Selene\Module\Cache\Tests;
 
 use Memcached;
-use Selene\Components\Cache\Storage;
-use Selene\Components\Cache\Driver\MemcachedDriver;
-use Selene\Components\Cache\Driver\MemcachedConnection;
+use Selene\Module\Cache\Storage;
+use Selene\Module\Cache\Driver\MemcachedDriver;
+use Selene\Module\Cache\Driver\MemcachedConnection;
 
 /**
  * Class: StorageMemcachedTest

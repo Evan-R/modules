@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Package package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Package;
+namespace Selene\Module\Package;
 
-use \Selene\Components\Filesystem\Filesystem;
-use \Selene\Components\Filesystem\Traits\PathHelperTrait;
-use \Selene\Components\Package\Traits\FileBackUpHelper;
-use \Selene\Components\Package\Exception\MissingFileException;
+use \Selene\Module\Filesystem\Filesystem;
+use \Selene\Module\Filesystem\Traits\PathHelperTrait;
+use \Selene\Module\Package\Traits\FileBackUpHelper;
+use \Selene\Module\Package\Exception\MissingFileException;
 
 /**
  * @class FileTargetRepository
- * @packageSelene\Components\Package
+ * @packageSelene\Module\Package
  * @version $Id$
  */
 class FileTargetRepository implements FileRepositoryInterface

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Config package
+ * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,17 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Config;
+namespace Selene\Module\Config;
 
-use \Selene\Components\Filesystem\Filesystem;
-use \Selene\Components\Filesystem\Traits\FsHelperTrait;
-use \Selene\Components\Filesystem\Traits\PathHelperTrait;
-use \Selene\Components\Filesystem\Exception\IOException;
+use \Selene\Module\Filesystem\Filesystem;
+use \Selene\Module\Filesystem\Traits\FsHelperTrait;
+use \Selene\Module\Filesystem\Traits\PathHelperTrait;
+use \Selene\Module\Filesystem\Exception\IOException;
 
 /**
  * @class Cache
  *
- * @package Selene\Components\Config
+ * @package Selene\Module\Config
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -47,7 +47,7 @@ class Cache implements CacheInterface
     /**
      * fs
      *
-     * @var \Selene\Components\Filesystem\Filesystem
+     * @var \Selene\Module\Filesystem\Filesystem
      */
     private $fs;
 

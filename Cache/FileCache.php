@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\Cache package
+ * This File is part of the Selene\Module\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,11 +9,11 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\Cache;
+namespace Selene\Module\Cache;
 
 /**
  * @class FileCache
- * @package Selene\Components\Cache
+ * @package Selene\Module\Cache
  * @version $Id$
  */
 class FileCache implements FileCacheInterface

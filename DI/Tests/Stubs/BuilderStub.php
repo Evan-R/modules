@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Tests\Stubs package
+ * This File is part of the Selene\Module\DI\Tests\Stubs package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Components\DI\Tests\Stubs;
+namespace Selene\Module\DI\Tests\Stubs;
 
-use \Selene\Components\DI\Processor\ProcessorInterface;
+use \Selene\Module\DI\Processor\ProcessorInterface;
 
 /**
  * @class BuilderStub
- * @package Selene\Components\DI\Tests\Stubs
+ * @package Selene\Module\DI\Tests\Stubs
  * @version $Id$
  */
-class BuilderStub extends \Selene\Components\DI\Builder
+class BuilderStub extends \Selene\Module\DI\Builder
 {
 
     protected $processes;
