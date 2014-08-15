@@ -16,6 +16,7 @@ use \Selene\Module\Common\Traits\Getter;
 /**
  * @class Dispatcher implements DispatcherInterface
  * @see DispatcherInterface
+ * @TODO use Object has to identify handlers?
  *
  * @package Selene\Module\Events
  * @version $Id$
