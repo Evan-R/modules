@@ -31,7 +31,7 @@
             <object class="League\PHPUnitCoverageListener\Hook\Travis"/>
           </element>
           <element key="namespace">
-            <string>Selene\Writer</string>
+            <string>Selene\Module\Writer</string>
           </element>
           <element key="repo_token">
             <string>rgD5PlatnJk54EkcAL04wYoLZktBJJnS0</string>
