@@ -171,7 +171,7 @@ class UrlBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function getStack()
     {
-        return m::mock('Selene\Module\Http\RequestStack, Selene\Module\Http\StackInterface');
+        return m::mock('Selene\Adapter\Http\RequestStack, Selene\Adapter\Http\StackInterface');
     }
 
     protected function getRoutes()
