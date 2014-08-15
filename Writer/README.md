@@ -3,7 +3,7 @@
 
 ## Installation
 
-Require `selene\writer` in your composer file.
+Require `Selene\Module\Writer` in your composer file.
 
 ```json
 {
@@ -21,12 +21,14 @@ $ composer install
 
 ## The Writer
 
+### Dumping strings
+
 Write a 2 line text block:
 
 ```php
 <?php
 
-use \Selene\Writer\Writer;
+use \Selene\Module\Writer\Writer;
 
 $writer = new Writer;
 
@@ -38,15 +40,17 @@ echo $write->dump();  //"foo\n    bar"
 ```
 
 
+### Indentation
+
 The default indentation level is 4 spaces.
 
-If you need a different level using spaces, you'll have to specify this on the
+If you require a different level using spaces, you'll have to specify this on the.
 constructor:
 
 ```php
 <?php
 
-use \Selene\Writer\Writer;
+use \Selene\Module\Writer\Writer;
 
 $writer = new Writer(2);
 
@@ -57,40 +61,58 @@ $writer
 echo $write->dump(); //"foo\n  bar"   
 ```
 
+You may also change spaces to tabs using the `useTabs()` method.
+
+```php
+<?php
+
+use \Selene\Module\Writer\Writer;
+
+$writer = new Writer;
+$writer->useTabs(true);
+
+// …
+```
+### Output indentation
+
+Output indentation indents the whole block and is applied just before the
+string is being dumped. The value passed to `setOutputIndentation(int $level)`
+acts as a multiplyer.  
+
 ### API
 
 Fluent methods:
 
-- **writeln( `string|null $str` )**  
+- **`Selene\Module\Writer\Writer` writeln( `string|null $str` )**  
 Adds a line.
  
-- **indent( `void` )** 
+- **`Selene\Module\Writer\Writer` indent( `void` )** 
 Adds an indentation.
 
-- **replaceln( string $str, int $index)**  
+- **`Selene\Module\Writer\Writer` replaceln( string $str, int $index)**  
 Replaces a line at a line index.
 
-- **removeln( `int $index` )**  
+- **`Selene\Module\Writer\Writer` removeln( `int $index` )**  
 Removes a line at a line index.
 
-- **popln ( `void` )**  
+- **`Selene\Module\Writer\Writer` popln ( `void` )**  
 Removes the last line.
 
-- **appendln ( `string $str` )**  
+- **`Selene\Module\Writer\Writer` appendln ( `string $str` )**  
 Appends a string to the last line.
 
 None fluent methods:
 
-- **ignoreNull( `bool $ignore` )**  
+- **`void` ignoreNull( `bool $ignore` )**  
 Don't add a line if `$str` in `Writer::writeln()` is `null`. 
 
-- **useTabs( `void` )**  
+- **`void` useTabs( `void` )**  
 Use Tabs for indentation instead of spaces.
 
-- **setOutputIndentation( `int $level` )**  
+- **`void` setOutputIndentation( `int $level` )**  
 Sets the output indentation level of the whole text block.
 
-- **getOutputIndentation( `void` )**  
+- **`int` getOutputIndentation( `void` )**  
 Gets the output indentation level.
 
 ## Generators
@@ -111,7 +133,7 @@ or `AcmeLibFoo`, or `AcmeLibFooAlias`, and so on.
 Note that the use statement is considered to be the FQN;
 
 - **getImportResolver( )**  
-Will return an instance of `Selene\Writer\Object\ImportResolver`.
+Will return an instance of `Selene\Module\Writer\Object\ImportResolver`.
 This is useful if you need to know the aliases name of a imported string
 (interface, trait, parent class or usestatement), e.g.
 
@@ -120,21 +142,21 @@ This is useful if you need to know the aliases name of a imported string
 $alias = $cg->getImportResolver()->getAlias('Acme\MyClass') // e.g. AcmeMyClassAlias;
 ```
 
-- **addConstant( `Selene\Writer\Object\Constant $constant` )**  
+- **`void` addConstant( `Selene\Module\Writer\Object\Constant $constant` )**  
 Adds a constant to the interface.
 
-- **addMethod( `Selene\Writer\Object\MethodInterface $method` )**  
-Takes an object of type `Selene\Writer\Object\MethodInterface` and adds it to the object declaration.
+- **`void` addMethod( `Selene\Module\Writer\Object\MethodInterface $method` )**  
+Takes an object of type `Selene\Module\Writer\Object\MethodInterface` and adds it to the object declaration.
 
-- **getDoc()**  
-Returns an instance of `Selene\Writer\Object\DocBlock` that represents the
+- **`Selene\Module\Writer\Object\DocBlock` getDoc( `void` )**  
+Returns an instance of `Selene\Module\Writer\Object\DocBlock` that represents the
 document level docblock.
 
-- **getObjDoc()**  
-Returns an instance of `Selene\Writer\Object\DocBlock` that represents the
+- **`Selene\Module\Writer\Object\DocBlock` getObjDoc( `void` )**  
+Returns an instance of `Selene\Module\Writer\Object\DocBlock` that represents the
 object level docblock.
 
-- **noAutoGenerateTag()**  
+- **`void` noAutoGenerateTag( void )**  
 By default, the objectwriter will add a timestamp to the document level
 docblock. Use this if you wan't to deactivate this behavior.
 
@@ -146,7 +168,7 @@ Use this for autogenerating php interfaces.
 ```php
 <?php 
 
-use \Selene\Writer\Object\ClassWriter;
+use \Selene\Module\Writer\Object\ClassWriter;
 
 $iw = new InterfaceWriter('Foo', 'Acme', '\Acme\Parent');
 
@@ -175,8 +197,8 @@ interface Foo extends Parent
 
 ### API
 
-- **addMethod( `Selene\Writer\Object\MethodInterface $method` )**  
-Takes an object of type `Selene\Writer\Object\InterfaceMethod` and adds it to the interface.
+- **addMethod( `Selene\Module\Writer\Object\MethodInterface $method` )**  
+Takes an object of type `Selene\Module\Writer\Object\InterfaceMethod` and adds it to the interface.
 
 
 ### ClassWriter
@@ -186,7 +208,7 @@ Use this for autogenerating php classes.
 ```php
 <?php 
 
-use \Selene\Writer\Object\ClassWriter;
+use \Selene\Module\Writer\Object\ClassWriter;
 
 $cg = new ClassWriter('Foo', 'Acme');
 
@@ -216,32 +238,32 @@ class Foo
 
 In addition to the InterfaceWriter:
 
-- **addTrait( `string $trait` )**  
+- **`void` addTrait( `string $trait` )**  
 Takes a FQN of a trait and adds it as a trait. Traits will be automatically
 added to the use statements list, except they're belong to exact same namespace of
 the class.
 
-- **addInterface( `string $interface` )**  
+- **`void` addInterface( `string $interface` )**  
 Adds an interface. Will be automatically added to the class imports. 
 
-- ** setAbstract( `boolean $abstract` )**  
+- **`void` setAbstract( `boolean $abstract` )**  
 Toggle this class abstract.
 
-- **addMethod( `MethodInterface $method` )**  
+- **`void` addMethod( `MethodInterface $method` )**  
 Takes an object of type `Method` and adds it to the class.
 
-- **setProperties( `array $properties` )**   
+- **`void` setProperties( `array $properties` )**   
 Set the class properties. `$properties` must be an array of
-`Selene\Writer\Object\Property` instances.
+`Selene\Module\Writer\Object\Property` instances.
 
-- **addProperty( `Selene\Writer\Object\Property $property` )**  
-Takes an object of type `Selene\Writer\Object\Property` and adds it as a class property.
+- **`void` addProperty( `Selene\Module\Writer\Object\Property $property` )**  
+Takes an object of type `Selene\Module\Writer\Object\Property` and adds it as a class property.
 
-- **useTraitMethodAs(`string $trait`, `string $method`, `string $replacement`, `[string $visibility]`)**    
+- **`void` useTraitMethodAs(`string $trait`, `string $method`, `string $replacement`, `[string $visibility]`)**    
 Replaces a method naming conflict between a trait an a class. Default visiblity
 is `public`.
 
-- **replaceTraitConflict(`string $trait`, `string $conflict`, `string $method`)**  
+- **`void` replaceTraitConflict(`string $trait`, `string $conflict`, `string $method`)**  
 Replaces a method conflict between two traits.
 
 ### Example 
@@ -251,12 +273,12 @@ Generating a class with constants, methods, properties, and traits.
 ```php
 <?php
 
-use \Selene\Writer\Writer;
-use \Selene\Writer\Object\Constant;
-use \Selene\Writer\Object\Argument;
-use \Selene\Writer\Object\Method;
-use \Selene\Writer\Object\Property;
-use \Selene\Writer\Object\ClassGenerator;
+use \Selene\Module\Writer\Writer;
+use \Selene\Module\Writer\Object\Constant;
+use \Selene\Module\Writer\Object\Argument;
+use \Selene\Module\Writer\Object\Method;
+use \Selene\Module\Writer\Object\Property;
+use \Selene\Module\Writer\Object\ClassGenerator;
 
 $cg = new ClassGenerator('Foo', 'Acme');
 
@@ -341,4 +363,6 @@ class Foo extends Bar
 ```
 ### TraitWriter
 
-Behaves like the `ClassWriter` except there's no constants and interfaces.
+Behaves like the `ClassWriter` except there're no constants and interfaces.
+
+
