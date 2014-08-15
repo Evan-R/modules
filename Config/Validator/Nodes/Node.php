@@ -495,6 +495,7 @@ abstract class Node implements NodeInterface
             }
         } catch (ValueUnsetException $e) {
             $value = null;
+            //$this->getParent()->removeChild($this);
             $this->removeParent();
         } catch (ValidationException $e) {
             $this->markInvalid($e);

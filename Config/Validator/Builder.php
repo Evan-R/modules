@@ -299,9 +299,9 @@ class Builder implements BuilderInterface
      *
      * @return DictNode
      */
-    public function dict($key = null)
+    public function dict($key = null, $mode = DictNode::KEYS_LOOSE)
     {
-        return $this->addNode(new DictNode, $key);
+        return $this->addNode(new DictNode($mode), $key);
     }
 
     /**

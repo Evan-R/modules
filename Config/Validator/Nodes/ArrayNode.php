@@ -75,6 +75,22 @@ abstract class ArrayNode extends Node implements ParentableInterface, \IteratorA
     }
 
     /**
+     * unsetValue
+     *
+     * @param string $key
+     *
+     * @return void
+     */
+    public function unsetValue($key = null)
+    {
+        if (null !== $key) {
+            $this->value = null;
+        } else {
+            unset($this->value[$key]);
+        }
+    }
+
+    /**
      * Check it this node has children
      *
      * @access public
@@ -205,9 +221,16 @@ abstract class ArrayNode extends Node implements ParentableInterface, \IteratorA
     protected function validateChildren(array $values, array &$results = [])
     {
         foreach ($this->getChildren() as $child) {
+
             $value = array_key_exists($child->getKey(), $values) ? $values[$child->getKey()] : new MissingValue($child);
 
             $child->finalize($value);
+
+            // child could be removed:
+            if (!$this->hasChild($child)) {
+                continue;
+            }
+
             $child->validate();
 
             $results[$child->getKey()] = $child->getValue();
