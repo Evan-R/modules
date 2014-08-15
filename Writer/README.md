@@ -36,7 +36,7 @@ $writer
 	->writeln('foo')
 	->writeln('bar');
 
-echo $write->dump();  //"foo\n    bar"  
+echo $writer->dump();  //"foo\n    bar"  
 ```
 
 
@@ -58,7 +58,7 @@ $writer
 	->writeln('foo')
 	->writeln('bar');
 
-echo $write->dump(); //"foo\n  bar"   
+echo $writer->dump(); //"foo\n  bar"   
 ```
 
 You may also change spaces to tabs using the `useTabs()` method.
