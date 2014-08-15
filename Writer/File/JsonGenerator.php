@@ -13,7 +13,7 @@ namespace Selene\Module\Writer\File;
 
 use \Selene\Module\Writer\Writer;
 use \Selene\Module\Writer\GeneratorInterface;
-use \Selene\Components\Common\Helper\ListHelper;
+use \Selene\Module\Common\Helper\ListHelper;
 
 /**
  * @class JsonGenerator
