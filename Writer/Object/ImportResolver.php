@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Components\DI\Dumper package
+ * This File is part of the Selene\Module\Writer package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -12,9 +12,12 @@
 namespace Selene\Module\Writer\Object;
 
 /**
+ * This class handles class, interface, and trait aliases.
  * @class ImportResolver
- * @package Selene\Components\DI\Dumper
+ *
+ * @package Selene\Module\Writer
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
  */
 class ImportResolver
 {
@@ -87,6 +90,13 @@ class ImportResolver
         return $o;
     }
 
+    /**
+     * Does the alias exitst?
+     *
+     * @param string $import
+     *
+     * @return boolean
+     */
     public function hasAlias($import)
     {
         list($import, $alias) = $this->splitImport($o = $this->pad($import));
@@ -95,9 +105,12 @@ class ImportResolver
     }
 
     /**
-     * getImport
+     * Gets the import name as used with the use statement.
      *
-     * @param mixed $import
+     * If an alias exists for the given import, this method will return the
+     * original import name suffixed with the alias, e.g. `\Foo as FooAlias`
+     *
+     * @param string $import
      *
      * @return string
      */
@@ -113,7 +126,7 @@ class ImportResolver
     }
 
     /**
-     * setAlias
+     * Generate an alias name for an import.
      *
      * @param string $import
      * @param string $name
@@ -138,7 +151,7 @@ class ImportResolver
     }
 
     /**
-     * getAliasName
+     * Construct the alias name.
      *
      * @param string $alias
      * @param array  $parts
@@ -158,7 +171,7 @@ class ImportResolver
     }
 
     /**
-     * getBaseName
+     * Get the import base name without the namespace.
      *
      * @param string $import
      *
@@ -219,6 +232,6 @@ class ImportResolver
      */
     private function pad($import)
     {
-        return '\\'.ltrim($import, '\\');
+        return str_pad(ltrim($import, '\\'), 1, '\\', STR_PAD_LEFT);
     }
 }

@@ -38,10 +38,6 @@ class TraitWriterTest extends ObjectWriterTest
         $tw->addTrait('Acme\Test\HelperTrait');
         $tw->useTraitMethodAs('Acme\Traits\BarTrait', 'getFoo', 'bla');
         $tw->replaceTraitConflict('Acme\Traits\BarTrait', 'Acme\Test\HelperTrait', 'retrieve');
-
-        echo PHP_EOL;
-        echo $tw->generate();
-        echo PHP_EOL;
     }
 
     protected function newObw($name = 'MyObject', $namespace = null)
