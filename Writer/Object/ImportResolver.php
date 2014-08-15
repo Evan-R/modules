@@ -232,6 +232,6 @@ class ImportResolver
      */
     private function pad($import)
     {
-        return str_pad(ltrim($import, '\\'), 1, '\\', STR_PAD_LEFT);
+        return sprintf('\%s', ltrim($import, '\\'));
     }
 }
