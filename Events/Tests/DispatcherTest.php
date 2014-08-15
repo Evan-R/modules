@@ -292,33 +292,6 @@ class DispatcherTest extends TestCase
     }
 
     /** @test */
-    public function itShouldThrowOnInvalidServiceMethod()
-    {
-        $dispatcher = $this->newDispatcher();
-
-        $container = m::mock('Selene\Module\DI\ContainerInterface');
-        $container->shouldReceive('has')->with('bar')->andReturn(true);
-        $container->shouldReceive('get')->with('bar')->andReturn(new \stdClass);
-
-        //$container->shouldReceive('has')->with('baz')->andReturn(true);
-        //$container->shouldReceive('get')->with('baz')->andReturn(new \StdClass);
-
-        $dispatcher->setContainer($container);
-
-        $dispatcher->on('foo', 'bar');
-
-        try {
-            $dispatcher->dispatch('foo');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertSame('No callable method on service "bar".', $e->getMessage());
-
-            return;
-        }
-
-        $this->giveUp();
-    }
-
-    /** @test */
     public function itShouldDispatchEventsDependingOnTheirPriority()
     {
         $dispatcher = $this->newDispatcher();
@@ -658,7 +631,7 @@ class DispatcherTest extends TestCase
      */
     protected function newDispatcher(ContainerInterface $container = null)
     {
-        return new Dispatcher($container);
+        return new Dispatcher;
     }
 
     protected function tearDown()
