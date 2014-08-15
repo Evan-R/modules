@@ -1,5 +1,11 @@
-[![Build Status](https://travis-ci.org/seleneapp/writer.svg?branch=master)](https://travis-ci.org/seleneapp/writer)
-[![Coverage Status](https://coveralls.io/repos/seleneapp/writer/badge.png)](https://coveralls.io/r/seleneapp/writer)
+[![Build Status](https://travis-ci.org/seleneapp/writer.svg?branch=development)](https://travis-ci.org/seleneapp/writer)
+[![Latest Stable Version](https://poser.pugx.org/selene/writer/v/stable.png)](https://packagist.org/packages/selene/writer) 
+[![Latest Unstable Version](https://poser.pugx.org/selene/writer/v/unstable.png)](https://packagist.org/packages/selene/writer) 
+[![License](https://poser.pugx.org/selene/writer/license.png)](https://packagist.org/packages/selene/writer)
+[![HHVM Status](http://hhvm.h4cc.de/badge/selene/writer.png)](http://hhvm.h4cc.de/package/selene/writer)
+
+[![Coverage Status](https://coveralls.io/repos/seleneapp/writer/badge.png?branch=development)](https://coveralls.io/r/seleneapp/writer?branch=development)
+[![Code Climate](https://codeclimate.com/github/seleneapp/writer/badges/gpa.svg)](https://codeclimate.com/github/seleneapp/writer)
 
 ## Installation
 
@@ -8,7 +14,7 @@ Require `Selene\Module\Writer` in your composer file.
 ```json
 {
 	"require": {
-		"selene/writer": "dev-master"
+		"selene/writer": "dev-development"
 	}
 }
 ```
