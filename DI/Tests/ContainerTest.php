@@ -555,7 +555,7 @@ class ContainerTest extends TestCase
     public function itShouldThrowExceptionWhenLockedWhileSettingADefinition()
     {
         $def    = m::mock('Selene\Module\DI\Definition\DefinitionInterface');
-        $params = m::mock('Selene\Module\DI\StaticParameters, Selene\Components\DI\ParameterInterface');
+        $params = m::mock('Selene\Module\DI\StaticParameters, Selene\Module\DI\ParameterInterface');
 
         $container = new Container($params);
 
