@@ -648,6 +648,19 @@ class DispatcherTest extends TestCase
         $this->assertSame([], $result);
     }
 
+    /**
+     * newDispatcher
+     *
+     * @param ContainerInterface $container
+     *
+     * @access protected
+     * @return Dispatcher
+     */
+    protected function newDispatcher(ContainerInterface $container = null)
+    {
+        return new Dispatcher($container);
+    }
+
     protected function tearDown()
     {
         m::close();
