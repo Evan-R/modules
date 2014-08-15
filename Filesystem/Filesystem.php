@@ -17,27 +17,18 @@ use \Selene\Module\Filesystem\Traits\FsHelperTrait;
 use \Selene\Module\Filesystem\Traits\PathHelperTrait;
 
 /**
- * @class Filesystem
+ * @class Filesystem implements FilesystemInterface
+ * @see FilesystemInterface
  *
  * @package Selene\Module\Filesystem
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
-class Filesystem
+class Filesystem implements FilesystemInterface
 {
     use PathHelperTrait, FsHelperTrait {
         FsHelperTrait::mask as public getMask;
     }
-
-    /**
-     * @var string
-     */
-    const COPY_PREFIX = 'copy';
-
-    /**
-     * @var int
-     */
-    const COPY_START_OFFSET = 1;
 
     /**
      * file
@@ -224,27 +215,28 @@ class Filesystem
     }
 
     /**
-     * remove
+     * Remove
      *
-     * @param mixed $file
+     * @param string|array $file
      *
-     * @return boolean
+     * @return boolean returns true if all files where deleted successfully,
+     * and false if some or one file coulnd not be deleted.
      */
     public function remove($file)
     {
-        $result = false;
+        $result = 1;
 
         foreach ($this->ensureTraversable($file) as $item) {
             if ($this->isFile($item)) {
-                $result = $this->unlink($item);
+                $result = $result & (int)$this->unlink($item);
             }
 
             if ($this->isDir($item)) {
-                $result = $this->rmdir($item);
+                $result = $result & (int)$this->rmdir($item);
             }
         }
 
-        return false;
+        return 0 !== $result;
     }
 
     /**
@@ -314,7 +306,7 @@ class Filesystem
      *
      * @throws \Selene\Module\Filesystem\Exception\IOException
      *
-     * @return void
+     * @return boolean true
      */
     public function chmod($file, $permission = 0755, $recursive = true, $umask = 0000)
     {
@@ -328,10 +320,13 @@ class Filesystem
                     $umask
                 );
             }
+
             if (true !== @chmod($item, $permission & ~$umask)) {
-                throw new IOException('filerpermissions could not be set');
+                throw IOException::chmodError($item);
             }
         }
+
+        return true;
     }
 
     /**
@@ -346,14 +341,16 @@ class Filesystem
     public function chown($file, $owner, $recursive = true)
     {
         if (!$this->uidExists($owner)) {
-            throw new IOException(sprintf('group %s does not exist', $owner));
+            throw IOException::uidError($owner);
         }
 
         foreach ($this->ensureTraversable($file) as $item) {
             if ($this->isLink($item) && function_exists('lchown')) {
+
                 if (true !== @lchown($item, $owner)) {
-                    throw new IOException(sprintf('could not change owner on link %s', $item));
+                    throw IOException::chownError($item, true);
                 }
+
                 continue;
             }
 
@@ -362,7 +359,7 @@ class Filesystem
             }
 
             if (true !== @chown($item, $owner)) {
-                throw new IOException(sprintf('could not change owner on %s', $item));
+                throw IOException::chownError($item);
             }
         }
 
@@ -382,13 +379,13 @@ class Filesystem
     public function chgrp($file, $group, $recursive = true)
     {
         if (!$this->gidExists($group)) {
-            throw new IOException(sprintf('group %s does not exist', $group));
+            throw IOException::gidError($group);
         }
 
         foreach ($this->ensureTraversable($file) as $item) {
             if ($this->isLink($item) && function_exists('lchgrp')) {
                 if (true !== @lchgrp($item, $owner)) {
-                    throw new IOException(sprintf('could not change group on link %s', $item));
+                    throw IOException::chgrpError($item, true);
                 }
                 continue;
             }
@@ -398,7 +395,7 @@ class Filesystem
             }
 
             if (true !== @chgrp($item, $group)) {
-                throw new IOException(sprintf('could not change group on %s', $item));
+                throw IOException::chgrpError($item);
             }
         }
 
@@ -408,10 +405,10 @@ class Filesystem
     /**
      * mask
      *
-     * @param mixed $file
-     * @param mixed $mode
+     * @param string $file
+     * @param int    $mode
      *
-     * @throws \InvalidArgumentException if file is invalid.
+     * @throws IOException if file is invalid.
      *
      * @return boolean
      */
@@ -420,7 +417,7 @@ class Filesystem
         $cmask = $mode ?: ($this->isFile($file) ? 0666 : ($this->isDir($file) ? 0775 : $mode));
 
         if (null === $cmask) {
-            throw new \InvalidArgumentException(sprintf('%s is not a file or a directory', $file));
+            throw new IOException(sprintf('%s is not a file or a directory', $file));
         }
 
         return $this->chmod($file, $this->getMask($cmask));
@@ -435,7 +432,7 @@ class Filesystem
      */
     public function exists($file)
     {
-        return $this->isDir($file) or $this->isFile($file);
+        return $this->isDir($file) || $this->isFile($file);
     }
 
     /**
@@ -789,10 +786,11 @@ class Filesystem
      */
     protected function getBackupFileName($source, $date)
     {
+        $sp        = $this->getSeparator();
         $num       = 1;
         $extension = pathinfo($source, PATHINFO_EXTENSION);
         $basename  = basename($source, $extension);
-        $basename  = dirname($source).DIRECTORY_SEPARATOR.$basename.$date;
+        $basename  = dirname($source).$sp.$basename.$date;
         $file      = $basename.'.'.$extension;
 
         while ($this->isFile($file)) {
@@ -868,7 +866,7 @@ class Filesystem
             $prefix :
             ($pad ? str_pad($prefix, strlen($prefix) + 2, ' ', STR_PAD_BOTH) : $prefix);
 
-        $path      = dirname($file).DIRECTORY_SEPARATOR;
+        $path      = dirname($file).$this->getSeparator();
         $extension = 0 < strlen($ext = pathinfo($file, PATHINFO_EXTENSION)) ? ".$ext" : '';
         $basename = basename($file, $extension);
 
@@ -933,9 +931,10 @@ class Filesystem
         $this->ensureDirectory($target);
 
         $bytes = 0;
+        $sp = $this->getSeparator();
 
         foreach (new FilesystemIterator($source, $flags) as $path => $info) {
-            $tfile = $target . DIRECTORY_SEPARATOR . $info->getBaseName();
+            $tfile = $target . $sp . $info->getBaseName();
 
             if ($info->isDir()) {
                 $bytes += $this->doCopyDir($path, $tfile, $flags);
@@ -944,13 +943,19 @@ class Filesystem
             if ($info->isFile()) {
                 $bytes += $this->doCopyFile($path, $tfile);
             }
-
-            //if ($info->isLink()) {
-            //
-            //}
         }
 
         return $bytes;
+    }
+
+    /**
+     * getSeparator
+     *
+     * @return string
+     */
+    protected function getSeparator()
+    {
+        return DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -962,7 +967,7 @@ class Filesystem
      * @throws IOException
      * @return string
      */
-    private function validateCopyTarget($source, $target = null, $replace = false)
+    protected function validateCopyTarget($source, $target = null, $replace = false)
     {
         if (null === $target) {
             $target = $this->enum($source, $this->getCopyStartOffset(), $this->getCopyPrefix());
@@ -983,7 +988,7 @@ class Filesystem
      *
      * @return Traversable
      */
-    private function ensureTraversable($file)
+    protected function ensureTraversable($file)
     {
         if (!(is_array($file) || $file instanceof \Traversable)) {
             return [$file];

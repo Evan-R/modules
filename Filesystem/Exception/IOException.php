@@ -22,4 +22,28 @@ namespace Selene\Module\Filesystem\Exception;
  */
 class IOException extends \RuntimeException
 {
+    public static function gidError($group)
+    {
+        return new self(sprintf('Group %s does not exist.', $group));
+    }
+
+    public static function uidError($user)
+    {
+        return new self(sprintf('User %s does not exist.', $user));
+    }
+
+    public static function chmodError($file)
+    {
+        return new self(sprintf('Permissions on %s could not be set.', $file));
+    }
+
+    public static function chownError($file, $linkError = false)
+    {
+        return new self(sprintf('Could not change owner on %s%s.', $linkError ? 'link ' : '', $file));
+    }
+
+    public static function chgrpError($file, $linkError = false)
+    {
+        return new self(sprintf('Could not change group on %s%s.', $linkError ? 'link ' : '', $file));
+    }
 }

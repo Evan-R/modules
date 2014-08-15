@@ -87,9 +87,9 @@ interface StreamWrapperInterface
      *
      * @param int $cast_as
      *
-     * @return resource
+     * @return resource|bool false
      */
-    //public function stream_cast($cast_as);
+    public function stream_cast($cast_as);
 
     /**
      * stream_close
@@ -164,7 +164,7 @@ interface StreamWrapperInterface
     public function stream_seek($offset, $whence = SEEK_SET);
 
     /**
-     * stream_set_option
+     * Change stream options.
      *
      * @param int $option
      * @param int $arg1
@@ -189,13 +189,13 @@ interface StreamWrapperInterface
     public function stream_tell();
 
     /**
-     * stream_truncate
+     * Truncate stream.
      *
      * @param int $new_size
      *
      * @return bool
      */
-    //public function stream_truncate($new_size);
+    public function stream_truncate($new_size);
 
     /**
      * stream_write

@@ -1,7 +1,24 @@
 <?php
 
+/**
+ * This File is part of the Selene\Module\Filesystem package
+ *
+ * (c) Thomas Appel <mail@thomas-appel.com>
+ *
+ * For full copyright and license information, please refer to the LICENSE file
+ * that was distributed with this package.
+ */
+
 namespace Selene\Module\Filesystem;
 
+/**
+ * @abstract class StreamWrapper implements StreamWrapperInterface
+ * @see StreamWrapperInterface
+ *
+ * @package Selene\Module\Filesystem
+ * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
+ */
 abstract class StreamWrapper implements StreamWrapperInterface
 {
     /**
@@ -24,9 +41,7 @@ abstract class StreamWrapper implements StreamWrapperInterface
      */
     public function dir_opendir($uri, $options)
     {
-        $this->handle = opendir($this->getTarget($uri));
-
-        return (bool)$this->handle;
+        return (bool)$this->handle = opendir($this->getTarget($uri));
     }
 
     /**
@@ -42,9 +57,7 @@ abstract class StreamWrapper implements StreamWrapperInterface
      */
     public function stream_open($uri, $mode, $options, &$opened_url)
     {
-        $this->handle = fopen($this->getTarget($uri), $mode);
-
-        return (bool)$this->handle;
+        return (bool)$this->handle = fopen($this->getTarget($uri), $mode);
     }
 
     /**
@@ -130,6 +143,22 @@ abstract class StreamWrapper implements StreamWrapperInterface
     public function unlink($uri)
     {
         return unlink($this->getTarget($uri));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stream_truncate($new_size)
+    {
+        return ftruncate($this->handle, $new_size);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stream_cast($cast_as)
+    {
+        return false;
     }
 
     /**
