@@ -225,6 +225,11 @@ class ContainerGenerator implements GeneratorInterface
      */
     protected function setServiceMethods()
     {
+        $desc = 'Gets the %s service.';
+        $internalDesc =
+            wordwrap('This service is used internaly and cannot be accessed via
+            `Container::get(\'%s\')` outsite of a building context.', 50);
+
         foreach ($this->container->getDefinitions() as $id => $definition) {
 
             if ($definition->isAbstract()) {
@@ -247,6 +252,12 @@ class ContainerGenerator implements GeneratorInterface
             $method->setBody(
                 new ServiceMethodBody($this->container, $id, $this->cg->getImportResolver()->getAlias($class))
             );
+
+            if ($definition->isInternal()) {
+                $method->setLongDescription(sprintf(preg_replace('~\s\s~', '', $internalDesc), $id));
+            } else {
+                $method->setLongDescription(sprintf($desc, $id));
+            }
         }
     }
 
@@ -361,11 +372,13 @@ class ContainerGenerator implements GeneratorInterface
         // method: ContainerInterface::checkSynced():
         $this->cg->addMethod($method = new Method('checkSynced', Method::IS_PRIVATE, 'void'));
 
-        $comment  = "Post check synced callers\n\n";
-        $comment .= "Post check if a setter of a called service that\n";
-        $comment .= "has synced dependencies needs to be called immediately.";
 
-        $method->setDescription($comment);
+        $method->setDescription('Post check synced callers');
+        $ldesc = (new Writer)
+            ->writeln('Checks if a setter of a called service that')
+            ->writeln('has synced dependencies needs to be called immediately.')
+            ->dump();
+        $method->setLongDescription($ldesc);
 
         $method->addArgument($arg = new Argument('synced', Method::T_ARRAY));
 

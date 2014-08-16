@@ -61,6 +61,7 @@ class ServiceMethod extends Method
      */
     public function generate($raw = false)
     {
+        $this->setDescription('Service: ' . $this->id);
         $this->setType($this->getServiceClass());
 
         return parent::generate($raw);
@@ -131,17 +132,5 @@ class ServiceMethod extends Method
     public function getBody()
     {
         return $this->body ?: new ServiceMethodBody($this->container, $this->id);
-    }
-
-    /**
-     * getDocBlock
-     *
-     * @return string
-     */
-    protected function getDocBlock()
-    {
-        $this->setDocComment('Service: ' . $this->id);
-
-        return parent::getDocBlock();
     }
 }
