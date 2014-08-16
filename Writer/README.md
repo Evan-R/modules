@@ -1,3 +1,5 @@
+# Selene Writer: dumping strings with elegance
+
 [![Build Status](https://travis-ci.org/seleneapp/writer.svg?branch=development)](https://travis-ci.org/seleneapp/writer)
 [![Latest Stable Version](https://poser.pugx.org/selene/writer/v/stable.png)](https://packagist.org/packages/selene/writer) 
 [![Latest Unstable Version](https://poser.pugx.org/selene/writer/v/unstable.png)](https://packagist.org/packages/selene/writer) 
@@ -6,6 +8,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/seleneapp/writer/badge.png?branch=development)](https://coveralls.io/r/seleneapp/writer?branch=development)
 [![Code Climate](https://codeclimate.com/github/seleneapp/writer/badges/gpa.svg)](https://codeclimate.com/github/seleneapp/writer)
+
 
 ## Installation
 
@@ -45,6 +48,22 @@ $writer
 echo $writer->dump();  //"foo\n    bar"  
 ```
 
+
+### Behavior
+
+By defatault, the Writer will remove trailing spaces at the end of each line.
+
+You may override this behavior by calling the `allowTrailingSpace()`
+method.
+
+```php
+<?php
+
+use \Selene\Module\Writer\Writer;
+
+$writer = new Writer;
+$writer->allowTrailingSpace(true); // will now preserve trailing space chars for each line.
+```
 
 ### Indentation
 
@@ -110,21 +129,28 @@ Appends a string to the last line.
 None fluent methods:
 
 - **`void` ignoreNull( `bool $ignore` )**  
-Don't add a line if `$str` in `Writer::writeln()` is `null`. 
+Don't add a line if `$str` in `Writer::writeln()` is `null`. Default is on.
+
+- **`void` allowTrailingSpace( `bool $space` )**  
+Allow/Disallow traling space chars. Default is off.
 
 - **`void` useTabs( `void` )**  
 Use Tabs for indentation instead of spaces.
 
 - **`void` setOutputIndentation( `int $level` )**  
-Sets the output indentation level of the whole text block.
+Sets the output indentation level of the whole text block.  
+The level value increments the indentation by one indent, e.g. `0` is no additional indentation, `1` is one indent, etc.  
+Default is `0`.
 
 - **`int` getOutputIndentation( `void` )**  
-Gets the output indentation level.
+Gets the output indentation level. (see `Writer::setOutputIndentation()`);
 
 ## Generators
 
-There're three generator, `InterfaceWriter`, `ClassWriter`, and `TraitWriter`.  
-All object generators share the following API:
+Dump PSR-2 compliant php source code.
+
+There're three object generators, `InterfaceWriter`, `ClassWriter`, and `TraitWriter`.  
+All object generators share a common API.
 
 ### Shared API
 
@@ -371,4 +397,20 @@ class Foo extends Bar
 
 Behaves like the `ClassWriter` except there're no constants and interfaces.
 
+#### Notes
 
+Setting method bodies is up to you. However, if you rely on class base names
+that have been imported you can utilize the import resolver to determine the
+actual shortname that's used on the object writer.
+
+Also see the [Shared API](#shared-api) section.
+
+```php
+<?php
+
+// $cl beeing the object writer instance.
+
+$body = 'return new '.$cl->getImportResolver()->getAlias('Acme\MyClass').';';
+$method->setBody($body);
+
+```

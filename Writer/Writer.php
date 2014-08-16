@@ -66,13 +66,13 @@ class Writer
      */
     protected $useTabs;
 
+    /**
+     * noTrailingSapce
+     *
+     * @var boolean
+     */
     protected $noTrailingSapce;
 
-    /**
-     * Constructor.
-     *
-     * @param int $indentLevel
-     */
     /**
      * Constructor.
      *
@@ -94,6 +94,7 @@ class Writer
     /**
      * Use tabs for indentation.
      *
+     * @api
      * @return void
      */
     public function useTabs()
@@ -105,6 +106,7 @@ class Writer
     /**
      * allowTrailingSpace
      *
+     * @api
      * @return void
      */
     public function allowTrailingSpace($space)
@@ -117,6 +119,7 @@ class Writer
      *
      * @param boolean $ignore
      *
+     * @api
      * @return void
      */
     public function ignoreNull($ignore = false)
@@ -129,13 +132,9 @@ class Writer
      *
      * The default level is 0, 1 means one indent, etc.
      *
-     * @return void
-     */
-    /**
-     * setOutputIndentation
-     *
      * @param int $level
      *
+     * @api
      * @return void
      */
     public function setOutputIndentation($level = 0)
@@ -154,10 +153,11 @@ class Writer
     }
 
     /**
-     * Adds a line to the linestack.
+     * Adds a line to the line stack.
      *
      * @param string $str
      *
+     * @api
      * @return Writer
      */
     public function writeln($str = null)
@@ -176,6 +176,7 @@ class Writer
      *
      * @param string $str
      *
+     * @api
      * @return Writer
      */
     public function appendln($str)
@@ -192,6 +193,7 @@ class Writer
     /**
      * Removes the last line.
      *
+     * @api
      * @return writer
      */
     public function popln()
@@ -207,6 +209,7 @@ class Writer
      * @param string $line
      * @param int $index
      *
+     * @api
      * @return Writer
      */
     public function replaceln($str, $index = 0)
@@ -225,6 +228,7 @@ class Writer
      *
      * @param int $index
      *
+     * @api
      * @return Writer
      */
     public function removeln($index = 0)
@@ -241,6 +245,7 @@ class Writer
     /**
      * Adds an indentation to the following line.
      *
+     * @api
      * @return Writer
      */
     public function indent()
@@ -253,6 +258,7 @@ class Writer
     /**
      * Removes the previous indentation.
      *
+     * @api
      * @return Writer
      */
     public function outdent()
@@ -266,6 +272,7 @@ class Writer
     /**
      * Inserts a blanc line to the line stack.
      *
+     * @api
      * @return Writer
      */
     public function newline()
@@ -278,6 +285,7 @@ class Writer
     /**
      * Concatenates the line stack into a single string.
      *
+     * @api
      * @return string
      */
     public function dump()

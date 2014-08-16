@@ -78,7 +78,7 @@ abstract class Annotateable implements MemberInterface
      *
      * @return void
      */
-    public function setLongDescription()
+    public function setLongDescription($description)
     {
         $this->docBlock->setLongDescription($description);
     }
