@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Module\View\Composer package
+ * This File is part of the Selene\Module\View package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -14,9 +14,14 @@ namespace Selene\Module\View\Composer;
 use \Selene\Module\View\RendererInterface;
 
 /**
+ * The Context object acts as a facade for the renderer object,
+ * as It only allows to add context to the renderer.
+ *
  * @class Context
- * @package Selene\Module\View\Composer
+ *
+ * @package Selene\Module\View
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
  */
 class Context
 {
@@ -38,9 +43,9 @@ class Context
     }
 
     /**
-     * addContext
+     * Adds a context array to the renderer context.
      *
-     * @param array $context
+     * @param array $context the context data
      *
      * @return Context
      */
@@ -52,11 +57,12 @@ class Context
     }
 
     /**
-     * nestView
+     * Adds a view instance to the renderer context.
      *
-     * @param mixed $key
-     * @param mixed $template
-     * @param array $context
+     * @param string $key the key on which the view intance is stored within
+     * the context array.
+     * @param mixed  $template the remplate that should ne rendered
+     * @param array  $context the actual context array
      *
      * @return Context
      */

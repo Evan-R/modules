@@ -9,19 +9,17 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Module\DI\Tests\Dumper\Traits;
+namespace Selene\Module\Writer\Tests;
 
-use Selene\Module\DI\Dumper\Traits\FormatterTrait;
+use \Selene\Module\Writer\FormatterHelper;
 
 class FormatterTraitTest extends \PHPUnit_Framework_TestCase
 {
-    use FormatterTrait;
+    use FormatterHelper;
 
     /** @test */
     public function itShouldFormatIntents()
     {
-        $formatter = new FormatterStub;
-
         $this->assertSame('    ', $this->indent(4));
         $this->assertSame('      ', $this->indent(6));
         $this->assertSame('', $this->indent(0));
@@ -66,12 +64,5 @@ class FormatterTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("[\n    'foo' => \$this->doStuff(),\n]", $str);
 
         $var = ['foo' => 'bar', 'baz' => ['foof' => 'swosh']];
-
-        //$str = $this->extractParams($var, 0);
-        //echo $this->extractParams($var, 0);
-        //echo "\n";
-        //echo $this->extractParams($var, 4);
-        //echo "\n";
-        //echo $this->extractParams($var, 8);
     }
 }

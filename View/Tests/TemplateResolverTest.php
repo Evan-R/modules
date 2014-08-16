@@ -13,8 +13,8 @@ namespace Selene\Module\View\Tests;
 
 use \Mockery as m;
 use \org\bovigo\vfs\vfsStream;
-use \Selene\Module\View\TemplateResolver;
-use \Selene\Module\View\TemplateResolverInterface;
+use \Selene\Module\View\Template\Resolver;
+use \Selene\Module\View\Template\ResolverInterface;
 
 /**
  * @class TemplateResolverTest extends \PHPUnit_Framework_TestCase
@@ -69,8 +69,8 @@ class TemplateResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldBeInstantiable()
     {
-        $resolver = new TemplateResolver;
-        $this->assertInstanceof('Selene\Module\View\TemplateResolverInterface', $resolver);
+        $resolver = new Resolver;
+        $this->assertInstanceof('Selene\Module\View\Template\ResolverInterface', $resolver);
     }
 
     /**
@@ -81,11 +81,11 @@ class TemplateResolverTest extends \PHPUnit_Framework_TestCase
     {
         $this->createFiles($files);
 
-        $resolver = new TemplateResolver($path = $this->templateRoot());
+        $resolver = new Resolver($path = $this->templateRoot());
 
         $resolved = $resolver->resolve($template);
 
-        $this->assertEquals(count($files), count($resolved));
+        $this->assertEquals(1, count($resolved));
 
         foreach ($resolved as $i => $info) {
             $this->assertInstanceof('SplFileInfo', $info);
@@ -102,7 +102,7 @@ class TemplateResolverTest extends \PHPUnit_Framework_TestCase
         $packages = [$packages[0] => $this->templateRoot(). '/' . $packages[1]];
         $this->createFiles($files);
 
-        $resolver = new TemplateResolver($path = $this->templateRoot(), $packages);
+        $resolver = new Resolver($path = $this->templateRoot(), $packages);
 
         $resolved = $resolver->resolve($template);
 
@@ -120,7 +120,7 @@ class TemplateResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldThrowExeptionIfNoTemplateIsFound()
     {
-        $resolver = new TemplateResolver($path = $this->templateRoot());
+        $resolver = new Resolver($path = $this->templateRoot());
         $resolved = $resolver->resolve('some template');
     }
 
