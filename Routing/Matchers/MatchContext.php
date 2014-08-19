@@ -43,16 +43,24 @@ class MatchContext
     private $request;
 
     /**
+     * routeName
+     *
+     * @var string
+     */
+    private $routeName;
+
+    /**
      * Constructor.
      *
      * @param Route $route
      * @param array $params
      */
-    public function __construct(Route $route, array $params = [], Request $request = null)
+    public function __construct(Route $route, array $params = [], Request $request = null, $name = null)
     {
         $this->route   = $route;
         $this->params  = $params;
         $this->request = $request;
+        $this->routeName    = $name ?: $route->getName();
     }
 
     /**
@@ -117,4 +125,27 @@ class MatchContext
     {
         return $this->route;
     }
+
+    /**
+     * getRouteName
+     *
+     * @return string
+     */
+    public function setRouteName($routeName)
+    {
+        if (null !== $this->getRoute() && null === $this->getRoute()->getName()) {
+            $this->routeName = $routeName;
+        }
+    }
+
+    /**
+     * getRouteName
+     *
+     * @return string
+     */
+    public function getRouteName()
+    {
+        return $this->routeName;
+    }
+
 }

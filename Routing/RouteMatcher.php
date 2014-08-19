@@ -69,14 +69,36 @@ class RouteMatcher implements RouteMatcherInterface
     {
         $this->prepareMatchers();
 
-        $matchedRoute = null;
-
         //just filter routes that matches the current request method.
         $routes = $routes->findByMethod($request->getMethod());
+        $routeName = null;
 
-        foreach ($routes as $route) {
+        if (0 < count($routes)) {
+            $routeName = $this->findRoute($routes, $request);
+        }
 
-            $route->compile();
+        return $this->getMatchContext($request, $routeName);
+    }
+
+    /**
+     * findRoute
+     *
+     * @param RouteCollectionInterface $routes
+     * @param Request $request
+     *
+     * @return string|null
+     */
+    protected function findRoute(RouteCollectionInterface $routes, Request $request)
+    {
+        $routeName = null;
+        $matchedRoute = null;
+
+        foreach ($routes as $routeName => $route) {
+
+            if (!$route->isCompiled()) {
+                $route->setName($routeName);
+                $route->compile();
+            }
 
             $noVars = false;
             $matchesHost = false;
@@ -100,7 +122,7 @@ class RouteMatcher implements RouteMatcherInterface
             }
         }
 
-        return $this->getMatchContext($request);
+        return $routeName;
     }
 
     /**
@@ -152,7 +174,7 @@ class RouteMatcher implements RouteMatcherInterface
      */
     protected function matchStaticPath(Route $route, Request $request)
     {
-        return $this->getStaticPathMatcher()->matches($route, $request->getRequestUri());
+        return $this->getStaticPathMatcher()->matches($route, $request->getPathInfo());
     }
 
     /**
@@ -178,7 +200,7 @@ class RouteMatcher implements RouteMatcherInterface
      */
     protected function matchPathRegexp(Route $route, Request $request)
     {
-        return $this->getRegexpPathMatcher()->matches($route, $request->getRequestUri());
+        return $this->getRegexpPathMatcher()->matches($route, $request->getPathInfo());
     }
 
     /**
@@ -191,7 +213,7 @@ class RouteMatcher implements RouteMatcherInterface
      */
     protected function directMatch(Route $route, Request $request)
     {
-        return $this->getDirectMatcher()->matches($route, $request->getRequestUri());
+        return $this->getDirectMatcher()->matches($route, $request->getPathInfo());
     }
 
     /**
@@ -281,11 +303,16 @@ class RouteMatcher implements RouteMatcherInterface
     /**
      * @return MatchContext
      */
-    private function getMatchContext(Request $request)
+    private function getMatchContext(Request $request, $routeName = null)
     {
         try {
             $context = $this->matches->pop();
+
             $context->setRequest($request);
+
+            if ($context->getRoute()) {
+                $context->setRouteName($routeName);
+            }
 
             return $context;
         } catch (\Exception $e) {

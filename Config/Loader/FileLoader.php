@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of the Selene\Module\Config\Loader package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
@@ -51,7 +51,6 @@ abstract class FileLoader extends AbstractLoader
     public function supports($resource)
     {
         return is_string($resource) && $this->extension ===  pathinfo(strtolower($resource), PATHINFO_EXTENSION);
-
     }
 
     /**

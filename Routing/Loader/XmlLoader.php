@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of the Selene\Module\Routing package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
@@ -108,6 +108,7 @@ class XmlLoader extends XmlFileLoader
     protected function parseRouteNode($node, array $methods = null)
     {
         $requirements = array_merge(
+            ['parent' => null],
             $this->parseSingleRequirements($node->xpath('./@*')),
             $this->parseSingleRequirements($node->xpath('./*'))
         );
@@ -133,11 +134,12 @@ class XmlLoader extends XmlFileLoader
         }
 
         $name       = $requirements['name'];
+        $parent     = $requirements['parent'];
         $path       = $requirements['path'];
         $methods    = $requirements['methods'];
         $controller = $requirements['_action'];
 
-        foreach (['name', 'path', 'prefix', 'methods', '_action'] as $attr) {
+        foreach (['name', 'parent', 'path', 'prefix', 'methods', '_action'] as $attr) {
             unset($requirements[$attr]);
         }
 
@@ -149,6 +151,8 @@ class XmlLoader extends XmlFileLoader
 
         $this->parseDefaults($route, $node);
         $this->parseConstraints($route, $node);
+
+        $route->setParent($parent);
 
         $this->getRoutes()
             ->add($route);
@@ -321,6 +325,7 @@ class XmlLoader extends XmlFileLoader
 
             switch ($name) {
                 case 'name':
+                case 'parent':
                 case 'path':
                 case 'prefix':
                     $requirements[$name] = $this->getPhpValue($node);

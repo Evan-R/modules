@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of package name
  *
  * (c) author <email>

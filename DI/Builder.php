@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of the Selene\Module\DI package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
@@ -18,6 +18,8 @@ use \Selene\Module\DI\Processor\ProcessorDecorator;
 use \Selene\Module\DI\Processor\ProcessorInterface;
 use \Selene\Module\Config\Resource\FileResource;
 use \Selene\Module\Config\Resource\ObjectResource;
+use \Selene\Module\Config\Resource\Collector;
+use \Selene\Module\Config\Resource\CollectorInterface;
 use \Selene\Module\Config\Loader\LoaderInterface;
 
 /**
@@ -75,11 +77,14 @@ class Builder implements BuilderInterface
      * @param ProcessorInterface $proc      the processor
      * @param array              $resources resource
      */
-    public function __construct(ContainerInterface $container, ProcessorInterface $proc = null, array $resources = [])
-    {
+    public function __construct(
+        ContainerInterface $container,
+        ProcessorInterface $proc = null,
+        CollectorInterface $resources = null
+    ) {
         $this->container = $container;
         $this->processor = $proc ?: new Processor(new Configuration);
-        $this->resources = $resources;
+        $this->resources = $resources ?: new Collector;
 
         $this->packages  = [];
     }
@@ -161,7 +166,7 @@ class Builder implements BuilderInterface
      */
     public function addFileResource($file)
     {
-        $this->resources[] = new FileResource($file);
+        $this->resources->addFileResource($file);
     }
 
     /**
@@ -173,7 +178,7 @@ class Builder implements BuilderInterface
      */
     public function addObjectResource($object)
     {
-        $this->resources[] = new ObjectResource($object);
+        $this->resources->addObjectResource($object);
     }
 
     /**
@@ -183,7 +188,7 @@ class Builder implements BuilderInterface
      */
     public function getResources()
     {
-        return $this->resources;
+        return $this->resources->getResources();
     }
 
     /**
@@ -265,8 +270,8 @@ class Builder implements BuilderInterface
      */
     protected function mergeResources(BuilderInterface $builder)
     {
-        $this->resources = array_unique(
-            array_merge($this->resources, $builder->getResources())
-        );
+        $this->resources->setResources(array_unique(
+            array_merge($this->getResources(), $builder->getResources())
+        ));
     }
 }

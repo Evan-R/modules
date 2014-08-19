@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of the Selene\Module\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>

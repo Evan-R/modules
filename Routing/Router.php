@@ -83,6 +83,8 @@ class Router implements RouterInterface
         $this->matcher     = $matcher ?: new RouteMatcher;
         $this->events      = $events ?: new Dispatcher;
 
+        $this->dispatched  = new \SplStack;
+
         $this->initControllerHandler();
     }
 
@@ -131,6 +133,11 @@ class Router implements RouterInterface
         return $this->events;
     }
 
+    public function getCurrentRoute()
+    {
+        return $this->dispatched->count() ? $this->dispatched->top() : null;
+    }
+
     /**
      * Dispatch a route collections agaibts a request
      *
@@ -159,6 +166,8 @@ class Router implements RouterInterface
         $route   = $context->getRoute();
         $request = $context->getRequest();
 
+        $this->dispatched->push($context->getRouteName());
+
         // if there's a result on the event, abort the routing.
         if ($response  = $this->filterBefore($request, $route)) {
 
@@ -184,6 +193,8 @@ class Router implements RouterInterface
         if ($response  = $this->filterAfter($event)) {
             return $response;
         }
+
+        $this->dispatched->pop();
 
         return $event->getResponse();
     }

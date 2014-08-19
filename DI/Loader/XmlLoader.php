@@ -404,8 +404,9 @@ class XmlLoader extends XmlFileLoader
     private function getValueFromString($val, $default = null)
     {
         if ($this->container->isReference($val)) {
-            return new Reference(substr($val, strlen(ContainerInterface::SERVICE_REF_INDICATOR)));
+            //return new Reference(substr($val, strlen(ContainerInterface::SERVICE_REF_INDICATOR)));
         }
+
         return Parser::getPhpValue($val, $default, $this->getParser());
     }
 }

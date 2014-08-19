@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of the \Users\malcolm\www\selene_source\src\Selene\Module\Routing\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>

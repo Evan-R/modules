@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of the Selene\Compiler package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>

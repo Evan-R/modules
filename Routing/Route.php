@@ -48,7 +48,7 @@ class Route implements Serializable
      *
      * @var string
      */
-    protected $parent;
+    private $parent;
 
     /**
      * requirements
@@ -977,8 +977,8 @@ class Route implements Serializable
         $data = unserialize($data);
 
         $this->name         = $data['name'];
-        $this->pattern      = $data['pattern'];
         $this->parent       = $data['parent'];
+        $this->pattern      = $data['pattern'];
         $this->defaults     = $data['defaults'];
         $this->parameters   = $data['parameters'];
         $this->requirements = $data['requirements'];

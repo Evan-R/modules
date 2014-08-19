@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of the Selene\Module\Config package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
@@ -15,6 +15,7 @@ use \Selene\Module\Filesystem\Filesystem;
 use \Selene\Module\Filesystem\Traits\FsHelperTrait;
 use \Selene\Module\Filesystem\Traits\PathHelperTrait;
 use \Selene\Module\Filesystem\Exception\IOException;
+use \Selene\Module\Config\Resource\Collector;
 
 /**
  * @class Cache
@@ -62,6 +63,12 @@ class Cache implements CacheInterface
     {
         $this->file = $file;
         $this->debug = $debug;
+        $this->resources = new Collector;
+    }
+
+    public function getResourceCollector()
+    {
+        return $this->resources;
     }
 
     /**
@@ -187,14 +194,9 @@ class Cache implements CacheInterface
 
         $timestamp = filemtime($this->file);
 
+        $this->resources->setResources(unserialize(file_get_contents($manifest)));
 
-        foreach (unserialize(file_get_contents($manifest)) as $configFile) {
-            if (!$configFile->isValid($timestamp)) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->resources->isValid($timestamp);
     }
 
     /**

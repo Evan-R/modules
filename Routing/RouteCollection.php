@@ -11,6 +11,7 @@
 
 namespace Selene\Module\Routing;
 
+use \Countable;
 use \Serializable;
 use \JsonSerializable;
 use \IteratorAggregate;
@@ -22,7 +23,7 @@ use \Selene\Module\Common\Data\AbstractList;
  * @package Selene\Module\Routing
  * @version $Id$
  */
-class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Serializable
+class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Serializable, Countable
 {
     use Getter;
 
@@ -40,6 +41,11 @@ class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Se
     public function __construct()
     {
         $this->routes = [];
+    }
+
+    public function count()
+    {
+        return count($this->routes);
     }
 
     /**
@@ -116,6 +122,7 @@ class RouteCollection implements RouteCollectionInterface, IteratorAggregate, Se
     public function findByMethod($method)
     {
         $method = strtoupper($method);
+
         $collection = $this->create();
 
         foreach ($this->routes as $name => $route) {

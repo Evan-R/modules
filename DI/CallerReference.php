@@ -48,9 +48,7 @@ class CallerReference
             throw new \InvalidArgumentException(sprintf('"%s" is not a suitable reference string.'));
         }
 
-        $service = substr($reference, 0, $pos = strpos($reference, '->'));
-
-        $method = substr($reference, $pos + 2);
+        list ($service, $method) = explode('->', substr($reference, strlen(ContainerInterface::SERVICE_REF_INDICATOR)));
 
         if (0 === substr_count($method, '(')) {
             return new self($service, $method);

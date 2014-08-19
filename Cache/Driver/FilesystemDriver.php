@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of the Stream\Cache package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
@@ -308,7 +308,8 @@ class FilesystemDriver extends AbstractDriver
      */
     private function getExpiryTimeStamp($time = null)
     {
-        return is_int($time) ? time() + ($time * 60) : (is_string($time) ? strtotime($time) : (time() + $this->default * 60));
+        return is_int($time) ? time() + ($time * 60) :
+            (is_string($time) ? strtotime($time) : (time() + $this->default * 60));
     }
 
     /**

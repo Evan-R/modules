@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of the Selene\Module\Common\Traits package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>

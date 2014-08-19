@@ -173,6 +173,7 @@ class RouteBuilder
             $route->getRequirements()
         );
 
+        $newRoute->setParent($route->getParent());
         $newRoute->setDefaults($route->getDefaults());
         //$newRoute->setConstraits($route->getConstraits());
 

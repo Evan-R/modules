@@ -1,7 +1,7 @@
 <?php
 
-/**
- * This File is part of the Selene\Module\Writer\Object package
+/*
+ * This File is part of the Selene\Module\Writer package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -16,9 +16,13 @@ use \Selene\Module\Writer\Stringable;
 use \Selene\Module\Writer\GeneratorInterface;
 
 /**
- * @class DocBlock
- * @package Selene\Module\Writer\Object
+ * @class DocBlock implements GeneratorInterface
+ *
+ * @see GeneratorInterface
+ *
+ * @package Selene\Module\Writer
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
  */
 class DocBlock implements GeneratorInterface
 {
