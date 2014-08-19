@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
@@ -27,6 +27,7 @@ use \Selene\Module\Routing\Loader\DI\PhpLoader as PhpRoutingLoader;
 use \Selene\Module\Routing\Loader\DI\XmlLoader as XmlRoutingLoader;
 use \Selene\Module\Routing\Loader\DI\CallableLoader as CallableRoutingLoader;
 use \Selene\Module\Routing\RouteCollectionInterface as Routes;
+use \Selene\Module\Filesystem\Traits\PathHelperTrait;
 
 /**
  * @abstract class PackageConfiguration extends BaseConfig
@@ -40,7 +41,8 @@ use \Selene\Module\Routing\RouteCollectionInterface as Routes;
  */
 abstract class PackageConfiguration extends Configuration
 {
-    use Getter;
+    use Getter,
+        PathHelperTrait;
 
     /**
      * package
