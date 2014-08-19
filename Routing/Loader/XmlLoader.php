@@ -213,6 +213,7 @@ class XmlLoader extends XmlFileLoader
             $this->parseResourceRequirements($node->xpath('./*'))
         );
 
+
         if (!isset($requirements['path'])) {
             throw new \InvalidArgumentException('Resource requires a path.');
         }
@@ -224,8 +225,24 @@ class XmlLoader extends XmlFileLoader
         $actions     = isset($requirements['actions']) ? $requirements['actions'] : null;
         $constraints = isset($requirements['constraints']) ? $requirements['constraints'] : null;
 
+        $prefix = $this->getNamePrefix($node);
         $this->getRoutes()
-            ->resource($requirements['path'], $requirements['controller'], $actions, $constraints);
+
+            ->resource($requirements['path'], $requirements['controller'], $actions, $constraints, $prefix);
+    }
+
+    /**
+     * getNamePrefix
+     *
+     * @param DOMNode $node
+     *
+     * @return string|null
+     */
+    protected function getNamePrefix(\DOMNode $node)
+    {
+        foreach ($node->xpath('./@name-prefix|./name-prefix') as $item) {
+            return $this->getPhpValue($item);
+        }
     }
 
     /**

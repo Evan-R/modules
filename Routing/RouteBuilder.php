@@ -281,7 +281,7 @@ class RouteBuilder
      *
      * @return RouteBuilder
      */
-    public function resource($path, $resource, $actions = [], $resourceConstrait = null)
+    public function resource($path, $resource, $actions = [], $resourceConstrait = null, $namePrefix = null)
     {
         $this->validateActions((array)$actions);
 
@@ -290,6 +290,8 @@ class RouteBuilder
         foreach ($actions as $action) {
 
             list ($pattern, $controllerAction, $name) = $this->getResourcePaths(trim($path, '/'), strtolower($action));
+
+            $name = $namePrefix ? $namePrefix . '.' . $name : $name;
 
             $route = $this->define(
                 $this->getResourceActionVerb($action),
@@ -404,7 +406,7 @@ class RouteBuilder
             case 'index':
                 return ['/'.$path, $action, $name.'.'.$action];
             case 'create':
-                return ['/'.$path . '/create', $action, $name.'.'.$action];
+                return ['/'.$path . '/new', $action, $name.'.'.$action];
             case 'show':
             case 'update':
             case 'delete':
