@@ -71,7 +71,20 @@ class ConfigLoader
         $builder->addObjectResource($config);
         $builder->addObjectResource($package);
 
-        $this->loaded[$alias] = $pContainer;
+        $this->addToLoaded($alias, $pContainer);
+    }
+
+    /**
+     * addToLoaded
+     *
+     * @param string $alias
+     * @param PackageInterface $package
+     *
+     * @return void
+     */
+    protected function addToLoaded($alias, ContainerInterface $container)
+    {
+         $this->loaded[$alias] = $container;
     }
 
     /**

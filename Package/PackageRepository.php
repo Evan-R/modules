@@ -51,10 +51,10 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
     protected $configLoader;
 
     /**
-     * @param array $packages
+     * Constructor.
      *
-     * @access public
-     * @return mixed
+     * @param array $packages
+     * @param ConfigLoader $loader
      */
     public function __construct(array $packages = [], ConfigLoader $loader = null)
     {
@@ -70,12 +70,21 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
     }
 
     /**
+     * wasBuilt
+     *
+     * @return boolean
+     */
+    public function wasBuilt()
+    {
+        return count($this->built) === count($this->packages);
+    }
+
+    /**
      * addPackage
      *
      * @param PackageInterface $package
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function add(PackageInterface $package)
     {
@@ -90,7 +99,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      *
      * @param array $packages
      *
-     * @access public
      * @return void
      */
     public function addPackages(array $packages)
@@ -105,7 +113,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      *
      * @param mixed $name
      *
-     * @access public
      * @return boolean
      */
     public function has($name)
@@ -118,7 +125,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      *
      * @param mixed $name
      *
-     * @access public
      * @return PackageInterce
      */
     public function get($name)
@@ -135,7 +141,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      *
      * @param mixed $name
      *
-     * @access public
      * @return string|null
      */
     public function getAlias($name)
@@ -147,7 +152,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
     /**
      * get all packages
      *
-     * @access public
      * @return array
      */
     public function all()
@@ -159,7 +163,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      * Start the package build process.
      * Load package config and start package bulding.
      *
-     * @access public
      * @return void
      */
     public function build(ContainerBuilderInterface $builder)
@@ -198,7 +201,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
     /**
      * bootPackages
      *
-     * @access public
      * @return mixed
      */
     public function boot(ApplicationInterface $app)
@@ -211,7 +213,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
     /**
      * shutDown
      *
-     * @access public
      * @return void
      */
     public function shutDown()
@@ -224,7 +225,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
     /**
      * getIterator
      *
-     * @access public
      * @return \ArrayIterator
      */
     public function getIterator()
@@ -238,7 +238,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      * @param ContainerInterface $container
      * @param PackageInterce $package
      *
-     * @access protected
      * @return void
      */
     protected function loadPackageConfig(ContainerBuilderInterface $builder, PackageInterface $package)
@@ -271,7 +270,6 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      * @param ContainerInterface $container
      * @param PackageInterface $package
      *
-     * @access protected
      * @return mixed
      */
     protected function buildPackage(ContainerBuilderInterface $builder, PackageInterface $package)
