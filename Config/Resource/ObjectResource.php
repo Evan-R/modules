@@ -39,7 +39,7 @@ class ObjectResource extends FileResource implements ObjectResourceInterface
             throw \InvalidArgumentException('resource must be an object');
         }
 
-        parent::__construct($resource);
+        parent::__construct((new \ReflectionObject($resource))->getFileName());
     }
 
     /**
@@ -47,22 +47,24 @@ class ObjectResource extends FileResource implements ObjectResourceInterface
      *
      * @return string
      */
-    public function getPath()
-    {
-        return $this->getObjectReflection()->getFileName();
-    }
+    //public function getPath()
+    //{
+        //return $this->resource;
+        //return $this->getObjectReflection()->getFileName();
+    //}
 
     /**
      * Get the reflection of the object.
      *
      * @return \ReflectionObject
      */
-    public function getObjectReflection()
-    {
-        if (null === $this->reflection) {
-            $this->reflection = new \ReflectionObject($this->resource);
-        }
+    //public function getObjectReflection()
+    //{
+        //var_dump($resource);
+        //if (null === $this->reflection) {
+            //$this->reflection = new \ReflectionObject($this->resource);
+        //}
 
-        return $this->reflection;
-    }
+        //return $this->reflection;
+    //}
 }

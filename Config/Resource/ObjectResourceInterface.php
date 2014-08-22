@@ -28,5 +28,5 @@ interface ObjectResourceInterface extends ResourceInterface
      * @access public
      * @return \ReflectionObject
      */
-    public function getObjectReflection();
+    //public function getObjectReflection();
 }
