@@ -56,7 +56,7 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
      * @access public
      * @return mixed
      */
-    public function __construct(array $packages = [])
+    public function __construct(array $packages = [], ConfigLoader $loader = null)
     {
         $this->sorted = false;
         $this->aliases = [];
@@ -66,7 +66,7 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
         $this->dependecies = new DependencyManager($this);
 
         $this->addPackages($packages);
-        $this->configLoader = new ConfigLoader;
+        $this->configLoader = $loader ?: new ConfigLoader;
     }
 
     /**
@@ -82,7 +82,7 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
         $this->sorted = false;
 
         $this->aliases[$package->getName()] = $package->getAlias();
-        $this->packages[$package->getAlias()] = $package;
+        $this->packages[$alias = $package->getAlias()] = $package;
     }
 
     /**
@@ -168,18 +168,26 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
 
         foreach ($packages as &$package) {
 
-            if (in_array($alias = $package->getAlias(), $this->built)) {
+            if (!$this->isBuildable($package)) {
                 continue;
             }
 
-            //$this->loadPackageConfig($builder, $package);
             $this->configLoader->load($builder, $package);
             $this->buildPackage($builder, $package);
 
-            $this->built[] = $alias;
+            $this->built[] = $alias = $package->getAlias();
         }
 
         $this->configLoader->unload();
+    }
+
+    protected function isBuildable(PackageInterface $package)
+    {
+        if (in_array($package->getAlias(), $this->built)) {
+            return false;
+        }
+
+        return true;
     }
 
     protected function packageHasDependecies(PackageInterface $package)

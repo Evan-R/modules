@@ -48,14 +48,13 @@ class ConfigLoader
      */
     public function load(BuilderInterface $builder, PackageInterface $package)
     {
-
         if (!($config = $package->getConfiguration()) instanceof ConfigurationInterface) {
             return;
         }
 
         $container = $builder->getContainer();
 
-        $pContainer = $this->getContainer($container, $this->getRequirements($package));
+        $pContainer = $this->getContainer($container, $r = $this->getRequirements($package));
 
         //$parameters = $container->getParameters();
         //$containerClass = (new \ReflectionObject($container))->getName();

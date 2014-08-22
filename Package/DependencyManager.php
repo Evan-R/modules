@@ -115,9 +115,11 @@ class DependencyManager
             $req = rtrim($req, '?');
 
             if (!$this->repository->has($req)) {
+
                 if ($optional) {
                     continue;
                 }
+
                 throw RequirementConflictException::missingPackage($alias, $req);
             }
 
