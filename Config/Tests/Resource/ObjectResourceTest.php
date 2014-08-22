@@ -33,7 +33,7 @@ class ObjectResourceTest extends \PHPUnit_Framework_TestCase
     public function itShouldGetTheRightPath()
     {
         $resource = new ObjectResource($this);
-        $this->assertEquals(__FILE__, $resource->getPath());
+        $this->assertEquals(__FILE__, $resource->getResource());
     }
 
     /** @test */
@@ -65,6 +65,6 @@ class ObjectResourceTest extends \PHPUnit_Framework_TestCase
     public function itShouldReturnThisInstance()
     {
         $resource = new ObjectResource($this);
-        $this->assertSame($this, $resource->getResource());
+        $this->assertSame(__FILE__, $resource->getResource());
     }
 }
