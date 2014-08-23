@@ -69,7 +69,7 @@ class SimpleInflector implements InflectorInterface
     ];
 
     /**
-     * Pattern for 'ies' to 'y' and 'ases/oxexs' to 'as/ox' conversion.
+     * Pattern for 'ies' to 'y' and 'ases/oxes' to 'as/ox' conversion.
      *
      * @var array
      */
