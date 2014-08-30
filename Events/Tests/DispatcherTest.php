@@ -17,6 +17,7 @@ use \Selene\Module\Events\Event;
 use \Selene\Module\Events\Dispatcher;
 use \Selene\Module\Events\Tests\Stubs\EventStub;
 use \Selene\Module\Events\Tests\Stubs\EventSubscriberStub;
+use \Selene\Module\Events\Tests\Fixures\PrioritySubscriber;
 use \Selene\Module\Events\Tests\Stubs\InvalidSubscriber;
 use \Selene\Module\DI\ContainerInterface;
 
@@ -31,28 +32,24 @@ use \Selene\Module\DI\ContainerInterface;
  */
 class DispatcherTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function testBindEvent()
+    /** @test */
+    public function it_should_bind_a_callable_as_handler()
     {
+        $called = false;
+
         $dispatcher = $this->newDispatcher();
 
-        $dispatcher->on('foo', function () {
-            return 'bar';
+        $dispatcher->on('event', $handler = function () use (&$called) {
+            $called = true;
         });
 
-        $dispatcher->on('foo', function () {
-            return 'baz';
-        });
+        $dispatcher->dispatch('event');
 
-        $result = $dispatcher->dispatch('foo');
-
-        $this->assertSame(['bar', 'baz'], $result);
+        $this->assertTrue($called, 'It should have called the handler.');
     }
 
     /** @test */
-    public function itShouldBindMultipleEventsToOneHandler()
+    public function it_should_bind_multiple_events_to_one_handler()
     {
         $called = 0;
 
@@ -65,11 +62,11 @@ class DispatcherTest extends TestCase
         $dispatcher->dispatch('foo');
         $dispatcher->dispatch('bar');
 
-        $this->assertSame(2, $called);
+        $this->assertSame(2, $called, 'The handler should have been called twice.');
     }
 
     /** @test */
-    public function itShouldBindMultipleEventsToOneHandlerOnce()
+    public function it_Should_Bind_Multiple_Events_To_One_Handler_Once()
     {
         $called = 0;
 
@@ -85,10 +82,44 @@ class DispatcherTest extends TestCase
         $dispatcher->dispatch('foo');
         $dispatcher->dispatch('bar');
 
-        $dispatcher->dispatch('foo');
-        $dispatcher->dispatch('bar');
-
         $this->assertSame(2, $called);
+    }
+
+    /** @test */
+    public function it_should_be_able_to_dispatch_event_objects()
+    {
+        $called = false;
+        $event = new EventStub;
+        $event->setEventName('test');
+
+        $dispatcher = $this->newDispatcher();
+
+        $dispatcher->on('test', function ($evt) use ($event, &$called) {
+            $called = true;
+            $this->assertSame($evt, $event);
+        });
+
+        $dispatcher->dispatchEvent($event);
+        $this->assertTrue($called);
+
+        $i = 0;
+
+        $eventB = new EventStub;
+        $eventB->setEventName('test_b');
+
+        $eventC = new EventStub;
+        $eventC->setEventName('test_c');
+
+        $dispatcher->on('test_b', function ($evt) use (&$i) {
+            $i++;
+        });
+
+        $dispatcher->on('test_c', function ($evt) use (&$i) {
+            $i++;
+        });
+
+        $dispatcher->dispatchEvents([$eventB, $eventC]);
+        $this->assertSame(2, $i);
     }
 
     /** @test */
@@ -294,21 +325,22 @@ class DispatcherTest extends TestCase
     /** @test */
     public function itShouldDispatchEventsDependingOnTheirPriority()
     {
+        $result = [];
         $dispatcher = $this->newDispatcher();
 
-        $dispatcher->on('foo', function () {
-            return 'foo';
+        $dispatcher->on('foo', function () use (&$result) {
+            $result[] = 'foo';
         }, 200);
 
-        $dispatcher->on('foo', function () {
-            return 'bar';
+        $dispatcher->on('foo', function () use (&$result) {
+            $result[] = 'bar';
         }, 100);
 
-        $dispatcher->on('foo', function () {
-            return 'baz';
+        $dispatcher->on('foo', function () use (&$result) {
+            $result[] = 'baz';
         }, 300);
 
-        $result = $dispatcher->dispatch('foo');
+        $dispatcher->dispatch('foo');
 
         $this->assertSame(['baz', 'foo', 'bar'], $result);
     }
@@ -351,97 +383,77 @@ class DispatcherTest extends TestCase
             }
         );
 
-        $result = $dispatcher->dispatch('foo');
-        $result = $dispatcher->dispatch('foo');
+        $dispatcher->dispatch('foo');
+        $dispatcher->dispatch('foo');
 
         $this->assertTrue(true);
+        $this->assertSame(1, $counter);
     }
 
-    /**
-     * @test
-     */
-    public function testStopEventPropagation()
+    /** @test */
+    public function it_should_stop_propagation_when_Event_is_stopped()
     {
+        $called = [
+            'a' => false,
+            'b' => false,
+            'c' => false,
+        ];
+
         $dispatcher = $this->newDispatcher();
         $dispatcher->on(
             'foo',
-            function ($event) {
+            function ($event) use (&$called) {
                 $event->stopPropagation();
-                return 'bar';
+                $called['a'] = true;
             }
         );
 
         $dispatcher->on(
             'foo',
-            function () {
-                return 'baz';
+            function ($event) use (&$called) {
+                $called['b'] = true;
             }
         );
 
         $dispatcher->on(
             'foo',
-            function () {
-                return 'boom';
+            function ($event) use (&$called) {
+                $called['c'] = true;
             }
         );
 
-        $result = $dispatcher->dispatch('foo', new EventStub);
-        $this->assertSame(['bar'], $result);
+        $dispatcher->dispatch('foo', new EventStub);
+
+        $this->assertTrue($called['a']);
+        $this->assertFalse($called['b']);
+        $this->assertFalse($called['c']);
     }
 
-    /**
-     * @test
-     */
-    public function testDispatchUntil()
-    {
-
-        $dispatcher = $this->newDispatcher();
-
-        $dispatcher->on('foo', function () {
-            return;
-        });
-
-        $dispatcher->on('foo', function () {
-            return;
-        });
-
-        $dispatcher->on('foo', function () {
-            return 'boom';
-        });
-
-        $dispatcher->on('foo', function () {
-            return 'bam';
-        });
-
-        $result = $dispatcher->until('foo');
-
-        $this->assertSame(['boom'], $result);
-    }
-
-    /**
-     * @test
-     */
-    public function testDetachEvent()
+    /** @test */
+    public function it_should_be_able_to_detach_handlers()
     {
         $dispatcher = $this->newDispatcher();
+
+        $i = 0;
         $dispatcher->on(
             'foo',
-            $foo = function () {
+            $foo = function () use (&$i) {
+                $i++;
                 $this->fail();
-                return 'bar';
             }
         );
 
         $dispatcher->on(
             'foo',
-            function () {
-                return 'baz';
+            function () use (&$i) {
+                $i++;
             }
         );
 
         $dispatcher->off('foo', $foo);
-        $result = $dispatcher->dispatch('foo');
-        $this->assertSame(['baz'], $result);
+        $dispatcher->dispatch('foo');
+
+        $this->assertSame(1, $i);
     }
 
     /**
@@ -449,20 +461,23 @@ class DispatcherTest extends TestCase
      */
     public function testDetachEventWithBoundCallable()
     {
+        $called = 0;
+
         $dispatcher = $this->newDispatcher();
 
         $class = m::mock('HandleAwareClass');
+
         $class->shouldReceive('handleEvent')->andReturnUsing(
-            function () {
+            function () use (&$called) {
+                $called++;
                 $this->fail();
-                return true;
             }
         );
 
         $class->shouldReceive('doHandleEvent')->andReturnUsing(
-            function () {
+            function () use (&$called) {
+                $called++;
                 $this->assertTrue(true);
-                return true;
             }
         );
 
@@ -470,8 +485,10 @@ class DispatcherTest extends TestCase
         $dispatcher->on('foo', [$class, 'doHandleEvent']);
 
         $dispatcher->off('foo', [$class, 'handleEvent']);
-        $result = $dispatcher->dispatch('foo');
-        $this->assertSame([true], $result);
+
+        $dispatcher->dispatch('foo');
+
+        $this->assertSame(1, $called);
     }
 
     public function testGetAllHandlers()
@@ -484,6 +501,7 @@ class DispatcherTest extends TestCase
         };
 
         $dispatcher = $this->newDispatcher();
+
         $dispatcher->on('foo', $foo);
         $dispatcher->on('bar', $bar);
         $dispatcher->on('baz', $baz);
@@ -493,20 +511,6 @@ class DispatcherTest extends TestCase
         $this->assertSame([$foo, $bar, $baz], $handlers);
     }
 
-    /**
-     * @test
-     */
-    public function testAddSubscriber()
-    {
-        $dispatcher = $this->newDispatcher();
-        $dispatcher->addSubscriber(new EventSubscriberStub);
-        $result = $dispatcher->dispatch('foo.event');
-
-        $this->assertSame(['foo.pre', 'foo.mid', 'foo.after'], $result);
-
-        $result = $dispatcher->dispatch('bar.event');
-        $this->assertSame(['bar'], $result);
-    }
 
     /** @test */
     public function itShouldFilterOutInvalidSubscriptions()
@@ -521,21 +525,37 @@ class DispatcherTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function testRemoveObserver()
+    /** @test */
+    public function it_should_be_able_to_add_subscribers()
+    {
+        $results = [];
+
+        $dispatcher = $this->newDispatcher();
+        $dispatcher->addSubscriber(new PrioritySubscriber($results));
+
+        $dispatcher->dispatch('event_a');
+
+        $this->assertSame($a = ['a.pre', 'a.mid', 'a.after'], $results);
+
+        $dispatcher->dispatch('event_b');
+
+        $this->assertSame(array_merge($a, ['b']), $results);
+    }
+
+    /** @test */
+    public function it_should_be_able_to_remove_subscribers()
     {
         $dispatcher = $this->newDispatcher();
-        $dispatcher->addSubscriber($observer = new EventSubscriberStub);
-        $result = $dispatcher->dispatch('foo.event');
 
-        $dispatcher->removeSubscriber($observer);
-        $result = $dispatcher->dispatch('foo.event');
-        $this->assertSame([], $result);
+        $dispatcher->addSubscriber($subscriber = new PrioritySubscriber);
 
-        $result = $dispatcher->dispatch('bar.event');
-        $this->assertSame([], $result);
+        $dispatcher->on('event', $handler = function () {
+        });
+
+        $dispatcher->removeSubscriber($subscriber);
+
+        $this->assertSame([$handler], $dispatcher->getEventHandlers());
+
     }
 
     /**

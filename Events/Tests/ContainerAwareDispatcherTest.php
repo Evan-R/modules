@@ -28,17 +28,20 @@ class ContainerAwareDispatcherTest extends DispatcherTest
      */
     public function testDetachEventWithBoundCallableClass()
     {
+        $called_a = false;
+        $called_b = false;
+
         $class = m::mock('HandleAwareClass');
         $class
             ->shouldReceive('handleEvent')->andReturnUsing(
-                function () {
+                function () use (&$called_a) {
                     $this->fail('event callback `handleEvent` should not be called');
-                    return true;
+                    $called_a = true;
                 }
             )
             ->shouldReceive('respond')->andReturnUsing(
-                function () {
-                    return true;
+                function () use (&$called_b) {
+                    $called_b = true;
                 }
             );
 
@@ -53,9 +56,10 @@ class ContainerAwareDispatcherTest extends DispatcherTest
 
         $dispatcher->off('foo', 'some_service');
 
-        $result = $dispatcher->dispatch('foo');
+        $dispatcher->dispatch('foo');
 
-        $this->assertSame([true], $result);
+        $this->assertTrue($called_b);
+        $this->assertFalse($called_a);
     }
 
     /** @test */
@@ -131,12 +135,13 @@ class ContainerAwareDispatcherTest extends DispatcherTest
     /** @test */
     public function bindClassDefinitionShouldCallHandleEvent()
     {
+        $called = false;
+
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('handleEvent')->andReturnUsing(
-            function () {
+            function () use (&$called) {
                 $this->assertTrue(true);
-
-                return true;
+                $called = true;
             }
         );
 
@@ -144,29 +149,26 @@ class ContainerAwareDispatcherTest extends DispatcherTest
         $container->shouldReceive('get')->with('some_service')->andReturn($class);
         $container->shouldReceive('has')->with('some_service')->andReturn(true);
 
-
         $dispatcher = $this->newDispatcher($container);
 
         $dispatcher->on('foo', 'some_service@handleEvent');
 
-        $result = $dispatcher->dispatch('foo');
+        $dispatcher->dispatch('foo');
 
-        if (empty($result)) {
-            $this->fail('event results should not be empty.');
-        }
+        $this->assertTrue($called, 'event results should not be empty.');
     }
 
     /** @test */
     public function boundListenersShouldBeDispatched()
     {
+        $called = false;
         $event = new Event;
 
         $class = m::mock('Selene\Module\Events\EventListenerInterface');
         $class->shouldReceive('handleEvent')->with($event)->andReturnUsing(
-            function () {
+            function () use (&$called) {
                 $this->assertTrue(true);
-
-                return true;
+                $called = true;
             }
         );
 
@@ -180,20 +182,18 @@ class ContainerAwareDispatcherTest extends DispatcherTest
 
         $result = $dispatcher->dispatch('foo', $event);
 
-        if (empty($result)) {
-            $this->fail('event results should not be empty.');
-        }
+        $this->assertTrue($called, 'event results should not be empty.');
     }
 
     /** @test */
     public function bindingAServiceDefinitionShouldCallDefinedMethod()
     {
+        $called = false;
         $class = m::mock('HandleAwareClass');
         $class->shouldReceive('doHandle')->andReturnUsing(
-            function () {
+            function () use (&$called) {
                 $this->assertTrue(true);
-
-                return true;
+                $called = true;
             }
         );
 
@@ -206,9 +206,7 @@ class ContainerAwareDispatcherTest extends DispatcherTest
         $dispatcher->on('foo', 'some_service@doHandle');
         $result = $dispatcher->dispatch('foo');
 
-        if (empty($result)) {
-            $this->giveUp();
-        }
+        $this->assertTrue($called, 'event results should not be empty.');
     }
 
     /**

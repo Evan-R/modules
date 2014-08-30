@@ -37,4 +37,18 @@ class EventQueueFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame([$eventA, $eventB], $this->releaseEvents());
     }
+
+    /** @test */
+    public function itShouldQueueAndReleaseEventsSorted()
+    {
+        $eventA = m::mock('Selene\Module\Events\EventInterface');
+        $eventB = m::mock('Selene\Module\Events\EventInterface');
+        $eventC = m::mock('Selene\Module\Events\EventInterface');
+
+        $this->raiseEvent($eventA, 10);
+        $this->raiseEvent($eventB, 100);
+        $this->raiseEvent($eventC, 1);
+
+        $this->assertSame([$eventB, $eventA, $eventC], $this->releaseEvents());
+    }
 }

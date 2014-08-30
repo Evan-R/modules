@@ -16,7 +16,6 @@ use \Selene\Module\Common\Traits\Getter;
 /**
  * @class Dispatcher implements DispatcherInterface
  * @see DispatcherInterface
- * @TODO use Object has to identify handlers?
  *
  * @package Selene\Module\Events
  * @version $Id$
@@ -38,7 +37,7 @@ class Dispatcher implements DispatcherInterface
      *
      * @var array
      */
-    private $sorted = [];
+    protected $sorted = [];
 
     /**
      * handler
@@ -72,7 +71,7 @@ class Dispatcher implements DispatcherInterface
      *
      * @return void
      */
-    public function on($events, $eventHandler, $priority = null)
+    public function on($events, $eventHandler, $priority = 0)
     {
         foreach ((array)$events as $event) {
             $this->registerEvent($event, $eventHandler, $priority);
@@ -90,7 +89,7 @@ class Dispatcher implements DispatcherInterface
      *
      * @return void
      */
-    public function once($events, $eventHandler, $priority = 10)
+    public function once($events, $eventHandler, $priority = 0)
     {
         foreach ((array)$events as $event) {
             $this->registerOnce($event, $eventHandler, $priority);
@@ -177,17 +176,14 @@ class Dispatcher implements DispatcherInterface
      * @param string $event      the event name
      * @param mixed  $parameters data to be send along with the event,
      * typically an EventInteface instance
-     * @param bool $stopOnFirstResult stop firing if first result was found
      *
      * @return array the event results;
      */
-    public function dispatch($eventName, EventInterface $event = null, $stopOnFirstResult = false)
+    public function dispatch($eventName, EventInterface $event = null)
     {
-        if (!isset($this->handlers[$eventName])) {
+        if (null === $eventName || !isset($this->handlers[$eventName])) {
             return;
         }
-
-        $results = [];
 
         if (null === $event) {
             $event = new Event;
@@ -198,26 +194,40 @@ class Dispatcher implements DispatcherInterface
 
         $handlers = $this->getSorted($eventName);
 
-        foreach ($handlers as &$handlers) {
+        foreach ($handlers as &$handler) {
 
-            if (!$this->doDispatch($handlers, $event, $results, $stopOnFirstResult)) {
-                return $results;
+            if ($event->isPropagationStopped()) {
+                break;
             }
-        }
 
-        return $results;
+            $this->callListener($handler, $event);
+        }
     }
 
     /**
-     * Dispatches an event until the first response happened.
+     * dispatchEvent
      *
-     * @see Dispatcher#dispatch()
+     * @param EventInterface $event
      *
-     * @return array
+     * @return void
      */
-    public function until($eventName, EventInterface $event = null)
+    public function dispatchEvent(EventInterface $event)
     {
-        return $this->dispatch($eventName, $event, true);
+        $this->dispatch($event->getEventName(), $event);
+    }
+
+    /**
+     * dispatchEvents
+     *
+     * @param array $events
+     *
+     * @return void
+     */
+    public function dispatchEvents(array $events)
+    {
+        foreach ($events as &$event) {
+            $this->dispatch($event->getEventName(), $event);
+        }
     }
 
     /**
@@ -229,21 +239,40 @@ class Dispatcher implements DispatcherInterface
      */
     public function getEventHandlers($event = null)
     {
+        if (isset($this->handlers[$event])) {
+            return $this->getSorted($event);
+        }
+
         $handlers = [];
 
         if (null === $event) {
             foreach ($this->handlers as $event => $eventHandlers) {
                 $handlers = array_merge($handlers, $this->getEventHandlers($event));
             }
-        } elseif (isset($this->handlers[$event])) {
-
-            foreach ($this->getSorted($event) as $priority => $eventHandlers) {
-                $handlers = array_merge($handlers, $eventHandlers);
-            }
         }
 
         return $handlers;
     }
+
+    /**
+     * callListener
+     *
+     * @param mixed $eventHandler
+     * @param mixed $parameters
+     *
+     * @return mixed
+     */
+    private function callListener($eventHandler, EventInterface $event)
+    {
+        $eventHandler = $this->resolveHandler($eventHandler);
+
+        if ($eventHandler instanceof EventListenerInterface) {
+            return $eventHandler->handleEvent($event);
+        } else {
+            return call_user_func_array($eventHandler, [$event]);
+        }
+    }
+
 
     /**
      * extractEventHandler
@@ -365,7 +394,7 @@ class Dispatcher implements DispatcherInterface
     private function listSubscriptions($subscriber, $event, array $eventSubscriptions, array &$list = [])
     {
         if (is_string(current($eventSubscriptions))) {
-            list ($method, $priority) = array_pad($eventSubscriptions, 2, 10);
+            list ($method, $priority) = array_pad($eventSubscriptions, 2, 0);
 
             $list[] = [$event, [$subscriber, $method], $priority];
 
@@ -407,7 +436,7 @@ class Dispatcher implements DispatcherInterface
      *
      * @return void
      */
-    private function registerOnce($event, $eventHandler, $priority = 10)
+    private function registerOnce($event, $eventHandler, $priority = 0)
     {
         if ($eventHandler instanceof EventListenerInterface) {
             return $this->addListenerOnce($event, $eventHandler, $priority);
@@ -455,7 +484,7 @@ class Dispatcher implements DispatcherInterface
      *
      * @return void
      */
-    private function bindEvent($event, &$eventHandler, $priority = 0)
+    protected function bindEvent($event, &$eventHandler, $priority = 0)
     {
         unset($this->sorted[$event]);
 
@@ -463,63 +492,11 @@ class Dispatcher implements DispatcherInterface
     }
 
     /**
-     * doDispatch
-     *
-     * @param array           $handlers
-     * @param EventInterface  $event
-     * @param array           $results
-     * @param boolean         $stopOnFirstResult
-     *
-     * @return boolean
-     */
-    private function doDispatch(array $handlers, EventInterface $event, &$results = [], $stopOnFirstResult = false)
-    {
-        foreach ($handlers as $index => &$handler) {
-
-            if ($event->isPropagationStopped()) {
-                break;
-            }
-
-            $res = $this->callListener($handler, $event);
-
-            if (null !== $res) {
-                $results[] = $res;
-
-                // stop on first result;
-                if ($stopOnFirstResult) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * callListener
-     *
-     * @param mixed $eventHandler
-     * @param mixed $parameters
-     *
-     * @return mixed
-     */
-    private function callListener($eventHandler, EventInterface $event)
-    {
-        $eventHandler = $this->resolveHandler($eventHandler);
-
-        if ($eventHandler instanceof EventListenerInterface) {
-            return $eventHandler->handleEvent($event);
-        } else {
-            return call_user_func_array($eventHandler, [$event]);
-        }
-    }
-
-    /**
      * Sort eventhandler by their priority.
      *
      * @return array
      */
-    private function &getSorted($event)
+    protected function getSorted($event)
     {
         if (!isset($this->sorted[$event])) {
             krsort($this->handlers[$event]);
@@ -527,7 +504,7 @@ class Dispatcher implements DispatcherInterface
 
         $this->sorted[$event] = true;
 
-        return $this->handlers[$event];
+        return call_user_func_array('array_merge', $this->handlers[$event]);
     }
 
     /**
