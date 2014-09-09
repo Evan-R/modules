@@ -13,8 +13,10 @@ namespace Selene\Module\Package;
 
 /**
  * @interface FileTargetInterface
+ *
  * @package Selene\Module\Package
  * @version $Id$
+ * @author iwyg <mail@thomas-appel.com>
  */
 interface FileTargetInterface
 {

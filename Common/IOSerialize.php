@@ -35,6 +35,10 @@ class IOSerialize implements IOProxyInterface
      */
     public function out($data)
     {
-        return unserialize($data);
+        if (false !== ($data = @unserialize($data))) {
+            return $data;
+        }
+
+        return null;
     }
 }

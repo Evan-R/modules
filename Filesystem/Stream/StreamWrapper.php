@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Module\Filesystem;
+namespace Selene\Module\Filesystem\Stream;
 
 /**
  * @abstract class StreamWrapper implements StreamWrapperInterface

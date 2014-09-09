@@ -12,7 +12,7 @@
 namespace Selene\Module\Routing\Controller;
 
 use \Selene\Module\Routing\Matchers\MatchContext;
-use \Selene\Module\Routing\Events\RouteDispatchEvent;
+use \Selene\Module\Routing\Event\RouteDispatched;
 
 /**
  * @interface DispatcherInterface
@@ -21,5 +21,5 @@ use \Selene\Module\Routing\Events\RouteDispatchEvent;
  */
 interface DispatcherInterface
 {
-    public function dispatch(MatchContext $context, RouteDispatchEvent $event = null);
+    public function dispatch(MatchContext $context, RouteDispatched $event = null);
 }

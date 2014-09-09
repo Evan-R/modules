@@ -14,6 +14,7 @@ namespace Selene\Module\Package\Tests;
 use \Mockery as m;
 use \Selene\Module\Package\PackageRepository;
 use \Selene\Module\Package\DependencyManager;
+use \Selene\Module\Package\Exception\RequirementConflictException;
 
 /**
  * @class DependencyManagerTest
@@ -101,7 +102,7 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
 
         try {
             $r3 = $mngr->getRequirements($p3);
-        } catch (\InvalidArgumentException $e) {
+        } catch (RequirementConflictException $e) {
             $this->assertSame(
                 'Circular reference error: Package "p2" requires "p3" wich requires "p2".',
                 $e->getMessage()

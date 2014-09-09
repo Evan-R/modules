@@ -629,6 +629,30 @@ class Filesystem implements FilesystemInterface
     }
 
     /**
+     *
+     * @param mixed $destination
+     * @param mixed $content
+     *
+     * @return Boolean
+     */
+    public function writeStream($destination, $content)
+    {
+        if ($stream !== fopen($destination, 'w+')) {
+            return false;
+        }
+
+        while (!feof($content)) {
+            fwrite($stream, fread($content, 1024), 1024);
+        }
+
+        if (!fclose($stream)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * move
      *
      * @param mixed $param

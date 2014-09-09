@@ -12,7 +12,7 @@
 namespace Selene\Module\Config\Traits;
 
 use \Selene\Module\Xml\Parser;
-use \Selene\Module\Xml\Normalizer\PhpVarNormalizer;
+use \Selene\Module\Xml\Inflector\SimpleInflector;
 use \Selene\Module\Xml\Loader\Loader as XmlFileLoader;
 
 /**
@@ -74,10 +74,10 @@ trait XmlLoaderHelperTrait
     protected function getParser()
     {
         if (null === $this->parser) {
+            $inflector = new SimpleInflector(true);
             $this->parser = new Parser($this->getXmlLoader());
-            $this->parser->setPluralizer(function ($singular) {
-                return $singular . 's';
-            });
+
+            $this->parser->setPluralizer([$inflector, 'pluralize']);
             $this->parser->setMergeAttributes(true);
         }
 

@@ -14,7 +14,7 @@ namespace Selene\Module\Routing\Controller;
 use \Selene\Module\Common\SeparatorParserInterface;
 use \Selene\Module\Routing\Mapper\ParameterMapper;
 use \Selene\Module\Routing\Matchers\MatchContext;
-use \Selene\Module\Routing\Events\RouteDispatchEvent;
+use \Selene\Module\Routing\Event\RouteDispatched;
 
 /**
  * @class Resolver implements ResolverInterface
@@ -47,6 +47,8 @@ class Dispatcher implements DispatcherInterface
      */
     protected $mapParameters;
 
+    protected $cached;
+
     /**
      * Constructor.
      *
@@ -59,6 +61,7 @@ class Dispatcher implements DispatcherInterface
         $this->parser = $parser ?: new Parser;
 
         $this->mapParameters = false;
+        $this->cached = [];
     }
 
     /**
@@ -85,9 +88,11 @@ class Dispatcher implements DispatcherInterface
      *
      * @return mixed the result of the controller action.
      */
-    public function dispatch(MatchContext $context, RouteDispatchEvent $event = null)
+    public function dispatch(MatchContext $context, RouteDispatched $event = null)
     {
+
         list ($controller, $action, $callAction) = $this->findController($context);
+
 
         // if theres a mapper and routing arguments mismatch controller
         // arguments, then throw an exception:
@@ -115,7 +120,12 @@ class Dispatcher implements DispatcherInterface
             $controller->setEvent($event);
         }
 
-        return call_user_func_array([$controller, $action], $arguments);
+        //$start = microtime(true);
+
+        $res = call_user_func_array([$controller, $action], $arguments);
+        //$end = microtime(true);
+        //var_dump(($end - $start) * 1000);
+        return $res;
     }
 
     /**

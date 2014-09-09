@@ -24,7 +24,7 @@ class MemcachedConnectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldConnectToServer()
     {
-        $conn = new Connection(new \Memcached, [['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]]);
+        $conn = new Connection([['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]], new \Memcached);
 
         $this->assertFalse($conn->isConnected());
 
@@ -37,7 +37,7 @@ class MemcachedConnectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldCloseConnections()
     {
-        $conn = new Connection(new \Memcached, [['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]]);
+        $conn = new Connection([['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]], new \Memcached);
 
         $conn->connect();
         $this->assertTrue($conn->isConnected());
@@ -50,7 +50,7 @@ class MemcachedConnectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldThrowExceptionOnConnectionFailure()
     {
-        $conn = new Connection($mc = new \Memcached, [['host' => null, 'port' => 11211, 'weight' => 100]]);
+        $conn = new Connection([['host' => null, 'port' => 11211, 'weight' => 100]], $mc = new \Memcached);
 
         $mc->quit();
 

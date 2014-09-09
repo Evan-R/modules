@@ -11,11 +11,12 @@
 
 namespace Selene\Module\Config;
 
-use \Selene\Module\Filesystem\Filesystem;
 use \Selene\Module\Filesystem\Traits\FsHelperTrait;
 use \Selene\Module\Filesystem\Traits\PathHelperTrait;
 use \Selene\Module\Filesystem\Exception\IOException;
 use \Selene\Module\Config\Resource\Collector;
+use \Selene\Module\Filesystem\Filesystem;
+use \Selene\Module\Filesystem\FilesystemInterface;
 
 /**
  * @class Cache
@@ -25,7 +26,7 @@ use \Selene\Module\Config\Resource\Collector;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Cache implements CacheInterface
+abstract class Cache implements CacheInterface
 {
     use FsHelperTrait, PathHelperTrait {
         FsHelperTrait::mask as private getMask;
@@ -66,6 +67,12 @@ class Cache implements CacheInterface
         $this->resources = new Collector;
     }
 
+    /**
+     * getResourceCollector
+     *
+     *
+     * @return void
+     */
     public function getResourceCollector()
     {
         return $this->resources;
@@ -128,7 +135,7 @@ class Cache implements CacheInterface
      */
     public function forget()
     {
-        $this->getFs()->remove([$this->file, $this->file . '.manifest']);
+        $this->getFs()->remove([$this->file, $this->getManifest()]);
     }
 
     /**
@@ -160,11 +167,27 @@ class Cache implements CacheInterface
         $fs->setContents($this->file, $data);
 
         if (null !== $manifest) {
-            $file = $this->getManifest();
-            $fs->ensureFile($file);
-            $fs->mask($file);
-            $fs->setContents($file, serialize($manifest));
+            $this->createManifest($manifest);
         }
+    }
+
+    abstract public function load();
+
+    /**
+     * createManifest
+     *
+     * @param array $manifest
+     *
+     * @return void
+     */
+    protected function createManifest(array $manifest)
+    {
+        $fs = $this->getFs();
+
+        $file = $this->getManifest();
+        $fs->ensureFile($file);
+        $fs->mask($file);
+        $fs->setContents($file, serialize($manifest));
     }
 
     /**

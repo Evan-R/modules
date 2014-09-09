@@ -32,7 +32,7 @@ class RequirementConflictException extends \LogicException
     public static function missingPackage($parent, $missing)
     {
         return new static(
-            sprintf('Package "%1$s" requires package "%2$s", but package "%s" doesn\'t exist.', $parent, $missing)
+            sprintf('Package "%1$s" requires package "%2$s", but package "%2$s" doesn\'t exist.', $parent, $missing)
         );
     }
 

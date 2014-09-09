@@ -213,7 +213,7 @@ class Dispatcher implements DispatcherInterface
      */
     public function dispatchEvent(EventInterface $event)
     {
-        $this->dispatch($event->getEventName(), $event);
+        $this->dispatch(new EventName($event), $event);
     }
 
     /**
@@ -226,7 +226,7 @@ class Dispatcher implements DispatcherInterface
     public function dispatchEvents(array $events)
     {
         foreach ($events as &$event) {
-            $this->dispatch($event->getEventName(), $event);
+            $this->dispatch(new EventName($event), $event);
         }
     }
 

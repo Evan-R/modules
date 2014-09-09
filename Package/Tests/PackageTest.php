@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This File is part of the Selene\Module\Package\Tests package
+ * This File is part of the Selene\Module\Package package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -19,8 +19,11 @@ use \Selene\Module\Package\Tests\Stubs\StubPackage;
 
 /**
  * @class PackageTest
- * @package Selene\Module\Package\Tests
+ * @see \PHPUnit_Framework_TestCase
+ *
+ * @package Selene\Module\Package
  * @version $Id$
+ * @author Thomas Appel <mail@thomas-appel.com>
  */
 class PackageTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,12 +53,5 @@ class PackageTest extends \PHPUnit_Framework_TestCase
     {
         $package = new StubPackage;
         $this->assertSame(__DIR__.DIRECTORY_SEPARATOR.'Stubs', $package->getPath());
-    }
-
-    /** @test */
-    public function itShouldGetItsMetaInfo()
-    {
-        $package = new StubPackage;
-        $this->assertSame(__DIR__.DIRECTORY_SEPARATOR.'Stubs'.DIRECTORY_SEPARATOR.'package.xml', $package->getMeta());
     }
 }

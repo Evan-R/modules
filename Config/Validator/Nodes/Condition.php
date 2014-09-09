@@ -297,6 +297,7 @@ class Condition
     public function thenMarkInvalid($message = null)
     {
         $this->result = function ($value) use ($message) {
+            $value = is_scalar($value) ? $value : json_encode($value);
             $exp = $message ?
                 new ValidationException(sprintf($message, $value)) : ValidationException::invalidValue($value);
             throw $exp;

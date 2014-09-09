@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Module\Routing\Events;
+namespace Selene\Module\Routing\Event;
 
 use \Selene\Module\Events\Event;
 use \Symfony\Component\HttpFoundation\Request;
@@ -23,7 +23,7 @@ use \Symfony\Component\HttpFoundation\Request;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class RouteNotFoundEvent extends Event
+class RouteNotFound extends Event
 {
     private $request;
 

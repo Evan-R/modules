@@ -12,17 +12,18 @@
 namespace Selene\Module\Writer;
 
 /**
+ * This is the base writer that concats lines of strings to a visual block of
+ * text.
+ *
  * @class Writer
+ *
  * @package Selene\Module\Writer
  * @version $Id$
- * @author Thomas Appel <mail@thomas-appel.com>
+ * @author iwyg <mail@thomas-appel.com>
  */
 class Writer
 {
     use Stringable;
-
-    const INDENT_TAB = "\v";
-    const INDENT_SPACE = ' ';
 
     /**
      * ingnoreNull
@@ -57,7 +58,7 @@ class Writer
      *
      * @var array
      */
-    protected $lines;
+    protected $lnbuff;
 
     /**
      * useTabs
@@ -81,7 +82,7 @@ class Writer
      */
     public function __construct($indentLevel = 4, $ignoreNull = false)
     {
-        $this->lines = [];
+        $this->lnbuff = [];
         $this->indent = 0;
         $this->indentLevel = $indentLevel;
         $this->outputIndentation = 0;
@@ -100,7 +101,6 @@ class Writer
     public function useTabs()
     {
         $this->useTabs = true;
-        $this->tab = chr(11);
     }
 
     /**
@@ -181,11 +181,11 @@ class Writer
      */
     public function appendln($str)
     {
-        $line = array_pop($this->lines);
+        $line = array_pop($this->lnbuff);
 
         $line = $line.$str;
 
-        $this->lines[] = $line;
+        $this->lnbuff[] = $line;
 
         return $this;
     }
@@ -198,7 +198,7 @@ class Writer
      */
     public function popln()
     {
-        array_pop($this->lines);
+        array_pop($this->lnbuff);
 
         return $this;
     }
@@ -214,7 +214,7 @@ class Writer
      */
     public function replaceln($str, $index = 0)
     {
-        if ($index < 0 || ($index + 1) > count($this->lines)) {
+        if ($index < 0 || ($index + 1) > count($this->lnbuff)) {
             throw new \OutOfBoundsException(sprintf('replaceln: undefined index "%s".', $index));
         }
 
@@ -233,11 +233,11 @@ class Writer
      */
     public function removeln($index = 0)
     {
-        if ($index < 0 || ($index + 1) > count($this->lines)) {
+        if ($index < 0 || ($index + 1) > count($this->lnbuff)) {
             throw new \OutOfBoundsException(sprintf('removeln: undefined index "%s".', $index));
         }
 
-        array_splice($this->lines, $index, 1);
+        array_splice($this->lnbuff, $index, 1);
 
         return $this;
     }
@@ -277,7 +277,7 @@ class Writer
      */
     public function newline()
     {
-        $this->lines[] = '';
+        $this->lnbuff[] = '';
 
         return $this;
     }
@@ -292,7 +292,7 @@ class Writer
     {
         $pad = $this->padString('', $this->outputIndentation);
 
-        return preg_replace('/^\s+$/m', '', $pad.implode("\n".$pad, $this->lines));
+        return preg_replace('/^\s+$/m', '', $pad.implode("\n".$pad, $this->lnbuff));
     }
 
     /**
@@ -321,7 +321,7 @@ class Writer
             if (null === $index) {
                 $this->newline();
             } else {
-                $this->lines[$index + $i] = null;
+                $this->lnbuff[$index + $i] = null;
             }
         }
     }
@@ -342,12 +342,12 @@ class Writer
         }
 
         if (null !== $index) {
-            $this->lines[(int)$index] = $line;
+            $this->lnbuff[(int)$index] = $line;
 
             return;
         }
 
-        $this->lines[] = $line;
+        $this->lnbuff[] = $line;
     }
 
     /**
@@ -363,12 +363,24 @@ class Writer
             return $str;
         }
 
+        return sprintf('%s%s', $this->getIndent($indent), $str);
+    }
+
+    /**
+     * getIndent
+     *
+     * @param int $indent
+     *
+     * @return string space or tab chars
+     */
+    protected function getIndent($indent)
+    {
         if ($this->useTabs) {
             $level = $indent / $this->indentLevel;
 
-            return sprintf('%s%s', str_repeat(self::INDENT_TAB, $level), $str);
+            return str_repeat(chr(11), $level);
         }
 
-        return sprintf('%s%s', str_repeat(self::INDENT_SPACE, $indent), $str);
+        return str_repeat(' ', $indent);
     }
 }

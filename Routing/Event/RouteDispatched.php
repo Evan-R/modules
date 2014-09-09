@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Module\Routing\Events;
+namespace Selene\Module\Routing\Event;
 
 use \Selene\Module\Routing\Matchers\MatchContext;
 
@@ -19,7 +19,7 @@ use \Selene\Module\Routing\Matchers\MatchContext;
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  */
-class RouteDispatchEvent extends RouteEvent
+class RouteDispatched extends RouteEvent
 {
     /**
      * context

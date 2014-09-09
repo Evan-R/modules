@@ -20,17 +20,17 @@ use \Selene\Module\DI\ContainerInterface;
  */
 interface ProcessorInterface
 {
-    const BEFORE_OPTIMIZE = 0;
+    const BEFORE_OPTIMIZE = 100;
 
-    const OPTIMIZE = 1;
+    const OPTIMIZE = 101;
 
-    const BEFORE_REMOVE = 2;
+    const BEFORE_REMOVE = 200;
 
-    const RESOLVE = 3;
+    const RESOLVE = 300;
 
-    const REMOVE = 5;
+    const REMOVE = 400;
 
-    const AFTER_REMOVE = 6;
+    const AFTER_REMOVE = 401;
 
     public function process(ContainerInterface $container);
 

@@ -38,4 +38,9 @@ trait Setter
     {
         return ListHelper::arraySet($resource, $attribute, $value ?: $default);
     }
+
+    protected function unsetInArray(array &$resource, $attribute, $separator)
+    {
+        return ListHelper::arrayUnset($resource, $attribute, $separator);
+    }
 }

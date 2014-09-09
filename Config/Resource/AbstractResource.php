@@ -43,6 +43,11 @@ abstract class AbstractResource implements ResourceInterface
      */
     public function isValid($timestamp)
     {
+        if (!is_int($timestamp)) {
+            var_dump($timestamp);
+            die;
+        }
+
         return $this->exists() && filemtime($this->getPath()) < $timestamp;
     }
 

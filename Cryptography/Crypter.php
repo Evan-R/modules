@@ -127,6 +127,7 @@ class Crypter
         // be sure to serialize data as it my be an array;
         $enc = mcrypt_generic($keyVals['cmodule'], serialize($data));
         mcrypt_generic_deinit($keyVals['cmodule']);
+
         return $iv . $enc;
     }
 

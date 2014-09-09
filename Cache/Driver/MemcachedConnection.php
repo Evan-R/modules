@@ -40,10 +40,12 @@ class MemcachedConnection implements ConnectionInterface
     private $servers;
 
     /**
+     * Constructor.
+     *
+     * @param array $servers
      * @param Memcached $memcached
-     * @access public
      */
-    public function __construct(Memcached $memcached = null, array $servers = [])
+    public function __construct(array $servers, Memcached $memcached = null)
     {
         $this->servers   = $servers;
         $this->memcached = $memcached ?: new Memcached;

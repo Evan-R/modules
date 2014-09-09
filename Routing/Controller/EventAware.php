@@ -11,7 +11,7 @@
 
 namespace Selene\Module\Routing\Controller;
 
-use \Selene\Module\Routing\Events\RouteDispatchEvent;
+use \Selene\Module\Routing\Event\RouteDispatched;
 
 /**
  * @interface EventAware
@@ -20,5 +20,5 @@ use \Selene\Module\Routing\Events\RouteDispatchEvent;
  */
 interface EventAware
 {
-    public function setEvent(RouteDispatchEvent $event);
+    public function setEvent(RouteDispatched $event);
 }

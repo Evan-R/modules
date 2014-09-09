@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Module\Routing\Events;
+namespace Selene\Module\Routing\Event;
 
 use \Selene\Module\Events\Event;
 use \Selene\Module\Routing\Route;
@@ -20,7 +20,7 @@ use \Symfony\Component\HttpFoundation\Request;
  * @package Selene\Module\Routing\Events
  * @version $Id$
  */
-class RouteFilterAfterEvent extends RouteFilterEvent
+class RouteFilterAfter extends RouteFilter
 {
     private $response;
 

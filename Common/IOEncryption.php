@@ -39,9 +39,9 @@ class IOEncryption implements IOProxyInterface
      *
      * @access public
      */
-    public function __construct(Crypter $crypter)
+    public function __construct(Crypter $crypter = null)
     {
-        $this->crypter = $crypter;
+        $this->crypter = $crypter ?: new Crypter;
     }
 
     /**
@@ -54,7 +54,7 @@ class IOEncryption implements IOProxyInterface
      */
     public function in($data)
     {
-        return $this->crypter->encrypt($data);
+        return $this->crypter->encryptEncode($data);
     }
 
     /**
@@ -67,6 +67,6 @@ class IOEncryption implements IOProxyInterface
      */
     public function out($data)
     {
-        return $this->crypter->decrypt($data);
+        return $this->crypter->decryptDecode($data);
     }
 }

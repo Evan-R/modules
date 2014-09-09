@@ -35,17 +35,15 @@ class MemcacheConnection implements ConnectionInterface
     private $connected;
 
     /**
-     * __construct
+     * Constructor.
      *
+     * @param array $servers
      * @param Memcached $memcached
-     * @access public
-     * @return void
      */
-    public function __construct(Memcache $memcache = null, array $servers = [])
+    public function __construct(array $servers, Memcache $memcache = null)
     {
-        $this->memcache = $memcache ?: new Memcache;
-
         $this->servers = $servers;
+        $this->memcache = $memcache ?: new Memcache;
     }
 
     /**

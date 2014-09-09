@@ -94,6 +94,22 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
+     * getModTime
+     *
+     * @param string $id
+     *
+     * @return int
+     */
+    public function getModTime($id)
+    {
+        if ($this->has($id)) {
+            return filemtime($this->getFile($id));
+        }
+
+        return time();
+    }
+
+    /**
      * getContent
      *
      * @param mixed $file

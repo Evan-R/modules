@@ -9,14 +9,14 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Module\Routing\Events;
+namespace Selene\Module\Routing\Event;
 
 /**
  * @class RouterFilterAbortEvent
  * @package Selene\Module\Routing\Events
  * @version $Id$
  */
-class RouteFilterAbortEvent extends RouteDispatchEvent
+class RouteFilterAbort extends RouteDispatched
 {
     public function __construct($result = null)
     {

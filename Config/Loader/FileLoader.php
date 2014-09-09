@@ -50,7 +50,7 @@ abstract class FileLoader extends AbstractLoader
      */
     public function supports($resource)
     {
-        return is_string($resource) && $this->extension ===  pathinfo(strtolower($resource), PATHINFO_EXTENSION);
+        return is_string($resource) && $this->extension === pathinfo(strtolower($resource), PATHINFO_EXTENSION);
     }
 
     /**

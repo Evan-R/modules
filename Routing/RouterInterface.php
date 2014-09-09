@@ -30,7 +30,7 @@ interface RouterInterface
 
     //public function getMatcher();
 
-    public function dispatch(Request $request);
+    public function dispatch(Request $request, $type);
 
     //public function findRoute(Request $request);
 

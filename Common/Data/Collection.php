@@ -11,8 +11,6 @@
 
 namespace Selene\Module\Common\Data;
 
-use \Selene\Module\Common\Traits\Getter;
-use \Selene\Module\Common\Traits\Setter;
 use \Selene\Module\Common\Helper\ListHelper;
 use \Selene\Module\Common\Interfaces\ArrayableInterface;
 
@@ -27,16 +25,9 @@ use \Selene\Module\Common\Interfaces\ArrayableInterface;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregate, ArrayableInterface
+class Collection extends Attributes implements CollectionInterface, \ArrayAccess, \IteratorAggregate, ArrayableInterface
 {
-    use Getter, Setter;
-
-    /**
-     * attributes
-     *
-     * @var array
-     */
-    protected $attributes;
+    private $sorted;
 
     /**
      * @access public
@@ -44,59 +35,25 @@ class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregat
      */
     public function __construct(array $attributes = [])
     {
-        $this->attributes = $attributes;
+        $this->initialize($attributes);
     }
 
     /**
-     * initialize
-     *
-     * @param array $data
-     *
-     * @access public
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function initialize(array $data)
+    public function initialize(array $attributes)
     {
-        $this->attributes = $data;
+        parent::initialize($attributes);
+        $this->unsort();
     }
 
     /**
-     * set
-     *
-     * @param mixed $attribute
-     * @param mixed $value
-     *
-     * @access public
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function set($attribute, $value)
+    public function set($key, $value)
     {
-        return $this->attributes[$attribute] = $value;
-    }
-
-    /**
-     * get
-     *
-     * @param mixed $attribute
-     * @param mixed $default
-     *
-     * @access public
-     * @return mixed
-     */
-    public function get($attribute, $default = null)
-    {
-        return $this->getDefault($this->attributes, $attribute, $default);
-    }
-
-    /**
-     * all
-     *
-     * @access public
-     * @return mixed
-     */
-    public function all()
-    {
-        return $this->attributes;
+        $this->unsort();
+        parent::set($key, $value);
     }
 
     /**
@@ -108,33 +65,77 @@ class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregat
     }
 
     /**
-     * has
+     * Deletes a value by key.
      *
-     * @param mixed $attribute
+     * @param string $attribute
      *
-     * @access public
-     * @return mixed
-     */
-    public function has($attribute)
-    {
-        return isset($this->attributes[$attribute]);
-    }
-
-    /**
-     * delete
-     *
-     * @param mixed $attribute
-     *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function delete($attribute = null)
     {
         if (null !== $attribute) {
-            unset($this->attributes[$attribute]);
+            $this->remove($attribute);
         } else {
             $this->attributes = [];
         }
+    }
+
+    /**
+     * filter
+     *
+     * @param \Closure $callback
+     *
+     * @return CollectionInterface
+     */
+    public function filter(\Closure $callback)
+    {
+        $results = [];
+
+        foreach ($this->attributes as $key => $value) {
+            if (true === call_user_func($callback, $key, $value)) {
+                $results[$key] = $value;
+            }
+        }
+
+        return $this->newCollection($results);
+    }
+
+    /**
+     * filterKeys
+     *
+     * @param array $keys
+     *
+     * @return CollectionInterface
+     */
+    public function filterKeys(array $keys)
+    {
+        return $this->filter(function ($key) use ($keys) {
+            return in_array($key, $keys);
+        });
+    }
+
+    /**
+     * Sort collection by key.
+     *
+     * @param string $order
+     *
+     * @return void
+     */
+    public function sortKey($order = 'ASC')
+    {
+        $this->doSort($order, '__key__', ['ksort', 'krsort'], '__val__');
+    }
+
+    /**
+     * Sort collection by value.
+     *
+     * @param string $order
+     *
+     * @return void
+     */
+    public function sort($order = 'ASC')
+    {
+        $this->doSort($order, '__val__', ['sort', 'rsort'], '__key__');
     }
 
     /**
@@ -153,8 +154,7 @@ class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregat
     /**
      * getIterator
      *
-     * @access public
-     * @return mixed
+     * @return \ArrayIterator
      */
     public function getIterator()
     {
@@ -167,8 +167,7 @@ class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregat
      * @param mixed $attr
      * @param mixed $value
      *
-     * @access public
-     * @return mixed
+     * @return void
      */
     public function offsetSet($attr, $value)
     {
@@ -178,10 +177,9 @@ class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregat
     /**
      * offsetGet
      *
-     * @param mixed $attr
+     * @param string $attr
      *
-     * @access public
-     * @return mixed
+     * @return boolean
      */
     public function offsetGet($attr)
     {
@@ -193,8 +191,7 @@ class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregat
      *
      * @param mixed $attr
      *
-     * @access public
-     * @return mixed
+     * @return boolean
      */
     public function offsetExists($attr)
     {
@@ -206,7 +203,6 @@ class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregat
      *
      * @param mixed $attr
      *
-     * @access public
      * @return void
      */
     public function offsetUnset($attr)
@@ -215,13 +211,44 @@ class Collection implements CollectionInterface, \ArrayAccess, \IteratorAggregat
     }
 
     /**
-     * keys
+     * newCollection
      *
-     * @access public
-     * @return array
+     * @param array $attrs
+     *
+     * @return CollectionInterface
      */
-    public function keys()
+    protected function newCollection(array $attrs = [])
     {
-        return array_keys($this->attributes);
+        return new self($attrs);
     }
+
+    protected function unsort(array $keys = null)
+    {
+        foreach ($keys ?: ['__key__', '__val__'] as $key) {
+            $this->sorted[$key]['ASC'] = false;
+            $this->sorted[$key]['DESC'] = false;
+        }
+    }
+
+    protected function doSort($order, $key, array $methods, $unsort)
+    {
+        if ($this->getDefault($this->sorted[$key], $order, false)) {
+            return;
+        }
+
+        if ($oder === 'ASC') {
+            $m = $method[0];
+            $m($this->attributes);
+        } elseif ($order === 'DESC') {
+            $m = $method[1];
+            $m($this->attributes);
+        } else {
+            return;
+        }
+
+        $this->sorted[$key][$order] = true;
+        $this->unsort([$unsort]);
+    }
+
+
 }

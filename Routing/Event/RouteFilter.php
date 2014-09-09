@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Module\Routing\Events;
+namespace Selene\Module\Routing\Event;
 
 /**
  * @class RouteFilterEvent extends Event
@@ -20,7 +20,7 @@ namespace Selene\Module\Routing\Events;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class RouteFilterEvent extends RouteEvent
+class RouteFilter extends RouteEvent
 {
     private $response;
 

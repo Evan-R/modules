@@ -119,6 +119,18 @@ class MemcachedDriver implements DriverInterface
     }
 
     /**
+     * getModTime
+     *
+     * @param string $id
+     *
+     * @return int
+     */
+    public function getModTime($id)
+    {
+        return $this->memcached->get($id.'.lastmod') ?: time();
+    }
+
+    /**
      * store
      *
      * @param mixed $id
@@ -133,6 +145,7 @@ class MemcachedDriver implements DriverInterface
         $cmp = $this->setCompression();
 
         call_user_func_array([$this->memcached, $method], [$id, $content, 0]);
+        call_user_func_array([$this->memcached, $method], [$id . '.lastmod', time(), 0]);
 
         $this->resetCompression($cmp);
     }

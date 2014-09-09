@@ -18,7 +18,6 @@ namespace Selene\Module\Routing\Cache;
  */
 interface DriverInterface
 {
-
     /**
      * put
      *
@@ -70,4 +69,13 @@ interface DriverInterface
      * @return boolean
      */
     public function has($id);
+
+    /**
+     * The access time of the last write.
+     *
+     * @param string $id
+     *
+     * @return int
+     */
+    public function getModTime($id);
 }

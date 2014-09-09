@@ -37,7 +37,6 @@ use \Selene\Module\Filesystem\Traits\PathHelperTrait;
  * @package Selene\Module\Package
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
- * @license MIT
  */
 abstract class PackageConfiguration extends Configuration
 {
@@ -107,7 +106,14 @@ abstract class PackageConfiguration extends Configuration
     {
     }
 
-    public function getConfigTree(RootNode $rootNode)
+    /**
+     * configure
+     *
+     * @param RootNode $rootNode
+     *
+     * @return void
+     */
+    protected function configure(RootNode $rootNode)
     {
     }
 
@@ -162,24 +168,6 @@ abstract class PackageConfiguration extends Configuration
     }
 
     /**
-     * getRoutingLoader
-     *
-     * @param mixed $param
-     *
-     * @return LoaderInterface
-     */
-    protected function getRoutingLoader(BuilderInterface $builder, Routes $routes, LocatorInterface $locator = null)
-    {
-        $locator = $locator ?: new Locator([$this->getResourcePath()]);
-
-        return new DelegatingLoader(new LoaderResolver([
-            new CallableRoutingLoader($builder, $routes),
-            new PhpRoutingLoader($builder, $routes, $locator),
-            new XmlRoutingLoader($builder, $routes, $locator)
-        ]));
-    }
-
-    /**
      * getConfigLoader
      *
      * @param BuilderInterface $builder
@@ -199,13 +187,13 @@ abstract class PackageConfiguration extends Configuration
     }
 
     /**
-     * getResources
+     * Get the default config reousource to be loaded in the setup mmethod
      *
      * @return array
      */
     protected function getResources()
     {
-        return [];
+        return ['services.xml'];
     }
 
     /**

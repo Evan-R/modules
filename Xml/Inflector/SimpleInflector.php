@@ -75,7 +75,7 @@ class SimpleInflector implements InflectorInterface
      */
     protected static $_singulars = [
         '~(\w+[^ies])ies$~i' => '$1y',
-        '~(.*(ox|as))(es)$~i' => '$1',
+        '~(\w+(ox|as))(es)$~i' => '$1',
     ];
 
     /**

@@ -42,11 +42,11 @@ class ViewDispatcher implements DispatcherInterface
      * @var array
      */
     private $engines;
-
+    private $engineCache;
     private $composer;
-
     private $contexts;
-    private $pool;
+    private $cicles;
+    private $currentCicle;
 
     /**
      * Constructor.
@@ -59,8 +59,10 @@ class ViewDispatcher implements DispatcherInterface
         $this->engines  = $engines;
         $this->composer = $composer;
 
-        $this->pool = [];
+        $this->engineCache = [];
         $this->contexts = [];
+        $this->cicles = [];
+        $this->currentCicle = [];
     }
 
     /**
@@ -78,11 +80,59 @@ class ViewDispatcher implements DispatcherInterface
             return;
         }
 
+        //$this->startCicle($template);
+
         $context = empty($merge) ? $context : array_merge($merge, $context);
 
         $this->notifyComposers($renderer = new Renderer($this, $engine, $template, $context));
 
-        return $renderer->render();
+        $result = $renderer->render();
+
+        return $result;
+    }
+
+    /**
+     * wasRendered
+     *
+     * @param mixed $template
+     *
+     * @return boolean
+     */
+    public function wasRendered($template)
+    {
+        return in_array($template, $this->getCurrentCicle());
+    }
+
+    /**
+     * getCurrentCicle
+     *
+     * @return array
+     */
+    public function getCurrentCicle()
+    {
+        return isset($this->cicles[$this->currentCicle]) ? $this->cicles[$this->currentCicle] : [];
+    }
+
+    /**
+     * startCicle
+     *
+     * @param mixed $template
+     *
+     * @return void
+     */
+    protected function startCicle($template)
+    {
+        $this->cicles[$this->currentCicle = microtime(true)][] = $template;
+    }
+
+    /**
+     * stopCicle
+     *
+     * @return void
+     */
+    protected function stopCicle()
+    {
+        unset($this->cicles[$this->currentCicle]);
     }
 
     /**
@@ -224,10 +274,10 @@ class ViewDispatcher implements DispatcherInterface
         $engine = null;
         $name = $template instanceof Template ? $template->getName() : $template;
 
-        if (isset($this->pool[$name])) {
-            $engine = $this->engines->resolve($this->pool[$name]);
+        if (isset($this->engineCache[$name])) {
+            $engine = $this->engines->resolve($this->engineCache[$name]);
         } elseif ($engine = $this->engines->resolveByName($name)) {
-            $this->pool[$name] = $engine->getType();
+            $this->engineCache[$name] = $engine->getType();
         }
 
         if (null !== $engine) {

@@ -12,20 +12,26 @@
 namespace Selene\Module\Routing;
 
 use \Symfony\Component\HttpFoundation\Request;
+use \Selene\Module\Common\Helper\StringHelper;
 use \Selene\Module\Events\Dispatcher;
 use \Selene\Module\Events\EventInterface;
 use \Selene\Module\Events\DispatcherInterface;
 use \Selene\Module\Routing\Exception\RouteNotFoundException;
 use \Selene\Module\Routing\Matchers\MatchContext;
-use \Selene\Module\Routing\Events\RouteDispatchEvent;
-use \Selene\Module\Routing\Events\RouteNotFoundEvent;
-use \Selene\Module\Routing\Events\RouteFilterEvent;
-use \Selene\Module\Routing\Events\RouteFilterAbortEvent;
-use \Selene\Module\Routing\Events\RouterEvents as Events;
+use \Selene\Module\Routing\Event\RouteDispatched;
+use \Selene\Module\Routing\Event\RouteNotFound;
+use \Selene\Module\Routing\Event\RouteFilter;
+use \Selene\Module\Routing\Event\RouteMatched;
+use \Selene\Module\Routing\Event\RouteFilterAbort;
+use \Selene\Module\Routing\Event\RouterEvents as Events;
 use \Selene\Module\Routing\Controller\DispatcherInterface as ControllerDispatcher;
 use \Selene\Module\Routing\Controller\Dispatcher as Controllers;
 use \Selene\Module\Routing\RouteMatcherInterface as Matcher;
-use \Selene\Module\Common\Helper\StringHelper;
+use \Selene\Module\Routing\Filter\FilterLoader;
+use \Selene\Module\Routing\Filter\FilterInterface;
+use \Selene\Adapter\Kernel\KernelInterface;
+use \Selene\Adapter\Kernel\Event\KernelEvents;
+use \Selene\Adapter\Kernel\Subscriber\KernelSubscriber;
 
 /**
  * @class Router implements RouterInterface
@@ -36,7 +42,7 @@ use \Selene\Module\Common\Helper\StringHelper;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class Router implements RouterInterface
+class Router implements RouterInterface, KernelSubscriber
 {
     /**
      * routes
@@ -67,6 +73,13 @@ class Router implements RouterInterface
     private $controllers;
 
     /**
+     * filterPrefix
+     *
+     * @var FilterLoader
+     */
+    private $filters;
+
+    /**
      * @param Controllers $controllers
      * @param RouteCollectionInterface $routes
      * @param Matcher $matcher
@@ -76,7 +89,8 @@ class Router implements RouterInterface
         RouteCollectionInterface $routes,
         ControllerDispatcher $controllers = null,
         Matcher $matcher = null,
-        DispatcherInterface $events = null
+        DispatcherInterface $events = null,
+        FilterLoader $filters = null
     ) {
         $this->routes      = $routes;
         $this->controllers = $controllers ?: new Controllers;
@@ -85,32 +99,7 @@ class Router implements RouterInterface
 
         $this->dispatched  = new \SplStack;
 
-        $this->initControllerHandler();
-    }
-
-    /**
-     * Listens to an router event
-     *
-     * @param string|array $event
-     * @param mixed $handler
-     *
-     * @return void
-     */
-    public function on($event, $handler)
-    {
-        $this->events->on($this->filterEvents((array)$event), $handler);
-    }
-
-    /**
-     * setRoutes
-     *
-     * @param RouteCollectionInterface $routes
-     *
-     * @return void
-     */
-    public function setRoutes(RouteCollectionInterface $routes)
-    {
-        $this->routes = $routes;
+        $this->filters = $filters ?: new FilterLoader([], $this->events);
     }
 
     /**
@@ -124,6 +113,41 @@ class Router implements RouterInterface
     }
 
     /**
+     * getCurrentRoute
+     *
+     * @return Route|null
+     */
+    public function getCurrentRoute()
+    {
+        return $this->dispatched->count() ? $this->dispatched->top() : null;
+    }
+
+    /**
+     * addFilter
+     *
+     * @param FilterInterface $filter
+     *
+     * @return void
+     */
+    public function addFilter(FilterInterface $filter)
+    {
+        $this->filters->add($filter);
+    }
+
+    /**
+     * setRoutes
+     *
+     * @param RouteCollectionInterface $routes
+     *
+     * @return void
+     */
+    //public function setRoutes(RouteCollectionInterface $routes)
+    //{
+        //$this->routes = $routes;
+    //}
+
+
+    /**
      * getEvents
      *
      * @return DispatcherInterface
@@ -133,22 +157,25 @@ class Router implements RouterInterface
         return $this->events;
     }
 
-    public function getCurrentRoute()
-    {
-        return $this->dispatched->count() ? $this->dispatched->top() : null;
-    }
-
     /**
      * Dispatch a route collections agaibts a request
      *
      * @param Request $request
+     * @param $type   $string
      *
      * @return void
      */
-    public function dispatch(Request $request)
+    public function dispatch(Request $request, $type)
     {
-        if (!$context = $this->matcher->matches($request, $this->routes)) {
+        if (!$context = $this->matcher->matches($request, $this->getRoutes(), $type)) {
             return $this->handleNotFound($request);
+        }
+
+        try {
+            $this->events->dispatch(Events::MATCHED, new RouteMatched($context));
+        } catch (FilterException $e) {
+            var_dump($e->getMessage());
+            return $e->getResponse();
         }
 
         return $this->dispatchRoute($context);
@@ -168,13 +195,13 @@ class Router implements RouterInterface
 
         $this->dispatched->push($context->getRouteName());
 
-        // if there's a result on the event, abort the routing.
-        if ($response  = $this->filterBefore($request, $route)) {
+        //$this->events->dispatch(Events::DISPATCHED, $event = new RouteDispatched($context));
 
-            return $response;
+        $event = new RouteDispatched($context);
+
+        if ($result = $this->controllers->dispatch($context, $event)) {
+            $event->setResponse($result);
         }
-
-        $this->events->dispatch(Events::DISPATCHED, $event = new RouteDispatchEvent($context));
 
         // if the controller returns no result, or there's no controller, or
         // the event is not populated with a resoponse, handle the route not
@@ -186,13 +213,8 @@ class Router implements RouterInterface
             );
         }
 
-        $event = new RouteFilterEvent($route, $request);
+        $event = new RouteFilter($route, $request);
         $event->setResponse($result);
-
-        // if there's a result on the event, abort the routing.
-        if ($response  = $this->filterAfter($event)) {
-            return $response;
-        }
 
         $this->dispatched->pop();
 
@@ -200,17 +222,28 @@ class Router implements RouterInterface
     }
 
     /**
-     * initControllerHandler
+     * getSubscriptions
      *
      * @return void
      */
-    protected function initControllerHandler()
+    public function getSubscriptions()
     {
-        $this->events->on(Events::DISPATCHED, function (EventInterface $event) {
-            if ($result = $this->controllers->dispatch($event->getContext(), $event)) {
-                $event->setResponse($result);
-            }
-        });
+        return [
+            KernelEvents::FILTER_REQUEST, 'onFilterRequest',
+            KernelEvents::HANDLE, 'onHandleRequest'
+        ];
+    }
+
+    /**
+     * subscribeToKernel
+     *
+     * @param KernelInterface $kernel
+     *
+     * @return void
+     */
+    public function subscribeToKernel(KernelInterface $kernel)
+    {
+        $kernel->getEvents()->addSubscriber($this);
     }
 
     /**
@@ -225,9 +258,9 @@ class Router implements RouterInterface
     {
         foreach ((array)$route->getBeforeFilters() as $filter) {
 
-            $event = new RouteFilterEvent($route, $request);
+            $event = new RouteFilter($route, $request);
             // Listen for response
-            $this->events->dispatch(Events::FILTER_BEFORE . '.' . $filter, $event);
+            $this->filters->run($filter, FilterInterface::T_BEFORE, $event);
 
             if ($result = $event->getResponse()) {
 
@@ -235,6 +268,8 @@ class Router implements RouterInterface
                 $this->events->dispatch(Events::ABORT, $event);
 
                 return $event->getResponse();
+            } elseif ($event->isPropagationStopped()) {
+                return $result ?: '__EMPTY__, remove this';
             }
         }
     }
@@ -242,14 +277,14 @@ class Router implements RouterInterface
     /**
      * filterAfter
      *
-     * @param RouteFilterEvent $event
+     * @param RouteFilter $event
      *
      * @return void
      */
-    protected function filterAfter(RouteFilterEvent $event)
+    protected function filterAfter(RouteFilter $event)
     {
         foreach ((array)$event->getRoute()->getAfterFilters() as $filter) {
-            $this->events->dispatch(Events::FILTER_AFTER . '.' . $filter, $event);
+            $this->filters->run($filter, FilterInterface::T_AFTER, $event);
         }
     }
 
@@ -263,7 +298,7 @@ class Router implements RouterInterface
      */
     protected function handleNotFound(Request $request, $msg = null)
     {
-        $this->events->dispatch(Events::NOT_FOUND, new RouteNotFoundEvent($request));
+        $this->events->dispatch(Events::NOT_FOUND, new RouteNotFound($request));
 
         throw new RouteNotFoundException(
             $msg ?: sprintf('Route "%s" not found.', $request->getPathInfo()),
@@ -282,7 +317,7 @@ class Router implements RouterInterface
     private function filterEvents(array $events)
     {
         return array_filter($events, function ($event) {
-            return 0 === strpos($event, 'router.route_');
+            return 0 === strpos($event, Events::PREFIX);
         });
     }
 }

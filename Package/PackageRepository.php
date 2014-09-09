@@ -69,6 +69,11 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
         $this->configLoader = $loader ?: new ConfigLoader;
     }
 
+    public function getConfigLoader()
+    {
+        return $this->configLoader;
+    }
+
     /**
      * wasBuilt
      *
@@ -180,10 +185,15 @@ class PackageRepository implements PackageRepositoryInterface, \IteratorAggregat
 
             $this->built[] = $alias = $package->getAlias();
         }
-
-        $this->configLoader->unload();
     }
 
+    /**
+     * isBuildable
+     *
+     * @param PackageInterface $package
+     *
+     * @return boolean
+     */
     protected function isBuildable(PackageInterface $package)
     {
         if (in_array($package->getAlias(), $this->built)) {

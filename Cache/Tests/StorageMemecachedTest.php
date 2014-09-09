@@ -45,9 +45,9 @@ class StorageMemcachedTest extends StorageTestCase
                 'port' => 11211,
                 'weight' => 100
             ]
-            ];
+        ];
 
-        $connection = new MemcachedConnection(new Memcached('memcached_test'), $servers);
+        $connection = new MemcachedConnection($servers, new Memcached('memcached_test'));
         $connection->connect();
 
         $this->connection = $connection;

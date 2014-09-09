@@ -36,7 +36,6 @@ class Storage implements StorageInterface
      */
     private $storeId;
 
-
     /**
      * @param DriverInterface $driver
      * @param string $storeId
@@ -45,6 +44,38 @@ class Storage implements StorageInterface
     {
         $this->driver  = $driver;
         $this->storeId = $storeId;
+    }
+
+    /**
+     * exists
+     *
+     * @return void
+     */
+    public function exists()
+    {
+        return $this->driver->has($this->storeId);
+    }
+
+    /**
+     * isValid
+     *
+     * @param mixed $time
+     *
+     * @return void
+     */
+    public function isValid($time)
+    {
+        return $this->getLastWriteTime() < $time;
+    }
+
+    /**
+     * getLastWriteTime
+     *
+     * @return int
+     */
+    public function getLastWriteTime()
+    {
+        return $this->driver->getModTime($this->storeId);
     }
 
     /**

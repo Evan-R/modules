@@ -92,9 +92,11 @@ class XmlLoader extends XmlFileLoader
      */
     protected function parsePackageConfig($xml)
     {
-        foreach ($xml->xpath('../*[@package]|*[@package]') as $package) {
+        $key = $this->getPackageAttributeKey();
 
-            if (!$alias = $this->getAttributeValue($package, 'package', false)) {
+        foreach ($xml->xpath('../*[@'.$key.']|*[@'.$key.']') as $package) {
+
+            if (!$alias = $this->getPackageNameAlias($package, $key)) {
                 continue;
             }
 
@@ -109,6 +111,29 @@ class XmlLoader extends XmlFileLoader
                 $values[] = [$key => $this->getParser()->parseDomElement($item)];
             }
         }
+    }
+
+    /**
+     * getPackageNameAlias
+     *
+     * @param DOMElement $package
+     * @param string $key
+     *
+     * @return string|null
+     */
+    protected function getPackageNameAlias(DOMElement $package, $key)
+    {
+        return $this->getAttributeValue($package, $key, false);
+    }
+
+    /**
+     * getPackageAttributeKey
+     *
+     * @return string
+     */
+    protected function getPackageAttributeKey()
+    {
+        return 'package';
     }
 
     /**

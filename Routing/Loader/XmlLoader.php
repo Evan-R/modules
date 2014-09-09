@@ -46,6 +46,16 @@ class XmlLoader extends XmlFileLoader
     }
 
     /**
+     *
+     */
+    public function load($resource, $any = self::LOAD_ONE)
+    {
+        $res = parent::load($resource, $any);
+
+        return $res;
+    }
+
+    /**
      * load
      *
      * @param mixed $resource
@@ -57,6 +67,8 @@ class XmlLoader extends XmlFileLoader
         $xml = $this->loadXml($file);
 
         $this->parseRoutes($xml);
+
+        return $this->routes->getRoutes();
     }
 
     /**
@@ -94,6 +106,8 @@ class XmlLoader extends XmlFileLoader
             $this->parseGroups($node);
         } elseif ('resource' === $node->nodeName) {
             $this->parseResource($node);
+        } elseif ('include' === $node->nodeName) {
+            $this->parseInclude($node);
         }
     }
 
@@ -183,11 +197,7 @@ class XmlLoader extends XmlFileLoader
         }
 
         // import subroutes:
-        if (0 < strlen($import = $node->getAttribute('import'))) {
-            $this->getRoutes()->group($prefix, $requirements, function () use ($import) {
-                $this->import($import);
-            });
-
+        if ($this->importSubroutes($node, $prefix, $requirements)) {
             return;
         }
 
@@ -197,6 +207,40 @@ class XmlLoader extends XmlFileLoader
                 $this->parseRoute($routeNode, static::$methods);
             }
         });
+    }
+
+    /**
+     * importSubroutes
+     *
+     * @param DOMElement $node
+     * @param mixed $prefix
+     * @param array $requirements
+     *
+     * @return boolean
+     */
+    protected function importSubroutes(DOMElement $node, $prefix, array $requirements = [])
+    {
+        if (0 < strlen($import = $node->getAttribute('resource'))) {
+            $this->getRoutes()->group($prefix, $requirements, function () use ($import) {
+                $this->import($import);
+            });
+
+            return true;
+        }
+
+        return false;
+    }
+
+    // import subroutes:
+    protected function parseInclude(DOMElement $node)
+    {
+        if (0 !== strlen($prefix = $node->getAttribute('prefix'))) {
+            $this->importSubroutes($node, $prefix);
+
+            return;
+        }
+
+        $this->import($node->getAttribute('resource'));
     }
 
     /**

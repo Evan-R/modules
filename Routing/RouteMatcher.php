@@ -20,6 +20,8 @@ use \Selene\Module\Routing\Matchers\StaticPathMatcher;
 use \Selene\Module\Routing\Matchers\DirectPathMatcher;
 use \Selene\Module\Routing\Matchers\SchemeMatcher;
 use \Selene\Module\Routing\Matchers\MatchContext;
+use \Selene\Module\Routing\Cache\ApcSectionCache;
+use \Selene\Module\Routing\Cache\SectionCacheInterface;
 
 /**
  * @class RouteMatcher
@@ -52,8 +54,9 @@ class RouteMatcher implements RouteMatcherInterface
     /**
      * Constructor.
      */
-    public function __construct()
+    public function __construct(SectionCacheInterface $cache = null)
     {
+        $this->cache = $cache ?: new ApcSectionCache;
         $this->matches = new SplStack;
     }
 
@@ -65,19 +68,19 @@ class RouteMatcher implements RouteMatcherInterface
      *
      * @return MatchContext
      */
-    public function matches(Request $request, RouteCollectionInterface $routes)
+    public function matches(Request $request, RouteCollectionInterface $routes, $type)
     {
         $this->prepareMatchers();
 
         //just filter routes that matches the current request method.
-        $routes = $routes->findByMethod($request->getMethod());
+        $routes->findByMethod($request->getMethod());
         $routeName = null;
 
         if (0 < count($routes)) {
             $routeName = $this->findRoute($routes, $request);
         }
 
-        return $this->getMatchContext($request, $routeName);
+        return $this->getMatchContext($request, $routeName, $type);
     }
 
     /**
@@ -301,14 +304,37 @@ class RouteMatcher implements RouteMatcherInterface
     }
 
     /**
+     * findRoutesBySection
+     *
+     * @param RouteCollectionInterface $routes
+     * @param mixed $pathInfo
+     *
+     * @return void
+     */
+    protected function findRoutesBySection(RouteCollectionInterface $routes, $pathInfo)
+    {
+        if (null !== $this->cache && $this->cache->has($pathInfo)) {
+            $collection = new RouteCollection;
+
+            foreach ($this->cache->get($pathInfo) as $name) {
+                $collection->add($routes->get($name), $name);
+            }
+
+            return $collection;
+        }
+
+        return $routes;
+    }
+
+    /**
      * @return MatchContext
      */
-    private function getMatchContext(Request $request, $routeName = null)
+    private function getMatchContext(Request $request, $type, $routeName = null)
     {
         try {
             $context = $this->matches->pop();
-
             $context->setRequest($request);
+            $context->setRequestType($type);
 
             if ($context->getRoute()) {
                 $context->setRouteName($routeName);

@@ -130,6 +130,52 @@ class PackageRepositoryTest extends TestCase
     }
 
     /** @test */
+    public function itShouldBeLoadedBeforeBuild()
+    {
+        $called = false;
+
+        $repo = new PackageRepository([], $cfl = $this->mockConfigLoader());
+        $cfl->shouldIgnoreMissing()
+            ->shouldReceive('load')->once()->andReturnUsing(function () use (&$called) {
+                $called = true;
+            });
+
+        $p = $this->mockPackage();
+        $p->shouldReceive('getAlias')->andReturn('foo');
+        $p->shouldIgnoreMissing();
+
+        $repo->add($p);
+        $repo->build($this->mockBuilder());
+
+        $this->assertTrue($called);
+    }
+
+    /** @test */
+    public function itShouldUnloadCongAfterBuild()
+    {
+        $called = false;
+        $repo = new PackageRepository([], $cfl = $this->mockConfigLoader());
+        $cfl->shouldIgnoreMissing()
+            ->shouldReceive('unload')->once()->andReturnUsing(function () use (&$called) {
+                $called = true;
+            });
+
+        $repo->build($this->mockBuilder());
+
+        $this->assertTrue($called);
+    }
+
+    protected function mockBuilder()
+    {
+        return m::mock('\Selene\Module\DI\BuilderInterface');
+    }
+
+    protected function mockConfigLoader()
+    {
+        return m::mock('Selene\Module\Package\ConfigLoader');
+    }
+
+    /** @test */
     public function itShouldLoadPackageConfig()
     {
         $pass = false;

@@ -66,7 +66,7 @@ class ResolveDefinitionArguments implements ProcessInterface
 
         $this->replaceDefinitionArguments($definition);
         $this->replaceSetterArguments($definition);
-        $this->replaceFactoryArgsuments($definition);
+        $this->replaceFactoryArguments($definition);
     }
 
     /**
@@ -113,24 +113,20 @@ class ResolveDefinitionArguments implements ProcessInterface
     }
 
     /**
-     * replaceFactoryArgsuments
+     * Adds the building class to the end of the argument list
      *
      * @param DefinitionInterface $definition
      *
      * @access private
      * @return mixed
      */
-    private function replaceFactoryArgsuments(DefinitionInterface $definition)
+    private function replaceFactoryArguments(DefinitionInterface $definition)
     {
         if (!$definition->hasFactory()) {
             return;
         }
 
-        $arguments =  $definition->getArguments();
-
-        array_unshift($arguments, $definition->getClass());
-
-        $definition->setArguments($arguments);
+        $definition->addArgument($definition->getClass());
     }
 
     /**

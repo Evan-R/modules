@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Module\Routing\Events;
+namespace Selene\Module\Routing\Event;
 
 use \Selene\Module\Events\Event;
 use \Selene\Module\Routing\Route;

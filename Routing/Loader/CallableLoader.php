@@ -43,7 +43,7 @@ class CallableLoader extends BaseCallableLoader
      */
     public function doLoad($resource, $any = false)
     {
-        call_user_func($resource, $this->getRoutes());
+        return call_user_func($resource, $this->getRoutes());
     }
 
     /**

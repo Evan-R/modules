@@ -11,6 +11,21 @@
 
 namespace {
 
+    if (!function_exists('vd')) {
+        function vd()
+        {
+            return call_user_func_array('var_dump', func_get_args());
+        }
+    }
+
+    if (!function_exists('vdd')) {
+        function vdd()
+        {
+            call_user_func_array('var_dump', func_get_args());
+            die;
+        }
+    }
+
     if (!function_exists('array_column')) {
 
         /**

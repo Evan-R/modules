@@ -61,7 +61,7 @@ class Event implements EventInterface
      */
     public function getEventName()
     {
-        return $this->eventName ?: $this->getBaseEventName();
+        return $this->eventName;
     }
 
     /**
@@ -104,17 +104,5 @@ class Event implements EventInterface
     public function getEventDispatcher()
     {
         return $this->eventDispatcher;
-    }
-
-    /**
-     * getBaseEventName
-     *
-     * @return string
-     */
-    private function getBaseEventName()
-    {
-        $name = basename(strtr(get_class($this), ['\\' => '/']));
-
-        return StringHelper::strLowDash($name, '.');
     }
 }

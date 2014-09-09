@@ -57,6 +57,10 @@ class Locator implements LocatorInterface
      */
     public function locate($file, $collection = LoaderInterface::LOAD_ONE)
     {
+        if ($this->isAbsolutePath($file) && is_file($file)) {
+            return $collection === LoaderInterface::LOAD_ONE ? $file : (array)$file;
+        }
+
         $files = [];
 
         foreach ($this->paths as $path) {

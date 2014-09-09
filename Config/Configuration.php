@@ -60,7 +60,7 @@ abstract class Configuration implements ConfigurationInterface
     {
         $builder = $this->newValidatorBuilder();
 
-        $this->getConfigTree($root = $builder->getRoot());
+        $this->configure($root = $builder->getRoot());
 
         $validator = $builder->getValidator();
         $validator->load($config);
@@ -73,7 +73,7 @@ abstract class Configuration implements ConfigurationInterface
      *
      * @return void;
      */
-    abstract public function getConfigTree(RootNode $rootNode);
+    abstract protected function configure(RootNode $rootNode);
 
     /**
      * getConfigBuilder

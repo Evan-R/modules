@@ -55,12 +55,35 @@ class MatchContext
      * @param Route $route
      * @param array $params
      */
-    public function __construct(Route $route, array $params = [], Request $request = null, $name = null)
+    public function __construct(Route $route, array $params = [], Request $request = null, $name = null, $type = null)
     {
-        $this->route   = $route;
-        $this->params  = $params;
-        $this->request = $request;
-        $this->routeName    = $name ?: $route->getName();
+        $this->route       = $route;
+        $this->params      = $params;
+        $this->request     = $request;
+        $this->routeName   = $name ?: $route->getName();
+        $this->requestType = $type;
+    }
+
+    /**
+     * getReqestType
+     *
+     * @return void
+     */
+    public function getRequestType()
+    {
+        return $this->requestType;
+    }
+
+    /**
+     * setReqestType
+     *
+     * @param mixed $type
+     *
+     * @return void
+     */
+    public function setRequestType($type)
+    {
+        $this->requestType = $type;
     }
 
     /**
@@ -147,5 +170,4 @@ class MatchContext
     {
         return $this->routeName;
     }
-
 }

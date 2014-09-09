@@ -11,6 +11,7 @@
 
 namespace Selene\Module\Config\Validator;
 
+use \Selene\Module\Config\Validator\Nodes\Children;
 use \Selene\Module\Config\Validator\Nodes\RootNode;
 use \Selene\Module\Config\Validator\Nodes\ScalarNode;
 use \Selene\Module\Config\Validator\Nodes\DictNode;
@@ -261,19 +262,25 @@ class Builder implements BuilderInterface
      * @throws \InvalidArgumentException if used on a scalar node.
      * @return ArrayNode
      */
-    public function useMacro($name)
+    public function useMacro($name, \Closure $callback = null)
     {
         if ($this->current instanceof ScalarNode) {
             throw new \InvalidArgumentException('Can’\t use a macro on a scalar node');
         }
 
-        $this->current->condition()->always(function ($value, $node) use ($name) {
+        $this->current->condition()->always(function ($value, $node) use ($name, $callback) {
 
             $builder = call_user_func($node->getBuilder()->getMacro($name));
             $children = $builder->getRoot()->getChildren();
 
+            $c = new Children;
             foreach ($children as $childNode) {
-                $node->addChild(clone($childNode));
+                $node->addChild($cn = clone($childNode));
+                $c->attach($cn);
+            }
+
+            if (null !== $callback) {
+                call_user_func($callback, $this->current, $c);
             }
         });
 

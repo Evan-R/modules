@@ -11,6 +11,7 @@
 
 namespace Selene\Module\Routing;
 
+use \Selene\Routing\Matchers\MatchContext;
 use \Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -25,9 +26,9 @@ interface RouteMatcherInterface
      *
      * @param Request $request
      * @param RouteCollectionInterface $routes
+     * @param string $type the request type
      *
-     * @access public
-     * @return mixed
+     * @return Matchcontext
      */
-    public function matches(Request $request, RouteCollectionInterface $routes);
+    public function matches(Request $request, RouteCollectionInterface $routes, $type);
 }

@@ -29,7 +29,7 @@ class MemcacheConnectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldConnectToServer()
     {
-        $conn = new MemcacheConnection(new \Memcache, [['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]]);
+        $conn = new MemcacheConnection([['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]], new \Memcache);
 
         $this->assertFalse($conn->isConnected());
 
@@ -42,7 +42,7 @@ class MemcacheConnectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldCloseConnections()
     {
-        $conn = new MemcacheConnection(new \Memcache, [['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]]);
+        $conn = new MemcacheConnection([['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]], new \Memcache);
 
         $conn->connect();
         $this->assertTrue($conn->isConnected());
@@ -54,7 +54,7 @@ class MemcacheConnectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldReturnFalseIfAlreadyConnection()
     {
-        $conn = new MemcacheConnection(new \Memcache, [['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]]);
+        $conn = new MemcacheConnection([['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]], new \Memcache);
         $this->assertTrue($conn->connect());
         $this->assertFalse($conn->connect());
     }
@@ -62,7 +62,7 @@ class MemcacheConnectionTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldThrowExceptionOnConnectionFailure()
     {
-        $conn = new MemcacheConnection(new \Memcache, [['host' => 'fakehost', 'port' => 11211, 'weight' => 100]]);
+        $conn = new MemcacheConnection([['host' => 'fakehost', 'port' => 11211, 'weight' => 100]], new \Memcache);
         try {
             $conn->connect();
         } catch (\RuntimeException $e) {
