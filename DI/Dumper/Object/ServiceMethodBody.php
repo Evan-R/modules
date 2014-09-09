@@ -83,8 +83,6 @@ class ServiceMethodBody implements GeneratorInterface
     {
         $definition = $this->container->getDefinition($this->serviceId);
 
-        $returnConstructor = true;
-
         if ($definition->requiresFile()) {
             $this->writer->writeln(sprintf('require_once %s;', $definition->getFile()));
         }
@@ -92,7 +90,6 @@ class ServiceMethodBody implements GeneratorInterface
         $parent = $definition->hasParent() ? $this->container->getDefinition($definition->getParent()) : null;
 
         if ($definition->isInjected()) {
-            $returnConstructor = true;
             $instance = null;
         } elseif ($definition->hasFactory()) {
             $instance = $this->getFactoryBody($definition, $parent);
@@ -101,15 +98,16 @@ class ServiceMethodBody implements GeneratorInterface
         }
 
         if (((bool)$parent && $parent->hasSetters()) || $definition->hasSetters()) {
-            $returnConstructor = false;
-            $this->writer->writeln(sprintf('$instance = %s;', $instance));
+            $this->writer->writeln(sprintf('$instance = %s;', $this->getInstanceValue($instance)));
+            $this->writer->newline();
 
             $definition = null !== $parent ? $parent : $definition;
 
             $this->getCallers('$instance', $definition);
+            $this->writer->writeln('return $instance;');
+        } else {
+            $this->writer->writeln($this->getReturnStatement($instance));
         }
-
-        $this->writer->writeln($this->getReturnStatement($returnConstructor ? $instance : '$instance'));
     }
 
     /**
@@ -399,6 +397,11 @@ class ServiceMethodBody implements GeneratorInterface
      */
     private function getReturnStatement($content = null)
     {
+        return new ReturnStatement($this->getInstanceValue($content), 0);
+    }
+
+    private function getInstanceValue($content = null)
+    {
         $definition = $this->container->getDefinition($this->serviceId);
 
         if ($definition->isInternal()) {
@@ -411,6 +414,6 @@ class ServiceMethodBody implements GeneratorInterface
             $value = sprintf('%s', $content);
         }
 
-        return new ReturnStatement($value, 0);
+        return $value;
     }
 }
