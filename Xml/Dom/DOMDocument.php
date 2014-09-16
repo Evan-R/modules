@@ -13,7 +13,8 @@ namespace Selene\Module\Xml\Dom;
 
 use \DOMNode;
 use \DOMXpath;
-use \DOMDocument as BaseDOM;
+use \DOMDocument as Document;
+use \DOMElement as XmlElement;
 
 /**
  * @class DOMDocument extends BaseDom
@@ -24,7 +25,7 @@ use \DOMDocument as BaseDOM;
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
  */
-class DOMDocument extends BaseDom
+class DOMDocument extends Document
 {
     /**
      * xpath
@@ -32,26 +33,53 @@ class DOMDocument extends BaseDom
      * @var DOMXpath
      */
     protected $xpath;
+    protected $nodeClasses;
 
     /**
-     * __construct
+     * Constructor.
      *
      * @param mixed $version
      * @param mixed $encoding
-     * @access public
-     * @return mixed
      */
     public function __construct($version = null, $encoding = null)
     {
+        $this->nodeClasses = [];
         parent::__construct($version, $encoding);
         $this->registerNodeClass('DOMElement', 'Selene\Module\Xml\Dom\DOMElement');
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function registerNodeClass($baseClass, $extendClass)
+    {
+        $this->nodeClasses[$a = ltrim($baseClass, '\\')] = ltrim($b = $extendClass, '\\');
+
+        return parent::registerNodeClass($a, $b);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createElement($name, $content = null)
+    {
+        return $this->ensureNodeClass(parent::createElement($name, $content));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createElementNS($namespaceURI, $qualifiedName, $value = null)
+    {
+        return $this->ensureNodeClass(parent::createElementNS($namespaceURI, $qualifiedName, $value));
+    }
+
+    /**
      * xPath
      *
-     * @param mixed $query
-     * @access public
+     * @param string $query
+     * @param DOMNode $contextNode
+     *
      * @return DOMNodeList
      */
     public function xpath($query, DOMNode $contextNode = null)
@@ -60,14 +88,9 @@ class DOMDocument extends BaseDom
     }
 
     /**
-     * importElement
-     *
-     * @param DOMElement $import
-     * @param DOMElement $element
-     * @access public
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function appendDomElement(\DOMElement $import, \DOMElement $element = null, $deep = true)
+    public function appendDomElement(XmlElement $import, XmlElement $element = null, $deep = true)
     {
         $import = $this->importNode($import, $deep);
 
@@ -90,5 +113,25 @@ class DOMDocument extends BaseDom
             $this->xpath = new DOMXpath($this);
         }
         return $this->xpath;
+    }
+
+    /**
+     * Workarround for hhvm issue
+     *
+     * @see https://github.com/facebook/hhvm/issues/1848
+     *
+     * @param DOMNode $node
+     *
+     * @return DOMNode
+     */
+    private function ensureNodeClass(DOMNode $node)
+    {
+        $class = $this->nodeClasses['DOMElement'];
+
+        if (true !== ($node instanceof $class) && $node instanceof \DOMElement) {
+            return $node->ownerDocument->importNode($node, true);
+        }
+
+        return $node;
     }
 }
